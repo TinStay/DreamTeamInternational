@@ -1,6 +1,7 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
 import { en } from "./en";
 import { bg } from "./bg";
 
@@ -16,18 +17,49 @@ interface LanguageContextType {
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
-  const [language, setLanguage] = useState<Language>("bg"); // default to bg as requested
-  const [mounted, setMounted] = useState(false);
+  const router = useRouter();
+  const pathname = usePathname();
+  const routeLanguage = useMemo<Language>(() => {
+    if (pathname?.startsWith("/bg")) return "bg";
+    return "en";
+  }, [pathname]);
 
   useEffect(() => {
-    const saved = localStorage.getItem("app-lang") as Language;
-    if (saved === "en" || saved === "bg") {
-      setLanguage(saved);
-    }
-    setMounted(true);
-  }, []);
+    localStorage.setItem("app-lang", routeLanguage);
+  }, [routeLanguage]);
+
+  const [language, setLanguage] = useState<Language>(routeLanguage);
+
+  useEffect(() => {
+    setLanguage(routeLanguage);
+  }, [routeLanguage]);
+
+  useEffect(() => {
+    document.documentElement.lang = language;
+  }, [language]);
 
   const handleSetLanguage = (lang: Language) => {
+    const hash = typeof window !== "undefined" ? window.location.hash : "";
+
+    if (lang === routeLanguage) {
+      setLanguage(lang);
+      localStorage.setItem("app-lang", lang);
+      return;
+    }
+
+    const toBg = (path: string) => {
+      if (path === "/") return "/bg";
+      return `/bg${path}`;
+    };
+
+    const toEn = (path: string) => {
+      if (!path.startsWith("/bg")) return path;
+      const next = path.slice(3);
+      return next.length ? next : "/";
+    };
+
+    const nextPath = lang === "bg" ? toBg(pathname || "/") : toEn(pathname || "/");
+    router.push(`${nextPath}${hash}`);
     setLanguage(lang);
     localStorage.setItem("app-lang", lang);
   };

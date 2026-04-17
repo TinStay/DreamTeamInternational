@@ -181,7 +181,7 @@ export function OrderFormSection() {
         <div className="text-center mb-16">
           <h2 className="font-heading font-bold text-4xl md:text-5xl mb-4 text-foreground">
             {t.pricing.title1}{" "}
-            <span className="text-primary italic">{t.pricing.title2}</span>
+            <span className="text-primary">{t.pricing.title2}</span>
           </h2>
           <p className="text-muted-foreground text-lg">{t.pricing.subtitle}</p>
         </div>

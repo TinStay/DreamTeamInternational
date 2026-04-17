@@ -20,7 +20,7 @@ export function PartnersSection() {
   return (
     <section className="py-12 overflow-hidden relative">
       <div className="max-w-6xl mx-auto px-4 z-10 relative mb-8">
-        <h2 className="text-center font-heading font-medium text-muted-foreground text-sm tracking-widest uppercase">
+        <h2 className="text-center font-heading font-semibold text-muted-foreground/70 text-base md:text-lg tracking-widest uppercase">
           {t.partners.title}
         </h2>
       </div>

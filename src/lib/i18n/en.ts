@@ -10,7 +10,7 @@ export const en = {
     title1: "Your imagination",
     title2: "is the limit",
     subtitle: "At DreamTeam, we strive to achieve the balance between human nature and the new technology that is here to assist us.",
-    cta1: "Get a Quote",
+    cta1: "Contact",
     cta2: "View Our Work"
   },
   process: {
@@ -118,14 +118,28 @@ export const en = {
     emailLbl: "Email",
     subject: "Subject",
     subjectPh: "Regarding...",
+    aboutOptions: {
+      order_video: "I want to order a video",
+      question: "I want to ask a question",
+      collaborate: "I want to collaborate",
+      partner: "I want to partner",
+      other: "Other",
+    },
     message: "Message",
     messagePh: "Tell us about it...",
+    terms: {
+      prefix: "I agree to the",
+      link: "Terms & Conditions",
+      suffix: ".",
+    },
     send: "Send"
   },
   footer: {
     desc: "At DreamTeam Technology, we handle end-to-end video production using the latest AI technologies.",
     links: "Links",
     legal: "Legal",
+    terms: "Terms & Conditions",
+    privacy: "Privacy Policy",
     copy: "DreamTeam Technology. All rights reserved.",
     made: "Made with ♥ and AI."
   },

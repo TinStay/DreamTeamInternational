@@ -38,7 +38,7 @@ export function ProcessSection() {
         
         <div className={`text-center mb-16 transition-all duration-1000 transform ${isInView ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"}`}>
           <h2 className="font-heading font-bold text-4xl md:text-5xl mb-4 text-foreground">
-            {t.process.title1} <span className="text-primary italic">{t.process.title2}</span>
+            {t.process.title1} <span className="text-primary">{t.process.title2}</span>
           </h2>
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
             {t.process.subtitle}
@@ -55,7 +55,7 @@ export function ProcessSection() {
               return (
                 <div 
                   key={index} 
-                  className={`flex flex-col items-center text-center relative group w-full lg:w-1/4 transition-all duration-700 ease-out fill-mode-both ${
+                  className={`flex flex-col items-center text-center relative group w-full lg:w-1/4 transition-all duration-700 ease-out fill-mode-both shadow-elevated-soft ${
                     isInView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-12"
                   }`}
                   style={{ transitionDelay: delayStr }}

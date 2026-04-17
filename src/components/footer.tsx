@@ -3,11 +3,14 @@
 import Link from "next/link";
 import { Sphere } from "./iridescent-shapes";
 import { useLanguage } from "@/lib/i18n/language-context";
-import { LanguageToggle } from "./language-toggle";
+import { LanguageDropdown } from "./language-dropdown";
 import { ThemeToggle } from "./theme-toggle";
 
 export function Footer() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+  const homeHref = language === "bg" ? "/bg" : "/";
+  const termsHref = language === "bg" ? "/bg/terms" : "/terms";
+  const privacyHref = language === "bg" ? "/bg/privacy" : "/privacy";
 
   return (
     <footer className="relative overflow-hidden border-t border-border/20 liquid-glass mt-20">
@@ -16,7 +19,7 @@ export function Footer() {
           
           {/* Brand column */}
           <div className="flex flex-col items-center md:items-start gap-4">
-            <Link href="/" className="font-heading font-bold text-2xl tracking-tight">
+            <Link href={homeHref} className="font-heading font-bold text-2xl tracking-tight">
               <img src="/logo-1.png" alt="DreamTeam Technology" className="h-8 w-auto grayscale dark:invert transition-all" />
             </Link>
             <p className="text-sm text-muted-foreground max-w-xs">
@@ -24,7 +27,7 @@ export function Footer() {
             </p>
             {/* Language + theme toggles in footer */}
             <div className="flex items-center gap-3 mt-1">
-              <LanguageToggle />
+              <LanguageDropdown />
               <ThemeToggle />
             </div>
           </div>
@@ -40,9 +43,12 @@ export function Footer() {
 
           {/* Legal column */}
           <div className="flex flex-col gap-3 items-center md:items-end text-sm">
-            <h4 className="font-heading font-semibold text-foreground mb-2">{t.footer.legal}</h4>
-            <Link href="/terms"   className="text-muted-foreground hover:text-primary transition-colors">Terms &amp; Conditions</Link>
-            <Link href="/privacy" className="text-muted-foreground hover:text-primary transition-colors">Privacy Policy</Link>
+            <Link href={termsHref} className="text-muted-foreground hover:text-primary transition-colors">
+              {t.footer.terms}
+            </Link>
+            <Link href={privacyHref} className="text-muted-foreground hover:text-primary transition-colors">
+              {t.footer.privacy}
+            </Link>
           </div>
           
         </div>
@@ -50,9 +56,6 @@ export function Footer() {
         <div className="mt-12 pt-8 border-t border-border/10 flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-xs text-muted-foreground">
             © {new Date().getFullYear()} {t.footer.copy}
-          </p>
-          <p className="text-xs text-muted-foreground">
-            {t.footer.made}
           </p>
         </div>
       </div>

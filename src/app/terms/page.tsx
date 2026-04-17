@@ -8,6 +8,13 @@ import { cn } from "@/lib/utils";
 
 export const metadata = {
   title: "Terms & Conditions | DreamTeam Technology",
+  alternates: {
+    canonical: "/terms",
+    languages: {
+      en: "/terms",
+      bg: "/bg/terms",
+    },
+  },
 };
 
 export default function TermsPage() {

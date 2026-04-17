@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Play } from "lucide-react";
 import { useLanguage } from "@/lib/i18n/language-context";
+import { Tabs } from "@/components/ui/aceternity-tabs";
 
 function useInView(options = {}) {
   const [isInView, setIsInView] = useState(false);
@@ -30,7 +31,6 @@ function useInView(options = {}) {
 export function PortfolioSection() {
   const { ref, isInView } = useInView();
   const { t } = useLanguage();
-  const [activeTab, setActiveTab] = useState("all");
 
   const CATEGORIES = [
     { key: "all",          label: t.portfolio.categories.all },
@@ -80,14 +80,30 @@ export function PortfolioSection() {
     },
   ];
 
-  const filteredItems =
-    activeTab === "all"
-      ? PORTFOLIO_ITEMS
-      : PORTFOLIO_ITEMS.filter((item) => item.category === activeTab);
-
   // Label lookup for the overlay tag
   const labelFor = (category: string) =>
     CATEGORIES.find((c) => c.key === category)?.label ?? category;
+
+  const contentFor = (category: string) => {
+    const items =
+      category === "all"
+        ? PORTFOLIO_ITEMS
+        : PORTFOLIO_ITEMS.filter((item) => item.category === category);
+
+    return (
+      <div className="w-full overflow-hidden relative h-full rounded-2xl">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <AnimatedItems items={items} labelFor={labelFor} />
+        </div>
+      </div>
+    );
+  };
+
+  const tabs = CATEGORIES.map((cat) => ({
+    title: cat.label,
+    value: cat.key,
+    content: contentFor(cat.key),
+  }));
 
   return (
     <section id="portfolio" className="py-24 relative overflow-hidden" ref={ref}>
@@ -101,7 +117,7 @@ export function PortfolioSection() {
           <div className="mb-8">
             <h2 className="font-heading font-bold text-4xl md:text-5xl mb-3 text-foreground">
               {t.portfolio.title1}{" "}
-              <span className="text-primary italic">{t.portfolio.title2}</span>
+              <span className="text-primary">{t.portfolio.title2}</span>
             </h2>
             <p className="text-muted-foreground text-base max-w-xl">
               {t.portfolio.subtitle}
@@ -110,28 +126,10 @@ export function PortfolioSection() {
 
           {/* ── Filter Tabs (below title) ── */}
           <div className="pb-2 mb-10">
-            <div className="flex flex-wrap gap-2">
-              {CATEGORIES.map((cat) => (
-                <button
-                  key={cat.key}
-                  onClick={() => setActiveTab(cat.key)}
-                  className={`cursor-pointer rounded-full px-5 py-2 text-sm font-semibold transition-all duration-300 border whitespace-nowrap select-none
-                    ${
-                      activeTab === cat.key
-                        ? "bg-primary text-primary-foreground border-primary/60 shadow-lg shadow-primary/25"
-                        : "text-muted-foreground border-border/25 hover:border-primary/40 hover:text-foreground bg-background"
-                    }`}
-                >
-                  {cat.label}
-                </button>
-              ))}
-            </div>
+            <Tabs tabs={tabs} />
           </div>
 
-          {/* ── Full-width Grid ── */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            <AnimatedItems items={filteredItems} labelFor={labelFor} />
-          </div>
+          {/* Grid is rendered inside Tabs content */}
         </div>
       </div>
     </section>

@@ -10,9 +10,17 @@ const syne = Syne({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://dreamteam.technology"),
   title: "DreamTeam Technology | AI Video Production Agency",
   description: "DreamTeam Technology creates high-impact AI-generated videos for brands worldwide — from realistic to animated. Custom scripts, global clients, fast turnarounds.",
   keywords: "AI video production, 3D animation, brand videos, AI-generated scenes, product videos, DreamTeam Technology",
+  alternates: {
+    canonical: "/",
+    languages: {
+      en: "/",
+      bg: "/bg",
+    },
+  },
   openGraph: {
     title: "DreamTeam Technology | AI Video Production",
     description: "End-to-end AI video production — photorealistic, animated, or hybrid. Serving global clients with custom scripts and diverse budgets.",
@@ -32,7 +40,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="bg" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning>
       <body
         className={`${syne.variable} font-sans antialiased relative min-h-screen`}
         suppressHydrationWarning

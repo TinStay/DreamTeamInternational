@@ -3,9 +3,19 @@
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Mail, Phone, MapPin, Send } from "lucide-react";
 import { useLanguage } from "@/lib/i18n/language-context";
+import Link from "next/link";
+import { useMemo, useState } from "react";
 
 const FacebookIcon = () => (
   <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
@@ -29,7 +39,21 @@ const LinkedInIcon = () => (
 
 
 export function ContactSection() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+  const [about, setAbout] = useState<string | null>(null);
+  const [termsAccepted, setTermsAccepted] = useState(false);
+
+  const termsHref = language === "bg" ? "/bg/terms" : "/terms";
+  const aboutOptions = useMemo(() => {
+    const opts = t.contact.aboutOptions;
+    return [
+      { value: "order_video", label: opts.order_video },
+      { value: "question", label: opts.question },
+      { value: "collaborate", label: opts.collaborate },
+      { value: "partner", label: opts.partner },
+      { value: "other", label: opts.other },
+    ];
+  }, [t.contact.aboutOptions]);
 
   return (
     <section id="contact" className="py-24 relative overflow-hidden">
@@ -40,7 +64,7 @@ export function ContactSection() {
           {/* Left Column: Info */}
           <div className="animate-in slide-in-from-left-12 fade-in duration-1000">
             <h2 className="font-heading font-bold text-4xl md:text-5xl mb-6 text-foreground">
-              {t.contact.title1} <span className="text-primary italic">{t.contact.title2}</span>
+              {t.contact.title1} <span className="text-primary">{t.contact.title2}</span>
             </h2>
             <p className="text-muted-foreground text-lg mb-10 max-w-md">
               {t.contact.subtitle}
@@ -125,10 +149,31 @@ export function ContactSection() {
           </div>
 
           {/* Right Column: Form */}
-          <div className="rounded-3xl p-8 border border-border/30 animate-in slide-in-from-right-12 fade-in duration-1000 delay-200 bg-card text-card-foreground shadow-xl">
+          <div className="rounded-3xl p-8 border border-border/30 animate-in slide-in-from-right-12 fade-in duration-1000 delay-200 bg-card text-card-foreground shadow-elevated-soft">
             <h3 className="text-2xl font-heading font-semibold mb-6 text-foreground">{t.contact.formTitle}</h3>
             
             <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
+              <div className="space-y-2">
+                <Label className="text-foreground">{t.contact.message}</Label>
+                <Textarea placeholder={t.contact.messagePh} className="min-h-[120px] bg-background/40 border-border/40 focus:border-primary/50 transition-colors" />
+              </div>
+
+              <div className="space-y-2">
+                <Label className="text-foreground">{t.contact.subject}</Label>
+                <Select value={about ?? undefined} onValueChange={(v) => setAbout(v)}>
+                  <SelectTrigger className="w-full bg-background/40 border-border/40 focus:border-primary/50 transition-colors">
+                    <SelectValue placeholder={t.contact.subjectPh} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {aboutOptions.map((opt) => (
+                      <SelectItem key={opt.value} value={opt.value}>
+                        {opt.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label className="text-foreground">{t.contact.name}</Label>
@@ -139,18 +184,27 @@ export function ContactSection() {
                   <Input type="email" placeholder={t.contact.emailLbl} className="bg-background/40 border-border/40 focus:border-primary/50 transition-colors" />
                 </div>
               </div>
-              
-              <div className="space-y-2">
-                <Label className="text-foreground">{t.contact.subject}</Label>
-                <Input placeholder={t.contact.subjectPh} className="bg-background/40 border-border/40 focus:border-primary/50 transition-colors" />
-              </div>
-              
-              <div className="space-y-2">
-                <Label className="text-foreground">{t.contact.message}</Label>
-                <Textarea placeholder={t.contact.messagePh} className="min-h-[120px] bg-background/40 border-border/40 focus:border-primary/50 transition-colors" />
+
+              <div className="flex items-start gap-3 pt-2">
+                <Checkbox
+                  checked={termsAccepted}
+                  onCheckedChange={(v) => setTermsAccepted(Boolean(v))}
+                  className="mt-0.5"
+                />
+                <div className="text-sm text-muted-foreground leading-relaxed">
+                  <span>{t.contact.terms.prefix} </span>
+                  <Link href={termsHref} className="text-primary hover:underline underline-offset-4">
+                    {t.contact.terms.link}
+                  </Link>
+                  <span>{t.contact.terms.suffix}</span>
+                </div>
               </div>
 
-              <Button type="submit" className="w-full rounded-full bg-primary text-primary-foreground hover:bg-primary/90 font-bold h-12 mt-4 shadow-lg hover:scale-105 active:scale-95 transition-all">
+              <Button
+                type="submit"
+                disabled={!termsAccepted}
+                className="w-full rounded-full bg-primary text-primary-foreground hover:bg-primary/90 font-bold h-12 mt-4 shadow-lg hover:scale-105 active:scale-95 transition-all disabled:hover:scale-100"
+              >
                 {t.contact.send} <Send className="ml-2 w-4 h-4" />
               </Button>
             </form>
