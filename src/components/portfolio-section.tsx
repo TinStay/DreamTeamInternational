@@ -31,7 +31,8 @@ import {
   Wand2,
 } from "lucide-react";
 
-const LAZY_IFRAME_ROOT_MARGIN = "160px 0px 160px 0px";
+/** Generous vertical margin so short tiles get a callback while scrolling; four-value form for Safari. */
+const LAZY_IFRAME_ROOT_MARGIN = "200px 0px 200px 0px";
 
 /** YouTube iframe mounts when near viewport (or immediately if `priority`). */
 function LazyYouTubeIframe({
@@ -65,13 +66,19 @@ function LazyYouTubeIframe({
     let cancelled = false;
     const observer = new IntersectionObserver(
       (entries) => {
-        const hit = entries.some((e) => e.isIntersecting);
+        const hit = entries.some(
+          (e) => e.isIntersecting || e.intersectionRatio > 0
+        );
         if (hit && !cancelled) {
           setShouldLoad(true);
           observer.disconnect();
         }
       },
-      { root: null, rootMargin: LAZY_IFRAME_ROOT_MARGIN, threshold: 0 }
+      {
+        root: null,
+        rootMargin: LAZY_IFRAME_ROOT_MARGIN,
+        threshold: [0, 0.01, 0.05],
+      }
     );
 
     observer.observe(el);
@@ -366,13 +373,13 @@ export function PortfolioSection() {
   return (
       <section id="portfolio" className="relative w-full overflow-visible py-6" ref={ref}>
         <div className="relative z-10 mx-auto w-full max-w-none px-4 sm:px-6 lg:px-10">
+          {/* Fade title only — do not wrap iframes in opacity:0 (iOS/WebKit breaks IntersectionObserver for lazy embeds). */}
           <div
-            className={`transition-opacity duration-700 delay-200 ${
+            className={cn(
+              "mb-6 transition-opacity duration-700 delay-200",
               isInView ? "opacity-100" : "opacity-0"
-            }`}
+            )}
           >
-          {/* ── Title & Subtitle ── */}
-          <div className="mb-6">
             <h2 className="font-heading font-bold text-4xl md:text-5xl mb-3 text-foreground">
               {t.portfolio.title1}{" "}
               <span className="text-primary">{t.portfolio.title2}</span>
@@ -382,7 +389,7 @@ export function PortfolioSection() {
             </p>
           </div>
 
-          {/* Sticky controls: resolution row + category row in separate cards (below fixed header on desktop) */}
+          {/* Sticky controls + grid stay fully opaque so lazy IO works on mobile */}
           <div className="flex flex-col gap-8 pb-12">
             <div className="sticky top-[max(0.75rem,env(safe-area-inset-top))] z-40 -mx-4 flex flex-col gap-2 px-4 sm:-mx-6 sm:px-6 sm:gap-2.5 lg:top-[7.25rem] lg:-mx-10 lg:px-10">
               {/* Format: full-width pill on small screens; compact tabs from sm+ */}
@@ -493,7 +500,6 @@ export function PortfolioSection() {
             <div className="min-w-0"><PortfolioTabBody … /></div>
           </div>
           */}
-        </div>
       </div>
     </section>
   );
