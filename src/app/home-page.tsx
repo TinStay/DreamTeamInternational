@@ -6,22 +6,14 @@ import { PortfolioSection } from "@/components/portfolio-section";
 import { PartnersSection } from "@/components/partners-section";
 import { ContactSection } from "@/components/contact-section";
 import { Footer } from "@/components/footer";
-import { cn } from "@/lib/utils";
+import { InfiniteGridBackground } from "@/components/ui/the-infinite-grid";
 
 export function HomePage() {
   return (
     <main className="flex min-h-screen flex-col overflow-x-hidden relative">
-      {/* Background that covers everything */}
-      <div className="fixed inset-0 pointer-events-none z-[-1] bg-background">
-        <div
-          className={cn(
-            "absolute inset-0",
-            "[background-size:20px_20px]",
-            "[background-image:radial-gradient(#d4d4d4_1px,transparent_1px)]",
-            "dark:[background-image:radial-gradient(rgba(82,82,82,0.35)_1px,transparent_1px)]",
-          )}
-        />
-        <div className="absolute inset-0 bg-background [mask-image:radial-gradient(ellipse_at_center,transparent_20%,black)]"></div>
+      {/* Site-wide animated grid (replaces dot pattern) */}
+      <div className="fixed inset-0 z-[-1] bg-background">
+        <InfiniteGridBackground className="absolute inset-0 h-full w-full" />
       </div>
 
       <SiteHeader />

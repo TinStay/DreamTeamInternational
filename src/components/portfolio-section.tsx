@@ -314,11 +314,12 @@ function embedsForAll() {
     wMas[1]!,
   ];
 
+  // Short column order: swap 1st ↔ 4th vertical (was sTv[0] / sCon[0])
   const short: YouTubeEmbed[] = [
-    sTv[0]!,
+    sCon[0]!,
     sPr[0]!,
     sCar[0]!,
-    sCon[0]!,
+    sTv[0]!,
     sCon[1]!,
     sCon[2]!,
     sTv[1]!,
