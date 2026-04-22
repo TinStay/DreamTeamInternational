@@ -31,36 +31,55 @@ import {
   Wand2,
 } from "lucide-react";
 
-/** YouTube iframe mounts only when near viewport — avoids loading every embed at once. */
+const LAZY_IFRAME_ROOT_MARGIN = "160px 0px 160px 0px";
+
+/** YouTube iframe mounts when near viewport (or immediately if `priority`). */
 function LazyYouTubeIframe({
   src,
   title,
   iframeClassName,
+  priority = false,
 }: {
   src: string;
   title: string;
   iframeClassName: string;
+  /** First above-the-fold slots: skip observer so the section always gets a player. */
+  priority?: boolean;
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [shouldLoad, setShouldLoad] = useState(false);
+  const [shouldLoad, setShouldLoad] = useState(priority);
 
   useEffect(() => {
-    const el = containerRef.current;
-    if (!el || shouldLoad) return;
+    if (priority || shouldLoad) return;
 
+    const el = containerRef.current;
+    if (!el) return;
+
+    if (typeof IntersectionObserver === "undefined") {
+      queueMicrotask(() => {
+        setShouldLoad(true);
+      });
+      return;
+    }
+
+    let cancelled = false;
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0]?.isIntersecting) {
+        const hit = entries.some((e) => e.isIntersecting);
+        if (hit && !cancelled) {
           setShouldLoad(true);
           observer.disconnect();
         }
       },
-      { root: null, rootMargin: "280px 0px 280px 0px", threshold: 0.01 }
+      { root: null, rootMargin: LAZY_IFRAME_ROOT_MARGIN, threshold: 0 }
     );
 
     observer.observe(el);
-    return () => observer.disconnect();
-  }, [shouldLoad]);
+    return () => {
+      cancelled = true;
+      observer.disconnect();
+    };
+  }, [priority, shouldLoad, src]);
 
   return (
     <div
@@ -71,7 +90,7 @@ function LazyYouTubeIframe({
         <iframe
           className={iframeClassName}
           src={src}
-          title={title ?? "YouTube video"}
+          title={title}
           allow={YOUTUBE_IFRAME_ALLOW}
           allowFullScreen
           loading="lazy"
@@ -87,25 +106,34 @@ function LazyYouTubeIframe({
   );
 }
 
-function useInView(options = {}) {
+function useInView(threshold = 0.1) {
   const [isInView, setIsInView] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+
+    if (typeof IntersectionObserver === "undefined") {
+      queueMicrotask(() => {
+        setIsInView(true);
+      });
+      return;
+    }
+
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting) {
+        if (entry?.isIntersecting) {
           setIsInView(true);
           observer.disconnect();
         }
       },
-      { threshold: 0.1, ...options }
+      { threshold }
     );
 
-    const currentRef = ref.current;
-    if (currentRef) observer.observe(currentRef);
-    return () => { if (currentRef) observer.unobserve(currentRef); };
-  }, [options]);
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [threshold]);
 
   return { ref, isInView };
 }
@@ -163,6 +191,7 @@ function PortfolioTabBody({
                         src={wide.src}
                         title={wide.title ?? "YouTube video"}
                         iframeClassName="absolute inset-0 h-full w-full"
+                        priority={idx === 0}
                       />
                     </div>
                   </div>
@@ -180,6 +209,7 @@ function PortfolioTabBody({
                         src={short.src}
                         title={short.title ?? "YouTube video"}
                         iframeClassName="absolute left-1/2 top-1/2 h-full w-[177.78%] -translate-x-1/2 -translate-y-1/2"
+                        priority={idx === 0}
                       />
                     </div>
                   </div>
@@ -207,6 +237,7 @@ function PortfolioTabBody({
                     src={embed.src}
                     title={embed.title ?? "YouTube video"}
                     iframeClassName="absolute left-1/2 top-1/2 h-full w-[177.78%] -translate-x-1/2 -translate-y-1/2"
+                    priority={idx < 2}
                   />
                 </div>
               </div>
@@ -231,6 +262,7 @@ function PortfolioTabBody({
                     src={embed.src}
                     title={embed.title ?? "YouTube video"}
                     iframeClassName="absolute inset-0 h-full w-full"
+                    priority={idx < 2}
                   />
                 </div>
               </div>
@@ -411,8 +443,8 @@ export function PortfolioSection() {
 
               <div className="rounded-3xl border border-border/25 bg-background/95 px-1 py-2 shadow-[0_12px_40px_rgba(15,23,42,0.1)] backdrop-blur-lg supports-[backdrop-filter]:bg-background/85 dark:border-border/30 dark:shadow-[0_12px_48px_rgba(0,0,0,0.45)] sm:px-1 sm:py-2">
                 <div className="relative min-h-[2.75rem] min-w-0 flex-1 rounded-xl bg-muted/10 px-3 py-1 sm:px-4 sm:py-1.5">
-                  <div className="pointer-events-none absolute inset-y-1 left-3 z-[1] w-6  to-transparent sm:left-4 sm:w-8" />
-                  <div className="pointer-events-none absolute inset-y-1 right-3 z-[1] w-6 rounded-r-xl  sm:right-4 sm:w-8" />
+                  <div className="pointer-events-none absolute inset-y-1 left-3 z-[1] w-6 rounded-l-xl bg-gradient-to-r from-muted/80 to-transparent sm:left-4 sm:w-8" />
+                  <div className="pointer-events-none absolute inset-y-1 right-3 z-[1] w-6 rounded-r-xl bg-gradient-to-l from-muted/80 to-transparent sm:right-4 sm:w-8" />
                   <div className="relative flex w-full items-center gap-2 overflow-x-auto overflow-y-hidden py-0.5 no-scrollbar">
                     {CATEGORIES.map((cat) => (
                       <Button
