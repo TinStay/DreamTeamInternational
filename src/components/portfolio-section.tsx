@@ -31,6 +31,62 @@ import {
   Wand2,
 } from "lucide-react";
 
+/** YouTube iframe mounts only when near viewport — avoids loading every embed at once. */
+function LazyYouTubeIframe({
+  src,
+  title,
+  iframeClassName,
+}: {
+  src: string;
+  title: string;
+  iframeClassName: string;
+}) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [shouldLoad, setShouldLoad] = useState(false);
+
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el || shouldLoad) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0]?.isIntersecting) {
+          setShouldLoad(true);
+          observer.disconnect();
+        }
+      },
+      { root: null, rootMargin: "280px 0px 280px 0px", threshold: 0.01 }
+    );
+
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [shouldLoad]);
+
+  return (
+    <div
+      ref={containerRef}
+      className="absolute inset-0 overflow-hidden rounded-[inherit] bg-muted/20"
+    >
+      {shouldLoad ? (
+        <iframe
+          className={iframeClassName}
+          src={src}
+          title={title ?? "YouTube video"}
+          allow={YOUTUBE_IFRAME_ALLOW}
+          allowFullScreen
+          loading="lazy"
+          referrerPolicy={YOUTUBE_REFERRER_POLICY}
+        />
+      ) : (
+        <div
+          className="absolute inset-0 bg-gradient-to-b from-muted/30 to-muted/50"
+          aria-hidden
+        />
+      )}
+    </div>
+  );
+}
+
 function useInView(options = {}) {
   const [isInView, setIsInView] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -103,14 +159,10 @@ function PortfolioTabBody({
                 {hasWide && (
                   <div className="flex flex-col gap-3">
                     <div className="relative rounded-2xl overflow-hidden bg-card border border-border/20 shadow-sm aspect-video">
-                      <iframe
-                        className="absolute inset-0 h-full w-full"
+                      <LazyYouTubeIframe
                         src={wide.src}
                         title={wide.title ?? "YouTube video"}
-                        allow={YOUTUBE_IFRAME_ALLOW}
-                        allowFullScreen
-                        loading="lazy"
-                        referrerPolicy={YOUTUBE_REFERRER_POLICY}
+                        iframeClassName="absolute inset-0 h-full w-full"
                       />
                     </div>
                   </div>
@@ -124,14 +176,10 @@ function PortfolioTabBody({
                     )}
                   >
                     <div className="relative rounded-2xl overflow-hidden border border-border/20 bg-card aspect-[9/16] shadow-sm">
-                      <iframe
-                        className="absolute left-1/2 top-1/2 h-full w-[177.78%] -translate-x-1/2 -translate-y-1/2"
+                      <LazyYouTubeIframe
                         src={short.src}
                         title={short.title ?? "YouTube video"}
-                        allow={YOUTUBE_IFRAME_ALLOW}
-                        allowFullScreen
-                        loading="lazy"
-                        referrerPolicy={YOUTUBE_REFERRER_POLICY}
+                        iframeClassName="absolute left-1/2 top-1/2 h-full w-[177.78%] -translate-x-1/2 -translate-y-1/2"
                       />
                     </div>
                   </div>
@@ -155,14 +203,10 @@ function PortfolioTabBody({
                 }}
               >
                 <div className="relative rounded-2xl overflow-hidden border border-border/20 bg-card aspect-[9/16] shadow-sm">
-                  <iframe
-                    className="absolute left-1/2 top-1/2 h-full w-[177.78%] -translate-x-1/2 -translate-y-1/2"
+                  <LazyYouTubeIframe
                     src={embed.src}
                     title={embed.title ?? "YouTube video"}
-                    allow={YOUTUBE_IFRAME_ALLOW}
-                    allowFullScreen
-                    loading="lazy"
-                    referrerPolicy={YOUTUBE_REFERRER_POLICY}
+                    iframeClassName="absolute left-1/2 top-1/2 h-full w-[177.78%] -translate-x-1/2 -translate-y-1/2"
                   />
                 </div>
               </div>
@@ -183,14 +227,10 @@ function PortfolioTabBody({
                 }}
               >
                 <div className="relative rounded-2xl overflow-hidden bg-card border border-border/20 shadow-sm aspect-video">
-                  <iframe
-                    className="absolute inset-0 h-full w-full"
+                  <LazyYouTubeIframe
                     src={embed.src}
                     title={embed.title ?? "YouTube video"}
-                    allow={YOUTUBE_IFRAME_ALLOW}
-                    allowFullScreen
-                    loading="lazy"
-                    referrerPolicy={YOUTUBE_REFERRER_POLICY}
+                    iframeClassName="absolute inset-0 h-full w-full"
                   />
                 </div>
               </div>
@@ -312,8 +352,8 @@ export function PortfolioSection() {
           {/* Sticky controls: resolution row + category row in separate cards (below fixed header on desktop) */}
           <div className="flex flex-col gap-8 pb-12">
             <div className="sticky top-[max(0.75rem,env(safe-area-inset-top))] z-40 -mx-4 flex flex-col gap-2 px-4 sm:-mx-6 sm:px-6 sm:gap-2.5 lg:top-[7.25rem] lg:-mx-10 lg:px-10">
-              {/* Format: shadcn Tabs — near full width on mobile, pill / rounded-2xl on larger screens */}
-              <div className="w-full rounded-full border border-border/25 bg-background/95 px-2 py-2 shadow-[0_12px_40px_rgba(15,23,42,0.1)] backdrop-blur-lg supports-[backdrop-filter]:bg-background/85 dark:border-border/30 dark:shadow-[0_12px_48px_rgba(0,0,0,0.45)] sm:rounded-2xl sm:px-3 sm:py-2.5">
+              {/* Format: full-width pill on small screens; compact tabs from sm+ */}
+              <div className="w-full rounded-full border border-border/25 bg-background/95 px-2 py-2 shadow-[0_12px_40px_rgba(15,23,42,0.1)] backdrop-blur-lg supports-[backdrop-filter]:bg-background/85 dark:border-border/30 dark:shadow-[0_12px_48px_rgba(0,0,0,0.45)] sm:w-fit sm:self-start sm:rounded-2xl sm:px-3 sm:py-2">
                 <Tabs
                   value={format}
                   onValueChange={(v) => {
@@ -321,19 +361,20 @@ export function PortfolioSection() {
                       setFormat(v);
                     }
                   }}
-                  className="w-full max-w-full"
+                  className="w-auto"
                 >
                   <TabsList
                     variant="default"
                     className={cn(
-                      "h-auto min-h-10 w-full max-w-full justify-stretch gap-1 rounded-full border-0 bg-muted/25 p-1 text-[10px] shadow-none sm:min-h-9 sm:text-[11px]"
+                      "h-auto min-h-8 w-fit max-w-full justify-center gap-0.5 rounded-full border-0 bg-muted/25 p-0.5 text-[10px] shadow-none",
+                      "sm:min-h-8 sm:text-[11px]"
                     )}
                   >
                     <TabsTrigger
                       value="all"
                       aria-label={t.portfolio.format.all}
                       className={cn(
-                        "flex-1 min-w-0 rounded-full border border-transparent px-2 py-2 text-[10px] font-semibold shadow-none sm:py-1.5 sm:text-[11px]",
+                        "flex-none rounded-full border border-transparent px-1.5 py-1 text-[10px] font-semibold sm:px-2 sm:py-1 sm:text-[11px]",
                         "data-active:border-white/15 data-active:bg-gradient-to-br data-active:from-indigo-600 data-active:via-indigo-600 data-active:to-indigo-800 data-active:text-white data-active:!shadow-none",
                         "hover:text-foreground data-active:hover:brightness-[1.06] data-active:hover:text-white"
                       )}
@@ -344,25 +385,25 @@ export function PortfolioSection() {
                       value="desktop"
                       aria-label={t.portfolio.format.desktop}
                       className={cn(
-                        "flex-1 min-w-0 gap-0.5 rounded-full border border-transparent px-2 py-2 text-[10px] font-semibold shadow-none sm:py-1.5 sm:text-[11px]",
+                        "flex-none gap-0.5 rounded-full border border-transparent px-1.5 py-1 text-[10px] font-semibold sm:px-2 sm:py-1 sm:text-[11px]",
                         "data-active:border-white/15 data-active:bg-gradient-to-br data-active:from-indigo-600 data-active:via-indigo-600 data-active:to-indigo-800 data-active:text-white data-active:!shadow-none",
                         "hover:text-foreground data-active:hover:brightness-[1.06] data-active:hover:text-white"
                       )}
                     >
                       <Monitor className="h-3.5 w-3.5 shrink-0 sm:h-4 sm:w-4" />
-                      <span className="truncate pl-0.5">{t.portfolio.format.ratio169}</span>
+                      <span className="pl-0.5">{t.portfolio.format.ratio169}</span>
                     </TabsTrigger>
                     <TabsTrigger
                       value="mobile"
                       aria-label={t.portfolio.format.mobile}
                       className={cn(
-                        "flex-1 min-w-0 gap-0.5 rounded-full border border-transparent px-2 py-2 text-[10px] font-semibold shadow-none sm:py-1.5 sm:text-[11px]",
+                        "flex-none gap-0.5 rounded-full border border-transparent px-1.5 py-1 text-[10px] font-semibold shadow-none sm:px-2 sm:py-1 sm:text-[11px]",
                         "data-active:border-white/15 data-active:bg-gradient-to-br data-active:from-indigo-600 data-active:via-indigo-600 data-active:to-indigo-800 data-active:text-white data-active:!shadow-none",
                         "hover:text-foreground data-active:hover:brightness-[1.06] data-active:hover:text-white"
                       )}
                     >
                       <Smartphone className="h-3.5 w-3.5 shrink-0 sm:h-4 sm:w-4" />
-                      <span className="truncate pl-0.5">{t.portfolio.format.ratio916}</span>
+                      <span className="pl-0.5">{t.portfolio.format.ratio916}</span>
                     </TabsTrigger>
                   </TabsList>
                 </Tabs>
