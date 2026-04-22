@@ -40,7 +40,9 @@ export const en = {
     format: {
       all: "All",
       desktop: "Desktop",
-      mobile: "Mobile (9:16)"
+      mobile: "Mobile (9:16)",
+      ratio169: "16:9",
+      ratio916: "9:16",
     },
     pagination: {
       previous: "Previous",

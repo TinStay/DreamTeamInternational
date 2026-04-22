@@ -40,7 +40,9 @@ export const bg = {
     format: {
       all: "Всички",
       desktop: "Десктоп",
-      mobile: "Мобилни (9:16)"
+      mobile: "Мобилни (9:16)",
+      ratio169: "16:9",
+      ratio916: "9:16",
     },
     pagination: {
       previous: "Назад",

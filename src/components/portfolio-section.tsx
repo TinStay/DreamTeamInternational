@@ -116,7 +116,12 @@ function PortfolioTabBody({
                 )}
 
                 {hasShort && (
-                  <div className="flex flex-col gap-3">
+                  <div
+                    className={cn(
+                      "flex flex-col gap-3",
+                      !hasWide && "mx-auto w-full max-w-[min(100%,380px)] lg:max-w-[420px]"
+                    )}
+                  >
                     <div className="relative rounded-2xl overflow-hidden border border-border/20 bg-card aspect-[9/16] shadow-sm">
                       <iframe
                         className="absolute left-1/2 top-1/2 h-full w-[177.78%] -translate-x-1/2 -translate-y-1/2"
@@ -213,10 +218,42 @@ function embedsForCategory(category: string) {
   }
 }
 
+/**
+ * Curated “All” feed: first rows mix categories (not only construction), then fills
+ * remaining clips; **last row is short-only (9:16)** so it never spans full page width.
+ */
 function embedsForAll() {
-  const categories = ["construction", "mascots", "cars", "tv", "product"];
-  const wide = categories.flatMap((c) => embedsForCategory(c).wide);
-  const short = categories.flatMap((c) => embedsForCategory(c).short);
+  const { wide: wCon, short: sCon } = embedsForCategory("construction");
+  const { wide: wMas } = embedsForCategory("mascots");
+  const { wide: wCar, short: sCar } = embedsForCategory("cars");
+  const { wide: wTv, short: sTv } = embedsForCategory("tv");
+  const { wide: wPr, short: sPr } = embedsForCategory("product");
+
+  const wide: YouTubeEmbed[] = [
+    wTv[0]!,
+    wMas[0]!,
+    wCar[0]!,
+    wPr[0]!,
+    wCon[0]!,
+    wCon[1]!,
+    wTv[1]!,
+    wCon[2]!,
+    wMas[1]!,
+  ];
+
+  const short: YouTubeEmbed[] = [
+    sTv[0]!,
+    sPr[0]!,
+    sCar[0]!,
+    sCon[0]!,
+    sCon[1]!,
+    sCon[2]!,
+    sTv[1]!,
+    sCon[3]!,
+    sCon[4]!,
+    sTv[2]!,
+  ];
+
   return { wide, short };
 }
 
@@ -246,96 +283,20 @@ export function PortfolioSection() {
 
   const formatToggleBtnClass = (active: boolean) =>
     cn(
-      "flex flex-1 items-center justify-center rounded-full cursor-pointer shadow-none hover:shadow-none h-12 min-h-12 px-2 sm:px-3",
+      "flex h-8 min-h-8 shrink-0 items-center justify-center gap-1 rounded-lg px-2 text-[10px] font-semibold leading-none shadow-none hover:shadow-none sm:h-8 sm:px-2.5 sm:text-[11px]",
       active ? formatToggleActive : "text-foreground/70 hover:text-foreground"
     );
-
-  const FormatToggleMobile = (
-    <div className="flex w-full items-stretch gap-1 rounded-full border border-border/20 bg-background/40 backdrop-blur-md shadow-elevated-soft p-1.5">
-      <Button
-        type="button"
-        onClick={() => setFormat("all")}
-        variant="ghost"
-        size="sm"
-        className={formatToggleBtnClass(format === "all")}
-        aria-label={t.portfolio.format.all}
-      >
-        <Grid2X2 className="h-5 w-5" />
-      </Button>
-      <Button
-        type="button"
-        onClick={() => setFormat("desktop")}
-        variant="ghost"
-        size="sm"
-        className={formatToggleBtnClass(format === "desktop")}
-        aria-label={t.portfolio.format.desktop}
-      >
-        <Monitor className="h-5 w-5" />
-      </Button>
-      <Button
-        type="button"
-        onClick={() => setFormat("mobile")}
-        variant="ghost"
-        size="sm"
-        className={formatToggleBtnClass(format === "mobile")}
-        aria-label={t.portfolio.format.mobile}
-      >
-        <Smartphone className="h-5 w-5" />
-      </Button>
-    </div>
-  );
-
-  const formatToggleDesktopBtn = (active: boolean) =>
-    cn(
-      "flex flex-1 items-center justify-center rounded-full cursor-pointer shadow-none hover:shadow-none h-9 min-h-9 px-1",
-      active ? formatToggleActive : "text-foreground/70 hover:text-foreground"
-    );
-
-  const FormatToggle = (
-    <div className="flex w-full items-stretch gap-0.5 rounded-full border border-border/20 bg-background/40 backdrop-blur-md shadow-elevated-soft p-1">
-      <Button
-        type="button"
-        onClick={() => setFormat("all")}
-        variant="ghost"
-        size="sm"
-        className={formatToggleDesktopBtn(format === "all")}
-        aria-label={t.portfolio.format.all}
-      >
-        <Grid2X2 className="h-4 w-4" />
-      </Button>
-      <Button
-        type="button"
-        onClick={() => setFormat("desktop")}
-        variant="ghost"
-        size="sm"
-        className={formatToggleDesktopBtn(format === "desktop")}
-        aria-label={t.portfolio.format.desktop}
-      >
-        <Monitor className="h-4 w-4" />
-      </Button>
-      <Button
-        type="button"
-        onClick={() => setFormat("mobile")}
-        variant="ghost"
-        size="sm"
-        className={formatToggleDesktopBtn(format === "mobile")}
-        aria-label={t.portfolio.format.mobile}
-      >
-        <Smartphone className="h-4 w-4" />
-      </Button>
-    </div>
-  );
 
   return (
-      <section id="portfolio" className="py-6 relative overflow-visible" ref={ref}>
-        <div className="w-[96%] lg:w-[90vw] max-w-none mx-auto px-4 z-10 relative">
+      <section id="portfolio" className="relative w-full overflow-visible py-6" ref={ref}>
+        <div className="relative z-10 mx-auto w-full max-w-none px-4 sm:px-6 lg:px-10">
           <div
             className={`transition-opacity duration-700 delay-200 ${
               isInView ? "opacity-100" : "opacity-0"
             }`}
           >
           {/* ── Title & Subtitle ── */}
-          <div className="mb-5">
+          <div className="mb-6">
             <h2 className="font-heading font-bold text-4xl md:text-5xl mb-3 text-foreground">
               {t.portfolio.title1}{" "}
               <span className="text-primary">{t.portfolio.title2}</span>
@@ -345,88 +306,100 @@ export function PortfolioSection() {
             </p>
           </div>
 
-          {/* ── Filter Tabs (below title) ── */}
-          <div className="pb-0 mb-6">
-            {/* Mobile: sticky top tabs */}
-            <div className="lg:hidden sticky top-4 z-30 -mx-4 px-4 pt-2 pb-3 bg-background/40 backdrop-blur-md">
-              <div className="mb-3">{FormatToggleMobile}</div>
-
-              <div className="relative w-full overflow-x-auto no-scrollbar rounded-full border border-border/20 bg-background/40 backdrop-blur-md shadow-elevated-soft px-3 py-2.5">
-                <div className="pointer-events-none absolute inset-y-0 left-0 w-10 bg-gradient-to-r from-background/80 to-transparent" />
-                <div className="pointer-events-none absolute inset-y-0 right-0 w-10 bg-gradient-to-l from-background/80 to-transparent" />
-                <div className="relative flex w-max min-w-full items-center gap-2 px-2">
-                  {CATEGORIES.map((cat) => (
+          {/* Single sticky bar: aspect + categories (sits below fixed site header on desktop) */}
+          <div className="flex flex-col gap-8 pb-12">
+            <div className="sticky top-[max(0.75rem,env(safe-area-inset-top))] z-40 -mx-4 sm:-mx-6 lg:top-[7.25rem] lg:-mx-10">
+              <div className="rounded-2xl border border-border/25 bg-background/95 px-2 py-2 shadow-[0_12px_40px_rgba(15,23,42,0.1)] backdrop-blur-lg supports-[backdrop-filter]:bg-background/85 dark:border-border/30 dark:shadow-[0_12px_48px_rgba(0,0,0,0.45)] sm:px-3 sm:py-2.5">
+                <div className="flex flex-col gap-2.5 sm:flex-row sm:items-center sm:gap-3">
+                  <div className="flex shrink-0 items-center justify-center gap-1 rounded-xl border border-border/15 bg-muted/10 p-1 sm:justify-start">
                     <Button
-                      key={cat.key}
                       type="button"
-                      onClick={() => setActiveCategory(cat.key)}
-                      variant={isActiveTab(cat.key) ? "default" : "outline"}
+                      onClick={() => setFormat("all")}
+                      variant="ghost"
                       size="sm"
-                      className={cn(
-                        "relative shrink-0 rounded-full cursor-pointer inline-flex items-center gap-2 font-semibold",
-                        "h-12 px-5 text-base"
-                      )}
+                      className={formatToggleBtnClass(format === "all")}
+                      aria-label={t.portfolio.format.all}
                     >
-                      <span
-                        className={cn(
-                          "opacity-90",
-                          isActiveTab(cat.key) && "text-primary-foreground opacity-100"
-                        )}
-                      >
-                        {cat.icon}
-                      </span>
-                      <span>{cat.label}</span>
+                      <Grid2X2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                     </Button>
-                  ))}
+                    <Button
+                      type="button"
+                      onClick={() => setFormat("desktop")}
+                      variant="ghost"
+                      size="sm"
+                      className={formatToggleBtnClass(format === "desktop")}
+                      aria-label={t.portfolio.format.desktop}
+                    >
+                      <Monitor className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                      <span className="pl-0.5">{t.portfolio.format.ratio169}</span>
+                    </Button>
+                    <Button
+                      type="button"
+                      onClick={() => setFormat("mobile")}
+                      variant="ghost"
+                      size="sm"
+                      className={formatToggleBtnClass(format === "mobile")}
+                      aria-label={t.portfolio.format.mobile}
+                    >
+                      <Smartphone className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                      <span className="pl-0.5">{t.portfolio.format.ratio916}</span>
+                    </Button>
+                  </div>
+
+                  <div className="relative min-h-[2.75rem] min-w-0 flex-1 sm:border-l sm:border-border/20 sm:pl-3">
+                    <div className="pointer-events-none absolute inset-y-0 left-0 z-[1] w-8 bg-gradient-to-r from-card to-transparent sm:w-6" />
+                    <div className="pointer-events-none absolute inset-y-0 right-0 z-[1] w-8 bg-gradient-to-l from-card to-transparent sm:w-6" />
+                    <div className="relative flex w-full items-center gap-1.5 overflow-x-auto overflow-y-hidden px-1 py-0.5 no-scrollbar">
+                      {CATEGORIES.map((cat) => (
+                        <Button
+                          key={cat.key}
+                          type="button"
+                          onClick={() => setActiveCategory(cat.key)}
+                          variant={isActiveTab(cat.key) ? "default" : "outline"}
+                          size="sm"
+                          className={cn(
+                            "relative shrink-0 cursor-pointer rounded-full font-semibold inline-flex items-center gap-1.5",
+                            "h-9 px-3 text-xs sm:h-10 sm:gap-2 sm:px-4 sm:text-sm"
+                          )}
+                        >
+                          <span
+                            className={cn(
+                              "[&_svg]:h-4 [&_svg]:w-4 opacity-90 sm:[&_svg]:h-[1.05rem] sm:[&_svg]:w-[1.05rem]",
+                              isActiveTab(cat.key) && "text-primary-foreground opacity-100"
+                            )}
+                          >
+                            {cat.icon}
+                          </span>
+                          <span>{cat.label}</span>
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
 
-            {/* Desktop: toggle lives with sidebar menu */}
+            <PortfolioTabBody
+              key={`${activeCategory}-${format}`}
+              wideEmbeds={embeds.wide}
+              shortEmbeds={embeds.short}
+              format={format}
+            />
           </div>
 
-          {/* Desktop: sidebar tabs left, content right */}
-          <div className="hidden lg:grid grid-cols-[240px_1fr] gap-10 items-start">
-            <div className="sticky top-28 self-start max-h-[calc(100svh-8rem)] overflow-auto rounded-2xl border border-border/20 bg-background/40 backdrop-blur-md shadow-elevated-soft p-3">
-              <div className="mb-3">{FormatToggle}</div>
-              <div className="flex flex-col gap-1">
-                {CATEGORIES.map((cat) => (
-                  <Button
-                    key={cat.key}
-                    type="button"
-                    onClick={() => setActiveCategory(cat.key)}
-                    variant={isActiveTab(cat.key) ? "default" : "ghost"}
-                    size="sm"
-                    className={cn(
-                      "w-full rounded-xl px-4 h-11 text-base font-semibold inline-flex items-center gap-2 justify-start cursor-pointer shadow-none hover:shadow-none"
-                    )}
-                  >
-                    <span className={cn("opacity-90", isActiveTab(cat.key) && "text-primary-foreground opacity-100")}>
-                      {cat.icon}
-                    </span>
-                    <span>{cat.label}</span>
-                  </Button>
-                ))}
+          {/*
+          Legacy layout: left sidebar + right content (replaced by sticky top tab bar + full-width grid).
+
+          <div className="mb-8 hidden min-h-0 gap-10 lg:grid lg:grid-cols-[240px_1fr] lg:items-stretch">
+            <div className="min-h-0 min-w-0">
+              <div className="sticky top-28 max-h-[calc(100svh-7rem)] overflow-y-auto rounded-2xl border border-border/20 bg-background/40 p-3 shadow-elevated-soft backdrop-blur-md">
+                <div className="mb-3">{FormatToggle}</div>
+                <div className="flex flex-col gap-1">…category buttons…</div>
               </div>
             </div>
-
-            <PortfolioTabBody
-              key={`${activeCategory}-${format}`}
-              wideEmbeds={embeds.wide}
-              shortEmbeds={embeds.short}
-              format={format}
-            />
+            <div className="min-w-0"><PortfolioTabBody … /></div>
           </div>
-
-          {/* Mobile: content below top tab menu */}
-          <div className="lg:hidden">
-            <PortfolioTabBody
-              key={`${activeCategory}-${format}`}
-              wideEmbeds={embeds.wide}
-              shortEmbeds={embeds.short}
-              format={format}
-            />
-          </div>
+          */}
         </div>
       </div>
     </section>
