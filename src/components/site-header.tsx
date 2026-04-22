@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ThemeToggle } from "./theme-toggle";
+// import { ThemeToggle } from "./theme-toggle";
 // import { LanguageDropdown } from "./language-dropdown";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -33,7 +33,7 @@ export function SiteHeader() {
           <img
             src="/logo-1.png"
             alt="DreamTeam Technology"
-            className="h-16 w-auto grayscale group-hover:grayscale-0 transition-all dark:invert"
+            className="h-14 w-auto grayscale group-hover:grayscale-0 transition-all dark:invert"
           />
         </Link>
 
@@ -53,7 +53,7 @@ export function SiteHeader() {
         {/* Right controls */}
         <div className="flex items-center gap-4 flex-shrink-0">
           {/* <LanguageDropdown /> */}
-          <ThemeToggle />
+          {/* <ThemeToggle /> */}
           <Link
             href="#order-form"
             className={cn(

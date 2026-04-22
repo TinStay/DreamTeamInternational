@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Home from "@/app/page";
+import { HomePage } from "@/app/home-page";
 
 export const metadata: Metadata = {
   title: "DreamTeam Technology | AI Видео Продукция",
@@ -14,5 +14,7 @@ export const metadata: Metadata = {
   },
 };
 
-export default Home;
+export default function BgHomePage() {
+  return <HomePage />;
+}
 

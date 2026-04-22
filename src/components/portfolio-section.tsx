@@ -1,9 +1,31 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Play } from "lucide-react";
 import { useLanguage } from "@/lib/i18n/language-context";
-import { Tabs } from "@/components/ui/aceternity-tabs";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import {
+  AVATARS_WIDE,
+  CARS_WIDE,
+  CONSTRUCTION_SHORT,
+  CONSTRUCTION_WIDE,
+  PRODUCT_WIDE,
+  TV_WIDE,
+  YOUTUBE_IFRAME_ALLOW,
+  YOUTUBE_REFERRER_POLICY,
+  type YouTubeEmbed,
+} from "@/lib/youtube-embeds";
+import {
+  Car,
+  Grid2X2,
+  Hammer,
+  Monitor,
+  Package,
+  Smartphone,
+  Sparkles,
+  Tv,
+  Wand2,
+} from "lucide-react";
 
 function useInView(options = {}) {
   const [isInView, setIsInView] = useState(false);
@@ -28,93 +50,297 @@ function useInView(options = {}) {
   return { ref, isInView };
 }
 
+function PortfolioTabBody({
+  wideEmbeds,
+  shortEmbeds,
+  format,
+}: {
+  wideEmbeds: YouTubeEmbed[];
+  shortEmbeds: YouTubeEmbed[];
+  format: "all" | "desktop" | "mobile";
+}) {
+  const isMobileOnly = format === "mobile";
+
+  return (
+    <div className="w-full">
+      <style>{`
+        @keyframes fadeSlideIn {
+          from { opacity: 0; transform: translateY(12px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+      `}</style>
+
+      <div>
+        {format === "all" ? (
+          <div className="flex flex-col gap-10 lg:gap-12">
+            {Array.from({ length: Math.max(wideEmbeds.length, shortEmbeds.length) }).map((_, idx) => {
+              const wide = wideEmbeds[idx];
+              const short = shortEmbeds[idx];
+              const hasWide = Boolean(wide);
+              const hasShort = Boolean(short);
+
+              return (
+              <div
+                key={`row-${idx}`}
+                className={cn(
+                  "grid grid-cols-1 gap-6 lg:gap-10 items-stretch",
+                  hasWide && hasShort
+                    ? "lg:grid-cols-[minmax(0,1fr)_clamp(220px,22vw,360px)]"
+                    : "lg:grid-cols-1"
+                )}
+                style={{
+                  animationName: "fadeSlideIn",
+                  animationDuration: "0.45s",
+                  animationTimingFunction: "ease",
+                  animationFillMode: "both",
+                  animationDelay: `${idx * 90}ms`,
+                }}
+              >
+                {hasWide && (
+                  <div className="flex flex-col gap-3">
+                    <div className="relative rounded-2xl overflow-hidden bg-card border border-border/20 shadow-sm aspect-video">
+                      <iframe
+                        className="absolute inset-0 h-full w-full"
+                        src={wide.src}
+                        title={wide.title ?? "YouTube video"}
+                        allow={YOUTUBE_IFRAME_ALLOW}
+                        allowFullScreen
+                        loading="lazy"
+                        referrerPolicy={YOUTUBE_REFERRER_POLICY}
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {hasShort && (
+                  <div className="flex flex-col gap-3">
+                    <div className="relative rounded-2xl overflow-hidden border border-border/20 bg-card aspect-[9/16] shadow-sm">
+                      <iframe
+                        className="absolute left-1/2 top-1/2 h-full w-[177.78%] -translate-x-1/2 -translate-y-1/2"
+                        src={short.src}
+                        title={short.title ?? "YouTube video"}
+                        allow={YOUTUBE_IFRAME_ALLOW}
+                        allowFullScreen
+                        loading="lazy"
+                        referrerPolicy={YOUTUBE_REFERRER_POLICY}
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
+              );
+            })}
+          </div>
+        ) : isMobileOnly ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+            {shortEmbeds.map((embed, idx) => (
+              <div
+                key={`short-${idx}`}
+                className="flex flex-col gap-3"
+                style={{
+                  animationName: "fadeSlideIn",
+                  animationDuration: "0.45s",
+                  animationTimingFunction: "ease",
+                  animationFillMode: "both",
+                  animationDelay: `${idx * 70}ms`,
+                }}
+              >
+                <div className="relative rounded-2xl overflow-hidden border border-border/20 bg-card aspect-[9/16] shadow-sm">
+                  <iframe
+                    className="absolute left-1/2 top-1/2 h-full w-[177.78%] -translate-x-1/2 -translate-y-1/2"
+                    src={embed.src}
+                    title={embed.title ?? "YouTube video"}
+                    allow={YOUTUBE_IFRAME_ALLOW}
+                    allowFullScreen
+                    loading="lazy"
+                    referrerPolicy={YOUTUBE_REFERRER_POLICY}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-10">
+            {wideEmbeds.map((embed, idx) => (
+              <div
+                key={`wide-${idx}`}
+                className="flex flex-col gap-3"
+                style={{
+                  animationName: "fadeSlideIn",
+                  animationDuration: "0.45s",
+                  animationTimingFunction: "ease",
+                  animationFillMode: "both",
+                  animationDelay: `${idx * 70}ms`,
+                }}
+              >
+                <div className="relative rounded-2xl overflow-hidden bg-card border border-border/20 shadow-sm aspect-video">
+                  <iframe
+                    className="absolute inset-0 h-full w-full"
+                    src={embed.src}
+                    title={embed.title ?? "YouTube video"}
+                    allow={YOUTUBE_IFRAME_ALLOW}
+                    allowFullScreen
+                    loading="lazy"
+                    referrerPolicy={YOUTUBE_REFERRER_POLICY}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function embedsForCategory(category: string) {
+  switch (category) {
+    case "construction":
+      return { wide: CONSTRUCTION_WIDE, short: CONSTRUCTION_SHORT };
+    case "mascots": // avatars
+      return { wide: AVATARS_WIDE, short: [] as YouTubeEmbed[] };
+    case "cars":
+      return { wide: CARS_WIDE, short: [] as YouTubeEmbed[] };
+    case "tv":
+      return { wide: TV_WIDE, short: [] as YouTubeEmbed[] };
+    case "product":
+      return { wide: PRODUCT_WIDE, short: [] as YouTubeEmbed[] };
+    default:
+      return { wide: [] as YouTubeEmbed[], short: [] as YouTubeEmbed[] };
+  }
+}
+
+function embedsForAll() {
+  const categories = ["construction", "mascots", "cars", "tv", "product"];
+  const wide = categories.flatMap((c) => embedsForCategory(c).wide);
+  const short = categories.flatMap((c) => embedsForCategory(c).short);
+  return { wide, short };
+}
+
 export function PortfolioSection() {
   const { ref, isInView } = useInView();
   const { t } = useLanguage();
+  const [format, setFormat] = useState<"all" | "desktop" | "mobile">("all");
+  const [activeCategory, setActiveCategory] = useState<string>("all");
 
-  const CATEGORIES = [
-    { key: "all",          label: t.portfolio.categories.all },
-    { key: "cinema",       label: t.portfolio.categories.cinema },
-    { key: "avatars",      label: t.portfolio.categories.avatars },
-    { key: "storytelling", label: t.portfolio.categories.storytelling },
-    { key: "product",      label: t.portfolio.categories.product },
-    { key: "animation",    label: t.portfolio.categories.animation },
+  const CATEGORIES: { key: string; label: string; icon: React.ReactNode }[] = [
+    { key: "all", label: t.portfolio.categories.all, icon: <Grid2X2 className="h-5 w-5" /> },
+    { key: "construction", label: t.portfolio.categories.construction, icon: <Hammer className="h-5 w-5" /> },
+    { key: "mascots", label: t.portfolio.categories.mascots, icon: <Sparkles className="h-5 w-5" /> },
+    { key: "tv", label: t.portfolio.categories.tv, icon: <Tv className="h-5 w-5" /> },
+    { key: "cars", label: t.portfolio.categories.cars, icon: <Car className="h-5 w-5" /> },
+    { key: "product", label: t.portfolio.categories.product, icon: <Package className="h-5 w-5" /> },
+    { key: "animated", label: t.portfolio.categories.animated, icon: <Wand2 className="h-5 w-5" /> },
   ];
 
-  const PORTFOLIO_ITEMS = [
-    {
-      id: 1,
-      category: "product",
-      title: "Tech Gadget Launch",
-      img: "https://images.unsplash.com/photo-1526406915894-7bcd65f60845?auto=format&fit=crop&w=600&q=80",
-    },
-    {
-      id: 2,
-      category: "storytelling",
-      title: "Sustainable Future",
-      img: "https://images.unsplash.com/photo-1497250681558-469c4fa2417d?auto=format&fit=crop&w=600&q=80",
-    },
-    {
-      id: 3,
-      category: "cinema",
-      title: "Modern Villa 3D",
-      img: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=600&q=80",
-    },
-    {
-      id: 4,
-      category: "animation",
-      title: "Energy Drink Promo",
-      img: "https://images.unsplash.com/photo-1556817411-31ae72fa3ea0?auto=format&fit=crop&w=600&q=80",
-    },
-    {
-      id: 5,
-      category: "avatars",
-      title: "Cosmetics Reveal",
-      img: "https://images.unsplash.com/photo-1596462502278-27bf85033e5a?auto=format&fit=crop&w=600&q=80",
-    },
-    {
-      id: 6,
-      category: "cinema",
-      title: "Automotive Journey",
-      img: "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?auto=format&fit=crop&w=600&q=80",
-    },
-  ];
+  const embeds =
+    activeCategory === "all" ? embedsForAll() : embedsForCategory(activeCategory);
 
-  // Label lookup for the overlay tag
-  const labelFor = (category: string) =>
-    CATEGORIES.find((c) => c.key === category)?.label ?? category;
+  const isActiveTab = (key: string) => key === activeCategory;
 
-  const contentFor = (category: string) => {
-    const items =
-      category === "all"
-        ? PORTFOLIO_ITEMS
-        : PORTFOLIO_ITEMS.filter((item) => item.category === category);
-
-    return (
-      <div className="w-full overflow-hidden relative h-full rounded-2xl">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          <AnimatedItems items={items} labelFor={labelFor} />
-        </div>
-      </div>
+  const formatToggleBtnClass = (active: boolean) =>
+    cn(
+      "flex flex-1 items-center justify-center rounded-full cursor-pointer shadow-none hover:shadow-none h-12 min-h-12 px-2 sm:px-3",
+      active
+        ? "bg-primary text-primary-foreground hover:bg-primary/90"
+        : "text-foreground/70 hover:text-foreground"
     );
-  };
 
-  const tabs = CATEGORIES.map((cat) => ({
-    title: cat.label,
-    value: cat.key,
-    content: contentFor(cat.key),
-  }));
+  const FormatToggleMobile = (
+    <div className="flex w-full items-stretch gap-1 rounded-full border border-border/20 bg-background/40 backdrop-blur-md shadow-elevated-soft p-1.5">
+      <Button
+        type="button"
+        onClick={() => setFormat("all")}
+        variant="ghost"
+        size="sm"
+        className={formatToggleBtnClass(format === "all")}
+        aria-label={t.portfolio.format.all}
+      >
+        <Grid2X2 className="h-5 w-5" />
+      </Button>
+      <Button
+        type="button"
+        onClick={() => setFormat("desktop")}
+        variant="ghost"
+        size="sm"
+        className={formatToggleBtnClass(format === "desktop")}
+        aria-label={t.portfolio.format.desktop}
+      >
+        <Monitor className="h-5 w-5" />
+      </Button>
+      <Button
+        type="button"
+        onClick={() => setFormat("mobile")}
+        variant="ghost"
+        size="sm"
+        className={formatToggleBtnClass(format === "mobile")}
+        aria-label={t.portfolio.format.mobile}
+      >
+        <Smartphone className="h-5 w-5" />
+      </Button>
+    </div>
+  );
+
+  const FormatToggle = (
+    <div className="inline-flex items-center rounded-full border border-border/20 bg-background/40 backdrop-blur-md shadow-elevated-soft p-1">
+      <Button
+        type="button"
+        onClick={() => setFormat("all")}
+        variant="ghost"
+        size="sm"
+        className={cn(
+          "rounded-full px-3 py-2 cursor-pointer shadow-none hover:shadow-none",
+          format === "all"
+            ? "bg-primary text-primary-foreground hover:bg-primary/90"
+            : "text-foreground/70 hover:text-foreground"
+        )}
+        aria-label={t.portfolio.format.all}
+      >
+        <Grid2X2 className="h-4 w-4" />
+      </Button>
+      <Button
+        type="button"
+        onClick={() => setFormat("desktop")}
+        variant="ghost"
+        size="sm"
+        className={cn(
+          "rounded-full px-3 py-2 cursor-pointer shadow-none hover:shadow-none",
+          format === "desktop"
+            ? "bg-primary text-primary-foreground hover:bg-primary/90"
+            : "text-foreground/70 hover:text-foreground"
+        )}
+        aria-label={t.portfolio.format.desktop}
+      >
+        <Monitor className="h-4 w-4" />
+      </Button>
+      <Button
+        type="button"
+        onClick={() => setFormat("mobile")}
+        variant="ghost"
+        size="sm"
+        className={cn(
+          "rounded-full px-3 py-2 cursor-pointer shadow-none hover:shadow-none",
+          format === "mobile"
+            ? "bg-primary text-primary-foreground hover:bg-primary/90"
+            : "text-foreground/70 hover:text-foreground"
+        )}
+        aria-label={t.portfolio.format.mobile}
+      >
+        <Smartphone className="h-4 w-4" />
+      </Button>
+    </div>
+  );
 
   return (
-    <section id="portfolio" className="py-24 relative overflow-hidden" ref={ref}>
-      <div className="max-w-7xl mx-auto px-4 z-10 relative">
-        <div
-          className={`transition-all duration-1000 delay-300 ${
-            isInView ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"
-          }`}
-        >
+      <section id="portfolio" className="py-6 relative overflow-visible" ref={ref}>
+        <div className="w-[96%] lg:w-[90vw] max-w-none mx-auto px-4 z-10 relative">
+          <div
+            className={`transition-opacity duration-700 delay-200 ${
+              isInView ? "opacity-100" : "opacity-0"
+            }`}
+          >
           {/* ── Title & Subtitle ── */}
-          <div className="mb-8">
+          <div className="mb-5">
             <h2 className="font-heading font-bold text-4xl md:text-5xl mb-3 text-foreground">
               {t.portfolio.title1}{" "}
               <span className="text-primary">{t.portfolio.title2}</span>
@@ -125,71 +351,89 @@ export function PortfolioSection() {
           </div>
 
           {/* ── Filter Tabs (below title) ── */}
-          <div className="pb-2 mb-10">
-            <Tabs tabs={tabs} />
+          <div className="pb-0 mb-6">
+            {/* Mobile: sticky top tabs */}
+            <div className="lg:hidden sticky top-4 z-30 -mx-4 px-4 pt-2 pb-3 bg-background/40 backdrop-blur-md">
+              <div className="mb-3">{FormatToggleMobile}</div>
+
+              <div className="relative w-full overflow-x-auto no-scrollbar rounded-full border border-border/20 bg-background/40 backdrop-blur-md shadow-elevated-soft px-3 py-2.5">
+                <div className="pointer-events-none absolute inset-y-0 left-0 w-10 bg-gradient-to-r from-background/80 to-transparent" />
+                <div className="pointer-events-none absolute inset-y-0 right-0 w-10 bg-gradient-to-l from-background/80 to-transparent" />
+                <div className="relative flex w-max min-w-full items-center gap-2 px-2">
+                  {CATEGORIES.map((cat) => (
+                    <Button
+                      key={cat.key}
+                      type="button"
+                      onClick={() => setActiveCategory(cat.key)}
+                      variant={isActiveTab(cat.key) ? "default" : "outline"}
+                      size="sm"
+                      className={cn(
+                        "relative shrink-0 rounded-full cursor-pointer inline-flex items-center gap-2 font-semibold",
+                        "h-12 px-5 text-base"
+                      )}
+                    >
+                      <span
+                        className={cn(
+                          "opacity-90",
+                          isActiveTab(cat.key) && "text-primary-foreground opacity-100"
+                        )}
+                      >
+                        {cat.icon}
+                      </span>
+                      <span>{cat.label}</span>
+                    </Button>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Desktop: toggle lives with sidebar menu */}
           </div>
 
-          {/* Grid is rendered inside Tabs content */}
+          {/* Desktop: sidebar tabs left, content right */}
+          <div className="hidden lg:grid grid-cols-[240px_1fr] gap-10 items-start">
+            <div className="sticky top-28 self-start max-h-[calc(100svh-8rem)] overflow-auto rounded-2xl border border-border/20 bg-background/40 backdrop-blur-md shadow-elevated-soft p-3">
+              <div className="mb-3">{FormatToggle}</div>
+              <div className="flex flex-col gap-1">
+                {CATEGORIES.map((cat) => (
+                  <Button
+                    key={cat.key}
+                    type="button"
+                    onClick={() => setActiveCategory(cat.key)}
+                    variant={isActiveTab(cat.key) ? "default" : "ghost"}
+                    size="sm"
+                    className={cn(
+                      "w-full rounded-xl px-4 h-11 text-base font-semibold inline-flex items-center gap-2 justify-start cursor-pointer shadow-none hover:shadow-none"
+                    )}
+                  >
+                    <span className={cn("opacity-90", isActiveTab(cat.key) && "text-primary-foreground opacity-100")}>
+                      {cat.icon}
+                    </span>
+                    <span>{cat.label}</span>
+                  </Button>
+                ))}
+              </div>
+            </div>
+
+            <PortfolioTabBody
+              key={`${activeCategory}-${format}`}
+              wideEmbeds={embeds.wide}
+              shortEmbeds={embeds.short}
+              format={format}
+            />
+          </div>
+
+          {/* Mobile: content below top tab menu */}
+          <div className="lg:hidden">
+            <PortfolioTabBody
+              key={`${activeCategory}-${format}`}
+              wideEmbeds={embeds.wide}
+              shortEmbeds={embeds.short}
+              format={format}
+            />
+          </div>
         </div>
       </div>
     </section>
-  );
-}
-
-/* Separate component so AnimatePresence can re-trigger on filter change */
-function AnimatedItems({
-  items,
-  labelFor,
-}: {
-  items: { id: number; category: string; title: string; img: string }[];
-  labelFor: (cat: string) => string;
-}) {
-  return (
-    <>
-      {items.map((item, idx) => (
-        <div
-          key={item.id}
-          className="group relative rounded-2xl overflow-hidden bg-card border border-border/20 aspect-[4/3] cursor-pointer hover:border-primary/50 hover:-translate-y-1 transition-all duration-500 shadow-sm hover:shadow-xl hover:shadow-primary/10"
-          style={{
-            animationName: "fadeSlideIn",
-            animationDuration: "0.45s",
-            animationTimingFunction: "ease",
-            animationFillMode: "both",
-            animationDelay: `${idx * 80}ms`,
-          }}
-        >
-          <style>{`
-            @keyframes fadeSlideIn {
-              from { opacity: 0; transform: translateY(12px); }
-              to   { opacity: 1; transform: translateY(0); }
-            }
-          `}</style>
-
-          <img
-            src={item.img}
-            alt={item.title}
-            className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105 opacity-80 group-hover:opacity-100 grayscale group-hover:grayscale-0"
-            loading="lazy"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent opacity-90 group-hover:opacity-75 transition-opacity" />
-
-          {/* Play button */}
-          <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-            <div className="w-20 h-20 rounded-full bg-primary flex items-center justify-center text-primary-foreground shadow-lg transform scale-50 group-hover:scale-100 transition-all duration-500 drop-shadow-xl">
-              <Play fill="currentColor" size={32} className="translate-x-0.5" />
-            </div>
-          </div>
-
-          <div className="absolute bottom-0 left-0 right-0 p-6 translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
-            <div className="text-primary text-xs font-bold tracking-wider uppercase mb-2">
-              {labelFor(item.category)}
-            </div>
-            <h3 className="text-white font-heading text-xl font-semibold">
-              {item.title}
-            </h3>
-          </div>
-        </div>
-      ))}
-    </>
   );
 }

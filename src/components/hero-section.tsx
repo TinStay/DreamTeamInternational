@@ -1,18 +1,18 @@
 "use client";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState } from "react";
 import { useLanguage } from "@/lib/i18n/language-context";
+import {
+  HERO_EMBED,
+  YOUTUBE_IFRAME_ALLOW,
+  YOUTUBE_REFERRER_POLICY,
+} from "@/lib/youtube-embeds";
 
 export function HeroSection() {
-  const [mounted, setMounted] = useState(false);
   const { t, language } = useLanguage();
   const homeHref = language === "bg" ? "/bg" : "/";
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   return (
     <section
@@ -22,17 +22,16 @@ export function HeroSection() {
       
       {/* Background Video */}
       <div className="absolute inset-0 z-0 overflow-hidden drop-shadow-[0_12px_34px_rgba(0,0,0,0.75)]">
-        <video 
-          autoPlay 
-          muted 
-          loop 
-          playsInline 
-          className="object-cover w-full h-full scale-105  "
-          poster="https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?q=80&w=2070&auto=format&fit=crop"
-        >
-          {/* Local Portfolio Video */}
-          <source src="/videos/DT%20Portoflio%20Horizontal%20BG%20YT.mp4" type="video/mp4" />
-        </video>
+        <div className="absolute inset-0 scale-105 pointer-events-none">
+          <iframe
+            className="absolute left-1/2 top-1/2 h-[100svh] w-[177.78svh] min-h-[56.25vw] min-w-[100vw] -translate-x-1/2 -translate-y-1/2"
+            src={HERO_EMBED.src}
+            title={HERO_EMBED.title ?? "YouTube video"}
+            allow={YOUTUBE_IFRAME_ALLOW}
+            allowFullScreen
+            referrerPolicy={YOUTUBE_REFERRER_POLICY}
+          />
+        </div>
         
         {/* Dynamic Overlay (dark corner vignettes) */}
         <div className="absolute inset-0 transition-opacity duration-700 bg-[radial-gradient(1200px_700px_at_50%_30%,rgba(0,0,0,0.25),transparent_55%),radial-gradient(900px_600px_at_0%_0%,rgba(0,0,0,0.65),transparent_55%),radial-gradient(900px_600px_at_100%_0%,rgba(0,0,0,0.65),transparent_55%),radial-gradient(900px_600px_at_0%_100%,rgba(0,0,0,0.55),transparent_60%),radial-gradient(900px_600px_at_100%_100%,rgba(0,0,0,0.55),transparent_60%)]" />
@@ -41,24 +40,27 @@ export function HeroSection() {
       </div>
 
       {/* Mobile logo (top-center) */}
-      <Link href={homeHref} className="lg:hidden absolute top-6 left-1/2 -translate-x-1/2 z-30 group">
-        <img
+      <Link href={homeHref} className="lg:hidden absolute top-5 left-1/2 -translate-x-1/2 z-30 group">
+        <Image
           src="/logo-1.png"
           alt="DreamTeam Technology"
-          className="h-16 sm:h-20 w-auto grayscale group-hover:grayscale-0 transition-all dark:invert drop-shadow-[0_12px_30px_rgba(0,0,0,0.6)]"
+          width={320}
+          height={128}
+          className="h-16 sm:h-20 w-auto grayscale transition-all group-hover:grayscale-0 dark:invert drop-shadow-[0_12px_30px_rgba(0,0,0,0.6)]"
+          priority
         />
       </Link>
 
       {/* Content */}
-      <div className="relative z-20 flex flex-col items-center text-center px-4 max-w-5xl mx-auto pt-24 sm:pt-28 lg:pt-0">
-        <h1 className="font-heading font-extrabold text-5xl md:text-7xl lg:text-8xl tracking-tight leading-[1.03] mb-8 text-white animate-in slide-in-from-bottom-8 fade-in duration-700 delay-100 fill-mode-both drop-shadow-[0_12px_34px_rgba(0,0,0,0.75)]">
+      <div className="relative z-20 flex w-full flex-col items-center justify-center text-center px-4 max-w-5xl mx-auto mt-24 sm:mt-28 pb-8 sm:pb-10 lg:mt-0 lg:pb-0">
+        <h1 className="font-heading font-extrabold text-4xl leading-[1.06] sm:text-5xl md:text-7xl lg:text-8xl tracking-tight md:leading-[1.03] mb-6 sm:mb-8 text-white animate-in slide-in-from-bottom-8 fade-in duration-700 delay-100 fill-mode-both drop-shadow-[0_12px_34px_rgba(0,0,0,0.75)]">
           {t.hero.title1}{" "}
           <span className="text-white drop-shadow-[0_12px_34px_rgba(0,0,0,0.75)]">
             {t.hero.title2}
           </span>
         </h1>
 
-        <div className="flex flex-col sm:flex-row items-center gap-4 animate-in slide-in-from-bottom-8 fade-in duration-700 delay-700 fill-mode-both w-full sm:w-auto">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 animate-in slide-in-from-bottom-8 fade-in duration-700 delay-700 fill-mode-both w-full sm:w-auto max-w-md sm:max-w-none mx-auto">
           <Link 
             href="#contact"
             className={cn(
@@ -72,7 +74,7 @@ export function HeroSection() {
             href="#portfolio" 
             className={cn(
                buttonVariants({ variant: "outline", size: "lg" }),
-              "w-full sm:w-auto rounded-full transition-all font-semibold tracking-wide h-14 px-10 border-border/20 bg-transparent text-foreground dark:text-white liquid-glass-header hover:scale-105 active:scale-95 text-base shadow-elevated-soft"
+              "w-full sm:w-auto rounded-full transition-all font-semibold tracking-wide h-14 px-10 border-border/30 bg-background/20 text-foreground dark:text-white liquid-glass-header hover:scale-105 active:scale-95 text-base shadow-elevated-soft"
             )}
           >
              {t.hero.cta2}
@@ -83,8 +85,8 @@ export function HeroSection() {
 
 
       {/* Scroll Indicator */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 animate-bounce">
-        <div className="w-[30px] h-[50px] rounded-full border-2 border-foreground/30 flex items-start justify-center p-2 liquid-glass">
+      <div className="absolute bottom-24 left-1/2 -translate-x-1/2 z-20 animate-bounce lg:bottom-8">
+        <div className="w-[30px] h-[50px] rounded-full border-2 border-white/35 flex items-start justify-center p-2 liquid-glass">
           <div className="w-1.5 h-1.5 rounded-full bg-primary animate-[float_2s_ease-in-out_infinite]" />
         </div>
       </div>

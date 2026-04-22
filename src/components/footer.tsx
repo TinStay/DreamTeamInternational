@@ -4,7 +4,7 @@ import Link from "next/link";
 import { Sphere } from "./iridescent-shapes";
 import { useLanguage } from "@/lib/i18n/language-context";
 import { LanguageDropdown } from "./language-dropdown";
-import { ThemeToggle } from "./theme-toggle";
+// import { ThemeToggle } from "./theme-toggle";
 
 export function Footer() {
   const { t, language } = useLanguage();
@@ -28,7 +28,7 @@ export function Footer() {
             {/* Language + theme toggles in footer */}
             <div className="flex items-center gap-3 mt-1">
               <LanguageDropdown />
-              <ThemeToggle />
+              {/* <ThemeToggle /> */}
             </div>
           </div>
 

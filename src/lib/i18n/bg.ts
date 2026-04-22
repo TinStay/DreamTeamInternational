@@ -30,11 +30,22 @@ export const bg = {
     subtitle: "Разгледайте нашето разнообразно портфолио от AI генерирани видео продукции, създадени за модерни брандове.",
     categories: {
       all: "Всички",
-      cinema: "Кино",
-      avatars: "Аватари",
-      storytelling: "Сторителинг",
+      construction: "Строителство",
+      mascots: "Талисмани",
+      tv: "ТВ Продукция",
+      cars: "Коли",
       product: "Продуктови",
-      animation: "Анимация"
+      animated: "Анимирани"
+    },
+    format: {
+      all: "Всички",
+      desktop: "Десктоп",
+      mobile: "Мобилни (9:16)"
+    },
+    pagination: {
+      previous: "Назад",
+      next: "Напред",
+      page: "Страница"
     }
   },
   pricing: {
@@ -117,7 +128,7 @@ export const bg = {
     name: "Име",
     emailLbl: "Имейл",
     subject: "Относно",
-    subjectPh: "За какво се отнася?",
+    subjectPh: "",
     aboutOptions: {
       order_video: "Искам да поръчам видео",
       question: "Искам да задам въпрос",
@@ -125,6 +136,19 @@ export const bg = {
       partner: "Искам да станем партньори",
       other: "Друго",
     },
+    foundUs: "Как ни намерихте?",
+    foundUsPh: "",
+    foundUsOptions: {
+      google: "Google търсене",
+      social: "Социални мрежи",
+      instagram: "Instagram",
+      tiktok: "TikTok",
+      youtube: "YouTube",
+      referral: "Препоръка",
+      event: "Събитие / конференция",
+      other: "Друго",
+    },
+    phoneLbl: "Телефон",
     message: "Съобщение",
     messagePh: "Кажете ни повече...",
     terms: {

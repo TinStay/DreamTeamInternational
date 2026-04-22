@@ -37,11 +37,36 @@ const LinkedInIcon = () => (
   </svg>
 );
 
+function FieldLabel({
+  children,
+  required,
+}: {
+  children: React.ReactNode;
+  required?: boolean;
+}) {
+  return (
+    <Label className="text-foreground inline-flex items-baseline gap-0.5">
+      <span>{children}</span>
+      {required ? (
+        <span className="text-primary text-xs font-semibold leading-none" aria-hidden>
+          *
+        </span>
+      ) : null}
+    </Label>
+  );
+}
 
 export function ContactSection() {
   const { t, language } = useLanguage();
-  const [about, setAbout] = useState<string | null>(null);
+  const [about, setAbout] = useState<string>("");
+  const [foundUs, setFoundUs] = useState<string>("");
   const [termsAccepted, setTermsAccepted] = useState(false);
+  const [phoneNumber, setPhoneNumber] = useState<string>("");
+  const [name, setName] = useState<string>("");
+  const [email, setEmail] = useState<string>("");
+  const [message, setMessage] = useState<string>("");
+  const [isSending, setIsSending] = useState(false);
+  const [sendResult, setSendResult] = useState<null | "ok" | "error">(null);
 
   const termsHref = language === "bg" ? "/bg/terms" : "/terms";
   const aboutOptions = useMemo(() => {
@@ -55,11 +80,67 @@ export function ContactSection() {
     ];
   }, [t.contact.aboutOptions]);
 
+  const foundUsOptions = useMemo(() => {
+    const opts = t.contact.foundUsOptions;
+    return [
+      { value: "google", label: opts.google },
+      { value: "social", label: opts.social },
+      { value: "instagram", label: opts.instagram },
+      { value: "tiktok", label: opts.tiktok },
+      { value: "youtube", label: opts.youtube },
+      { value: "referral", label: opts.referral },
+      { value: "event", label: opts.event },
+      { value: "other", label: opts.other },
+    ];
+  }, [t.contact.foundUsOptions]);
+
+  const selectedAboutLabel =
+    aboutOptions.find((o) => o.value === about)?.label ?? "";
+  const selectedFoundUsLabel =
+    foundUsOptions.find((o) => o.value === foundUs)?.label ?? "";
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!termsAccepted || isSending) return;
+    if (!message.trim() || !name.trim() || !email.trim()) return;
+
+    setIsSending(true);
+    setSendResult(null);
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          name,
+          email,
+          phone: phoneNumber,
+          subject: about,
+          foundUs,
+          message,
+        }),
+      });
+
+      if (!res.ok) throw new Error("Request failed");
+      setSendResult("ok");
+      setMessage("");
+      setAbout("");
+      setFoundUs("");
+      setPhoneNumber("");
+      setName("");
+      setEmail("");
+      setTermsAccepted(false);
+    } catch {
+      setSendResult("error");
+    } finally {
+      setIsSending(false);
+    }
+  }
+
   return (
     <section id="contact" className="py-24 relative overflow-hidden">
       
       <div className="max-w-7xl mx-auto px-4 z-10 relative">
-        <div className="grid lg:grid-cols-2 gap-16 items-center">
+        <div className="grid gap-12 lg:gap-16 items-center lg:grid-cols-[minmax(0,40%)_minmax(0,60%)]">
           
           {/* Left Column: Info */}
           <div className="animate-in slide-in-from-left-12 fade-in duration-1000">
@@ -152,21 +233,22 @@ export function ContactSection() {
           <div className="rounded-3xl p-8 border border-border/30 animate-in slide-in-from-right-12 fade-in duration-1000 delay-200 bg-card text-card-foreground shadow-elevated-soft">
             <h3 className="text-2xl font-heading font-semibold mb-6 text-foreground">{t.contact.formTitle}</h3>
             
-            <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
+            <form className="space-y-4" onSubmit={handleSubmit}>
               <div className="space-y-2">
-                <Label className="text-foreground">{t.contact.message}</Label>
-                <Textarea placeholder={t.contact.messagePh} className="min-h-[120px] bg-background/40 border-border/40 focus:border-primary/50 transition-colors" />
-              </div>
-
-              <div className="space-y-2">
-                <Label className="text-foreground">{t.contact.subject}</Label>
-                <Select value={about ?? undefined} onValueChange={(v) => setAbout(v)}>
-                  <SelectTrigger className="w-full bg-background/40 border-border/40 focus:border-primary/50 transition-colors">
-                    <SelectValue placeholder={t.contact.subjectPh} />
+                <FieldLabel>{t.contact.subject}</FieldLabel>
+                <Select value={about} onValueChange={(v) => setAbout(v ?? "")}>
+                  <SelectTrigger className="w-full h-12 px-3 text-base bg-background/40 border-border/40 focus:border-primary/50 transition-colors">
+                    <SelectValue
+                      placeholder={
+                        t.contact.subjectPh.trim() === "" ? undefined : t.contact.subjectPh
+                      }
+                    >
+                      {about !== "" ? selectedAboutLabel : null}
+                    </SelectValue>
                   </SelectTrigger>
                   <SelectContent>
                     {aboutOptions.map((opt) => (
-                      <SelectItem key={opt.value} value={opt.value}>
+                      <SelectItem key={opt.value} value={opt.value} className="py-2 text-base">
                         {opt.label}
                       </SelectItem>
                     ))}
@@ -174,15 +256,73 @@ export function ContactSection() {
                 </Select>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label className="text-foreground">{t.contact.name}</Label>
-                  <Input placeholder={t.contact.name} className="bg-background/40 border-border/40 focus:border-primary/50 transition-colors" />
-                </div>
-                <div className="space-y-2">
-                  <Label className="text-foreground">{t.contact.emailLbl}</Label>
-                  <Input type="email" placeholder={t.contact.emailLbl} className="bg-background/40 border-border/40 focus:border-primary/50 transition-colors" />
-                </div>
+              <div className="space-y-2">
+                <FieldLabel required>{t.contact.message}</FieldLabel>
+                <Textarea
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                  placeholder={t.contact.messagePh}
+                  required
+                  className="min-h-[140px] text-base bg-background/40 border-border/40 focus:border-primary/50 transition-colors"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <FieldLabel required>{t.contact.name}</FieldLabel>
+                <Input
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder={t.contact.name}
+                  required
+                  autoComplete="name"
+                  className="h-12 text-base bg-background/40 border-border/40 focus:border-primary/50 transition-colors"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <FieldLabel required>{t.contact.emailLbl}</FieldLabel>
+                <Input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder={t.contact.emailLbl}
+                  required
+                  autoComplete="email"
+                  className="h-12 text-base bg-background/40 border-border/40 focus:border-primary/50 transition-colors"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <FieldLabel>{t.contact.phoneLbl}</FieldLabel>
+                <Input
+                  type="tel"
+                  value={phoneNumber}
+                  onChange={(e) => setPhoneNumber(e.target.value)}
+                  autoComplete="tel"
+                  className="h-12 text-base bg-background/40 border-border/40 focus:border-primary/50 transition-colors"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <FieldLabel>{t.contact.foundUs}</FieldLabel>
+                <Select value={foundUs} onValueChange={(v) => setFoundUs(v ?? "")}>
+                  <SelectTrigger className="w-full h-12 px-3 text-base bg-background/40 border-border/40 focus:border-primary/50 transition-colors">
+                    <SelectValue
+                      placeholder={
+                        t.contact.foundUsPh.trim() === "" ? undefined : t.contact.foundUsPh
+                      }
+                    >
+                      {foundUs !== "" ? selectedFoundUsLabel : null}
+                    </SelectValue>
+                  </SelectTrigger>
+                  <SelectContent>
+                    {foundUsOptions.map((opt) => (
+                      <SelectItem key={opt.value} value={opt.value} className="py-2 text-base">
+                        {opt.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
 
               <div className="flex items-start gap-3 pt-2">
@@ -202,11 +342,23 @@ export function ContactSection() {
 
               <Button
                 type="submit"
-                disabled={!termsAccepted}
+                disabled={!termsAccepted || isSending}
                 className="w-full rounded-full bg-primary text-primary-foreground hover:bg-primary/90 font-bold h-12 mt-4 shadow-lg hover:scale-105 active:scale-95 transition-all disabled:hover:scale-100"
               >
-                {t.contact.send} <Send className="ml-2 w-4 h-4" />
+                {isSending ? "Sending..." : t.contact.send}{" "}
+                <Send className="ml-2 w-4 h-4" />
               </Button>
+
+              {sendResult === "ok" && (
+                <p className="text-sm text-foreground/70">
+                  Sent successfully.
+                </p>
+              )}
+              {sendResult === "error" && (
+                <p className="text-sm text-destructive">
+                  Failed to send. Please try again.
+                </p>
+              )}
             </form>
           </div>
 

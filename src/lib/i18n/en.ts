@@ -30,11 +30,22 @@ export const en = {
     subtitle: "Explore our diverse range of AI-generated video productions tailored for cutting-edge brands.",
     categories: {
       all: "All",
-      cinema: "Cinema",
-      avatars: "Avatars",
-      storytelling: "Storytelling",
+      construction: "Construction",
+      mascots: "Mascots",
+      tv: "TV Production",
+      cars: "Cars",
       product: "Product",
-      animation: "Animation"
+      animated: "Animated"
+    },
+    format: {
+      all: "All",
+      desktop: "Desktop",
+      mobile: "Mobile (9:16)"
+    },
+    pagination: {
+      previous: "Previous",
+      next: "Next",
+      page: "Page"
     }
   },
   pricing: {
@@ -117,7 +128,7 @@ export const en = {
     name: "Name",
     emailLbl: "Email",
     subject: "Subject",
-    subjectPh: "Regarding...",
+    subjectPh: "",
     aboutOptions: {
       order_video: "I want to order a video",
       question: "I want to ask a question",
@@ -125,6 +136,19 @@ export const en = {
       partner: "I want to partner",
       other: "Other",
     },
+    foundUs: "How did you find us?",
+    foundUsPh: "",
+    foundUsOptions: {
+      google: "Google Search",
+      social: "Social media",
+      instagram: "Instagram",
+      tiktok: "TikTok",
+      youtube: "YouTube",
+      referral: "Recommendation / referral",
+      event: "Event / conference",
+      other: "Other",
+    },
+    phoneLbl: "Phone",
     message: "Message",
     messagePh: "Tell us about it...",
     terms: {

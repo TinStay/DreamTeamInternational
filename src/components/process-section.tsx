@@ -55,7 +55,7 @@ export function ProcessSection() {
               return (
                 <div 
                   key={index} 
-                  className={`flex flex-col items-center text-center relative group w-full lg:w-1/4 transition-all duration-700 ease-out fill-mode-both shadow-elevated-soft ${
+                  className={`flex flex-col items-center text-center relative group w-full lg:w-1/4 transition-all duration-700 ease-out fill-mode-both ${
                     isInView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-12"
                   }`}
                   style={{ transitionDelay: delayStr }}
