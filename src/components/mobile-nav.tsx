@@ -44,7 +44,7 @@ export function MobileNav() {
         <Sheet open={isOpen} onOpenChange={setIsOpen}>
           <SheetTrigger
             render={
-              <button className="shrink-0 w-14 h-14 rounded-full border border-white/15 bg-gradient-to-br from-indigo-600 via-violet-600 to-[#7033ff] text-white flex items-center justify-center shadow-[0_8px_22px_rgba(79,70,229,0.35)] hover:brightness-110 hover:scale-105 active:scale-95 transition-all outline-none" />
+              <button className="shrink-0 w-14 h-14 rounded-full border border-white/15 bg-gradient-to-br from-indigo-600 via-indigo-600 to-indigo-800 text-white flex items-center justify-center shadow-[0_8px_22px_rgba(67,56,202,0.32)] hover:brightness-110 hover:scale-105 active:scale-95 transition-all outline-none" />
             }
           >
             <Menu size={26} />
@@ -54,7 +54,7 @@ export function MobileNav() {
             <div className="absolute top-4 left-1/2 -translate-x-1/2 w-12 h-1.5 bg-border/40 rounded-full" />
             <div className="flex flex-col h-full pt-16 pb-8 px-6 overflow-y-auto">
               <div className="flex flex-col items-center mb-8 pb-8 border-b border-border/20">
-                <img src="/logo-1.png" alt="DreamTeam Technology" className="h-12 w-auto mb-6 grayscale dark:invert" />
+                <img src="/logo-2.png" alt="DreamTeam Technology" className="h-16 w-auto mb-6 grayscale dark:invert" />
                 <div className="flex gap-4">
                   <LanguageDropdown />
                   {/* <ThemeToggle /> */}

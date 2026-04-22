@@ -210,7 +210,7 @@ export function OrderFormSection() {
               >
                 {/* Popular badge */}
                 {plan.popular && (
-                  <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-purple-500 via-primary to-fuchsia-400" />
+                  <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-indigo-500 via-primary to-indigo-400" />
                 )}
                 {plan.popular && (
                   <div className="absolute top-3 right-3">
@@ -258,7 +258,7 @@ export function OrderFormSection() {
                       className={`w-full rounded-full font-bold h-10 text-sm transition-all ${
                         plan.popular
                           ? "shadow-lg shadow-indigo-500/25"
-                          : "border border-transparent hover:border-white/10 hover:bg-gradient-to-br hover:from-indigo-600 hover:via-violet-600 hover:to-[#7033ff] hover:text-primary-foreground hover:brightness-105"
+                          : "border border-transparent hover:border-white/10 hover:bg-gradient-to-br hover:from-indigo-600 hover:via-indigo-600 hover:to-indigo-800 hover:text-primary-foreground hover:brightness-105"
                       } ${isSelected ? "ring-2 ring-indigo-400/50" : ""}`}
                     >
                       {t.pricing.order}

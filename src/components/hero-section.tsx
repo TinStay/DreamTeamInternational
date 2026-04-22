@@ -42,11 +42,11 @@ export function HeroSection() {
       {/* Mobile logo (top-center) */}
       <Link href={homeHref} className="lg:hidden absolute top-5 left-1/2 -translate-x-1/2 z-30 group">
         <Image
-          src="/logo-1.png"
+          src="/logo-2.png"
           alt="DreamTeam Technology"
-          width={320}
-          height={128}
-          className="h-12 w-auto sm:h-14 grayscale transition-all group-hover:grayscale-0 dark:invert drop-shadow-[0_8px_24px_rgba(0,0,0,0.45)]"
+          width={420}
+          height={420}
+          className="h-18 w-auto sm:h-14 grayscale transition-all group-hover:grayscale-0 dark:invert drop-shadow-[0_8px_24px_rgba(0,0,0,0.75)]"
           priority
         />
       </Link>

@@ -75,17 +75,17 @@
   --border: #e7e7ee;
   --radius: 1.4rem;
   --chart-1: #4ac885;
-  --chart-2: #7033ff;
+  --chart-2: #4f46e5;
   --chart-3: #fd822b;
   --chart-4: #3276e4;
   --chart-5: #747474;
   --popover: #ffffff;
-  --primary: #7033ff;
+  --primary: #4f46e5;
   --sidebar: #f5f8fb;
   --spacing: 0.27rem;
   --font-mono: IBM Plex Mono, monospace;
   --font-sans: "Nunito Sans", Plus Jakarta Sans, sans-serif;
-  --secondary: #e8e5ff;
+  --secondary: #eef2ff;
   --background: #f6f7f9;
   --font-serif: Lora, serif;
   --foreground: #000000;
@@ -115,19 +115,19 @@
 
 .dark {
   --card: #222327;
-  --ring: #8c5cff;
+  --ring: #6366f1;
   --input: #33353a;
   --muted: #2a2c33;
   --accent: #1e293b;
   --border: #33353a;
   --radius: 1.4rem;
   --chart-1: #4ade80;
-  --chart-2: #8c5cff;
+  --chart-2: #6366f1;
   --chart-3: #fca5a5;
   --chart-4: #5993f4;
   --chart-5: #a0a0a0;
   --popover: #222327;
-  --primary: #8c5cff;
+  --primary: #6366f1;
   --sidebar: #161618;
   --spacing: 0.27rem;
   --font-mono: IBM Plex Mono, monospace;
@@ -139,7 +139,7 @@
   --destructive: #f87171;
   --shadow-blur: 3px;
   --shadow-color: hsl(0 0% 0%);
-  --sidebar-ring: #8c5cff;
+  --sidebar-ring: #6366f1;
   --shadow-spread: 0px;
   --letter-spacing: -0.025em;
   --shadow-opacity: 0.16;
@@ -148,7 +148,7 @@
   --card-foreground: #f0f0f0;
   --shadow-offset-x: 0px;
   --shadow-offset-y: 2px;
-  --sidebar-primary: #8c5cff;
+  --sidebar-primary: #6366f1;
   --muted-foreground: #a0a0a0;
   --accent-foreground: #79c0ff;
   --popover-foreground: #f0f0f0;
@@ -156,18 +156,18 @@
   --sidebar-foreground: #f0f0f0;
   --secondary-foreground: #e0e7ff;
   --destructive-foreground: #ffffff;
-  --sidebar-accent-foreground: #8c5cff;
+  --sidebar-accent-foreground: #818cf8;
   --sidebar-primary-foreground: #ffffff;
 }
 
-/* Glassmorphism Classes (Purple in Dark, Neutral in Light) */
+/* Glassmorphism Classes (Indigo tint in Dark, Neutral in Light) */
 
 /* Dark mode */
 .dark .liquid-glass {
-  background: rgba(20, 8, 40, 0.55);
+  background: rgba(15, 23, 42, 0.55);
   backdrop-filter: blur(20px) saturate(150%);
-  border: 1px solid rgba(180, 120, 255, 0.12);
-  box-shadow: 0 4px 16px rgba(80,0,160,0.25), inset 0 1px 0 rgba(200,150,255,0.06);
+  border: 1px solid rgba(129, 140, 248, 0.14);
+  box-shadow: 0 4px 16px rgba(30, 27, 75, 0.35), inset 0 1px 0 rgba(165, 180, 252, 0.08);
 }
 
 /* Light mode */
@@ -179,9 +179,9 @@
 }
 
 .dark .liquid-glass-header {
-  background: rgba(12, 5, 28, 0.5);
+  background: rgba(15, 23, 42, 0.52);
   backdrop-filter: blur(20px);
-  border: 1px solid rgba(180, 120, 255, 0.12);
+  border: 1px solid rgba(129, 140, 248, 0.14);
 }
 
 :root:not(.dark) .liquid-glass-header {

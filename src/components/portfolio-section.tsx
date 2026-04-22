@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useLanguage } from "@/lib/i18n/language-context";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   AVATARS_WIDE,
   CARS_SHORT,
@@ -278,13 +279,15 @@ export function PortfolioSection() {
 
   const isActiveTab = (key: string) => key === activeCategory;
 
-  const formatToggleActive =
-    "bg-gradient-to-br from-indigo-600 via-violet-600 to-[#7033ff] text-white shadow-[0_6px_16px_rgba(79,70,229,0.28)] hover:brightness-110";
-
-  const formatToggleBtnClass = (active: boolean) =>
+  const categoryChipClass = (active: boolean) =>
     cn(
-      "flex h-8 min-h-8 shrink-0 items-center justify-center gap-1 rounded-lg px-2 text-[10px] font-semibold leading-none shadow-none hover:shadow-none sm:h-8 sm:px-2.5 sm:text-[11px]",
-      active ? formatToggleActive : "text-foreground/70 hover:text-foreground"
+      "relative shrink-0 cursor-pointer rounded-full font-semibold inline-flex items-center gap-1.5",
+      "h-9 px-3 text-xs sm:h-10 sm:gap-2 sm:px-4 sm:text-sm",
+      "border border-transparent !shadow-none hover:!shadow-none focus-visible:!shadow-none active:!shadow-none",
+      "transition-colors",
+      active
+        ? "border-white/15 bg-gradient-to-br from-indigo-600 via-indigo-600 to-indigo-800 text-primary-foreground hover:brightness-[1.06] hover:text-primary-foreground"
+        : "border-border/50 bg-background/80 text-foreground hover:bg-muted hover:text-foreground dark:border-border/40 dark:bg-input/25"
     );
 
   return (
@@ -306,74 +309,90 @@ export function PortfolioSection() {
             </p>
           </div>
 
-          {/* Single sticky bar: aspect + categories (sits below fixed site header on desktop) */}
+          {/* Sticky controls: resolution row + category row in separate cards (below fixed header on desktop) */}
           <div className="flex flex-col gap-8 pb-12">
-            <div className="sticky top-[max(0.75rem,env(safe-area-inset-top))] z-40 -mx-4 sm:-mx-6 lg:top-[7.25rem] lg:-mx-10">
-              <div className="rounded-2xl border border-border/25 bg-background/95 px-2 py-2 shadow-[0_12px_40px_rgba(15,23,42,0.1)] backdrop-blur-lg supports-[backdrop-filter]:bg-background/85 dark:border-border/30 dark:shadow-[0_12px_48px_rgba(0,0,0,0.45)] sm:px-3 sm:py-2.5">
-                <div className="flex flex-col gap-2.5 sm:flex-row sm:items-center sm:gap-3">
-                  <div className="flex shrink-0 items-center justify-center gap-1 rounded-xl border border-border/15 bg-muted/10 p-1 sm:justify-start">
-                    <Button
-                      type="button"
-                      onClick={() => setFormat("all")}
-                      variant="ghost"
-                      size="sm"
-                      className={formatToggleBtnClass(format === "all")}
+            <div className="sticky top-[max(0.75rem,env(safe-area-inset-top))] z-40 -mx-4 flex flex-col gap-2 px-4 sm:-mx-6 sm:px-6 sm:gap-2.5 lg:top-[7.25rem] lg:-mx-10 lg:px-10">
+              {/* Format: shadcn Tabs — near full width on mobile, pill / rounded-2xl on larger screens */}
+              <div className="w-full rounded-full border border-border/25 bg-background/95 px-2 py-2 shadow-[0_12px_40px_rgba(15,23,42,0.1)] backdrop-blur-lg supports-[backdrop-filter]:bg-background/85 dark:border-border/30 dark:shadow-[0_12px_48px_rgba(0,0,0,0.45)] sm:rounded-2xl sm:px-3 sm:py-2.5">
+                <Tabs
+                  value={format}
+                  onValueChange={(v) => {
+                    if (v === "all" || v === "desktop" || v === "mobile") {
+                      setFormat(v);
+                    }
+                  }}
+                  className="w-full max-w-full"
+                >
+                  <TabsList
+                    variant="default"
+                    className={cn(
+                      "h-auto min-h-10 w-full max-w-full justify-stretch gap-1 rounded-full border-0 bg-muted/25 p-1 text-[10px] shadow-none sm:min-h-9 sm:text-[11px]"
+                    )}
+                  >
+                    <TabsTrigger
+                      value="all"
                       aria-label={t.portfolio.format.all}
+                      className={cn(
+                        "flex-1 min-w-0 rounded-full border border-transparent px-2 py-2 text-[10px] font-semibold shadow-none sm:py-1.5 sm:text-[11px]",
+                        "data-active:border-white/15 data-active:bg-gradient-to-br data-active:from-indigo-600 data-active:via-indigo-600 data-active:to-indigo-800 data-active:text-white data-active:!shadow-none",
+                        "hover:text-foreground data-active:hover:brightness-[1.06] data-active:hover:text-white"
+                      )}
                     >
-                      <Grid2X2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                    </Button>
-                    <Button
-                      type="button"
-                      onClick={() => setFormat("desktop")}
-                      variant="ghost"
-                      size="sm"
-                      className={formatToggleBtnClass(format === "desktop")}
+                      <Grid2X2 className="h-3.5 w-3.5 shrink-0 sm:h-4 sm:w-4" />
+                    </TabsTrigger>
+                    <TabsTrigger
+                      value="desktop"
                       aria-label={t.portfolio.format.desktop}
+                      className={cn(
+                        "flex-1 min-w-0 gap-0.5 rounded-full border border-transparent px-2 py-2 text-[10px] font-semibold shadow-none sm:py-1.5 sm:text-[11px]",
+                        "data-active:border-white/15 data-active:bg-gradient-to-br data-active:from-indigo-600 data-active:via-indigo-600 data-active:to-indigo-800 data-active:text-white data-active:!shadow-none",
+                        "hover:text-foreground data-active:hover:brightness-[1.06] data-active:hover:text-white"
+                      )}
                     >
-                      <Monitor className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                      <span className="pl-0.5">{t.portfolio.format.ratio169}</span>
-                    </Button>
-                    <Button
-                      type="button"
-                      onClick={() => setFormat("mobile")}
-                      variant="ghost"
-                      size="sm"
-                      className={formatToggleBtnClass(format === "mobile")}
+                      <Monitor className="h-3.5 w-3.5 shrink-0 sm:h-4 sm:w-4" />
+                      <span className="truncate pl-0.5">{t.portfolio.format.ratio169}</span>
+                    </TabsTrigger>
+                    <TabsTrigger
+                      value="mobile"
                       aria-label={t.portfolio.format.mobile}
+                      className={cn(
+                        "flex-1 min-w-0 gap-0.5 rounded-full border border-transparent px-2 py-2 text-[10px] font-semibold shadow-none sm:py-1.5 sm:text-[11px]",
+                        "data-active:border-white/15 data-active:bg-gradient-to-br data-active:from-indigo-600 data-active:via-indigo-600 data-active:to-indigo-800 data-active:text-white data-active:!shadow-none",
+                        "hover:text-foreground data-active:hover:brightness-[1.06] data-active:hover:text-white"
+                      )}
                     >
-                      <Smartphone className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                      <span className="pl-0.5">{t.portfolio.format.ratio916}</span>
-                    </Button>
-                  </div>
+                      <Smartphone className="h-3.5 w-3.5 shrink-0 sm:h-4 sm:w-4" />
+                      <span className="truncate pl-0.5">{t.portfolio.format.ratio916}</span>
+                    </TabsTrigger>
+                  </TabsList>
+                </Tabs>
+              </div>
 
-                  <div className="relative min-h-[2.75rem] min-w-0 flex-1 sm:border-l sm:border-border/20 sm:pl-3">
-                    <div className="pointer-events-none absolute inset-y-0 left-0 z-[1] w-8 bg-gradient-to-r from-card to-transparent sm:w-6" />
-                    <div className="pointer-events-none absolute inset-y-0 right-0 z-[1] w-8 bg-gradient-to-l from-card to-transparent sm:w-6" />
-                    <div className="relative flex w-full items-center gap-1.5 overflow-x-auto overflow-y-hidden px-1 py-0.5 no-scrollbar">
-                      {CATEGORIES.map((cat) => (
-                        <Button
-                          key={cat.key}
-                          type="button"
-                          onClick={() => setActiveCategory(cat.key)}
-                          variant={isActiveTab(cat.key) ? "default" : "outline"}
-                          size="sm"
+              <div className="rounded-3xl border border-border/25 bg-background/95 px-1 py-2 shadow-[0_12px_40px_rgba(15,23,42,0.1)] backdrop-blur-lg supports-[backdrop-filter]:bg-background/85 dark:border-border/30 dark:shadow-[0_12px_48px_rgba(0,0,0,0.45)] sm:px-1 sm:py-2">
+                <div className="relative min-h-[2.75rem] min-w-0 flex-1 rounded-xl bg-muted/10 px-3 py-1 sm:px-4 sm:py-1.5">
+                  <div className="pointer-events-none absolute inset-y-1 left-3 z-[1] w-6  to-transparent sm:left-4 sm:w-8" />
+                  <div className="pointer-events-none absolute inset-y-1 right-3 z-[1] w-6 rounded-r-xl  sm:right-4 sm:w-8" />
+                  <div className="relative flex w-full items-center gap-2 overflow-x-auto overflow-y-hidden py-0.5 no-scrollbar">
+                    {CATEGORIES.map((cat) => (
+                      <Button
+                        key={cat.key}
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setActiveCategory(cat.key)}
+                        className={categoryChipClass(isActiveTab(cat.key))}
+                      >
+                        <span
                           className={cn(
-                            "relative shrink-0 cursor-pointer rounded-full font-semibold inline-flex items-center gap-1.5",
-                            "h-9 px-3 text-xs sm:h-10 sm:gap-2 sm:px-4 sm:text-sm"
+                            "[&_svg]:h-4 [&_svg]:w-4 opacity-90 sm:[&_svg]:h-[1.05rem] sm:[&_svg]:w-[1.05rem]",
+                            isActiveTab(cat.key) && "text-primary-foreground opacity-100"
                           )}
                         >
-                          <span
-                            className={cn(
-                              "[&_svg]:h-4 [&_svg]:w-4 opacity-90 sm:[&_svg]:h-[1.05rem] sm:[&_svg]:w-[1.05rem]",
-                              isActiveTab(cat.key) && "text-primary-foreground opacity-100"
-                            )}
-                          >
-                            {cat.icon}
-                          </span>
-                          <span>{cat.label}</span>
-                        </Button>
-                      ))}
-                    </div>
+                          {cat.icon}
+                        </span>
+                        <span>{cat.label}</span>
+                      </Button>
+                    ))}
                   </div>
                 </div>
               </div>

@@ -170,97 +170,18 @@ export function ContactSection() {
     <section id="contact" className="py-24 relative overflow-hidden">
       
       <div className="max-w-7xl mx-auto px-4 z-10 relative">
-        <div className="grid gap-12 lg:gap-16 items-center lg:grid-cols-[minmax(0,40%)_minmax(0,60%)]">
-          
-          {/* Left Column: Info */}
-          <div className="animate-in slide-in-from-left-12 fade-in duration-1000">
-            <h2 className="font-heading font-bold text-4xl md:text-5xl mb-6 text-foreground">
-              {t.contact.title1} <span className="text-primary">{t.contact.title2}</span>
-            </h2>
-            <p className="text-muted-foreground text-lg mb-10 max-w-md">
-              {t.contact.subtitle}
-            </p>
+        <div className="mb-10 lg:mb-12">
+          <h2 className="font-heading font-bold text-4xl md:text-5xl mb-6 text-foreground">
+            {t.contact.title1} <span className="text-primary">{t.contact.title2}</span>
+          </h2>
+          <p className="text-muted-foreground text-lg max-w-2xl">
+            {t.contact.subtitle}
+          </p>
+        </div>
 
-            <div className="space-y-6 mb-10">
-              {/* Email */}
-              <a href="mailto:info@dreamteam.technology" className="flex items-center gap-4 group">
-                <div className="w-12 h-12 rounded-full border border-border/50 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-colors bg-background/30">
-                  <Mail size={20} />
-                </div>
-                <div>
-                  <div className="text-sm text-muted-foreground">{t.contact.email}</div>
-                  <div className="font-semibold text-foreground group-hover:text-primary transition-colors">info@dreamteam.technology</div>
-                </div>
-              </a>
-
-              {/* Phone 1 */}
-              <a href="tel:+359878757930" className="flex items-center gap-4 group">
-                <div className="w-12 h-12 rounded-full border border-border/50 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-colors bg-background/30">
-                  <Phone size={20} />
-                </div>
-                <div>
-                  <div className="text-sm text-muted-foreground">{t.contact.phone}</div>
-                  <div className="font-semibold text-foreground group-hover:text-primary transition-colors">+359 87 875 7930</div>
-                </div>
-              </a>
-
-              {/* Phone 2 */}
-              <a href="tel:+359882367100" className="flex items-center gap-4 group">
-                <div className="w-12 h-12 rounded-full border border-border/50 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-colors bg-background/30">
-                  <Phone size={20} />
-                </div>
-                <div>
-                  <div className="text-sm text-muted-foreground">{t.contact.phone}</div>
-                  <div className="font-semibold text-foreground group-hover:text-primary transition-colors">+359 88 236 7100</div>
-                </div>
-              </a>
-
-              {/* Address */}
-              <div className="flex items-start gap-4">
-                <div className="w-12 h-12 rounded-full border border-border/50 flex items-center justify-center text-primary bg-background/30 flex-shrink-0 mt-0.5">
-                  <MapPin size={20} />
-                </div>
-                <div>
-                  <div className="text-sm text-muted-foreground mb-1">{t.contact.address}</div>
-                  <div className="font-semibold text-foreground leading-relaxed">
-                    ул. Николай Коперник № 27-29, ет. 2, офис 17<br />
-                    кв. Гео Милев, София, България
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Social links */}
-            <div className="flex gap-4">
-              <a
-                href="https://www.facebook.com/profile.php?id=61585919836260"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-10 h-10 rounded-full bg-background/30 border border-border/50 flex items-center justify-center text-foreground hover:text-primary-foreground hover:bg-primary transition-all hover:scale-110"
-              >
-              <FacebookIcon />
-              </a>
-              <a
-                href="https://www.instagram.com/dreamteam.video.ai/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-10 h-10 rounded-full bg-background/30 border border-border/50 flex items-center justify-center text-foreground hover:text-primary-foreground hover:bg-primary transition-all hover:scale-110"
-              >
-              <InstagramIcon />
-              </a>
-              <a
-                href="https://www.linkedin.com/company/109344952"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-10 h-10 rounded-full bg-background/30 border border-border/50 flex items-center justify-center text-foreground hover:text-primary-foreground hover:bg-primary transition-all hover:scale-110"
-              >
-              <LinkedInIcon />
-              </a>
-            </div>
-          </div>
-
-          {/* Right Column: Form */}
-          <div className="rounded-3xl p-8 border border-border/30 animate-in slide-in-from-right-12 fade-in duration-1000 delay-200 bg-card text-card-foreground shadow-elevated-soft">
+        <div className="grid gap-12 lg:gap-16 items-start lg:grid-cols-[minmax(0,60%)_minmax(0,40%)]">
+          {/* Column 1: Form */}
+          <div className="rounded-3xl p-8 border border-border/30 animate-in slide-in-from-left-12 fade-in duration-1000 bg-card text-card-foreground shadow-elevated-soft">
             <h3 className="text-2xl font-heading font-semibold mb-6 text-foreground">{t.contact.formTitle}</h3>
             
             <form className="space-y-4" onSubmit={handleSubmit}>
@@ -373,6 +294,86 @@ export function ContactSection() {
                 />
               )}
             </form>
+          </div>
+
+          {/* Column 2: Contact info */}
+          <div className="animate-in slide-in-from-right-12 fade-in duration-1000 delay-200">
+            <div className="space-y-6 mb-10">
+              {/* Email */}
+              <a href="mailto:info@dreamteam.technology" className="flex items-center gap-4 group">
+                <div className="w-12 h-12 rounded-full border border-border/50 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-colors bg-background/30">
+                  <Mail size={20} />
+                </div>
+                <div>
+                  <div className="text-sm text-muted-foreground">{t.contact.email}</div>
+                  <div className="font-semibold text-foreground group-hover:text-primary transition-colors">info@dreamteam.technology</div>
+                </div>
+              </a>
+
+              {/* Phone 1 */}
+              <a href="tel:+359878757930" className="flex items-center gap-4 group">
+                <div className="w-12 h-12 rounded-full border border-border/50 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-colors bg-background/30">
+                  <Phone size={20} />
+                </div>
+                <div>
+                  <div className="text-sm text-muted-foreground">{t.contact.phone}</div>
+                  <div className="font-semibold text-foreground group-hover:text-primary transition-colors">+359 87 875 7930</div>
+                </div>
+              </a>
+
+              {/* Phone 2 */}
+              <a href="tel:+359882367100" className="flex items-center gap-4 group">
+                <div className="w-12 h-12 rounded-full border border-border/50 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-colors bg-background/30">
+                  <Phone size={20} />
+                </div>
+                <div>
+                  <div className="text-sm text-muted-foreground">{t.contact.phone}</div>
+                  <div className="font-semibold text-foreground group-hover:text-primary transition-colors">+359 88 236 7100</div>
+                </div>
+              </a>
+
+              {/* Address */}
+              <div className="flex items-start gap-4">
+                <div className="w-12 h-12 rounded-full border border-border/50 flex items-center justify-center text-primary bg-background/30 flex-shrink-0 mt-0.5">
+                  <MapPin size={20} />
+                </div>
+                <div>
+                  <div className="text-sm text-muted-foreground mb-1">{t.contact.address}</div>
+                  <div className="font-semibold text-foreground leading-relaxed">
+                    ул. Николай Коперник № 27-29, ет. 2, офис 17<br />
+                    кв. Гео Милев, София, България
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Social links */}
+            <div className="flex gap-4">
+              <a
+                href="https://www.facebook.com/profile.php?id=61585919836260"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-10 h-10 rounded-full bg-background/30 border border-border/50 flex items-center justify-center text-foreground hover:text-primary-foreground hover:bg-primary transition-all hover:scale-110"
+              >
+              <FacebookIcon />
+              </a>
+              <a
+                href="https://www.instagram.com/dreamteam.video.ai/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-10 h-10 rounded-full bg-background/30 border border-border/50 flex items-center justify-center text-foreground hover:text-primary-foreground hover:bg-primary transition-all hover:scale-110"
+              >
+              <InstagramIcon />
+              </a>
+              <a
+                href="https://www.linkedin.com/company/109344952"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-10 h-10 rounded-full bg-background/30 border border-border/50 flex items-center justify-center text-foreground hover:text-primary-foreground hover:bg-primary transition-all hover:scale-110"
+              >
+              <LinkedInIcon />
+              </a>
+            </div>
           </div>
 
         </div>
