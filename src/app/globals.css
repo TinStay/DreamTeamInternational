@@ -85,7 +85,7 @@
   --spacing: 0.27rem;
   --font-mono: IBM Plex Mono, monospace;
   --font-sans: "Nunito Sans", Plus Jakarta Sans, sans-serif;
-  --secondary: #edf0f4;
+  --secondary: #e8e5ff;
   --background: #f6f7f9;
   --font-serif: Lora, serif;
   --foreground: #000000;
@@ -107,7 +107,7 @@
   --popover-foreground: #000000;
   --primary-foreground: #ffffff;
   --sidebar-foreground: #000000;
-  --secondary-foreground: #080808;
+  --secondary-foreground: #312e81;
   --destructive-foreground: #ffffff;
   --sidebar-accent-foreground: #000000;
   --sidebar-primary-foreground: #ffffff;
@@ -132,7 +132,7 @@
   --spacing: 0.27rem;
   --font-mono: IBM Plex Mono, monospace;
   --font-sans: "Nunito Sans", Plus Jakarta Sans, sans-serif;
-  --secondary: #2a2c33;
+  --secondary: #252342;
   --background: #1a1b1e;
   --font-serif: Lora, serif;
   --foreground: #f0f0f0;
@@ -154,7 +154,7 @@
   --popover-foreground: #f0f0f0;
   --primary-foreground: #ffffff;
   --sidebar-foreground: #f0f0f0;
-  --secondary-foreground: #f0f0f0;
+  --secondary-foreground: #e0e7ff;
   --destructive-foreground: #ffffff;
   --sidebar-accent-foreground: #8c5cff;
   --sidebar-primary-foreground: #ffffff;

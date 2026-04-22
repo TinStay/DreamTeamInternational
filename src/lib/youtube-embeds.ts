@@ -23,7 +23,7 @@ export const PORTFOLIO_DEFAULT_WIDE: YouTubeEmbed = {
 };
 
 export const PORTFOLIO_DEFAULT_SHORT: YouTubeEmbed = {
-  src: "https://www.youtube.com/embed/ERFq46M0MJQ",
+  src: "https://www.youtube.com/embed/ERFq46M0MJQ?si=RLc4e53ViJ_YqjN4",
   title: "DreamTeam portfolio short video",
 };
 
@@ -72,10 +72,39 @@ export const CARS_WIDE: YouTubeEmbed[] = [
   },
 ];
 
+/** Cars category (9:16 Shorts) */
+export const CARS_SHORT: YouTubeEmbed[] = [
+  {
+    src: "https://www.youtube.com/embed/TilXvyDCSGc?si=cdO0hr4QfCUyJxPV",
+    title: "Cars (short) 1",
+  },
+];
+
+/** Кино Реклама / TV category (16:9) */
 export const TV_WIDE: YouTubeEmbed[] = [
   {
+    src: "https://www.youtube.com/embed/fznYCs6dvQI?si=4Hn-P0ozS1KgdFjX",
+    title: "Кино реклама (wide) 1",
+  },
+  {
     src: "https://www.youtube.com/embed/hRQa2VGSWJY?si=an88Ta35rPjWbcy4",
-    title: "TV (wide) 1",
+    title: "Кино реклама (wide) 2",
+  },
+];
+
+/** Кино Реклама / TV category (9:16 Shorts) */
+export const TV_SHORT: YouTubeEmbed[] = [
+  {
+    src: "https://www.youtube.com/embed/xf3WQx89K08?si=_PlVQUSaBU4QWcAQ",
+    title: "Кино реклама (short) 1",
+  },
+  {
+    src: "https://www.youtube.com/embed/O7rSjOXZSwM?si=a9kVvbwH6fge68Hy",
+    title: "Кино реклама (short) 2",
+  },
+  {
+    src: "https://www.youtube.com/embed/ymzLC2ae6gw?si=BOct84jCEIHMRxzx",
+    title: "Кино реклама (short) 3",
   },
 ];
 
@@ -83,6 +112,14 @@ export const PRODUCT_WIDE: YouTubeEmbed[] = [
   {
     src: "https://www.youtube.com/embed/ZLld8y9aVzk?si=AZWoyOWCE1SJWVNs",
     title: "Product (wide) 1",
+  },
+];
+
+/** Product category (9:16 Shorts) */
+export const PRODUCT_SHORT: YouTubeEmbed[] = [
+  {
+    src: "https://www.youtube.com/embed/ERFq46M0MJQ?si=RLc4e53ViJ_YqjN4",
+    title: "Product (short) 1",
   },
 ];
 

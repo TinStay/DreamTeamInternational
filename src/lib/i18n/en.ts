@@ -32,7 +32,7 @@ export const en = {
       all: "All",
       construction: "Construction",
       mascots: "Mascots",
-      tv: "TV Production",
+      tv: "Cinema advertising",
       cars: "Cars",
       product: "Product",
       animated: "Animated"
@@ -153,16 +153,21 @@ export const en = {
     messagePh: "Tell us about it...",
     terms: {
       prefix: "I agree to the",
-      link: "Terms & Conditions",
+      link: "Terms and Conditions",
       suffix: ".",
     },
-    send: "Send"
+    send: "Send",
+    sending: "Sending…",
+    sendSuccessTitle: "Message sent",
+    sendSuccessBody: "Thank you — we have received your message and will get back to you shortly.",
+    sendErrorTitle: "Something went wrong",
+    sendErrorBody: "We could not send your message. Please try again in a moment or email us directly."
   },
   footer: {
     desc: "At DreamTeam Technology, we handle end-to-end video production using the latest AI technologies.",
     links: "Links",
     legal: "Legal",
-    terms: "Terms & Conditions",
+    terms: "Terms and Conditions",
     privacy: "Privacy Policy",
     copy: "DreamTeam Technology. All rights reserved.",
     made: "Made with ♥ and AI."

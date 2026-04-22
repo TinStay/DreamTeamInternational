@@ -6,10 +6,13 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
   AVATARS_WIDE,
+  CARS_SHORT,
   CARS_WIDE,
   CONSTRUCTION_SHORT,
   CONSTRUCTION_WIDE,
+  PRODUCT_SHORT,
   PRODUCT_WIDE,
+  TV_SHORT,
   TV_WIDE,
   YOUTUBE_IFRAME_ALLOW,
   YOUTUBE_REFERRER_POLICY,
@@ -200,11 +203,11 @@ function embedsForCategory(category: string) {
     case "mascots": // avatars
       return { wide: AVATARS_WIDE, short: [] as YouTubeEmbed[] };
     case "cars":
-      return { wide: CARS_WIDE, short: [] as YouTubeEmbed[] };
+      return { wide: CARS_WIDE, short: CARS_SHORT };
     case "tv":
-      return { wide: TV_WIDE, short: [] as YouTubeEmbed[] };
+      return { wide: TV_WIDE, short: TV_SHORT };
     case "product":
-      return { wide: PRODUCT_WIDE, short: [] as YouTubeEmbed[] };
+      return { wide: PRODUCT_WIDE, short: PRODUCT_SHORT };
     default:
       return { wide: [] as YouTubeEmbed[], short: [] as YouTubeEmbed[] };
   }
@@ -238,12 +241,13 @@ export function PortfolioSection() {
 
   const isActiveTab = (key: string) => key === activeCategory;
 
+  const formatToggleActive =
+    "bg-gradient-to-br from-indigo-600 via-violet-600 to-[#7033ff] text-white shadow-[0_6px_16px_rgba(79,70,229,0.28)] hover:brightness-110";
+
   const formatToggleBtnClass = (active: boolean) =>
     cn(
       "flex flex-1 items-center justify-center rounded-full cursor-pointer shadow-none hover:shadow-none h-12 min-h-12 px-2 sm:px-3",
-      active
-        ? "bg-primary text-primary-foreground hover:bg-primary/90"
-        : "text-foreground/70 hover:text-foreground"
+      active ? formatToggleActive : "text-foreground/70 hover:text-foreground"
     );
 
   const FormatToggleMobile = (
@@ -281,19 +285,20 @@ export function PortfolioSection() {
     </div>
   );
 
+  const formatToggleDesktopBtn = (active: boolean) =>
+    cn(
+      "flex flex-1 items-center justify-center rounded-full cursor-pointer shadow-none hover:shadow-none h-9 min-h-9 px-1",
+      active ? formatToggleActive : "text-foreground/70 hover:text-foreground"
+    );
+
   const FormatToggle = (
-    <div className="inline-flex items-center rounded-full border border-border/20 bg-background/40 backdrop-blur-md shadow-elevated-soft p-1">
+    <div className="flex w-full items-stretch gap-0.5 rounded-full border border-border/20 bg-background/40 backdrop-blur-md shadow-elevated-soft p-1">
       <Button
         type="button"
         onClick={() => setFormat("all")}
         variant="ghost"
         size="sm"
-        className={cn(
-          "rounded-full px-3 py-2 cursor-pointer shadow-none hover:shadow-none",
-          format === "all"
-            ? "bg-primary text-primary-foreground hover:bg-primary/90"
-            : "text-foreground/70 hover:text-foreground"
-        )}
+        className={formatToggleDesktopBtn(format === "all")}
         aria-label={t.portfolio.format.all}
       >
         <Grid2X2 className="h-4 w-4" />
@@ -303,12 +308,7 @@ export function PortfolioSection() {
         onClick={() => setFormat("desktop")}
         variant="ghost"
         size="sm"
-        className={cn(
-          "rounded-full px-3 py-2 cursor-pointer shadow-none hover:shadow-none",
-          format === "desktop"
-            ? "bg-primary text-primary-foreground hover:bg-primary/90"
-            : "text-foreground/70 hover:text-foreground"
-        )}
+        className={formatToggleDesktopBtn(format === "desktop")}
         aria-label={t.portfolio.format.desktop}
       >
         <Monitor className="h-4 w-4" />
@@ -318,12 +318,7 @@ export function PortfolioSection() {
         onClick={() => setFormat("mobile")}
         variant="ghost"
         size="sm"
-        className={cn(
-          "rounded-full px-3 py-2 cursor-pointer shadow-none hover:shadow-none",
-          format === "mobile"
-            ? "bg-primary text-primary-foreground hover:bg-primary/90"
-            : "text-foreground/70 hover:text-foreground"
-        )}
+        className={formatToggleDesktopBtn(format === "mobile")}
         aria-label={t.portfolio.format.mobile}
       >
         <Smartphone className="h-4 w-4" />

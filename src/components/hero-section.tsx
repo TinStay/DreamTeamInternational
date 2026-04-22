@@ -21,7 +21,7 @@ export function HeroSection() {
     >
       
       {/* Background Video */}
-      <div className="absolute inset-0 z-0 overflow-hidden drop-shadow-[0_12px_34px_rgba(0,0,0,0.75)]">
+      <div className="absolute inset-0 z-0 overflow-hidden">
         <div className="absolute inset-0 scale-105 pointer-events-none">
           <iframe
             className="absolute left-1/2 top-1/2 h-[100svh] w-[177.78svh] min-h-[56.25vw] min-w-[100vw] -translate-x-1/2 -translate-y-1/2"
@@ -33,10 +33,10 @@ export function HeroSection() {
           />
         </div>
         
-        {/* Dynamic Overlay (dark corner vignettes) */}
-        <div className="absolute inset-0 transition-opacity duration-700 bg-[radial-gradient(1200px_700px_at_50%_30%,rgba(0,0,0,0.25),transparent_55%),radial-gradient(900px_600px_at_0%_0%,rgba(0,0,0,0.65),transparent_55%),radial-gradient(900px_600px_at_100%_0%,rgba(0,0,0,0.65),transparent_55%),radial-gradient(900px_600px_at_0%_100%,rgba(0,0,0,0.55),transparent_60%),radial-gradient(900px_600px_at_100%_100%,rgba(0,0,0,0.55),transparent_60%)]" />
-        {/* Subtle bottom overlay (light & dark modes) */}
-        <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t  drop-shadow-[0_12px_34px_rgba(0,0,0,0.75)] to-transparent dark:from-background/100" />
+        {/* Dynamic Overlay (light corner vignettes — keep video readable) */}
+        <div className="absolute inset-0 transition-opacity duration-700 bg-[radial-gradient(1200px_700px_at_50%_30%,rgba(0,0,0,0.14),transparent_58%),radial-gradient(900px_600px_at_0%_0%,rgba(0,0,0,0.32),transparent_58%),radial-gradient(900px_600px_at_100%_0%,rgba(0,0,0,0.32),transparent_58%),radial-gradient(900px_600px_at_0%_100%,rgba(0,0,0,0.26),transparent_62%),radial-gradient(900px_600px_at_100%_100%,rgba(0,0,0,0.26),transparent_62%)]" />
+        {/* Subtle bottom overlay */}
+        <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t to-transparent from-black/25 dark:from-background/80" />
       </div>
 
       {/* Mobile logo (top-center) */}
@@ -46,16 +46,16 @@ export function HeroSection() {
           alt="DreamTeam Technology"
           width={320}
           height={128}
-          className="h-16 sm:h-20 w-auto grayscale transition-all group-hover:grayscale-0 dark:invert drop-shadow-[0_12px_30px_rgba(0,0,0,0.6)]"
+          className="h-12 w-auto sm:h-14 grayscale transition-all group-hover:grayscale-0 dark:invert drop-shadow-[0_8px_24px_rgba(0,0,0,0.45)]"
           priority
         />
       </Link>
 
       {/* Content */}
-      <div className="relative z-20 flex w-full flex-col items-center justify-center text-center px-4 max-w-5xl mx-auto mt-24 sm:mt-28 pb-8 sm:pb-10 lg:mt-0 lg:pb-0">
-        <h1 className="font-heading font-extrabold text-4xl leading-[1.06] sm:text-5xl md:text-7xl lg:text-8xl tracking-tight md:leading-[1.03] mb-6 sm:mb-8 text-white animate-in slide-in-from-bottom-8 fade-in duration-700 delay-100 fill-mode-both drop-shadow-[0_12px_34px_rgba(0,0,0,0.75)]">
+      <div className="relative z-20 flex w-full flex-col items-center justify-center text-center px-4 max-w-5xl mx-auto mt-[6.75rem] sm:mt-32 pb-8 sm:pb-10 lg:mt-0 lg:pb-0">
+        <h1 className="font-heading font-extrabold text-4xl leading-[1.06] sm:text-5xl md:text-7xl lg:text-8xl tracking-tight md:leading-[1.03] mb-6 sm:mb-8 text-white animate-in slide-in-from-bottom-8 fade-in duration-700 delay-100 fill-mode-both drop-shadow-[0_6px_20px_rgba(0,0,0,0.45)]">
           {t.hero.title1}{" "}
-          <span className="text-white drop-shadow-[0_12px_34px_rgba(0,0,0,0.75)]">
+          <span className="text-white drop-shadow-[0_6px_20px_rgba(0,0,0,0.45)]">
             {t.hero.title2}
           </span>
         </h1>
@@ -65,7 +65,7 @@ export function HeroSection() {
             href="#contact"
             className={cn(
               buttonVariants({ variant: "default", size: "lg" }),
-              "w-full sm:w-auto rounded-full bg-primary text-primary-foreground hover:bg-primary/90 transition-all font-semibold tracking-wide h-14 px-10 shadow-elevated-soft hover:scale-105 active:scale-95 text-base"
+              "w-full sm:w-auto rounded-full transition-all font-semibold tracking-wide h-14 px-10 shadow-elevated-soft hover:scale-105 active:scale-95 text-base"
             )}
           >
             {t.hero.cta1}

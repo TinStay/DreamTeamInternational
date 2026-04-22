@@ -246,6 +246,7 @@ export function OrderFormSection() {
                   {/* CTAs */}
                   <div className="flex flex-col gap-2 mt-auto">
                     <Button
+                      variant={plan.popular ? "default" : "secondary"}
                       onClick={() => {
                         setSelectedPlan(plan.id);
                         setShowCustomInput(false);
@@ -256,9 +257,9 @@ export function OrderFormSection() {
                       }}
                       className={`w-full rounded-full font-bold h-10 text-sm transition-all ${
                         plan.popular
-                          ? "bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg shadow-primary/30"
-                          : "bg-secondary text-foreground hover:bg-primary hover:text-primary-foreground"
-                      } ${isSelected ? "ring-2 ring-primary/50" : ""}`}
+                          ? "shadow-lg shadow-indigo-500/25"
+                          : "border border-transparent hover:border-white/10 hover:bg-gradient-to-br hover:from-indigo-600 hover:via-violet-600 hover:to-[#7033ff] hover:text-primary-foreground hover:brightness-105"
+                      } ${isSelected ? "ring-2 ring-indigo-400/50" : ""}`}
                     >
                       {t.pricing.order}
                     </Button>

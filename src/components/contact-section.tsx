@@ -12,10 +12,56 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Mail, Phone, MapPin, Send } from "lucide-react";
+import { AlertTriangle, CheckCircle2, Mail, Phone, MapPin, Send } from "lucide-react";
 import { useLanguage } from "@/lib/i18n/language-context";
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import { cn } from "@/lib/utils";
+
+function SendResultCard({
+  variant,
+  title,
+  description,
+}: {
+  variant: "success" | "error";
+  title: string;
+  description: string;
+}) {
+  const isOk = variant === "success";
+  return (
+    <output
+      aria-live="polite"
+      className={cn(
+        "mt-5 flex gap-4 overflow-hidden rounded-2xl border p-4 sm:p-5 text-left shadow-lg animate-in fade-in slide-in-from-bottom-2 duration-500",
+        isOk
+          ? "border-emerald-500/25 bg-gradient-to-br from-emerald-500/10 via-background to-background dark:from-emerald-500/15"
+          : "border-destructive/25 bg-gradient-to-br from-destructive/10 via-background to-background dark:from-destructive/15"
+      )}
+    >
+      <div
+        className={cn(
+          "flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border",
+          isOk
+            ? "border-emerald-500/30 bg-emerald-500/15 text-emerald-700 dark:text-emerald-300"
+            : "border-destructive/30 bg-destructive/10 text-destructive"
+        )}
+      >
+        {isOk ? <CheckCircle2 className="h-5 w-5" strokeWidth={2.25} /> : <AlertTriangle className="h-5 w-5" />}
+      </div>
+      <div className="min-w-0 flex-1 space-y-1">
+        <p
+          className={cn(
+            "font-heading text-base font-semibold tracking-tight",
+            isOk ? "text-emerald-900 dark:text-emerald-100" : "text-destructive"
+          )}
+        >
+          {title}
+        </p>
+        <p className="text-sm leading-relaxed text-muted-foreground">{description}</p>
+      </div>
+    </output>
+  );
+}
 
 const FacebookIcon = () => (
   <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
@@ -58,7 +104,6 @@ function FieldLabel({
 
 export function ContactSection() {
   const { t, language } = useLanguage();
-  const [about, setAbout] = useState<string>("");
   const [foundUs, setFoundUs] = useState<string>("");
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [phoneNumber, setPhoneNumber] = useState<string>("");
@@ -69,17 +114,6 @@ export function ContactSection() {
   const [sendResult, setSendResult] = useState<null | "ok" | "error">(null);
 
   const termsHref = language === "bg" ? "/bg/terms" : "/terms";
-  const aboutOptions = useMemo(() => {
-    const opts = t.contact.aboutOptions;
-    return [
-      { value: "order_video", label: opts.order_video },
-      { value: "question", label: opts.question },
-      { value: "collaborate", label: opts.collaborate },
-      { value: "partner", label: opts.partner },
-      { value: "other", label: opts.other },
-    ];
-  }, [t.contact.aboutOptions]);
-
   const foundUsOptions = useMemo(() => {
     const opts = t.contact.foundUsOptions;
     return [
@@ -94,8 +128,6 @@ export function ContactSection() {
     ];
   }, [t.contact.foundUsOptions]);
 
-  const selectedAboutLabel =
-    aboutOptions.find((o) => o.value === about)?.label ?? "";
   const selectedFoundUsLabel =
     foundUsOptions.find((o) => o.value === foundUs)?.label ?? "";
 
@@ -114,7 +146,6 @@ export function ContactSection() {
           name,
           email,
           phone: phoneNumber,
-          subject: about,
           foundUs,
           message,
         }),
@@ -123,7 +154,6 @@ export function ContactSection() {
       if (!res.ok) throw new Error("Request failed");
       setSendResult("ok");
       setMessage("");
-      setAbout("");
       setFoundUs("");
       setPhoneNumber("");
       setName("");
@@ -235,48 +265,38 @@ export function ContactSection() {
             
             <form className="space-y-4" onSubmit={handleSubmit}>
               <div className="space-y-2">
-                <FieldLabel>{t.contact.subject}</FieldLabel>
-                <Select value={about} onValueChange={(v) => setAbout(v ?? "")}>
-                  <SelectTrigger className="w-full h-12 px-3 text-base bg-background/40 border-border/40 focus:border-primary/50 transition-colors">
-                    <SelectValue
-                      placeholder={
-                        t.contact.subjectPh.trim() === "" ? undefined : t.contact.subjectPh
-                      }
-                    >
-                      {about !== "" ? selectedAboutLabel : null}
-                    </SelectValue>
-                  </SelectTrigger>
-                  <SelectContent>
-                    {aboutOptions.map((opt) => (
-                      <SelectItem key={opt.value} value={opt.value} className="py-2 text-base">
-                        {opt.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
                 <FieldLabel required>{t.contact.message}</FieldLabel>
                 <Textarea
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
                   placeholder={t.contact.messagePh}
                   required
-                  className="min-h-[140px] text-base bg-background/40 border-border/40 focus:border-primary/50 transition-colors"
+                  className="min-h-[120px] text-sm bg-background/40 border-border/40 focus:border-primary/50 transition-colors"
                 />
               </div>
 
-              <div className="space-y-2">
-                <FieldLabel required>{t.contact.name}</FieldLabel>
-                <Input
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder={t.contact.name}
-                  required
-                  autoComplete="name"
-                  className="h-12 text-base bg-background/40 border-border/40 focus:border-primary/50 transition-colors"
-                />
+              <div className="grid grid-cols-2 gap-2 sm:gap-4">
+                <div className="space-y-2">
+                  <FieldLabel required>{t.contact.name}</FieldLabel>
+                  <Input
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    placeholder={t.contact.name}
+                    required
+                    autoComplete="name"
+                    className="h-9 text-sm bg-background/40 border-border/40 focus:border-primary/50 transition-colors"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <FieldLabel>{t.contact.phoneLbl}</FieldLabel>
+                  <Input
+                    type="tel"
+                    value={phoneNumber}
+                    onChange={(e) => setPhoneNumber(e.target.value)}
+                    autoComplete="tel"
+                    className="h-9 text-sm bg-background/40 border-border/40 focus:border-primary/50 transition-colors"
+                  />
+                </div>
               </div>
 
               <div className="space-y-2">
@@ -288,25 +308,14 @@ export function ContactSection() {
                   placeholder={t.contact.emailLbl}
                   required
                   autoComplete="email"
-                  className="h-12 text-base bg-background/40 border-border/40 focus:border-primary/50 transition-colors"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <FieldLabel>{t.contact.phoneLbl}</FieldLabel>
-                <Input
-                  type="tel"
-                  value={phoneNumber}
-                  onChange={(e) => setPhoneNumber(e.target.value)}
-                  autoComplete="tel"
-                  className="h-12 text-base bg-background/40 border-border/40 focus:border-primary/50 transition-colors"
+                  className="h-9 text-sm bg-background/40 border-border/40 focus:border-primary/50 transition-colors"
                 />
               </div>
 
               <div className="space-y-2">
                 <FieldLabel>{t.contact.foundUs}</FieldLabel>
                 <Select value={foundUs} onValueChange={(v) => setFoundUs(v ?? "")}>
-                  <SelectTrigger className="w-full h-12 px-3 text-base bg-background/40 border-border/40 focus:border-primary/50 transition-colors">
+                  <SelectTrigger className="w-full h-9 px-2.5 text-sm bg-background/40 border-border/40 focus:border-primary/50 transition-colors">
                     <SelectValue
                       placeholder={
                         t.contact.foundUsPh.trim() === "" ? undefined : t.contact.foundUsPh
@@ -317,7 +326,7 @@ export function ContactSection() {
                   </SelectTrigger>
                   <SelectContent>
                     {foundUsOptions.map((opt) => (
-                      <SelectItem key={opt.value} value={opt.value} className="py-2 text-base">
+                      <SelectItem key={opt.value} value={opt.value} className="py-1.5 text-sm">
                         {opt.label}
                       </SelectItem>
                     ))}
@@ -343,21 +352,25 @@ export function ContactSection() {
               <Button
                 type="submit"
                 disabled={!termsAccepted || isSending}
-                className="w-full rounded-full bg-primary text-primary-foreground hover:bg-primary/90 font-bold h-12 mt-4 shadow-lg hover:scale-105 active:scale-95 transition-all disabled:hover:scale-100"
+                className="w-full rounded-full font-bold h-10 text-sm mt-4 shadow-lg hover:scale-105 active:scale-95 transition-all disabled:hover:scale-100"
               >
-                {isSending ? "Sending..." : t.contact.send}{" "}
+                {isSending ? t.contact.sending : t.contact.send}{" "}
                 <Send className="ml-2 w-4 h-4" />
               </Button>
 
               {sendResult === "ok" && (
-                <p className="text-sm text-foreground/70">
-                  Sent successfully.
-                </p>
+                <SendResultCard
+                  variant="success"
+                  title={t.contact.sendSuccessTitle}
+                  description={t.contact.sendSuccessBody}
+                />
               )}
               {sendResult === "error" && (
-                <p className="text-sm text-destructive">
-                  Failed to send. Please try again.
-                </p>
+                <SendResultCard
+                  variant="error"
+                  title={t.contact.sendErrorTitle}
+                  description={t.contact.sendErrorBody}
+                />
               )}
             </form>
           </div>

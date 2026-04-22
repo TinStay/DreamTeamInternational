@@ -6,6 +6,8 @@ import { LanguageDropdown } from "./language-dropdown";
 import { Home, Video, Mail, Menu } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
 import { useLanguage } from "@/lib/i18n/language-context";
+import { buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 export function MobileNav() {
   const [isOpen, setIsOpen] = useState(false);
@@ -42,7 +44,7 @@ export function MobileNav() {
         <Sheet open={isOpen} onOpenChange={setIsOpen}>
           <SheetTrigger
             render={
-              <button className="shrink-0 w-14 h-14 rounded-full bg-primary text-primary-foreground flex items-center justify-center shadow-lg hover:scale-105 active:scale-95 transition-all outline-none" />
+              <button className="shrink-0 w-14 h-14 rounded-full border border-white/15 bg-gradient-to-br from-indigo-600 via-violet-600 to-[#7033ff] text-white flex items-center justify-center shadow-[0_8px_22px_rgba(79,70,229,0.35)] hover:brightness-110 hover:scale-105 active:scale-95 transition-all outline-none" />
             }
           >
             <Menu size={26} />
@@ -88,7 +90,10 @@ export function MobileNav() {
                 <Link
                   href="#contact"
                   onClick={() => setIsOpen(false)}
-                  className="w-full h-14 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold text-lg shadow-lg select-none"
+                  className={cn(
+                    buttonVariants({ variant: "default", size: "lg" }),
+                    "w-full h-14 rounded-full flex items-center justify-center font-bold text-lg select-none"
+                  )}
                 >
                   {t.header.chat}
                 </Link>
