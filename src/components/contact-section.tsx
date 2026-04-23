@@ -15,9 +15,9 @@ import {
 import {
   IconAlertTriangle,
   IconCircleCheck,
-  IconMailFilled,
-  IconMapPinFilled,
-  IconPhoneFilled,
+  IconMail,
+  IconMapPin,
+  IconPhone,
   IconSend,
 } from "@tabler/icons-react";
 import { useLanguage } from "@/lib/i18n/language-context";
@@ -176,6 +176,28 @@ export function ContactSection() {
     }
   }
 
+  const addressText =
+    "ул. Николай Коперник № 27-29, ет. 2, офис 17, кв. Гео Милев, София, България";
+
+  async function copyAddress() {
+    try {
+      await navigator.clipboard.writeText(addressText);
+    } catch {
+      const ta = document.createElement("textarea");
+      ta.value = addressText;
+      ta.style.position = "fixed";
+      ta.style.left = "-9999px";
+      document.body.appendChild(ta);
+      ta.focus();
+      ta.select();
+      try {
+        document.execCommand("copy");
+      } finally {
+        document.body.removeChild(ta);
+      }
+    }
+  }
+
   return (
     <section id="contact" className="py-24 relative overflow-hidden">
       
@@ -192,9 +214,7 @@ export function ContactSection() {
 
         <div className="grid gap-12 lg:gap-16 items-start lg:grid-cols-[minmax(0,60%)_minmax(0,40%)]">
           {/* Column 1: Form */}
-          <div className="rounded-3xl p-8 border border-border/30 animate-in slide-in-from-left-12 fade-in duration-1000 bg-card text-card-foreground shadow-elevated-soft">
-            <h3 className="text-2xl font-heading font-semibold mb-6 text-foreground">{t.contact.formTitle}</h3>
-            
+          <div className="rounded-3xl p-8 border border-border/30 animate-in slide-in-from-left-12 fade-in duration-1000 bg-card text-card-foreground shadow-elevated-soft">            
             <form className="space-y-4" onSubmit={handleSubmit}>
               <div className="space-y-2">
                 <FieldLabel required>{t.contact.message}</FieldLabel>
@@ -231,39 +251,41 @@ export function ContactSection() {
                 </div>
               </div>
 
-              <div className="space-y-2">
-                <FieldLabel required>{t.contact.emailLbl}</FieldLabel>
-                <Input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder={t.contact.emailLbl}
-                  required
-                  autoComplete="email"
-                  className="h-9 text-sm bg-background/40 border-border/40 focus:border-primary/50 transition-colors"
-                />
-              </div>
+              <div className="grid gap-2 sm:gap-4 sm:grid-cols-2">
+                <div className="space-y-2">
+                  <FieldLabel required>{t.contact.emailLbl}</FieldLabel>
+                  <Input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder={t.contact.emailLbl}
+                    required
+                    autoComplete="email"
+                    className="h-9 text-sm bg-background/40 border-border/40 focus:border-primary/50 transition-colors"
+                  />
+                </div>
 
-              <div className="space-y-2">
-                <FieldLabel>{t.contact.foundUs}</FieldLabel>
-                <Select value={foundUs} onValueChange={(v) => setFoundUs(v ?? "")}>
-                  <SelectTrigger className="w-full h-9 px-2.5 text-sm bg-background/40 border-border/40 focus:border-primary/50 transition-colors">
-                    <SelectValue
-                      placeholder={
-                        t.contact.foundUsPh.trim() === "" ? undefined : t.contact.foundUsPh
-                      }
-                    >
-                      {foundUs !== "" ? selectedFoundUsLabel : null}
-                    </SelectValue>
-                  </SelectTrigger>
-                  <SelectContent>
-                    {foundUsOptions.map((opt) => (
-                      <SelectItem key={opt.value} value={opt.value} className="py-1.5 text-sm">
-                        {opt.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <div className="space-y-2">
+                  <FieldLabel>{t.contact.foundUs}</FieldLabel>
+                  <Select value={foundUs} onValueChange={(v) => setFoundUs(v ?? "")}>
+                    <SelectTrigger className="w-full h-9 px-2.5 text-sm bg-background/40 border-border/40 focus:border-primary/50 transition-colors">
+                      <SelectValue
+                        placeholder={
+                          t.contact.foundUsPh.trim() === "" ? undefined : t.contact.foundUsPh
+                        }
+                      >
+                        {foundUs !== "" ? selectedFoundUsLabel : null}
+                      </SelectValue>
+                    </SelectTrigger>
+                    <SelectContent>
+                      {foundUsOptions.map((opt) => (
+                        <SelectItem key={opt.value} value={opt.value} className="py-1.5 text-sm">
+                          {opt.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
 
               <div className="flex items-start gap-3 pt-2">
@@ -314,9 +336,9 @@ export function ContactSection() {
           <div className="animate-in slide-in-from-right-12 fade-in duration-1000 delay-200">
             <div className="space-y-6 mb-10">
               {/* Email */}
-              <a href="mailto:info@dreamteam.technology" className="flex items-center gap-4 group">
-                <div className="flex h-12 w-12 items-center justify-center rounded-full border border-border/50 bg-background/30 transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
-                  <IconMailFilled className="h-5 w-5 icon-on-brand group-hover:text-primary-foreground group-hover:filter-none" />
+              <a href="mailto:info@dreamteam.technology" className="flex items-center gap-4 group cursor-pointer">
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white shadow-[0_10px_30px_rgba(15,23,42,0.12)] ring-1 ring-black/5">
+                  <IconMail className="h-5 w-5 text-primary" />
                 </div>
                 <div>
                   <div className="text-sm text-muted-foreground">{t.contact.email}</div>
@@ -325,9 +347,9 @@ export function ContactSection() {
               </a>
 
               {/* Phone 1 */}
-              <a href="tel:+359878757930" className="flex items-center gap-4 group">
-                <div className="flex h-12 w-12 items-center justify-center rounded-full border border-border/50 bg-background/30 transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
-                  <IconPhoneFilled className="h-5 w-5 icon-on-brand group-hover:text-primary-foreground group-hover:filter-none" />
+              <a href="tel:+359878757930" className="flex items-center gap-4 group cursor-pointer">
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white shadow-[0_10px_30px_rgba(15,23,42,0.12)] ring-1 ring-black/5">
+                  <IconPhone className="h-5 w-5 text-primary" />
                 </div>
                 <div>
                   <div className="text-sm text-muted-foreground">{t.contact.phone}</div>
@@ -336,9 +358,9 @@ export function ContactSection() {
               </a>
 
               {/* Phone 2 */}
-              <a href="tel:+359882367100" className="flex items-center gap-4 group">
-                <div className="flex h-12 w-12 items-center justify-center rounded-full border border-border/50 bg-background/30 transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
-                  <IconPhoneFilled className="h-5 w-5 icon-on-brand group-hover:text-primary-foreground group-hover:filter-none" />
+              <a href="tel:+359882367100" className="flex items-center gap-4 group cursor-pointer">
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white shadow-[0_10px_30px_rgba(15,23,42,0.12)] ring-1 ring-black/5">
+                  <IconPhone className="h-5 w-5 text-primary" />
                 </div>
                 <div>
                   <div className="text-sm text-muted-foreground">{t.contact.phone}</div>
@@ -347,18 +369,24 @@ export function ContactSection() {
               </a>
 
               {/* Address */}
-              <div className="flex items-start gap-4">
-                <div className="mt-0.5 flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full border border-border/50 bg-background/30">
-                  <IconMapPinFilled className="h-5 w-5 icon-on-brand" />
+              <button
+                type="button"
+                onClick={copyAddress}
+                className="flex w-full items-start gap-4 text-left cursor-pointer"
+                aria-label="Copy address"
+                title="Copy address"
+              >
+                <div className="mt-0.5 flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-white shadow-[0_10px_30px_rgba(15,23,42,0.12)] ring-1 ring-black/5 transition-transform hover:scale-[1.04] active:scale-[0.98]">
+                  <IconMapPin className="h-5 w-5 text-primary" />
                 </div>
-                <div>
+                <div className="min-w-0">
                   <div className="text-sm text-muted-foreground mb-1">{t.contact.address}</div>
                   <div className="font-semibold text-foreground leading-relaxed">
                     ул. Николай Коперник № 27-29, ет. 2, офис 17<br />
                     кв. Гео Милев, София, България
                   </div>
                 </div>
-              </div>
+              </button>
             </div>
 
             {/* Social links */}

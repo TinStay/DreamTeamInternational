@@ -386,8 +386,8 @@ export function PortfolioSection() {
           <div className="flex flex-col gap-8 pb-12">
             <div className="sticky top-[max(0.75rem,env(safe-area-inset-top))] z-40 -mx-4 flex flex-col gap-2 px-4 sm:-mx-6 sm:px-6 sm:gap-2.5 lg:top-[7.25rem] lg:-mx-10 lg:px-10">
               {/* Categories (top) */}
-              <div className="w-fit max-w-full rounded-2xl border border-border/25 bg-background/95 p-1 shadow-[0_12px_40px_rgba(15,23,42,0.1)] backdrop-blur-lg supports-[backdrop-filter]:bg-background/85 dark:border-border/30 dark:shadow-[0_12px_48px_rgba(0,0,0,0.45)]">
-                <div className="relative rounded-xl bg-muted/10 px-2 py-1 sm:px-2.5">
+              <div className="w-fit max-w-full rounded-full border border-border/25 bg-background/95 p-1 shadow-[0_12px_40px_rgba(15,23,42,0.15)] backdrop-blur-lg supports-[backdrop-filter]:bg-background/85 dark:border-border/30 dark:shadow-[0_12px_48px_rgba(0,0,0,0.45)]">
+                <div className="relative rounded-full bg-muted/10 px-2 py-1 sm:px-2.5">
                   <div className="flex w-fit max-w-full items-center gap-1.5 overflow-x-auto overflow-y-hidden py-0.5 no-scrollbar">
                     {CATEGORIES.map((cat) => (
                       <Button
@@ -414,7 +414,7 @@ export function PortfolioSection() {
               </div>
 
               {/* Resolution tabs (bottom) */}
-              <div className="w-full rounded-2xl border border-border/25 bg-background/95 px-2 py-2 shadow-[0_12px_40px_rgba(15,23,42,0.1)] backdrop-blur-lg supports-[backdrop-filter]:bg-background/85 dark:border-border/30 dark:shadow-[0_12px_48px_rgba(0,0,0,0.45)] sm:w-fit sm:self-start sm:px-3 sm:py-2">
+              <div className="w-full rounded-full border border-border/25 bg-background/95 px-2 py-2 shadow-[0_12px_40px_rgba(15,23,42,0.1)] backdrop-blur-lg supports-[backdrop-filter]:bg-background/85 dark:border-border/30 dark:shadow-[0_12px_48px_rgba(0,0,0,0.45)] sm:w-fit sm:self-start sm:px-3 sm:py-2">
                 <Tabs
                   value={format}
                   onValueChange={(v) => {
