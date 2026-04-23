@@ -63,9 +63,7 @@ export function HeroSection() {
       <div className="relative z-20 flex w-full flex-col items-center justify-center text-center px-4 max-w-5xl mx-auto mt-[6.75rem] sm:mt-32 pb-8 sm:pb-10 lg:mt-0 lg:pb-0">
         <h1 className="font-heading font-extrabold text-4xl leading-[1.06] sm:text-5xl md:text-7xl lg:text-8xl tracking-tight md:leading-[1.03] mb-6 sm:mb-8 text-white animate-in slide-in-from-bottom-8 fade-in duration-700 delay-100 fill-mode-both ">
           {t.hero.title1}{" "}
-          <span className="text-white drop-shadow-[0_6px_20px_rgba(0,0,0,0.45)]">
-            {t.hero.title2}
-          </span>
+          <span className="text-hero-accent">{t.hero.title2}</span>
         </h1>
 
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 animate-in slide-in-from-bottom-8 fade-in duration-700 delay-700 fill-mode-both w-full sm:w-auto max-w-md sm:max-w-none mx-auto">
@@ -95,7 +93,7 @@ export function HeroSection() {
       {/* Scroll Indicator */}
       <div className="absolute bottom-24 left-1/2 -translate-x-1/2 z-20 animate-bounce lg:bottom-8">
         <div className="w-[30px] h-[50px] rounded-full border-2 border-white/35 flex items-start justify-center p-2 liquid-glass">
-          <div className="w-1.5 h-1.5 rounded-full bg-primary animate-[float_2s_ease-in-out_infinite]" />
+          <div className="h-1.5 w-1.5 animate-[float_2s_ease-in-out_infinite] rounded-full bg-primary shadow-[0_0_14px_var(--primary-soft-glow)]" />
         </div>
       </div>
     </section>

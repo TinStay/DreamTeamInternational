@@ -20,16 +20,16 @@ import {
   type YouTubeEmbed,
 } from "@/lib/youtube-embeds";
 import {
-  Car,
-  Grid2X2,
-  Hammer,
-  Monitor,
-  Package,
-  Smartphone,
-  Sparkles,
-  Tv,
-  Wand2,
-} from "lucide-react";
+  IconCar,
+  IconDeviceDesktop,
+  IconDeviceMobile,
+  IconDeviceTv,
+  IconHammer,
+  IconLayoutGrid,
+  IconPackage,
+  IconSparkles,
+  IconWand,
+} from "@tabler/icons-react";
 
 const LAZY_IFRAME_ROOT_MARGIN = "160px 0px 160px 0px";
 
@@ -338,13 +338,13 @@ export function PortfolioSection() {
   const [activeCategory, setActiveCategory] = useState<string>("all");
 
   const CATEGORIES: { key: string; label: string; icon: React.ReactNode }[] = [
-    { key: "all", label: t.portfolio.categories.all, icon: <Grid2X2 className="h-5 w-5" /> },
-    { key: "construction", label: t.portfolio.categories.construction, icon: <Hammer className="h-5 w-5" /> },
-    { key: "mascots", label: t.portfolio.categories.mascots, icon: <Sparkles className="h-5 w-5" /> },
-    { key: "tv", label: t.portfolio.categories.tv, icon: <Tv className="h-5 w-5" /> },
-    { key: "cars", label: t.portfolio.categories.cars, icon: <Car className="h-5 w-5" /> },
-    { key: "product", label: t.portfolio.categories.product, icon: <Package className="h-5 w-5" /> },
-    { key: "animated", label: t.portfolio.categories.animated, icon: <Wand2 className="h-5 w-5" /> },
+    { key: "all", label: t.portfolio.categories.all, icon: <IconLayoutGrid className="h-5 w-5" /> },
+    { key: "construction", label: t.portfolio.categories.construction, icon: <IconHammer className="h-5 w-5" /> },
+    { key: "mascots", label: t.portfolio.categories.mascots, icon: <IconSparkles className="h-5 w-5" /> },
+    { key: "tv", label: t.portfolio.categories.tv, icon: <IconDeviceTv className="h-5 w-5" /> },
+    { key: "cars", label: t.portfolio.categories.cars, icon: <IconCar className="h-5 w-5" /> },
+    { key: "product", label: t.portfolio.categories.product, icon: <IconPackage className="h-5 w-5" /> },
+    { key: "animated", label: t.portfolio.categories.animated, icon: <IconWand className="h-5 w-5" /> },
   ];
 
   const embeds =
@@ -359,8 +359,8 @@ export function PortfolioSection() {
       "border border-transparent !shadow-none hover:!shadow-none focus-visible:!shadow-none active:!shadow-none",
       "transition-colors",
       active
-        ? "border-white/15 bg-gradient-to-br from-indigo-600 via-indigo-600 to-indigo-800 text-primary-foreground hover:brightness-[1.06] hover:text-primary-foreground"
-        : "border-border/50 bg-background/80 text-foreground hover:bg-muted hover:text-foreground dark:border-border/40 dark:bg-input/25"
+        ? "border-white/15 bg-gradient-to-br from-primary via-primary to-[var(--primary-gradient-end)] text-primary-foreground hover:brightness-[1.06] hover:text-primary-foreground [&_svg]:text-primary-foreground [&_svg]:filter-none"
+        : "border-border/50 bg-background/80 text-foreground hover:bg-muted hover:text-foreground dark:border-border/40 dark:bg-input/25 [&_svg]:icon-on-brand"
     );
 
   return (
@@ -375,7 +375,7 @@ export function PortfolioSection() {
           <div className="mb-6">
             <h2 className="font-heading font-bold text-4xl md:text-5xl mb-3 text-foreground">
               {t.portfolio.title1}{" "}
-              <span className="text-primary">{t.portfolio.title2}</span>
+              <span className="text-section-accent">{t.portfolio.title2}</span>
             </h2>
             <p className="text-muted-foreground text-base max-w-xl">
               {t.portfolio.subtitle}
@@ -385,68 +385,10 @@ export function PortfolioSection() {
           {/* Sticky controls: resolution row + category row in separate cards (below fixed header on desktop) */}
           <div className="flex flex-col gap-8 pb-12">
             <div className="sticky top-[max(0.75rem,env(safe-area-inset-top))] z-40 -mx-4 flex flex-col gap-2 px-4 sm:-mx-6 sm:px-6 sm:gap-2.5 lg:top-[7.25rem] lg:-mx-10 lg:px-10">
-              {/* Format: full-width pill on small screens; compact tabs from sm+ */}
-              <div className="w-full rounded-full border border-border/25 bg-background/95 px-2 py-2 shadow-[0_12px_40px_rgba(15,23,42,0.1)] backdrop-blur-lg supports-[backdrop-filter]:bg-background/85 dark:border-border/30 dark:shadow-[0_12px_48px_rgba(0,0,0,0.45)] sm:w-fit sm:self-start sm:rounded-2xl sm:px-3 sm:py-2">
-                <Tabs
-                  value={format}
-                  onValueChange={(v) => {
-                    if (v === "all" || v === "desktop" || v === "mobile") {
-                      setFormat(v);
-                    }
-                  }}
-                  className="w-auto"
-                >
-                  <TabsList
-                    variant="default"
-                    className={cn(
-                      "h-auto min-h-8 w-fit max-w-full justify-center gap-0.5 rounded-full border-0 bg-muted/25 p-0.5 text-[10px] shadow-none",
-                      "sm:min-h-8 sm:text-[11px]"
-                    )}
-                  >
-                    <TabsTrigger
-                      value="all"
-                      aria-label={t.portfolio.format.all}
-                      className={cn(
-                        "flex-none rounded-full border border-transparent px-1.5 py-1 text-[10px] font-semibold sm:px-2 sm:py-1 sm:text-[11px]",
-                        "data-active:border-white/15 data-active:bg-gradient-to-br data-active:from-indigo-600 data-active:via-indigo-600 data-active:to-indigo-800 data-active:text-white data-active:!shadow-none",
-                        "hover:text-foreground data-active:hover:brightness-[1.06] data-active:hover:text-white"
-                      )}
-                    >
-                      <Grid2X2 className="h-3.5 w-3.5 shrink-0 sm:h-4 sm:w-4" />
-                    </TabsTrigger>
-                    <TabsTrigger
-                      value="desktop"
-                      aria-label={t.portfolio.format.desktop}
-                      className={cn(
-                        "flex-none gap-0.5 rounded-full border border-transparent px-1.5 py-1 text-[10px] font-semibold sm:px-2 sm:py-1 sm:text-[11px]",
-                        "data-active:border-white/15 data-active:bg-gradient-to-br data-active:from-indigo-600 data-active:via-indigo-600 data-active:to-indigo-800 data-active:text-white data-active:!shadow-none",
-                        "hover:text-foreground data-active:hover:brightness-[1.06] data-active:hover:text-white"
-                      )}
-                    >
-                      <Monitor className="h-3.5 w-3.5 shrink-0 sm:h-4 sm:w-4" />
-                      <span className="pl-0.5">{t.portfolio.format.ratio169}</span>
-                    </TabsTrigger>
-                    <TabsTrigger
-                      value="mobile"
-                      aria-label={t.portfolio.format.mobile}
-                      className={cn(
-                        "flex-none gap-0.5 rounded-full border border-transparent px-1.5 py-1 text-[10px] font-semibold shadow-none sm:px-2 sm:py-1 sm:text-[11px]",
-                        "data-active:border-white/15 data-active:bg-gradient-to-br data-active:from-indigo-600 data-active:via-indigo-600 data-active:to-indigo-800 data-active:text-white data-active:!shadow-none",
-                        "hover:text-foreground data-active:hover:brightness-[1.06] data-active:hover:text-white"
-                      )}
-                    >
-                      <Smartphone className="h-3.5 w-3.5 shrink-0 sm:h-4 sm:w-4" />
-                      <span className="pl-0.5">{t.portfolio.format.ratio916}</span>
-                    </TabsTrigger>
-                  </TabsList>
-                </Tabs>
-              </div>
-
-              <div className="rounded-3xl border border-border/25 bg-background/95 px-1 py-2 shadow-[0_12px_40px_rgba(15,23,42,0.1)] backdrop-blur-lg supports-[backdrop-filter]:bg-background/85 dark:border-border/30 dark:shadow-[0_12px_48px_rgba(0,0,0,0.45)] sm:px-1 sm:py-2">
-                <div className="relative min-h-[2.75rem] min-w-0 flex-1 rounded-xl bg-muted/10 px-3 py-1 sm:px-4 sm:py-1.5">
-                  <div className="pointer-events-none absolute inset-y-1 left-3 z-[1] w-6 rounded-l-xl bg-gradient-to-r from-muted/80 to-transparent sm:left-4 sm:w-8" />
-                  <div className="pointer-events-none absolute inset-y-1 right-3 z-[1] w-6 rounded-r-xl bg-gradient-to-l from-muted/80 to-transparent sm:right-4 sm:w-8" />
-                  <div className="relative flex w-full items-center gap-2 overflow-x-auto overflow-y-hidden py-0.5 no-scrollbar">
+              {/* Categories (top) */}
+              <div className="w-fit max-w-full rounded-2xl border border-border/25 bg-background/95 p-1 shadow-[0_12px_40px_rgba(15,23,42,0.1)] backdrop-blur-lg supports-[backdrop-filter]:bg-background/85 dark:border-border/30 dark:shadow-[0_12px_48px_rgba(0,0,0,0.45)]">
+                <div className="relative rounded-xl bg-muted/10 px-2 py-1 sm:px-2.5">
+                  <div className="flex w-fit max-w-full items-center gap-1.5 overflow-x-auto overflow-y-hidden py-0.5 no-scrollbar">
                     {CATEGORIES.map((cat) => (
                       <Button
                         key={cat.key}
@@ -469,6 +411,66 @@ export function PortfolioSection() {
                     ))}
                   </div>
                 </div>
+              </div>
+
+              {/* Resolution tabs (bottom) */}
+              <div className="w-full rounded-2xl border border-border/25 bg-background/95 px-2 py-2 shadow-[0_12px_40px_rgba(15,23,42,0.1)] backdrop-blur-lg supports-[backdrop-filter]:bg-background/85 dark:border-border/30 dark:shadow-[0_12px_48px_rgba(0,0,0,0.45)] sm:w-fit sm:self-start sm:px-3 sm:py-2">
+                <Tabs
+                  value={format}
+                  onValueChange={(v) => {
+                    if (v === "all" || v === "desktop" || v === "mobile") {
+                      setFormat(v);
+                    }
+                  }}
+                  className="w-auto"
+                >
+                  <TabsList
+                    variant="default"
+                    className={cn(
+                      "h-auto min-h-8 w-fit max-w-full justify-center gap-0.5 rounded-2xl border-0 bg-muted/25 p-0.5 text-[10px] shadow-none",
+                      "sm:min-h-8 sm:text-[11px]"
+                    )}
+                  >
+                    <TabsTrigger
+                      value="all"
+                      aria-label={t.portfolio.format.all}
+                      className={cn(
+                        "cursor-pointer flex-none rounded-2xl border border-transparent px-1.5 py-1 text-[10px] font-semibold sm:px-2 sm:py-1 sm:text-[11px]",
+                        "data-active:border-white/15 data-active:bg-gradient-to-br data-active:from-primary data-active:via-primary data-active:to-[var(--primary-gradient-end)] data-active:text-white data-active:!shadow-none",
+                        "[&_svg]:icon-on-brand data-active:[&_svg]:text-white data-active:[&_svg]:filter-none",
+                        "hover:text-foreground data-active:hover:brightness-[1.06] data-active:hover:text-white"
+                      )}
+                    >
+                      <IconLayoutGrid className="h-3.5 w-3.5 shrink-0 sm:h-4 sm:w-4" />
+                    </TabsTrigger>
+                    <TabsTrigger
+                      value="desktop"
+                      aria-label={t.portfolio.format.desktop}
+                      className={cn(
+                        "cursor-pointer flex-none gap-0.5 rounded-2xl border border-transparent px-1.5 py-1 text-[10px] font-semibold sm:px-2 sm:py-1 sm:text-[11px]",
+                        "data-active:border-white/15 data-active:bg-gradient-to-br data-active:from-primary data-active:via-primary data-active:to-[var(--primary-gradient-end)] data-active:text-white data-active:!shadow-none",
+                        "[&_svg]:icon-on-brand data-active:[&_svg]:text-white data-active:[&_svg]:filter-none",
+                        "hover:text-foreground data-active:hover:brightness-[1.06] data-active:hover:text-white"
+                      )}
+                    >
+                      <IconDeviceDesktop className="h-3.5 w-3.5 shrink-0 sm:h-4 sm:w-4" />
+                      <span className="pl-0.5">{t.portfolio.format.ratio169}</span>
+                    </TabsTrigger>
+                    <TabsTrigger
+                      value="mobile"
+                      aria-label={t.portfolio.format.mobile}
+                      className={cn(
+                        "cursor-pointer flex-none gap-0.5 rounded-2xl border border-transparent px-1.5 py-1 text-[10px] font-semibold shadow-none sm:px-2 sm:py-1 sm:text-[11px]",
+                        "data-active:border-white/15 data-active:bg-gradient-to-br data-active:from-primary data-active:via-primary data-active:to-[var(--primary-gradient-end)] data-active:text-white data-active:!shadow-none",
+                        "[&_svg]:icon-on-brand data-active:[&_svg]:text-white data-active:[&_svg]:filter-none",
+                        "hover:text-foreground data-active:hover:brightness-[1.06] data-active:hover:text-white"
+                      )}
+                    >
+                      <IconDeviceMobile className="h-3.5 w-3.5 shrink-0 sm:h-4 sm:w-4" />
+                      <span className="pl-0.5">{t.portfolio.format.ratio916}</span>
+                    </TabsTrigger>
+                  </TabsList>
+                </Tabs>
               </div>
             </div>
 

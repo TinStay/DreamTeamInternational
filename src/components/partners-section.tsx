@@ -41,7 +41,7 @@ export function PartnersSection() {
           <motion.div
             className="flex items-center whitespace-nowrap pl-10 md:pl-14 will-change-transform"
             animate={{ x: ["0%", "-50%"] }}
-            transition={{ ease: "linear", duration: 26, repeat: Infinity }}
+            transition={{ ease: "linear", duration: 42, repeat: Infinity }}
           >
             {items.map((src, idx) => (
               <div

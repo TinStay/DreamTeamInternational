@@ -78,8 +78,8 @@ export function InfiniteGridBackground({ className }: InfiniteGridBackgroundProp
   const gridOffsetX = useMotionValue(0);
   const gridOffsetY = useMotionValue(0);
 
-  const speedX = 0.5;
-  const speedY = 0.5;
+  const speedX = 0.22;
+  const speedY = 0.22;
 
   useAnimationFrame(() => {
     const currentX = gridOffsetX.get();
