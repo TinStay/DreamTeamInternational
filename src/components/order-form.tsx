@@ -6,7 +6,13 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
-import { ChevronRight, ChevronLeft, Lightbulb, UserCheck, MessageSquare, CheckCircle2, Sparkles, ExternalLink, Clock, Zap } from "lucide-react";
+import {
+  IconCircleCheck,
+  IconClock,
+  IconExternalLink,
+  IconSparkles,
+  IconBolt,
+} from "@tabler/icons-react";
 import { useLanguage } from "@/lib/i18n/language-context";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -20,7 +26,7 @@ const PLANS = [
     durationEN: "up to 15 seconds",
     price: 150,
     popular: false,
-    icon: <Zap size={22} />,
+    icon: <IconBolt className="h-[22px] w-[22px]" />,
     featuresBG: [
       "Съдържание до 15с",
       "Срок 2-3 дни",
@@ -57,7 +63,7 @@ const PLANS = [
     durationEN: "up to 30 seconds",
     price: 450,
     popular: true,
-    icon: <Sparkles size={22} />,
+    icon: <IconSparkles className="h-[22px] w-[22px]" />,
     featuresBG: [
       "Съдържание до 30с",
       "Срок 3-5 дни",
@@ -102,7 +108,7 @@ const PLANS = [
     durationEN: "up to 1 minute",
     price: 750,
     popular: false,
-    icon: <Clock size={22} />,
+    icon: <IconClock className="h-[22px] w-[22px]" />,
     featuresBG: [
       "Съдържание до 60с",
       "Срок 5-8 дни",
@@ -181,7 +187,7 @@ export function OrderFormSection() {
         <div className="text-center mb-16">
           <h2 className="font-heading font-bold text-4xl md:text-5xl mb-4 text-foreground">
             {t.pricing.title1}{" "}
-            <span className="text-primary">{t.pricing.title2}</span>
+            <span className="text-section-accent">{t.pricing.title2}</span>
           </h2>
           <p className="text-muted-foreground text-lg">{t.pricing.subtitle}</p>
         </div>
@@ -229,7 +235,7 @@ export function OrderFormSection() {
 
                   {/* Duration tag */}
                   <div className="inline-flex items-center gap-1.5 text-xs font-medium bg-primary/10 text-primary border border-primary/20 rounded-full px-3 py-1 mb-4 self-start">
-                    <Clock size={11} />
+                    <IconClock className="h-[11px] w-[11px]" />
                     {duration}
                   </div>
 
@@ -237,7 +243,7 @@ export function OrderFormSection() {
                   <ul className="space-y-2 mb-6 flex-1">
                     {features.map((f, i) => (
                       <li key={i} className="flex items-start gap-2 text-xs text-muted-foreground">
-                        <CheckCircle2 size={13} className="text-primary flex-shrink-0 mt-0.5" />
+                        <IconCircleCheck className="mt-0.5 h-[13px] w-[13px] flex-shrink-0 text-primary" />
                         {f}
                       </li>
                     ))}
@@ -269,7 +275,7 @@ export function OrderFormSection() {
                       rel="noopener noreferrer"
                       className="w-full rounded-full font-semibold h-10 text-sm border border-border/40 hover:border-primary/50 text-muted-foreground hover:text-primary transition-all flex items-center justify-center gap-1.5"
                     >
-                      {t.pricing.example} <ExternalLink size={13} />
+                      {t.pricing.example} <IconExternalLink className="h-[13px] w-[13px]" />
                     </a>
                   </div>
                 </div>
@@ -294,7 +300,7 @@ export function OrderFormSection() {
           >
             <div className="p-6 flex flex-col flex-1 items-center justify-center text-center gap-4 min-h-[200px]">
               <div className="w-12 h-12 rounded-full border border-dashed border-primary/40 flex items-center justify-center text-primary">
-                <Sparkles size={20} />
+                <IconSparkles className="h-5 w-5" />
               </div>
               <div>
                 <div className="font-heading font-bold text-foreground mb-2">{t.pricing.custom}</div>

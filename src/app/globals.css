@@ -80,7 +80,7 @@
   --chart-4: #3276e4;
   --chart-5: #747474;
   --popover: #ffffff;
-  --primary: #4f46e5;
+  --primary: #4840e3;
   --sidebar: #f5f8fb;
   --spacing: 0.27rem;
   --font-mono: IBM Plex Mono, monospace;
@@ -111,6 +111,12 @@
   --destructive-foreground: #ffffff;
   --sidebar-accent-foreground: #000000;
   --sidebar-primary-foreground: #ffffff;
+
+  /* Derived from --primary only (change --primary to retheme buttons, glows, gradients) */
+  --primary-soft-glow: color-mix(in srgb, var(--primary) 38%, transparent);
+  --primary-strong-glow: color-mix(in srgb, var(--primary) 55%, transparent);
+  --primary-gradient-end: color-mix(in srgb, var(--primary) 55%, #ffffff);
+  --primary-elevated-shadow: color-mix(in srgb, var(--primary) 34%, transparent);
 }
 
 .dark {
@@ -158,6 +164,11 @@
   --destructive-foreground: #ffffff;
   --sidebar-accent-foreground: #818cf8;
   --sidebar-primary-foreground: #ffffff;
+
+  --primary-soft-glow: color-mix(in srgb, var(--primary) 42%, transparent);
+  --primary-strong-glow: color-mix(in srgb, var(--primary) 62%, transparent);
+  --primary-gradient-end: color-mix(in srgb, var(--primary) 65%, rgb(0, 0, 0));
+  --primary-elevated-shadow: color-mix(in srgb, var(--primary) 45%, transparent);
 }
 
 /* Glassmorphism Classes (Indigo tint in Dark, Neutral in Light) */
@@ -194,6 +205,31 @@
   .shadow-elevated-soft {
     box-shadow:
       0 22px 70px rgba(15, 23, 42, 0.14);
+  }
+
+  /** Accent word in section headings — color + soft glow from --primary */
+  .text-section-accent {
+    color: var(--primary);
+    text-shadow: none;
+  }
+
+  .dark .text-section-accent {
+    text-shadow: none;
+  }
+
+  /** Hero second line: white copy + primary-tinted bloom (still keyed off --primary) */
+  .text-hero-accent {
+    color: #ffffff;
+    text-shadow:
+      0 0 22px var(--primary-strong-glow),
+      0 0 10px var(--primary-soft-glow),
+      0 4px 18px rgb(0 0 0 / 0.55);
+  }
+
+  /** Lucide / SVG: primary fill + subtle drop glow from --primary */
+  .icon-on-brand {
+    color: var(--primary);
+    filter: drop-shadow(0 2px 8px var(--primary-soft-glow));
   }
 }
 

@@ -35,6 +35,7 @@ export const en = {
       tv: "Cinema advertising",
       cars: "Cars",
       product: "Product",
+      services: "Services",
       animated: "Animated"
     },
     format: {

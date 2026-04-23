@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
-import { ChevronLeft } from "lucide-react";
+import { IconChevronLeft } from "@tabler/icons-react";
 import { SiteHeader } from "@/components/site-header";
 import { MobileNav } from "@/components/mobile-nav";
 import { Footer } from "@/components/footer";
@@ -54,7 +54,7 @@ export function LegalPageShell({
               "-ml-2 mb-6 inline-flex items-center text-muted-foreground hover:text-primary"
             )}
           >
-            <ChevronLeft className="mr-1 h-4 w-4" />
+            <IconChevronLeft className="mr-1 h-4 w-4" />
             {backLabel}
           </Link>
 

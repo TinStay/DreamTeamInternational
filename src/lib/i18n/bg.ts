@@ -35,6 +35,7 @@ export const bg = {
       tv: "Кино Реклама",
       cars: "Коли",
       product: "Продуктови",
+      services: "Услуги",
       animated: "Анимирани"
     },
     format: {

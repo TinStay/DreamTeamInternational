@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { useTheme } from "next-themes";
-import { Sun, Moon } from "lucide-react";
+import { IconMoon, IconSun } from "@tabler/icons-react";
 
 export function ThemeToggle({ className = "" }: { className?: string }) {
   const [mounted, setMounted] = React.useState(false);
@@ -42,8 +42,8 @@ export function ThemeToggle({ className = "" }: { className?: string }) {
         }
       `}>
         {isDark
-          ? <Moon size={10} className="transition-all duration-300 animate-morph" />
-          : <Sun size={10} className="transition-all duration-300 animate-morph" />
+          ? <IconMoon className="h-2.5 w-2.5 transition-all duration-300 animate-morph" />
+          : <IconSun className="h-2.5 w-2.5 transition-all duration-300 animate-morph" />
         }
       </span>
     </button>

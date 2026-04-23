@@ -7,6 +7,7 @@ import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useEffect, useState } from "react";
 import { useLanguage } from "@/lib/i18n/language-context";
+import { IconMailFilled } from "@tabler/icons-react";
 
 export function SiteHeader() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -55,12 +56,13 @@ export function SiteHeader() {
           {/* <LanguageDropdown /> */}
           {/* <ThemeToggle /> */}
           <Link
-            href="#order-form"
+            href="#contact"
             className={cn(
               buttonVariants({ variant: "default", size: "lg" }),
-              "rounded-full transition-all font-semibold h-11 px-6 text-base shadow-lg"
+              "rounded-full transition-all font-semibold h-11 px-6 text-base shadow-lg gap-2 cursor-pointer"
             )}
           >
+            <IconMailFilled className="h-5 w-5" />
             {t.header.chat}
           </Link>
         </div>

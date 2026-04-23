@@ -3,27 +3,32 @@
 import { useEffect, useRef, useState } from "react";
 import { useLanguage } from "@/lib/i18n/language-context";
 
-function useInView(options = {}) {
+function useInView(threshold = 0.1) {
   const [isInView, setIsInView] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const observer = new IntersectionObserver(([entry]) => {
-      if (entry.isIntersecting) {
-        setIsInView(true);
-        observer.disconnect();
-      }
-    }, { threshold: 0.1, ...options });
+    const el = ref.current;
+    if (!el) return;
 
-    const currentRef = ref.current;
-    if (currentRef) {
-      observer.observe(currentRef);
+    if (typeof IntersectionObserver === "undefined") {
+      queueMicrotask(() => setIsInView(true));
+      return;
     }
 
-    return () => {
-      if (currentRef) observer.unobserve(currentRef);
-    };
-  }, [options]);
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry?.isIntersecting) {
+          setIsInView(true);
+          observer.disconnect();
+        }
+      },
+      { threshold }
+    );
+
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [threshold]);
 
   return { ref, isInView };
 }
@@ -38,7 +43,8 @@ export function ProcessSection() {
         
         <div className={`text-center mb-16 transition-all duration-1000 transform ${isInView ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"}`}>
           <h2 className="font-heading font-bold text-4xl md:text-5xl mb-4 text-foreground">
-            {t.process.title1} <span className="text-primary">{t.process.title2}</span>
+            {t.process.title1}{" "}
+            <span className="text-section-accent">{t.process.title2}</span>
           </h2>
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
             {t.process.subtitle}
@@ -61,12 +67,12 @@ export function ProcessSection() {
                   style={{ transitionDelay: delayStr }}
                 >
                   {/* Step Number Circle */}
-                  <div className="w-20 h-20 rounded-full liquid-glass border border-primary flex items-center justify-center mb-6 relative shadow-[0_0_15px_rgba(255,255,255,0.1)] group-hover:shadow-[0_0_25px_rgba(255,255,255,0.4)] group-hover:scale-110 transition-all duration-300">
-                    <span className="font-heading font-bold text-3xl text-foreground group-hover:text-primary transition-colors">
+                  <div className="relative mb-6 flex h-20 w-20 items-center justify-center rounded-full border border-primary liquid-glass shadow-[0_0_15px_rgba(255,255,255,0.1),0_0_28px_var(--primary-soft-glow)] transition-all duration-300 group-hover:scale-110 group-hover:shadow-[0_0_25px_rgba(255,255,255,0.35),0_0_36px_var(--primary-soft-glow)]">
+                    <span className="font-heading text-3xl font-bold text-section-accent">
                       {index + 1}
                     </span>
                     {/* Glowing dot */}
-                    <div className="absolute -top-1 -right-1 w-3 h-3 bg-primary rounded-full animate-pulse shadow-sm" />
+                    <div className="absolute -right-1 -top-1 h-3 w-3 animate-pulse rounded-full bg-primary shadow-[0_0_12px_var(--primary-soft-glow)]" />
                   </div>
 
                   <h3 className="font-heading font-semibold text-xl mb-3 text-foreground group-hover:text-primary transition-colors">

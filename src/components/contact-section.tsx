@@ -12,11 +12,19 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { AlertTriangle, CheckCircle2, Mail, Phone, MapPin, Send } from "lucide-react";
+import {
+  IconAlertTriangle,
+  IconCircleCheck,
+  IconMail,
+  IconMapPin,
+  IconPhone,
+  IconSend,
+} from "@tabler/icons-react";
 import { useLanguage } from "@/lib/i18n/language-context";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { cn } from "@/lib/utils";
+import Image from "next/image";
 
 function SendResultCard({
   variant,
@@ -46,7 +54,11 @@ function SendResultCard({
             : "border-destructive/30 bg-destructive/10 text-destructive"
         )}
       >
-        {isOk ? <CheckCircle2 className="h-5 w-5" strokeWidth={2.25} /> : <AlertTriangle className="h-5 w-5" />}
+        {isOk ? (
+          <IconCircleCheck className="h-5 w-5" stroke={2.25} />
+        ) : (
+          <IconAlertTriangle className="h-5 w-5" stroke={2.25} />
+        )}
       </div>
       <div className="min-w-0 flex-1 space-y-1">
         <p
@@ -63,25 +75,23 @@ function SendResultCard({
   );
 }
 
-const FacebookIcon = () => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-    <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
-  </svg>
-);
-const InstagramIcon = () => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
-    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
-    <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
-  </svg>
-);
-const LinkedInIcon = () => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-    <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" />
-    <rect x="2" y="9" width="4" height="12" />
-    <circle cx="4" cy="4" r="2" />
-  </svg>
-);
+function SocialIcon({
+  src,
+  alt,
+}: {
+  src: string;
+  alt: string;
+}) {
+  return (
+    <Image
+      src={src}
+      alt={alt}
+      width={256}
+      height={256}
+      className="h-12 w-12 opacity-90 transition-all group-hover:opacity-100"
+    />
+  );
+}
 
 function FieldLabel({
   children,
@@ -94,7 +104,7 @@ function FieldLabel({
     <Label className="text-foreground inline-flex items-baseline gap-0.5">
       <span>{children}</span>
       {required ? (
-        <span className="text-primary text-xs font-semibold leading-none" aria-hidden>
+        <span className="text-section-accent text-xs font-semibold leading-none" aria-hidden>
           *
         </span>
       ) : null}
@@ -166,13 +176,36 @@ export function ContactSection() {
     }
   }
 
+  const addressText =
+    "ул. Николай Коперник № 27-29, ет. 2, офис 17, кв. Гео Милев, София, България";
+
+  async function copyAddress() {
+    try {
+      await navigator.clipboard.writeText(addressText);
+    } catch {
+      const ta = document.createElement("textarea");
+      ta.value = addressText;
+      ta.style.position = "fixed";
+      ta.style.left = "-9999px";
+      document.body.appendChild(ta);
+      ta.focus();
+      ta.select();
+      try {
+        document.execCommand("copy");
+      } finally {
+        document.body.removeChild(ta);
+      }
+    }
+  }
+
   return (
     <section id="contact" className="py-24 relative overflow-hidden">
       
       <div className="max-w-7xl mx-auto px-4 z-10 relative">
         <div className="mb-10 lg:mb-12">
           <h2 className="font-heading font-bold text-4xl md:text-5xl mb-6 text-foreground">
-            {t.contact.title1} <span className="text-primary">{t.contact.title2}</span>
+            {t.contact.title1}{" "}
+            <span className="text-section-accent">{t.contact.title2}</span>
           </h2>
           <p className="text-muted-foreground text-lg max-w-2xl">
             {t.contact.subtitle}
@@ -181,9 +214,7 @@ export function ContactSection() {
 
         <div className="grid gap-12 lg:gap-16 items-start lg:grid-cols-[minmax(0,60%)_minmax(0,40%)]">
           {/* Column 1: Form */}
-          <div className="rounded-3xl p-8 border border-border/30 animate-in slide-in-from-left-12 fade-in duration-1000 bg-card text-card-foreground shadow-elevated-soft">
-            <h3 className="text-2xl font-heading font-semibold mb-6 text-foreground">{t.contact.formTitle}</h3>
-            
+          <div className="rounded-3xl p-8 border border-border/30 animate-in slide-in-from-left-12 fade-in duration-1000 bg-card text-card-foreground shadow-elevated-soft">            
             <form className="space-y-4" onSubmit={handleSubmit}>
               <div className="space-y-2">
                 <FieldLabel required>{t.contact.message}</FieldLabel>
@@ -220,39 +251,41 @@ export function ContactSection() {
                 </div>
               </div>
 
-              <div className="space-y-2">
-                <FieldLabel required>{t.contact.emailLbl}</FieldLabel>
-                <Input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder={t.contact.emailLbl}
-                  required
-                  autoComplete="email"
-                  className="h-9 text-sm bg-background/40 border-border/40 focus:border-primary/50 transition-colors"
-                />
-              </div>
+              <div className="grid gap-2 sm:gap-4 sm:grid-cols-2">
+                <div className="space-y-2">
+                  <FieldLabel required>{t.contact.emailLbl}</FieldLabel>
+                  <Input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder={t.contact.emailLbl}
+                    required
+                    autoComplete="email"
+                    className="h-9 text-sm bg-background/40 border-border/40 focus:border-primary/50 transition-colors"
+                  />
+                </div>
 
-              <div className="space-y-2">
-                <FieldLabel>{t.contact.foundUs}</FieldLabel>
-                <Select value={foundUs} onValueChange={(v) => setFoundUs(v ?? "")}>
-                  <SelectTrigger className="w-full h-9 px-2.5 text-sm bg-background/40 border-border/40 focus:border-primary/50 transition-colors">
-                    <SelectValue
-                      placeholder={
-                        t.contact.foundUsPh.trim() === "" ? undefined : t.contact.foundUsPh
-                      }
-                    >
-                      {foundUs !== "" ? selectedFoundUsLabel : null}
-                    </SelectValue>
-                  </SelectTrigger>
-                  <SelectContent>
-                    {foundUsOptions.map((opt) => (
-                      <SelectItem key={opt.value} value={opt.value} className="py-1.5 text-sm">
-                        {opt.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <div className="space-y-2">
+                  <FieldLabel>{t.contact.foundUs}</FieldLabel>
+                  <Select value={foundUs} onValueChange={(v) => setFoundUs(v ?? "")}>
+                    <SelectTrigger className="w-full h-9 px-2.5 text-sm bg-background/40 border-border/40 focus:border-primary/50 transition-colors">
+                      <SelectValue
+                        placeholder={
+                          t.contact.foundUsPh.trim() === "" ? undefined : t.contact.foundUsPh
+                        }
+                      >
+                        {foundUs !== "" ? selectedFoundUsLabel : null}
+                      </SelectValue>
+                    </SelectTrigger>
+                    <SelectContent>
+                      {foundUsOptions.map((opt) => (
+                        <SelectItem key={opt.value} value={opt.value} className="py-1.5 text-sm">
+                          {opt.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
 
               <div className="flex items-start gap-3 pt-2">
@@ -263,7 +296,10 @@ export function ContactSection() {
                 />
                 <div className="text-sm text-muted-foreground leading-relaxed">
                   <span>{t.contact.terms.prefix} </span>
-                  <Link href={termsHref} className="text-primary hover:underline underline-offset-4">
+                  <Link
+                    href={termsHref}
+                    className="text-section-accent underline-offset-4 hover:underline"
+                  >
                     {t.contact.terms.link}
                   </Link>
                   <span>{t.contact.terms.suffix}</span>
@@ -276,7 +312,7 @@ export function ContactSection() {
                 className="w-full rounded-full font-bold h-10 text-sm mt-4 shadow-lg hover:scale-105 active:scale-95 transition-all disabled:hover:scale-100"
               >
                 {isSending ? t.contact.sending : t.contact.send}{" "}
-                <Send className="ml-2 w-4 h-4" />
+                <IconSend className="ml-2 h-4 w-4" stroke={2.25} />
               </Button>
 
               {sendResult === "ok" && (
@@ -300,9 +336,9 @@ export function ContactSection() {
           <div className="animate-in slide-in-from-right-12 fade-in duration-1000 delay-200">
             <div className="space-y-6 mb-10">
               {/* Email */}
-              <a href="mailto:info@dreamteam.technology" className="flex items-center gap-4 group">
-                <div className="w-12 h-12 rounded-full border border-border/50 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-colors bg-background/30">
-                  <Mail size={20} />
+              <a href="mailto:info@dreamteam.technology" className="flex items-center gap-4 group cursor-pointer">
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white shadow-[0_10px_30px_rgba(15,23,42,0.12)] ring-1 ring-black/5">
+                  <IconMail className="h-5 w-5 text-primary" />
                 </div>
                 <div>
                   <div className="text-sm text-muted-foreground">{t.contact.email}</div>
@@ -311,9 +347,9 @@ export function ContactSection() {
               </a>
 
               {/* Phone 1 */}
-              <a href="tel:+359878757930" className="flex items-center gap-4 group">
-                <div className="w-12 h-12 rounded-full border border-border/50 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-colors bg-background/30">
-                  <Phone size={20} />
+              <a href="tel:+359878757930" className="flex items-center gap-4 group cursor-pointer">
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white shadow-[0_10px_30px_rgba(15,23,42,0.12)] ring-1 ring-black/5">
+                  <IconPhone className="h-5 w-5 text-primary" />
                 </div>
                 <div>
                   <div className="text-sm text-muted-foreground">{t.contact.phone}</div>
@@ -322,9 +358,9 @@ export function ContactSection() {
               </a>
 
               {/* Phone 2 */}
-              <a href="tel:+359882367100" className="flex items-center gap-4 group">
-                <div className="w-12 h-12 rounded-full border border-border/50 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-colors bg-background/30">
-                  <Phone size={20} />
+              <a href="tel:+359882367100" className="flex items-center gap-4 group cursor-pointer">
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white shadow-[0_10px_30px_rgba(15,23,42,0.12)] ring-1 ring-black/5">
+                  <IconPhone className="h-5 w-5 text-primary" />
                 </div>
                 <div>
                   <div className="text-sm text-muted-foreground">{t.contact.phone}</div>
@@ -333,45 +369,59 @@ export function ContactSection() {
               </a>
 
               {/* Address */}
-              <div className="flex items-start gap-4">
-                <div className="w-12 h-12 rounded-full border border-border/50 flex items-center justify-center text-primary bg-background/30 flex-shrink-0 mt-0.5">
-                  <MapPin size={20} />
+              <button
+                type="button"
+                onClick={copyAddress}
+                className="flex w-full items-start gap-4 text-left cursor-pointer"
+                aria-label="Copy address"
+                title="Copy address"
+              >
+                <div className="mt-0.5 flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-white shadow-[0_10px_30px_rgba(15,23,42,0.12)] ring-1 ring-black/5 transition-transform hover:scale-[1.04] active:scale-[0.98]">
+                  <IconMapPin className="h-5 w-5 text-primary" />
                 </div>
-                <div>
+                <div className="min-w-0">
                   <div className="text-sm text-muted-foreground mb-1">{t.contact.address}</div>
                   <div className="font-semibold text-foreground leading-relaxed">
                     ул. Николай Коперник № 27-29, ет. 2, офис 17<br />
                     кв. Гео Милев, София, България
                   </div>
                 </div>
-              </div>
+              </button>
             </div>
 
             {/* Social links */}
-            <div className="flex gap-4">
+            <div className="flex items-center gap-5">
               <a
                 href="https://www.facebook.com/profile.php?id=61585919836260"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-10 h-10 rounded-full bg-background/30 border border-border/50 flex items-center justify-center text-foreground hover:text-primary-foreground hover:bg-primary transition-all hover:scale-110"
+                className="group inline-flex items-center justify-center transition-transform hover:scale-110"
               >
-              <FacebookIcon />
+                <SocialIcon src="/social_media_icons/facebook.png" alt="Facebook" />
               </a>
               <a
                 href="https://www.instagram.com/dreamteam.video.ai/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-10 h-10 rounded-full bg-background/30 border border-border/50 flex items-center justify-center text-foreground hover:text-primary-foreground hover:bg-primary transition-all hover:scale-110"
+                className="group inline-flex items-center justify-center transition-transform hover:scale-110"
               >
-              <InstagramIcon />
+                <SocialIcon src="/social_media_icons/instagram.png" alt="Instagram" />
               </a>
               <a
                 href="https://www.linkedin.com/company/109344952"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-10 h-10 rounded-full bg-background/30 border border-border/50 flex items-center justify-center text-foreground hover:text-primary-foreground hover:bg-primary transition-all hover:scale-110"
+                className="group inline-flex items-center justify-center transition-transform hover:scale-110"
               >
-              <LinkedInIcon />
+                <SocialIcon src="/social_media_icons/linkedin.png" alt="LinkedIn" />
+              </a>
+              <a
+                href="https://www.youtube.com/@DreamTeamVideo"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group inline-flex items-center justify-center transition-transform hover:scale-110"
+              >
+                <SocialIcon src="/social_media_icons/youtube.png" alt="YouTube" />
               </a>
             </div>
           </div>

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { LanguageDropdown } from "./language-dropdown";
-import { Home, Video, Mail, Menu } from "lucide-react";
+import { IconHome, IconMail, IconMenu2, IconVideo } from "@tabler/icons-react";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
 import { useLanguage } from "@/lib/i18n/language-context";
 import { buttonVariants } from "@/components/ui/button";
@@ -19,35 +19,35 @@ export function MobileNav() {
       <div className="lg:hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-[92%] max-w-md rounded-[2.25rem] liquid-glass px-4 py-4 flex items-center gap-2 border border-border/30 bg-background/90 backdrop-blur-md ring-1 ring-black/10 dark:ring-white/10 shadow-[0_22px_60px_rgba(0,0,0,0.42),0_10px_28px_rgba(0,0,0,0.28)] dark:shadow-[0_24px_70px_rgba(0,0,0,0.65),0_12px_36px_rgba(0,0,0,0.45)]">
         <Link
           href={homeHref}
-          className="flex-1 flex flex-col items-center justify-center gap-1 text-muted-foreground hover:text-primary transition-colors group select-none"
+          className="group flex flex-1 select-none flex-col items-center justify-center gap-1 text-muted-foreground transition-colors hover:text-primary"
         >
-          <Home size={26} className="group-hover:scale-110 transition-transform" />
+          <IconHome className="h-[26px] w-[26px] icon-on-brand transition-transform group-hover:scale-110 group-hover:brightness-110" />
           <span className="text-xs font-semibold tracking-wide">{t.mobileNav.home}</span>
         </Link>
 
         <Link
           href="#portfolio"
-          className="flex-1 flex flex-col items-center justify-center gap-1 text-muted-foreground hover:text-primary transition-colors group select-none"
+          className="group flex flex-1 select-none flex-col items-center justify-center gap-1 text-muted-foreground transition-colors hover:text-primary"
         >
-          <Video size={26} className="group-hover:scale-110 transition-transform" />
+          <IconVideo className="h-[26px] w-[26px] icon-on-brand transition-transform group-hover:scale-110 group-hover:brightness-110" />
           <span className="text-xs font-semibold tracking-wide">{t.mobileNav.work}</span>
         </Link>
 
         <Link
           href="#contact"
-          className="flex-1 flex flex-col items-center justify-center gap-1 text-muted-foreground hover:text-primary transition-colors group select-none"
+          className="group flex flex-1 select-none flex-col items-center justify-center gap-1 text-muted-foreground transition-colors hover:text-primary"
         >
-          <Mail size={26} className="group-hover:scale-110 transition-transform" />
+          <IconMail className="h-[26px] w-[26px] icon-on-brand transition-transform group-hover:scale-110 group-hover:brightness-110" />
           <span className="text-xs font-semibold tracking-wide">{t.mobileNav.contact}</span>
         </Link>
 
         <Sheet open={isOpen} onOpenChange={setIsOpen}>
           <SheetTrigger
             render={
-              <button className="shrink-0 w-14 h-14 rounded-full border border-white/15 bg-gradient-to-br from-indigo-600 via-indigo-600 to-indigo-800 text-white flex items-center justify-center shadow-[0_8px_22px_rgba(67,56,202,0.32)] hover:brightness-110 hover:scale-105 active:scale-95 transition-all outline-none" />
+              <button className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full border border-white/15 bg-gradient-to-br from-primary via-primary to-[var(--primary-gradient-end)] text-white shadow-[0_8px_22px_var(--primary-elevated-shadow)] outline-none transition-all hover:scale-105 hover:brightness-110 active:scale-95" />
             }
           >
-            <Menu size={26} />
+            <IconMenu2 className="h-[26px] w-[26px] drop-shadow-sm" />
           </SheetTrigger>
           <SheetContent side="bottom" className="h-[75vh] rounded-t-3xl border-t-0 liquid-glass p-0">
             <SheetTitle className="sr-only">Menu</SheetTitle>
@@ -65,23 +65,23 @@ export function MobileNav() {
                 <Link
                   href={homeHref}
                   onClick={() => setIsOpen(false)}
-                  className="flex items-center gap-4 text-foreground/80 hover:text-primary transition-colors select-none"
+                  className="flex select-none items-center gap-4 text-foreground/80 transition-colors hover:text-primary"
                 >
-                  <Home /> {t.mobileNav.home}
+                  <IconHome className="h-6 w-6 shrink-0 icon-on-brand" /> {t.mobileNav.home}
                 </Link>
                 <Link
                   href="#portfolio"
                   onClick={() => setIsOpen(false)}
-                  className="flex items-center gap-4 text-foreground/80 hover:text-primary transition-colors select-none"
+                  className="flex select-none items-center gap-4 text-foreground/80 transition-colors hover:text-primary"
                 >
-                  <Video /> {t.mobileNav.work}
+                  <IconVideo className="h-6 w-6 shrink-0 icon-on-brand" /> {t.mobileNav.work}
                 </Link>
                 <Link
                   href="#contact"
                   onClick={() => setIsOpen(false)}
-                  className="flex items-center gap-4 text-foreground/80 hover:text-primary transition-colors select-none"
+                  className="flex select-none items-center gap-4 text-foreground/80 transition-colors hover:text-primary"
                 >
-                  <Mail /> {t.mobileNav.contact}
+                  <IconMail className="h-6 w-6 shrink-0 icon-on-brand" /> {t.mobileNav.contact}
                 </Link>
               </div>
 
