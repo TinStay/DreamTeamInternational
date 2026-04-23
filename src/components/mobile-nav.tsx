@@ -54,11 +54,11 @@ export function MobileNav() {
             <div className="absolute top-4 left-1/2 -translate-x-1/2 w-12 h-1.5 bg-border/40 rounded-full" />
             <div className="flex flex-col h-full pt-16 pb-8 px-6 overflow-y-auto">
               <div className="flex flex-col items-center mb-8 pb-8 border-b border-border/20">
-                <img src="/logo-1.png" alt="DreamTeam Technology" className="h-16 w-auto mb-6 grayscale dark:invert" />
-                <div className="flex gap-4">
-                  <LanguageDropdown />
+                <img src="/logo-1.png" alt="DreamTeam Technology" className="h-18 w-auto mb-6 grayscale dark:invert" />
+                {/* <div className="flex gap-4"> */}
+                  {/* <LanguageDropdown /> */}
                   {/* <ThemeToggle /> */}
-                </div>
+                {/* </div> */}
               </div>
 
               <div className="flex flex-col gap-6 text-xl font-heading font-medium">
