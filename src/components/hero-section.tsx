@@ -62,8 +62,9 @@ export function HeroSection() {
       {/* Content */}
       <div className="relative z-20 flex w-full flex-col items-center justify-center text-center px-4 max-w-5xl mx-auto mt-[6.75rem] sm:mt-32 pb-8 sm:pb-10 lg:mt-0 lg:pb-0">
         <h1 className="font-heading font-extrabold text-4xl leading-[1.06] sm:text-5xl md:text-7xl lg:text-8xl tracking-tight md:leading-[1.03] mb-6 sm:mb-8 text-white animate-in slide-in-from-bottom-8 fade-in duration-700 delay-100 fill-mode-both ">
-          {t.hero.title1}{" "}
-          <span className="text-hero-accent">{t.hero.title2}</span>
+          {t.hero.titleBefore}
+          <span className="text-hero-accent">{t.hero.titleGlow}</span>
+          {t.hero.titleAfter}
         </h1>
 
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 animate-in slide-in-from-bottom-8 fade-in duration-700 delay-700 fill-mode-both w-full sm:w-auto max-w-md sm:max-w-none mx-auto">

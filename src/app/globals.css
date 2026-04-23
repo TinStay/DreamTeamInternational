@@ -217,12 +217,13 @@
     text-shadow: none;
   }
 
-  /** Hero second line: white copy + primary-tinted bloom (still keyed off --primary) */
+  /** Hero highlighted word: white copy + primary bloom behind the glyph */
   .text-hero-accent {
     color: #ffffff;
     text-shadow:
-      0 0 22px var(--primary-strong-glow),
-      0 0 10px var(--primary-soft-glow),
+      0 0 28px var(--primary-strong-glow),
+      0 0 14px var(--primary-soft-glow),
+      0 0 42px var(--primary-soft-glow),
       0 4px 18px rgb(0 0 0 / 0.55);
   }
 

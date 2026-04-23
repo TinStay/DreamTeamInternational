@@ -7,8 +7,9 @@ export const en = {
     chat: "Chat With Us"
   },
   hero: {
-    title1: "Your imagination",
-    title2: "is the limit",
+    titleBefore: "Your ",
+    titleGlow: "imagination",
+    titleAfter: " is the limit.",
     subtitle: "At DreamTeam, we strive to achieve the balance between human nature and the new technology that is here to assist us.",
     cta1: "Contact",
     cta2: "View Our Work"
@@ -179,7 +180,6 @@ export const en = {
     home: "Home",
     process: "Process",
     work: "Work",
-    contact: "Contact",
-    ready: "Ready to start?"
+    contact: "Contact"
   }
 };
