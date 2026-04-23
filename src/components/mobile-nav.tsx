@@ -16,28 +16,28 @@ export function MobileNav() {
 
   return (
     <>
-      <div className="lg:hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-[92%] max-w-md rounded-[2.25rem] liquid-glass px-4 py-4 flex items-center gap-2 border border-border/30 bg-background/90 backdrop-blur-md ring-1 ring-black/10 dark:ring-white/10 shadow-[0_22px_60px_rgba(0,0,0,0.42),0_10px_28px_rgba(0,0,0,0.28)] dark:shadow-[0_24px_70px_rgba(0,0,0,0.65),0_12px_36px_rgba(0,0,0,0.45)]">
+      <div className="lg:hidden fixed bottom-5 left-1/2 -translate-x-1/2 z-50 w-[92%] max-w-md rounded-[2.25rem] liquid-glass px-3 py-2.5 flex items-center gap-1.5 border border-border/30 bg-background/90 backdrop-blur-md ring-1 ring-black/10 dark:ring-white/10 shadow-[0_22px_60px_rgba(0,0,0,0.42),0_10px_28px_rgba(0,0,0,0.28)] dark:shadow-[0_24px_70px_rgba(0,0,0,0.65),0_12px_36px_rgba(0,0,0,0.45)]">
         <Link
           href={homeHref}
-          className="group flex flex-1 select-none flex-col items-center justify-center gap-1 text-muted-foreground transition-colors hover:text-primary"
+          className="group flex flex-1 select-none flex-col items-center justify-center gap-1 text-muted-foreground transition-colors hover:text-foreground"
         >
-          <IconHome className="h-[26px] w-[26px] icon-on-brand transition-transform group-hover:scale-110 group-hover:brightness-110" />
+          <IconHome className="h-[26px] w-[26px] text-neutral-800 transition-transform group-hover:scale-110 dark:text-neutral-200" />
           <span className="text-xs font-semibold tracking-wide">{t.mobileNav.home}</span>
         </Link>
 
         <Link
           href="#portfolio"
-          className="group flex flex-1 select-none flex-col items-center justify-center gap-1 text-muted-foreground transition-colors hover:text-primary"
+          className="group flex flex-1 select-none flex-col items-center justify-center gap-1 text-muted-foreground transition-colors hover:text-foreground"
         >
-          <IconVideo className="h-[26px] w-[26px] icon-on-brand transition-transform group-hover:scale-110 group-hover:brightness-110" />
+          <IconVideo className="h-[26px] w-[26px] text-neutral-800 transition-transform group-hover:scale-110 dark:text-neutral-200" />
           <span className="text-xs font-semibold tracking-wide">{t.mobileNav.work}</span>
         </Link>
 
         <Link
           href="#contact"
-          className="group flex flex-1 select-none flex-col items-center justify-center gap-1 text-muted-foreground transition-colors hover:text-primary"
+          className="group flex flex-1 select-none flex-col items-center justify-center gap-1 text-muted-foreground transition-colors hover:text-foreground"
         >
-          <IconMail className="h-[26px] w-[26px] icon-on-brand transition-transform group-hover:scale-110 group-hover:brightness-110" />
+          <IconMail className="h-[26px] w-[26px] text-neutral-800 transition-transform group-hover:scale-110 dark:text-neutral-200" />
           <span className="text-xs font-semibold tracking-wide">{t.mobileNav.contact}</span>
         </Link>
 
@@ -65,28 +65,31 @@ export function MobileNav() {
                 <Link
                   href={homeHref}
                   onClick={() => setIsOpen(false)}
-                  className="flex select-none items-center gap-4 text-foreground/80 transition-colors hover:text-primary"
+                  className="group flex select-none items-center gap-4 text-foreground/80 transition-colors"
                 >
-                  <IconHome className="h-6 w-6 shrink-0 icon-on-brand" /> {t.mobileNav.home}
+                  <IconHome className="h-6 w-6 shrink-0 text-neutral-800 dark:text-neutral-200" />
+                  <span className="transition-colors group-hover:text-primary">{t.mobileNav.home}</span>
                 </Link>
                 <Link
                   href="#portfolio"
                   onClick={() => setIsOpen(false)}
-                  className="flex select-none items-center gap-4 text-foreground/80 transition-colors hover:text-primary"
+                  className="group flex select-none items-center gap-4 text-foreground/80 transition-colors"
                 >
-                  <IconVideo className="h-6 w-6 shrink-0 icon-on-brand" /> {t.mobileNav.work}
+                  <IconVideo className="h-6 w-6 shrink-0 text-neutral-800 dark:text-neutral-200" />
+                  <span className="transition-colors group-hover:text-primary">{t.mobileNav.work}</span>
                 </Link>
                 <Link
                   href="#contact"
                   onClick={() => setIsOpen(false)}
-                  className="flex select-none items-center gap-4 text-foreground/80 transition-colors hover:text-primary"
+                  className="group flex select-none items-center gap-4 text-foreground/80 transition-colors"
                 >
-                  <IconMail className="h-6 w-6 shrink-0 icon-on-brand" /> {t.mobileNav.contact}
+                  <IconMail className="h-6 w-6 shrink-0 text-neutral-800 dark:text-neutral-200" />
+                  <span className="transition-colors group-hover:text-primary">{t.mobileNav.contact}</span>
                 </Link>
+                {/* Location (maps): was a separate row here — restore with IconMapPin + maps URL when needed */}
               </div>
 
               <div className="mt-auto pt-8">
-                <p className="text-sm text-muted-foreground mb-4">{t.mobileNav.ready}</p>
                 <Link
                   href="#contact"
                   onClick={() => setIsOpen(false)}

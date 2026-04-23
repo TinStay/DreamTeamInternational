@@ -480,14 +480,11 @@ export function PortfolioSection() {
     );
 
   return (
-      <section id="portfolio" className="relative w-full overflow-visible py-6" ref={ref}>
+      <section id="portfolio" className="relative w-full overflow-visible pt-2 pb-6 sm:pt-3" ref={ref}>
         <div className="relative z-10 mx-auto w-full max-w-none px-4 sm:px-6 lg:px-10">
           {/* Fade title only — never wrap lazy iframes in `opacity-0` (breaks IntersectionObserver on WebKit). */}
           <div
-            className={cn(
-              "mb-6 transition-opacity duration-700 delay-200",
-              isInView ? "opacity-100" : "opacity-0"
-            )}
+            className={"mb-6"}
           >
             <h2 className="font-heading mb-3 text-4xl font-bold text-foreground md:text-5xl">
               {t.portfolio.title1}{" "}
@@ -527,8 +524,8 @@ export function PortfolioSection() {
                 </div>
               </div>
 
-              {/* Resolution tabs (bottom) */}
-              <div className="w-full rounded-full border border-border/25 bg-background/95 px-2 py-2 shadow-[0_12px_40px_rgba(15,23,42,0.1)] backdrop-blur-lg supports-[backdrop-filter]:bg-background/85 dark:border-border/30 dark:shadow-[0_12px_48px_rgba(0,0,0,0.45)] sm:w-fit sm:self-start sm:px-3 sm:py-2">
+              {/* Resolution tabs (bottom) — hug content on mobile; same on sm+ */}
+              <div className="w-fit max-w-full self-start rounded-full border border-border/25 bg-background/95 px-2 py-2 shadow-[0_12px_40px_rgba(15,23,42,0.1)] backdrop-blur-lg supports-[backdrop-filter]:bg-background/85 dark:border-border/30 dark:shadow-[0_12px_48px_rgba(0,0,0,0.45)] sm:px-3 sm:py-2">
                 <Tabs
                   value={format}
                   onValueChange={(v) => {

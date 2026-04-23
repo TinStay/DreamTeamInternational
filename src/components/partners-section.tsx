@@ -29,8 +29,8 @@ export function PartnersSection() {
   };
 
   return (
-    <section className="py-10 md:py-12 overflow-hidden relative">
-      <div className="max-w-6xl mx-auto px-4 z-10 relative mb-5 md:mb-7">
+    <section className="pt-10 pb-4 md:pt-12 md:pb-6 overflow-hidden relative">
+      <div className="max-w-6xl mx-auto px-4 z-10 relative mb-4 md:mb-5">
         <h2 className="text-center font-heading font-semibold text-muted-foreground/70 text-base md:text-lg tracking-widest uppercase">
           {t.partners.title}
         </h2>
