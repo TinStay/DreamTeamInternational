@@ -6,6 +6,8 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
+  ANIMATED_SHORT,
+  ANIMATED_WIDE,
   AVATARS_WIDE,
   CARS_SHORT,
   CARS_WIDE,
@@ -389,6 +391,8 @@ function embedsForCategory(category: string) {
       return { wide: PRODUCT_WIDE, short: PRODUCT_SHORT };
     case "services":
       return { wide: SERVICES_WIDE, short: SERVICES_SHORT };
+    case "animated":
+      return { wide: ANIMATED_WIDE, short: ANIMATED_SHORT };
     default:
       return { wide: [] as YouTubeEmbed[], short: [] as YouTubeEmbed[] };
   }
@@ -405,6 +409,7 @@ function embedsForAll() {
   const { wide: wTv, short: sTv } = embedsForCategory("tv");
   const { wide: wPr, short: sPr } = embedsForCategory("product");
   const { wide: wSer, short: sSer } = embedsForCategory("services");
+  const { short: sAnim } = embedsForCategory("animated");
 
   const wide: YouTubeEmbed[] = [
     wTv[0]!,
@@ -417,6 +422,10 @@ function embedsForAll() {
     wTv[1]!,
     wCon[2]!,
     wMas[1]!,
+    wCon[3]!,
+    wPr[7]!,
+    wSer[3]!,
+    wSer[4]!,
   ];
 
   // Short column order: swap 1st ↔ 4th vertical (was sTv[0] / sCon[0])
@@ -436,13 +445,21 @@ function embedsForAll() {
     sCon[3]!,
     sCon[4]!,
     sTv[2]!,
+    sPr[3]!,
+    sPr[4]!,
+    sPr[5]!,
+    sPr[6]!,
+    sSer[2]!,
+    sTv[3]!,
+    sTv[4]!,
+    sAnim[0]!,
   ];
 
   return { wide, short };
 }
 
 export function PortfolioSection() {
-  const { ref, isInView } = useInView();
+  const { ref } = useInView();
   const { t } = useLanguage();
   const [format, setFormat] = useState<"all" | "desktop" | "mobile">("all");
   const [activeCategory, setActiveCategory] = useState<string>("all");

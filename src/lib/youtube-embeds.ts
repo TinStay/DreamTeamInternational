@@ -41,6 +41,10 @@ export const CONSTRUCTION_WIDE: YouTubeEmbed[] = [
     src: "https://www.youtube.com/embed/jdbcZ0noPI0?si=iagITF3S-W2QaeaK",
     title: "Construction (wide) 3",
   },
+  {
+    src: "https://www.youtube.com/embed/L-TYLYZO_Tc",
+    title: "Construction (wide) 4",
+  },
 ];
 
 // Construction category (9:16 Shorts)
@@ -79,12 +83,16 @@ export const CARS_WIDE: YouTubeEmbed[] = [
     title: "Cars (wide) 1",
   },
   {
+    src: "https://www.youtube.com/embed/jnyQrfLk0Lo",
+    title: "Services (wide) 2",
+  },
+  {
     src: "https://www.youtube.com/embed/oEkHqaeBsik?si=Xutqw9O7FZkFwzwI",
-    title: "Cars (wide) 2",
+    title: "Cars (wide) 3",
   },
   {
     src: "https://www.youtube.com/embed/BMoPhk-U35w?si=K36oEJh1RKLrh7iT",
-    title: "Cars (wide) 3",
+    title: "Cars (wide) 4",
   },
 ];
 
@@ -130,6 +138,14 @@ export const TV_SHORT: YouTubeEmbed[] = [
     src: "https://www.youtube.com/embed/ymzLC2ae6gw?si=BOct84jCEIHMRxzx",
     title: "Кино реклама (short) 3",
   },
+  {
+    src: "https://www.youtube.com/embed/UpA3ILk_Tm4",
+    title: "Кино реклама (short) 4",
+  },
+  {
+    src: "https://www.youtube.com/embed/qP5rhT5XtmM",
+    title: "Кино реклама (short) 5",
+  },
 ];
 
 export const PRODUCT_WIDE: YouTubeEmbed[] = [
@@ -161,6 +177,10 @@ export const PRODUCT_WIDE: YouTubeEmbed[] = [
     src: "https://www.youtube.com/embed/jj_LSOIpg58?si=QBjjv2VuSji_a8WJ",
     title: "Product (wide) 7",
   },
+  {
+    src: "https://www.youtube.com/embed/6vIDrUkpPEM",
+    title: "Product (wide) 8",
+  },
 ];
 
 /** Product category (9:16 Shorts) */
@@ -176,6 +196,22 @@ export const PRODUCT_SHORT: YouTubeEmbed[] = [
   {
     src: "https://www.youtube.com/embed/T40vemPjBJY?si=0brqU6akCOkI5EfW",
     title: "Product (short) 3",
+  },
+  {
+    src: "https://www.youtube.com/embed/sppnJ1zTcTg",
+    title: "Product (short) 4",
+  },
+  {
+    src: "https://www.youtube.com/embed/y9Sk-7PU89k",
+    title: "Product (short) 5",
+  },
+  {
+    src: "https://www.youtube.com/embed/U83f4Ku5xa4",
+    title: "Product (short) 6",
+  },
+  {
+    src: "https://www.youtube.com/embed/getNNKJZfaU",
+    title: "Product (short) 7",
   },
 ];
 
@@ -193,6 +229,10 @@ export const SERVICES_WIDE: YouTubeEmbed[] = [
     src: "https://www.youtube.com/embed/OrgF3MCq9rQ?si=OuGw5LDYD7WmGwBv",
     title: "Services (wide) 3",
   },
+  {
+    src: "https://www.youtube.com/embed/oVU1PXHVZ8A",
+    title: "Services (wide) 4",
+  },
 ];
 
 /** Services category (9:16 Shorts) */
@@ -205,5 +245,20 @@ export const SERVICES_SHORT: YouTubeEmbed[] = [
     src: "https://www.youtube.com/embed/mw9KUBHfkjM",
     title: "Services (short) 2",
   },
+  {
+    src: "https://www.youtube.com/embed/KNI6lZXqdzw",
+    title: "Services (short) 3",
+  },
 ];
+
+/** Animated category (9:16 Shorts) */
+export const ANIMATED_SHORT: YouTubeEmbed[] = [
+  {
+    src: "https://www.youtube.com/embed/HnMiNTf3NGw",
+    title: "Animation (short) 1",
+  },
+];
+
+/** Animated category (16:9) */
+export const ANIMATED_WIDE: YouTubeEmbed[] = [];
 
