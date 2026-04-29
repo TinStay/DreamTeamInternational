@@ -3,6 +3,7 @@ import { Syne } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { LanguageProvider } from "@/lib/i18n/language-context";
+import { Analytics } from "@vercel/analytics/next";
 
 const syne = Syne({ 
   subsets: ["latin"],
@@ -32,6 +33,9 @@ export const metadata: Metadata = {
     title: "DreamTeam Technology",
     description: "AI-powered video production for modern brands.",
   },
+  icons: {
+    icon: "/logo/logo_short_black.png",
+  },
 };
 
 export default function RootLayout({
@@ -57,6 +61,7 @@ export default function RootLayout({
             </div>
           </LanguageProvider>
         </ThemeProvider>
+        <Analytics />
       </body>
     </html>
   );
