@@ -114,10 +114,7 @@ export const TV_WIDE: YouTubeEmbed[] = [
     src: "https://www.youtube.com/embed/fznYCs6dvQI?si=4Hn-P0ozS1KgdFjX",
     title: "Кино реклама (wide) 1",
   },
-  {
-    src: "https://www.youtube.com/embed/hRQa2VGSWJY?si=an88Ta35rPjWbcy4",
-    title: "Кино реклама (wide) 2",
-  },
+
   {
     src: "https://www.youtube.com/embed/L81ngoOb-Xg?si=FFJYN0GcjYE1fjnd",
     title: "Кино реклама (wide) 3",
