@@ -176,6 +176,13 @@ export const bg = {
     copy: "DreamTeam Technology. Всички права запазени.",
     made: "Направено с ♥ и AI."
   },
+  legal: {
+    home: "Начало",
+    backToHome: "Обратно към началото",
+    lastUpdated: "Последна актуализация:",
+    privacyTitle: "Политика за поверителност",
+    termsTitle: "Общи условия",
+  },
   mobileNav: {
     home: "Начало",
     process: "Процес",

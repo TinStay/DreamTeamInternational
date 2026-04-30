@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { LegalPageShell } from "@/components/legal/legal-page-shell";
-import { TermsEnglishContent } from "@/components/legal/terms-english-content";
+import { TermsBulgarianContent } from "@/components/legal/terms-bulgarian-content";
+import { bg } from "@/lib/i18n/bg";
 
 const LAST_UPDATED = "February 20, 2026";
 
@@ -10,7 +11,7 @@ export const metadata: Metadata = {
   alternates: {
     canonical: "/bg/terms",
     languages: {
-      en: "/terms",
+      en: "/en/terms",
       bg: "/bg/terms",
     },
   },
@@ -20,16 +21,13 @@ export default function TermsPageBg() {
   return (
     <LegalPageShell
       homeHref="/bg"
-      homeLabel="Начало"
-      docTitle="Общи условия"
-      lastUpdatedLabel="Последна актуализация:"
+      homeLabel={bg.legal.home}
+      docTitle={bg.legal.termsTitle}
+      lastUpdatedLabel={bg.legal.lastUpdated}
       lastUpdated={LAST_UPDATED}
-      backLabel="Обратно към началото"
+      backLabel={bg.legal.backToHome}
     >
-      <p className="not-prose mb-8 rounded-xl border border-border/40 bg-muted/30 px-4 py-3 text-sm text-muted-foreground">
-        Официалният правен текст по-долу е на <strong className="text-foreground">английски език</strong>.
-      </p>
-      <TermsEnglishContent />
+      <TermsBulgarianContent />
     </LegalPageShell>
   );
 }

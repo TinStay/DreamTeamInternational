@@ -24,16 +24,16 @@ import {
   type YouTubeEmbed,
 } from "@/lib/youtube-embeds";
 import {
-  IconBriefcase,
-  IconCar,
+  IconBottleFilled,
+  IconCarFilled,
+  IconCookieManFilled,
+  IconDeviceTabletFilled,
   IconDeviceDesktop,
   IconDeviceMobile,
-  IconDeviceTv,
-  IconHammer,
+  IconDiamondFilled,
   IconLayoutGrid,
-  IconPackage,
-  IconSparkles,
-  IconWand,
+  IconHome2Filled,
+  IconMickeyFilled,
 } from "@tabler/icons-react";
 
 /** Generous margin so tiles near the fold still get a callback; four-value form for Safari. */
@@ -151,39 +151,59 @@ function useInView(threshold = 0.1) {
 }
 
 type AllLayoutSegment =
-  | { kind: "pair"; idx: number }
-  | { kind: "wideOnly"; idx: number }
+  | { kind: "pair"; wide: YouTubeEmbed; short: YouTubeEmbed; rowIdx: number }
+  | { kind: "triple"; wide: YouTubeEmbed; left: YouTubeEmbed; right: YouTubeEmbed; rowIdx: number }
+  | { kind: "wideOnly"; wide: YouTubeEmbed; rowIdx: number }
   | { kind: "shortGrid"; startIdx: number; embeds: YouTubeEmbed[] };
 
-/** Pair wide+short rows, then batch consecutive short-only clips into one grid (3 columns on lg). */
+/** Build “All” layout: prefer L(short) + wide + R(short) rows on desktop, then wide-only, then batch remaining shorts. */
 function buildAllFormatSegments(
   wideEmbeds: YouTubeEmbed[],
   shortEmbeds: YouTubeEmbed[]
 ): AllLayoutSegment[] {
-  const max = Math.max(wideEmbeds.length, shortEmbeds.length);
   const segments: AllLayoutSegment[] = [];
-  let i = 0;
-  while (i < max) {
-    const wide = wideEmbeds[i];
-    const short = shortEmbeds[i];
-    if (wide && short) {
-      segments.push({ kind: "pair", idx: i });
-      i += 1;
-    } else if (wide && !short) {
-      segments.push({ kind: "wideOnly", idx: i });
-      i += 1;
-    } else if (!wide && short) {
-      const embeds: YouTubeEmbed[] = [];
-      const startIdx = i;
-      while (i < max && !wideEmbeds[i] && shortEmbeds[i]) {
-        embeds.push(shortEmbeds[i]!);
-        i += 1;
-      }
-      segments.push({ kind: "shortGrid", startIdx, embeds });
-    } else {
-      i += 1;
+  let wideIdx = 0;
+  let shortIdx = 0;
+  let rowIdx = 0;
+
+  while (wideIdx < wideEmbeds.length || shortIdx < shortEmbeds.length) {
+    const wide = wideEmbeds[wideIdx];
+    const left = shortEmbeds[shortIdx];
+    const right = shortEmbeds[shortIdx + 1];
+
+    if (wide && left && right) {
+      segments.push({ kind: "triple", wide, left, right, rowIdx });
+      wideIdx += 1;
+      shortIdx += 2;
+      rowIdx += 1;
+      continue;
     }
+
+    if (wide && left) {
+      segments.push({ kind: "pair", wide, short: left, rowIdx });
+      wideIdx += 1;
+      shortIdx += 1;
+      rowIdx += 1;
+      continue;
+    }
+
+    if (wide) {
+      segments.push({ kind: "wideOnly", wide, rowIdx });
+      wideIdx += 1;
+      rowIdx += 1;
+      continue;
+    }
+
+    if (shortIdx < shortEmbeds.length) {
+      const startIdx = shortIdx;
+      const embeds = shortEmbeds.slice(shortIdx);
+      segments.push({ kind: "shortGrid", startIdx, embeds });
+      break;
+    }
+
+    break;
   }
+
   return segments;
 }
 
@@ -217,20 +237,69 @@ const PortfolioTabBody = memo(function PortfolioTabBody({
         {format === "all" ? (
           <div className="flex flex-col gap-10 lg:gap-12">
             {allSegments.map((seg) => {
-              if (seg.kind === "pair") {
-                const idx = seg.idx;
-                const wide = wideEmbeds[idx]!;
-                const short = shortEmbeds[idx]!;
+              if (seg.kind === "triple") {
+                const { wide, left, right, rowIdx } = seg;
                 return (
                   <div
-                    key={`row-pair-${idx}`}
+                    key={`row-triple-${rowIdx}-${wide.src}`}
+                    className="grid grid-cols-1 items-stretch gap-6 lg:grid-cols-[clamp(220px,22vw,340px)_minmax(0,1fr)_clamp(220px,22vw,340px)] lg:gap-10"
+                    style={{
+                      animationName: "fadeSlideIn",
+                      animationDuration: "0.45s",
+                      animationTimingFunction: "ease",
+                      animationFillMode: "both",
+                      animationDelay: `${rowIdx * 90}ms`,
+                    }}
+                  >
+                    <div className="flex flex-col gap-3">
+                      <div className="relative mx-auto aspect-[9/16] w-full max-w-[min(100%,420px)] overflow-hidden rounded-2xl border border-border/20 bg-card shadow-sm lg:max-w-none">
+                        <LazyYouTubeIframe
+                          key={left.src}
+                          src={left.src}
+                          title={left.title ?? "YouTube video"}
+                          iframeClassName="absolute left-1/2 top-1/2 h-full w-[177.78%] -translate-x-1/2 -translate-y-1/2"
+                          priority={rowIdx === 0}
+                        />
+                      </div>
+                    </div>
+                    <div className="flex flex-col gap-3">
+                      <div className="relative aspect-video overflow-hidden rounded-2xl border border-border/20 bg-card shadow-sm">
+                        <LazyYouTubeIframe
+                          key={wide.src}
+                          src={wide.src}
+                          title={wide.title ?? "YouTube video"}
+                          iframeClassName="absolute inset-0 h-full w-full"
+                          priority={rowIdx === 0}
+                        />
+                      </div>
+                    </div>
+                    <div className="flex flex-col gap-3">
+                      <div className="relative mx-auto aspect-[9/16] w-full max-w-[min(100%,420px)] overflow-hidden rounded-2xl border border-border/20 bg-card shadow-sm lg:max-w-none">
+                        <LazyYouTubeIframe
+                          key={right.src}
+                          src={right.src}
+                          title={right.title ?? "YouTube video"}
+                          iframeClassName="absolute left-1/2 top-1/2 h-full w-[177.78%] -translate-x-1/2 -translate-y-1/2"
+                          priority={false}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                );
+              }
+
+              if (seg.kind === "pair") {
+                const { wide, short, rowIdx } = seg;
+                return (
+                  <div
+                    key={`row-pair-${rowIdx}-${wide.src}`}
                     className="grid grid-cols-1 items-stretch gap-6 lg:grid-cols-[minmax(0,1fr)_clamp(220px,22vw,360px)] lg:gap-10"
                     style={{
                       animationName: "fadeSlideIn",
                       animationDuration: "0.45s",
                       animationTimingFunction: "ease",
                       animationFillMode: "both",
-                      animationDelay: `${idx * 90}ms`,
+                      animationDelay: `${rowIdx * 90}ms`,
                     }}
                   >
                     <div className="flex flex-col gap-3">
@@ -240,7 +309,7 @@ const PortfolioTabBody = memo(function PortfolioTabBody({
                           src={wide.src}
                           title={wide.title ?? "YouTube video"}
                           iframeClassName="absolute inset-0 h-full w-full"
-                          priority={idx === 0}
+                          priority={rowIdx === 0}
                         />
                       </div>
                     </div>
@@ -251,7 +320,7 @@ const PortfolioTabBody = memo(function PortfolioTabBody({
                           src={short.src}
                           title={short.title ?? "YouTube video"}
                           iframeClassName="absolute left-1/2 top-1/2 h-full w-[177.78%] -translate-x-1/2 -translate-y-1/2"
-                          priority={idx === 0}
+                          priority={false}
                         />
                       </div>
                     </div>
@@ -260,18 +329,17 @@ const PortfolioTabBody = memo(function PortfolioTabBody({
               }
 
               if (seg.kind === "wideOnly") {
-                const idx = seg.idx;
-                const wide = wideEmbeds[idx]!;
+                const { wide, rowIdx } = seg;
                 return (
                   <div
-                    key={`row-wide-${idx}`}
+                    key={`row-wide-${rowIdx}-${wide.src}`}
                     className="grid grid-cols-1 gap-6 lg:gap-10"
                     style={{
                       animationName: "fadeSlideIn",
                       animationDuration: "0.45s",
                       animationTimingFunction: "ease",
                       animationFillMode: "both",
-                      animationDelay: `${idx * 90}ms`,
+                      animationDelay: `${rowIdx * 90}ms`,
                     }}
                   >
                     <div className="flex flex-col gap-3">
@@ -281,7 +349,7 @@ const PortfolioTabBody = memo(function PortfolioTabBody({
                           src={wide.src}
                           title={wide.title ?? "YouTube video"}
                           iframeClassName="absolute inset-0 h-full w-full"
-                          priority={idx === 0}
+                          priority={rowIdx === 0}
                         />
                       </div>
                     </div>
@@ -411,49 +479,49 @@ function embedsForAll() {
   const { wide: wSer, short: sSer } = embedsForCategory("services");
   const { short: sAnim } = embedsForCategory("animated");
 
-  const wide: YouTubeEmbed[] = [
-    wTv[0]!,
-    wMas[0]!,
-    wCar[0]!,
-    wPr[0]!,
-    wSer[0]!,
-    wCon[0]!,
-    wCon[1]!,
-    wTv[1]!,
-    wCon[2]!,
-    wMas[1]!,
-    wCon[3]!,
-    wPr[7]!,
-    wSer[3]!,
-    wSer[4]!,
-  ];
+  const wide = [
+    wTv[0],
+    wMas[0],
+    wCar[0],
+    wPr[0],
+    wSer[0],
+    wCon[0],
+    wCon[1],
+    wTv[1],
+    wCon[2],
+    wMas[1],
+    wCon[3],
+    wPr[7],
+    wSer[3],
+    wSer[4],
+  ].filter((e): e is YouTubeEmbed => Boolean(e));
 
   // Short column order: swap 1st ↔ 4th vertical (was sTv[0] / sCon[0])
-  const short: YouTubeEmbed[] = [
-    sCon[0]!,
-    sPr[0]!,
-    sPr[1]!,
-    sPr[2]!,
-    sCar[0]!,
-    sCar[1]!,
-    sTv[0]!,
-    sSer[0]!,
-    sSer[1]!,
-    sCon[1]!,
-    sCon[2]!,
-    sTv[1]!,
-    sCon[3]!,
-    sCon[4]!,
-    sTv[2]!,
-    sPr[3]!,
-    sPr[4]!,
-    sPr[5]!,
-    sPr[6]!,
-    sSer[2]!,
-    sTv[3]!,
-    sTv[4]!,
-    sAnim[0]!,
-  ];
+  const short = [
+    sCon[0],
+    sPr[0],
+    sPr[1],
+    sPr[2],
+    sCar[0],
+    sCar[1],
+    sTv[0],
+    sSer[0],
+    sSer[1],
+    sCon[1],
+    sCon[2],
+    sTv[1],
+    sCon[3],
+    sCon[4],
+    sTv[2],
+    sPr[3],
+    sPr[4],
+    sPr[5],
+    sPr[6],
+    sSer[2],
+    sTv[3],
+    sTv[4],
+    sAnim[0],
+  ].filter((e): e is YouTubeEmbed => Boolean(e));
 
   return { wide, short };
 }
@@ -466,14 +534,15 @@ export function PortfolioSection() {
 
   const CATEGORIES: { key: string; label: string; icon: React.ReactNode }[] = useMemo(
     () => [
-      { key: "all", label: t.portfolio.categories.all, icon: <IconLayoutGrid className="h-5 w-5" /> },
-      { key: "construction", label: t.portfolio.categories.construction, icon: <IconHammer className="h-5 w-5" /> },
-      { key: "mascots", label: t.portfolio.categories.mascots, icon: <IconSparkles className="h-5 w-5" /> },
-      { key: "tv", label: t.portfolio.categories.tv, icon: <IconDeviceTv className="h-5 w-5" /> },
-      { key: "cars", label: t.portfolio.categories.cars, icon: <IconCar className="h-5 w-5" /> },
-      { key: "product", label: t.portfolio.categories.product, icon: <IconPackage className="h-5 w-5" /> },
-      { key: "services", label: t.portfolio.categories.services, icon: <IconBriefcase className="h-5 w-5" /> },
-      { key: "animated", label: t.portfolio.categories.animated, icon: <IconWand className="h-5 w-5" /> },
+      // Use `size-*` so shadcn `Button` doesn't clamp SVGs to `size-4`.
+      { key: "all", label: t.portfolio.categories.all, icon: <IconLayoutGrid className="size-6 sm:size-7" /> },
+      { key: "construction", label: t.portfolio.categories.construction, icon: <IconHome2Filled className="size-6 sm:size-7" /> },
+      { key: "mascots", label: t.portfolio.categories.mascots, icon: <IconCookieManFilled className="size-6 sm:size-7" /> },
+      { key: "tv", label: t.portfolio.categories.tv, icon: <IconDiamondFilled className="size-6 sm:size-7" /> },
+      { key: "cars", label: t.portfolio.categories.cars, icon: <IconCarFilled className="size-6 sm:size-7" /> },
+      { key: "product", label: t.portfolio.categories.product, icon: <IconBottleFilled className="size-6 sm:size-7" /> },
+      { key: "services", label: t.portfolio.categories.services, icon: <IconDeviceTabletFilled className="size-6 sm:size-7" /> },
+      { key: "animated", label: t.portfolio.categories.animated, icon: <IconMickeyFilled className="size-6 sm:size-7" /> },
     ],
     [t]
   );
@@ -487,13 +556,17 @@ export function PortfolioSection() {
 
   const categoryChipClass = (active: boolean) =>
     cn(
-      "relative shrink-0 cursor-pointer rounded-full font-semibold inline-flex items-center gap-1.5",
+      "group relative shrink-0 cursor-pointer rounded-full font-semibold inline-flex items-center gap-1.5",
       "h-9 px-3 text-xs sm:h-10 sm:gap-2 sm:px-4 sm:text-sm",
       "border border-transparent !shadow-none hover:!shadow-none focus-visible:!shadow-none active:!shadow-none",
-      "transition-colors",
+      "transition-[background-color,border-color,color,box-shadow,transform] duration-200 ease-out will-change-transform",
       active
-        ? "border-white/15 bg-gradient-to-br from-primary via-primary to-[var(--primary-gradient-end)] text-primary-foreground hover:brightness-[1.06] hover:text-primary-foreground [&_svg]:text-primary-foreground [&_svg]:filter-none"
-        : "border-border/50 bg-background/80 text-foreground hover:bg-muted hover:text-foreground dark:border-border/40 dark:bg-input/25 [&_svg]:icon-on-brand"
+        ? "border-white/15 bg-gradient-to-br from-primary via-primary to-[var(--primary-gradient-end)] text-primary-foreground hover:brightness-[1.06] hover:text-primary-foreground"
+        : cn(
+            "border-border/50 bg-background/80 text-foreground dark:border-border/40 dark:bg-input/25",
+            "hover:-translate-y-[1px] hover:bg-muted/60 hover:shadow-[0_10px_30px_rgba(15,23,42,0.08)] dark:hover:shadow-[0_10px_30px_rgba(0,0,0,0.25)]",
+            "hover:border-transparent"
+          )
     );
 
   return (
@@ -528,7 +601,8 @@ export function PortfolioSection() {
                       >
                         <span
                           className={cn(
-                            "[&_svg]:h-4 [&_svg]:w-4 opacity-90 sm:[&_svg]:h-[1.05rem] sm:[&_svg]:w-[1.05rem]",
+                            "opacity-90 transition-transform duration-200 ease-out",
+                            !isActiveTab(cat.key) && "group-hover:scale-[1.06]",
                             isActiveTab(cat.key) && "text-primary-foreground opacity-100"
                           )}
                         >

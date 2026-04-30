@@ -3,8 +3,8 @@ export function PrivacyEnglishContent() {
     <>
       <p className="not-prose text-[0.9375rem] leading-relaxed text-muted-foreground">
         We at &ldquo;DreamTeam&rdquo;, accessible at{" "}
-        <a href="https://dream-teamai.web.app" className="text-primary underline-offset-4 hover:underline">
-          https://dream-teamai.web.app
+        <a href="https://dreamteam.technology" className="text-primary underline-offset-4 hover:underline">
+          https://dreamteam.technology
         </a>
         , respect your privacy and are committed to protecting your personal data. This policy
         describes how we process information collected through our website.

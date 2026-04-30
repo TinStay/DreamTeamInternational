@@ -176,6 +176,13 @@ export const en = {
     copy: "DreamTeam Technology. All rights reserved.",
     made: "Made with ♥ and AI."
   },
+  legal: {
+    home: "Home",
+    backToHome: "Back to home",
+    lastUpdated: "Last updated:",
+    privacyTitle: "Privacy Policy",
+    termsTitle: "Terms and Conditions",
+  },
   mobileNav: {
     home: "Home",
     process: "Process",

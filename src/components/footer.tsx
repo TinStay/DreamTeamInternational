@@ -9,8 +9,8 @@ import { useLanguage } from "@/lib/i18n/language-context";
 export function Footer() {
   const { t, language } = useLanguage();
   const homeHref = language === "bg" ? "/bg" : "/";
-  const termsHref = language === "bg" ? "/bg/terms" : "/terms";
-  const privacyHref = language === "bg" ? "/bg/privacy" : "/privacy";
+  const termsHref = language === "bg" ? "/bg/terms" : "/en/terms";
+  const privacyHref = language === "bg" ? "/bg/privacy" : "/en/privacy";
 
   return (
     <footer className="relative overflow-hidden border-t border-border/20 liquid-glass mt-20">

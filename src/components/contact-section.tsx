@@ -123,7 +123,7 @@ export function ContactSection() {
   const [isSending, setIsSending] = useState(false);
   const [sendResult, setSendResult] = useState<null | "ok" | "error">(null);
 
-  const termsHref = language === "bg" ? "/bg/terms" : "/terms";
+  const termsHref = language === "bg" ? "/bg/terms" : "/en/terms";
   const foundUsOptions = useMemo(() => {
     const opts = t.contact.foundUsOptions;
     return [
