@@ -4,6 +4,9 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { LanguageProvider } from "@/lib/i18n/language-context";
 import { Analytics } from "@vercel/analytics/next";
+import { PostHogProvider } from "@/components/posthog-provider";
+import { PostHogPageView } from "@/components/posthog-pageview";
+import { Suspense } from "react";
 
 const syne = Syne({ 
   subsets: ["latin"],
@@ -49,18 +52,23 @@ export default function RootLayout({
         className={`${syne.variable} font-sans antialiased relative min-h-screen`}
         suppressHydrationWarning
       >
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="light"
-          enableSystem={false}
-          disableTransitionOnChange
-        >
-          <LanguageProvider>
-            <div className="relative z-10">
-              {children}
-            </div>
-          </LanguageProvider>
-        </ThemeProvider>
+        <PostHogProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="light"
+            enableSystem={false}
+            disableTransitionOnChange
+          >
+            <LanguageProvider>
+              <Suspense>
+                <PostHogPageView />
+              </Suspense>
+              <div className="relative z-10">
+                {children}
+              </div>
+            </LanguageProvider>
+          </ThemeProvider>
+        </PostHogProvider>
         <Analytics />
       </body>
     </html>
