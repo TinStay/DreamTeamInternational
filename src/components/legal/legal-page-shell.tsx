@@ -30,7 +30,7 @@ export function LegalPageShell({
     <main className="flex min-h-screen flex-col bg-background">
       <SiteHeader />
 
-      <div className="relative flex-1 w-full pt-28 lg:pt-32 pb-28 px-4">
+      <div className="relative flex-1 w-full pt-24 pb-28 px-4 lg:pt-32">
         <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(ellipse_90%_55%_at_50%_-20%,rgba(99,102,241,0.14),transparent),radial-gradient(ellipse_70%_45%_at_100%_40%,rgba(112,51,255,0.08),transparent),radial-gradient(ellipse_55%_38%_at_0%_55%,rgba(14,165,233,0.06),transparent)]" />
 
         <div className="mx-auto w-full max-w-4xl">

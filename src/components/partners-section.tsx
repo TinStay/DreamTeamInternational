@@ -3,68 +3,223 @@
 import { useLanguage } from "@/lib/i18n/language-context";
 import { motion } from "framer-motion";
 import Image from "next/image";
+import { cn } from "@/lib/utils";
+
+type Partner = {
+  id: string;
+  light: string | null;
+  dark: string | null;
+  href?: string;
+  ariaLabel: string;
+};
+
+const ICON_BASE = "/company_icons/";
+
+const PARTNERS: Partner[] = [
+  {
+    id: "asia",
+    light: "asia_agency_logo_light.png",
+    dark: "asia_agency_logo_dark.png",
+    href: "https://asiaeventagency.com/",
+    ariaLabel: "Asia Event Agency",
+  },
+  {
+    id: "boleron",
+    light: "boleron_logo_light.png",
+    dark: null,
+    href: "https://asiaeventagency.com/",
+    ariaLabel: "Boleron",
+  },
+  {
+    id: "designedbygg",
+    light: "designedbygg_logo_light.png",
+    dark: "designedbygg_logo_dark.png",
+    href: "http://designedby.gg/",
+    ariaLabel: "Designed by GG",
+  },
+  {
+    id: "hubchev",
+    light: null,
+    dark: "hubchev_logo_dark.png",
+    href: "https://hubchevproperties.com/",
+    ariaLabel: "Hubchev Properties",
+  },
+  {
+    id: "imotalert",
+    light: "imot_alert_logo_light.png",
+    dark: "imot_alert_logo_dark.png",
+    href: "https://www.imotalert.bg/",
+    ariaLabel: "ImotAlert",
+  },
+  {
+    id: "infinity",
+    light: "infinity_logo_light.png",
+    dark: "infinity_logo_dark.png",
+    href: "https://infinityproperty.bg/",
+    ariaLabel: "Infinity Property",
+  },
+  {
+    id: "oikia",
+    light: "oikia_logo_light.png",
+    dark: "oikia_logo_dark.png",
+    href: "https://www.oikia.com/",
+    ariaLabel: "Oikia",
+  },
+  {
+    id: "palltex",
+    light: "pallteximot_logo_light.png",
+    dark: null,
+    href: "https://palltex.bg/",
+    ariaLabel: "Palltex",
+  },
+  {
+    id: "rsg",
+    light: "rsg_logo_light.png",
+    dark: "rsg_logo_dark.png",
+    href: "https://rsgarch.com/",
+    ariaLabel: "RSG Architects",
+  },
+  {
+    id: "smartpharmacy",
+    light: "smartpharmacy_logo_light.png",
+    dark: null,
+    href: "https://smartpharmacy.bg/",
+    ariaLabel: "Smart Pharmacy",
+  },
+  {
+    id: "stroy-alliance",
+    light: "stroy_alliance_logo_light.png",
+    dark: "stroy_alliance_logo_dark.png",
+    href: "https://stroyalianceinvest.eu/",
+    ariaLabel: "Stroy Alliance Invest",
+  },
+  {
+    id: "valtcan",
+    light: "valtcan_logo_light.png",
+    dark: "valtcan_logo_dark.png",
+    href: "https://www.valtcan.com/",
+    ariaLabel: "Valtcan",
+  },
+];
+
+const imgClass =
+  "h-24 w-auto min-h-24 min-w-[200px] max-w-[min(320px,42vw)] object-contain transition-transform duration-200 group-hover:scale-[1.06] sm:h-28 sm:min-h-28 sm:min-w-[220px] sm:max-w-[min(360px,38vw)] md:h-32 md:min-h-32 md:min-w-[240px] md:max-w-[380px]";
+
+function PartnerLogo({ p }: { p: Partner }) {
+  if (p.light && p.dark) {
+    /* Grid stack: both images stay in layout so the strip keeps width in dark mode (absolute+hidden collapsed before). */
+    return (
+      <span className="inline-grid place-items-center [grid-template-columns:1fr] [grid-template-rows:1fr]">
+        <Image
+          src={`${ICON_BASE}${p.light}`}
+          alt={p.ariaLabel}
+          width={400}
+          height={140}
+          sizes="(max-width: 640px) 45vw, 280px"
+          className={cn(
+            imgClass,
+            "col-start-1 row-start-1 opacity-100 dark:pointer-events-none dark:opacity-0"
+          )}
+        />
+        <Image
+          src={`${ICON_BASE}${p.dark}`}
+          alt=""
+          width={400}
+          height={140}
+          sizes="(max-width: 640px) 45vw, 280px"
+          className={cn(
+            imgClass,
+            "col-start-1 row-start-1 opacity-0 pointer-events-none dark:pointer-events-auto dark:opacity-100"
+          )}
+          aria-hidden
+        />
+      </span>
+    );
+  }
+
+  const single = p.light ?? p.dark;
+  if (!single) return null;
+
+  return (
+    <Image
+      src={`${ICON_BASE}${single}`}
+      alt={p.ariaLabel}
+      width={400}
+      height={140}
+      sizes="(max-width: 640px) 45vw, 280px"
+      className={imgClass}
+    />
+  );
+}
+
+const innerClass =
+  "group mx-8 flex shrink-0 items-center justify-center md:mx-12 cursor-pointer opacity-80 hover:opacity-100 transition-opacity py-2";
+
+const MARQUEE_DURATION_SEC = 42;
+
+function PartnerMarqueeRow({
+  partners,
+  direction,
+  rowKey,
+}: {
+  partners: Partner[];
+  direction: "left" | "right";
+  rowKey: string;
+}) {
+  const items = [...partners, ...partners];
+  const animate =
+    direction === "left"
+      ? ({ x: ["0%", "-50%"] } satisfies { x: string[] })
+      : ({ x: ["-50%", "0%"] } satisfies { x: string[] });
+
+  return (
+    <div className="flex w-full overflow-x-hidden overflow-y-visible">
+      <motion.div
+        className="flex items-center whitespace-nowrap pl-10 will-change-transform md:pl-14"
+        animate={animate as { x: string[] }}
+        transition={{ ease: "linear", duration: MARQUEE_DURATION_SEC, repeat: Infinity }}
+      >
+        {items.map((p, idx) =>
+          p.href ? (
+            <a
+              key={`${rowKey}-${p.id}-${idx}`}
+              href={p.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={innerClass}
+            >
+              <PartnerLogo p={p} />
+            </a>
+          ) : (
+            <span key={`${rowKey}-${p.id}-${idx}`} className={`${innerClass} cursor-default`}>
+              <PartnerLogo p={p} />
+            </span>
+          )
+        )}
+      </motion.div>
+    </div>
+  );
+}
 
 export function PartnersSection() {
   const { t } = useLanguage();
-
-  // TODO: Replace placeholder hrefs with the real partner websites.
-  const PARTNERS = [
-    { src: "/company_icons/asia_event_agency.png", href: "https://example.com" },
-    { src: "/company_icons/infinity_properties_logo-Photoroom.png", href: "https://example.com" },
-    { src: "/company_icons/storoy_alliance_logo-Photoroom.png", href: "https://example.com" },
-    { src: "/company_icons/boleron.png", href: "https://example.com" },
-    { src: "/company_icons/oikia_logo-Photoroom.png", href: "https://example.com" },
-    { src: "/company_icons/rsg_logo-Photoroom.png", href: "https://example.com" },
-    { src: "/company_icons/Smart-Pharmacy-Presentation1-5-2.png", href: "https://example.com" },
-    { src: "/company_icons/hubchev_properties_logo-Photoroom.png", href: "https://example.com" },
-    { src: "/company_icons/valtcan.png", href: "https://example.com" },
-    { src: "/company_icons/c2 financial.png", href: "https://example.com" },
-    { src: "/company_icons/designedbygg.png", href: "https://example.com" },
-  ] as const;
-
-  const items = [...PARTNERS, ...PARTNERS];
-
-  const altFromPath = (path: string) => {
-    const file = path.split("/").pop() ?? path;
-    return file.replace(/[-_]/g, " ").replace(/\.[a-z0-9]+$/i, "");
-  };
+  const mid = Math.ceil(PARTNERS.length / 2);
+  const rowPartners = PARTNERS.slice(0, mid);
+  const rowPartnersB = PARTNERS.slice(mid);
 
   return (
-    <section className="pt-10 pb-4 md:pt-12 md:pb-6 overflow-x-hidden overflow-y-visible relative">
-      <div className="max-w-6xl mx-auto px-4 z-10 relative mb-4 md:mb-5">
-        <h2 className="text-center font-heading font-semibold text-muted-foreground/70 text-base md:text-lg tracking-widest uppercase">
+    <section className="relative overflow-x-hidden overflow-y-visible pt-10 pb-4 md:pt-12 md:pb-6">
+      <div className="relative z-10 mx-auto mb-4 max-w-6xl px-4 md:mb-5">
+        <h2 className="text-center font-heading text-base font-semibold uppercase tracking-widest text-muted-foreground/70 md:text-lg">
           {t.partners.title}
         </h2>
       </div>
 
-      <div className="relative w-full overflow-x-hidden overflow-y-visible flex flex-col items-center py-3">
-        <div className="w-full flex">
-          <motion.div
-            className="flex items-center whitespace-nowrap pl-10 md:pl-14 will-change-transform"
-            animate={{ x: ["0%", "-50%"] }}
-            transition={{ ease: "linear", duration: 42, repeat: Infinity }}
-          >
-            {items.map(({ src, href }, idx) => (
-              <a
-                key={`${src}-${idx}`}
-                href={href}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group mx-8 flex shrink-0 items-center justify-center md:mx-12 cursor-pointer opacity-80 hover:opacity-100 transition-opacity py-2"
-                aria-label={altFromPath(src)}
-              >
-                <Image
-                  src={src}
-                  alt={altFromPath(src)}
-                  width={400}
-                  height={140}
-                  sizes="(max-width: 640px) 45vw, 280px"
-                  className="h-24 w-auto min-h-24 min-w-[200px] max-w-[min(320px,42vw)] object-contain transition-transform duration-200 group-hover:scale-[1.06] sm:h-28 sm:min-h-28 sm:min-w-[220px] sm:max-w-[min(360px,38vw)] md:h-32 md:min-h-32 md:min-w-[240px] md:max-w-[380px]"
-                />
-              </a>
-            ))}
-          </motion.div>
-        </div>
+      <div className="relative flex w-full flex-col items-center gap-5 overflow-x-hidden overflow-y-visible py-3 md:gap-6">
+        <PartnerMarqueeRow partners={rowPartners} direction="left" rowKey="a" />
+        {rowPartnersB.length > 0 ? (
+          <PartnerMarqueeRow partners={rowPartnersB} direction="right" rowKey="b" />
+        ) : null}
       </div>
     </section>
   );

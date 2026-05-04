@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { LanguageDropdown } from "./language-dropdown";
-import { IconHome, IconMail, IconMenu2, IconVideo } from "@tabler/icons-react";
+import { IconBook, IconHome, IconMail, IconMenu2, IconVideo } from "@tabler/icons-react";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
 import { useLanguage } from "@/lib/i18n/language-context";
 import { buttonVariants } from "@/components/ui/button";
@@ -13,6 +13,7 @@ export function MobileNav() {
   const [isOpen, setIsOpen] = useState(false);
   const { t, language } = useLanguage();
   const homeHref = language === "bg" ? "/bg" : "/";
+  const trainingHref = language === "bg" ? "/bg/training" : "/en/training";
 
   return (
     <>
@@ -85,6 +86,14 @@ export function MobileNav() {
                 >
                   <IconMail className="h-6 w-6 shrink-0 text-neutral-800 dark:text-neutral-200" />
                   <span className="transition-colors group-hover:text-primary">{t.mobileNav.contact}</span>
+                </Link>
+                <Link
+                  href={trainingHref}
+                  onClick={() => setIsOpen(false)}
+                  className="group flex select-none items-center gap-4 text-foreground/80 transition-colors"
+                >
+                  <IconBook className="h-6 w-6 shrink-0 text-neutral-800 dark:text-neutral-200" />
+                  <span className="transition-colors group-hover:text-primary">{t.mobileNav.training}</span>
                 </Link>
                 {/* Location (maps): was a separate row here — restore with IconMapPin + maps URL when needed */}
               </div>

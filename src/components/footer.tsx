@@ -11,6 +11,7 @@ export function Footer() {
   const homeHref = language === "bg" ? "/bg" : "/";
   const termsHref = language === "bg" ? "/bg/terms" : "/en/terms";
   const privacyHref = language === "bg" ? "/bg/privacy" : "/en/privacy";
+  const trainingHref = language === "bg" ? "/bg/training" : "/en/training";
 
   return (
     <footer className="relative overflow-hidden border-t border-border/20 liquid-glass mt-20">
@@ -38,6 +39,7 @@ export function Footer() {
             <h4 className="font-heading font-semibold text-foreground mb-2">{t.footer.links}</h4>
             <Link href="#portfolio"   className="text-muted-foreground hover:text-primary transition-colors">{t.header.portfolio}</Link>
             <Link href="#process"     className="text-muted-foreground hover:text-primary transition-colors">{t.header.process}</Link>
+            <Link href={trainingHref} className="text-muted-foreground hover:text-primary transition-colors">{t.header.training}</Link>
             <Link href="#order-form"  className="text-muted-foreground hover:text-primary transition-colors">{t.header.pricing}</Link>
             <Link href="#contact"     className="text-muted-foreground hover:text-primary transition-colors">{t.header.contact}</Link>
           </div>
