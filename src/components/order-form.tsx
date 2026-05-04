@@ -216,7 +216,7 @@ export function OrderFormSection() {
               >
                 {/* Popular badge */}
                 {plan.popular && (
-                  <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-indigo-500 via-primary to-indigo-400" />
+                  <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[var(--primary-gradient-start)] to-[var(--primary-gradient-end)]" />
                 )}
                 {plan.popular && (
                   <div className="absolute top-3 right-3">

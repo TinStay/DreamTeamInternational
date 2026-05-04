@@ -38,7 +38,7 @@ export function ProcessSection() {
   const { t } = useLanguage();
 
   return (
-    <section id="process" className="py-24 relative overflow-hidden" ref={ref}>
+    <section id="process" className="relative overflow-hidden pt-12 pb-20 sm:pt-16 sm:pb-24" ref={ref}>
       <div className="max-w-7xl mx-auto px-4 z-10 relative">
         
         <div className={`text-center mb-16 transition-all duration-1000 transform ${isInView ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"}`}>

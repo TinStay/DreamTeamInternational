@@ -4,15 +4,20 @@ export const en = {
     portfolio: "Portfolio",
     pricing: "Get a Quote",
     contact: "Contact",
-    chat: "Chat With Us"
+    chat: "Chat With Us",
+    training: "Training"
   },
   hero: {
     titleBefore: "Your ",
     titleGlow: "imagination",
     titleAfter: " is the limit.",
-    subtitle: "At DreamTeam, we strive to achieve the balance between human nature and the new technology that is here to assist us.",
-    cta1: "Contact",
+    cta1: "Contact us",
     cta2: "View Our Work"
+  },
+  contactPage: {
+    metaTitle: "Contact & Process | DreamTeam Technology",
+    metaDescription:
+      "How we work from brief to delivery, and how to reach DreamTeam Technology for AI video production.",
   },
   process: {
     title1: "Our",
@@ -183,10 +188,111 @@ export const en = {
     privacyTitle: "Privacy Policy",
     termsTitle: "Terms and Conditions",
   },
+  training: {
+    metaTitle: "Training | DreamTeam Technology",
+    metaDescription:
+      "Individual AI video consultations, Skool community courses, and corporate workshops from DreamTeam Technology.",
+    eyebrow: "Learn to produce AI video",
+    title: "Trainings built for real shoots",
+    subtitle:
+      "From first prompt to final grade: we teach the workflows we use on client work — prompting, look development, editing, and delivery — in the format that matches your pace.",
+    comingSoon: "Coming soon",
+    cards: {
+      consultation: {
+        title: "Individual lessons",
+        suitableFor: "Brands, marketers, and creators who want direct feedback on scripts, tools, and production.",
+        cta: "Contact us",
+        image: "/trainings/individual_banner.jpeg",
+        modalIntro:
+          "Private sessions focused on how you actually build AI-assisted promos, explainers, and social cuts — not generic theory.",
+        features: [
+          { icon: "video", text: "Live 1:1 video calls shaped around your brief, references, and deadlines" },
+          { icon: "wand", text: "Prompt and storyboard coaching for photoreal, stylized, or hybrid looks" },
+          { icon: "tool", text: "Tooling walkthroughs (what we use in production and what to skip)" },
+          { icon: "message", text: "Feedback on pacing, VO, captions, and safe use of likeness / disclosure" },
+          { icon: "checklist", text: "Clear next steps after each call so your team can execute without us in the room" },
+        ],
+        modalTabs: { highlights: "What's included", more: "Practical details" },
+        outcomesTitle: "What you take away",
+        outcomesSubtitle: "Concrete skills for your next AI-assisted cut",
+        outcomes: [
+          { icon: "target", text: "A repeatable brief-to-prompt workflow you can reuse on new campaigns." },
+          { icon: "bulb", text: "Confidence judging when to generate, when to composite, and when to reshoot." },
+          { icon: "chart", text: "A realistic sense of timelines, revision budgets, and QC checkpoints." },
+        ],
+        logisticsTitle: "How sessions run",
+        logistics: [
+          "Sessions are typically 60–90 minutes on Google Meet or Zoom; we can record summaries on request.",
+          "Delivered in English or Bulgarian. You can share screen, cuts, and references live.",
+          "We recommend booking in blocks of 2–4 sessions so momentum compounds between calls.",
+        ],
+      },
+      skool: {
+        title: "Online course (Skool)",
+        suitableFor: "Learners who prefer a paced program with community discussion alongside the lessons.",
+        cta: "Open Skool",
+        image: "/trainings/skool_banner.jpeg",
+        modalIntro:
+          "A structured path through our AI video stack with cohort-style accountability — best when you want repeatable process, not a single advisory call.",
+        features: [
+          { icon: "book", text: "Module-based lessons from ideation to locked picture" },
+          { icon: "sparkles", text: "Assignments you can apply to your own brand or portfolio piece" },
+          { icon: "users", text: "Community Q&A and critique threads between milestones" },
+          { icon: "clock", text: "Updates when workflows or model options shift in the real world" },
+          { icon: "rocket", text: "Templates and checklists we use before client reviews" },
+        ],
+        modalTabs: { highlights: "What's included", more: "Practical details" },
+        outcomesTitle: "After the cohort",
+        outcomesSubtitle: "What changes in how you ship video",
+        outcomes: [
+          { icon: "stack", text: "A documented pipeline from script beat to export presets you can defend internally." },
+          { icon: "shield", text: "Shared language with stakeholders on risk, disclosure, and brand-safe prompts." },
+          { icon: "certificate", text: "Portfolio-ready piece with peer feedback baked into the milestones." },
+        ],
+        logisticsTitle: "Format & access",
+        logistics: [
+          "Hosted on Skool: async lessons plus scheduled live touchpoints and community threads.",
+          "Expect several hours per week when a module is active — you control depth vs. speed.",
+          "Materials include Notion templates, shot lists, and export checklists you can clone.",
+        ],
+      },
+      corporate: {
+        title: "Corporate training",
+        suitableFor: "Companies rolling out AI video capabilities across marketing, comms, or agency teams.",
+        cta: "Request a proposal",
+        image: "/trainings/corporate_banner.jpeg",
+        modalIntro:
+          "Private enablement for teams that need shared vocabulary, approvals, and quality bars — aligned to your brand rules and regions.",
+        features: [
+          { icon: "users", text: "Role-based tracks for producers, editors, strategists, and legal reviewers" },
+          { icon: "wand", text: "Workshops on prompt libraries, shot lists, and revision hygiene" },
+          { icon: "shield", text: "Guidelines for disclosure, talent, and archive use in AI-assisted edits" },
+          { icon: "video", text: "Hands-on labs using your product stories (under NDA)" },
+          { icon: "checklist", text: "Optional playbook: intake → storyboard → generation → QC → delivery" },
+        ],
+        modalTabs: { highlights: "What's included", more: "Practical details" },
+        outcomesTitle: "Organizational outcomes",
+        outcomesSubtitle: "Alignment your whole chain can audit",
+        outcomes: [
+          { icon: "certificate", text: "Signed-off standards for prompts, approvals, and asset provenance." },
+          { icon: "chart", text: "Metrics-friendly reporting on throughput, rework, and vendor mix." },
+          { icon: "target", text: "Trainers-of-trainers option so internal champions sustain the rollout." },
+        ],
+        logisticsTitle: "Delivery options",
+        logistics: [
+          "Modular agendas: half-day intensives, multi-week programs, or hybrid remote + on-site.",
+          "We tailor labs to your DAM, PIM, and review tools where possible.",
+          "Legal and comms stakeholders can join dedicated governance sessions.",
+        ],
+      },
+    },
+    skoolUrl: "https://www.skool.com",
+  },
   mobileNav: {
     home: "Home",
     process: "Process",
     work: "Work",
-    contact: "Contact"
+    contact: "Contact",
+    training: "Training"
   }
 };

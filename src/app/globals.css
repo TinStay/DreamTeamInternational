@@ -80,13 +80,13 @@
   --chart-4: #3276e4;
   --chart-5: #747474;
   --popover: #ffffff;
-  --primary: #4840e3;
+  --primary: #db4e4e;
   --sidebar: #f5f8fb;
   --spacing: 0.27rem;
   --font-mono: IBM Plex Mono, monospace;
   --font-sans: "Nunito Sans", Plus Jakarta Sans, sans-serif;
   --secondary: #eef2ff;
-  --background: #f6f7f9;
+  --background: #ffffff;
   --font-serif: Lora, serif;
   --foreground: #000000;
   --destructive: #e54b4f;
@@ -107,21 +107,29 @@
   --popover-foreground: #000000;
   --primary-foreground: #ffffff;
   --sidebar-foreground: #000000;
-  --secondary-foreground: #312e81;
+  --secondary-foreground: #581c87;
   --destructive-foreground: #ffffff;
   --sidebar-accent-foreground: #000000;
   --sidebar-primary-foreground: #ffffff;
 
-  /* Derived from --primary only (change --primary to retheme buttons, glows, gradients) */
+  /* Brand gradient: red → purple (LTR on buttons, chips, CTAs) */
+  --primary-gradient-start: #db4e4e;
+  --primary-gradient-end: #6b3f9a;
+
+  /* Derived from --primary (glows / shadows) */
   --primary-soft-glow: color-mix(in srgb, var(--primary) 38%, transparent);
   --primary-strong-glow: color-mix(in srgb, var(--primary) 55%, transparent);
-  --primary-gradient-end: color-mix(in srgb, var(--primary) 55%, #ffffff);
   --primary-elevated-shadow: color-mix(in srgb, var(--primary) 34%, transparent);
+
+  /* Dark decorative page bg (light: unused; avoids invalid var() when class is in DOM) */
+  --page-dark-grid-line: transparent;
+  --page-dark-orb-magenta: transparent;
+  --page-dark-orb-violet: transparent;
 }
 
 .dark {
   --card: #222327;
-  --ring: #6366f1;
+  --ring: #f87171;
   --input: #33353a;
   --muted: #2a2c33;
   --accent: #1e293b;
@@ -133,19 +141,19 @@
   --chart-4: #5993f4;
   --chart-5: #a0a0a0;
   --popover: #222327;
-  --primary: #6366f1;
+  --primary: #db4e4e;
   --sidebar: #161618;
   --spacing: 0.27rem;
   --font-mono: IBM Plex Mono, monospace;
   --font-sans: "Nunito Sans", Plus Jakarta Sans, sans-serif;
   --secondary: #252342;
-  --background: #1a1b1e;
+  --background: #020617;
   --font-serif: Lora, serif;
   --foreground: #f0f0f0;
   --destructive: #f87171;
   --shadow-blur: 3px;
   --shadow-color: hsl(0 0% 0%);
-  --sidebar-ring: #6366f1;
+  --sidebar-ring: #f87171;
   --shadow-spread: 0px;
   --letter-spacing: -0.025em;
   --shadow-opacity: 0.16;
@@ -154,7 +162,7 @@
   --card-foreground: #f0f0f0;
   --shadow-offset-x: 0px;
   --shadow-offset-y: 2px;
-  --sidebar-primary: #6366f1;
+  --sidebar-primary: #ef4444;
   --muted-foreground: #a0a0a0;
   --accent-foreground: #79c0ff;
   --popover-foreground: #f0f0f0;
@@ -165,10 +173,17 @@
   --sidebar-accent-foreground: #818cf8;
   --sidebar-primary-foreground: #ffffff;
 
+  --primary-gradient-start: #db4e4e;
+  --primary-gradient-end: #6b3f9a;
+
   --primary-soft-glow: color-mix(in srgb, var(--primary) 42%, transparent);
   --primary-strong-glow: color-mix(in srgb, var(--primary) 62%, transparent);
-  --primary-gradient-end: color-mix(in srgb, var(--primary) 65%, rgb(0, 0, 0));
   --primary-elevated-shadow: color-mix(in srgb, var(--primary) 45%, transparent);
+
+  /* Grid + orb layer (see `.page-dark-grid-layer`) — base always matches `--background` */
+  --page-dark-grid-line: rgb(71 85 105 / 0.15);
+  --page-dark-orb-magenta: rgb(236 72 153 / 0.15);
+  --page-dark-orb-violet: rgb(168 85 247 / 0.05);
 }
 
 /* Glassmorphism Classes (Indigo tint in Dark, Neutral in Light) */
@@ -231,6 +246,24 @@
   .icon-on-brand {
     color: var(--primary);
     filter: drop-shadow(0 2px 8px var(--primary-soft-glow));
+  }
+
+  /**
+   * Dark fixed page background (slate grid + magenta / violet orb).
+   * Single implementation for `GradientBlurPageBg` — uses `--background` so it always matches `body`.
+   */
+  .page-dark-grid-layer {
+    background-color: var(--background);
+    background-image:
+      linear-gradient(to right, var(--page-dark-grid-line) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--page-dark-grid-line) 1px, transparent 1px),
+      radial-gradient(
+        circle at 50% 60%,
+        var(--page-dark-orb-magenta) 0%,
+        var(--page-dark-orb-violet) 40%,
+        transparent 70%
+      );
+    background-size: 40px 40px, 40px 40px, 100% 100%;
   }
 }
 

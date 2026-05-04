@@ -2,11 +2,9 @@ import type { Metadata } from "next";
 import { Syne } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
+import { StyledComponentsRegistry } from "@/lib/styled-components-registry";
 import { LanguageProvider } from "@/lib/i18n/language-context";
 import { Analytics } from "@vercel/analytics/next";
-import { PostHogProvider } from "@/components/posthog-provider";
-import { PostHogPageView } from "@/components/posthog-pageview";
-import { Suspense } from "react";
 
 const syne = Syne({ 
   subsets: ["latin"],
@@ -19,9 +17,9 @@ export const metadata: Metadata = {
   description: "DreamTeam Technology creates high-impact AI-generated videos for brands worldwide — from realistic to animated. Custom scripts, global clients, fast turnarounds.",
   keywords: "AI video production, 3D animation, brand videos, AI-generated scenes, product videos, DreamTeam Technology",
   alternates: {
-    canonical: "/",
+    canonical: "/bg",
     languages: {
-      en: "/",
+      en: "/en",
       bg: "/bg",
     },
   },
@@ -52,7 +50,7 @@ export default function RootLayout({
         className={`${syne.variable} font-sans antialiased relative min-h-screen`}
         suppressHydrationWarning
       >
-        <PostHogProvider>
+        <StyledComponentsRegistry>
           <ThemeProvider
             attribute="class"
             defaultTheme="light"
@@ -60,15 +58,10 @@ export default function RootLayout({
             disableTransitionOnChange
           >
             <LanguageProvider>
-              <Suspense>
-                <PostHogPageView />
-              </Suspense>
-              <div className="relative z-10">
-                {children}
-              </div>
+              <div className="relative z-10">{children}</div>
             </LanguageProvider>
           </ThemeProvider>
-        </PostHogProvider>
+        </StyledComponentsRegistry>
         <Analytics />
       </body>
     </html>

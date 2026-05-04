@@ -1,9 +1,14 @@
 "use client";
-import { buttonVariants } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
-import Image from "next/image";
+
+import { motion } from "framer-motion";
 import Link from "next/link";
+import { IconMailFilled, IconVideoFilled } from "@tabler/icons-react";
+import { buttonVariants } from "@/components/ui/button";
+import HeroDecorativePaths from "@/components/ui/modern-background-paths";
+import { GlassShell } from "@/components/ui/glass-shell";
+import { cn } from "@/lib/utils";
 import { useLanguage } from "@/lib/i18n/language-context";
+import { contactProcessPath, homePath } from "@/lib/routes";
 import {
   HERO_EMBED,
   YOUTUBE_IFRAME_ALLOW,
@@ -12,88 +17,133 @@ import {
 
 export function HeroSection() {
   const { t, language } = useLanguage();
-  const homeHref = language === "bg" ? "/bg" : "/";
+  const contactHref = contactProcessPath(language);
+  const portfolioHref = `${homePath(language)}#portfolio`;
 
   return (
     <section
       id="hero"
-      className="relative min-h-[100svh] flex items-center justify-center overflow-hidden"
+      className="relative flex min-h-[100svh] items-center justify-center overflow-hidden"
     >
-      
-      {/* Background Video */}
+      {/* Background video */}
       <div className="absolute inset-0 z-0 overflow-hidden">
-        <div className="absolute inset-0 scale-105 pointer-events-none">
+        <div className="pointer-events-none absolute inset-0 overflow-hidden scale-105">
           <iframe
-            className="absolute left-1/2 top-1/2 h-[100svh] w-[177.78svh] min-h-[56.25vw] min-w-[100vw] -translate-x-1/2 -translate-y-1/2"
+            className="absolute left-1/2 top-1/2 h-[100svh] w-[177.78svh] min-h-[56.25vw] min-w-[100vw] -translate-x-1/2 -translate-y-1/2 origin-center scale-[1.22] [clip-path:inset(0_0_8%_0)]"
             src={HERO_EMBED.src}
             title={HERO_EMBED.title ?? "YouTube video"}
             allow={YOUTUBE_IFRAME_ALLOW}
-            allowFullScreen
+            allowFullScreen={false}
             referrerPolicy={YOUTUBE_REFERRER_POLICY}
           />
+          {/* Masks residual YouTube center / corner UI after load (cannot be removed from inside the iframe). */}
+          <div
+            className="pointer-events-none absolute inset-0 z-[0.5] bg-[radial-gradient(ellipse_52%_50%_at_50%_50%,transparent_22%,rgba(0,0,0,0.16)_50%,rgba(0,0,0,0.38)_100%)]"
+            aria-hidden
+          />
         </div>
-        
-        {/* Dynamic Overlay (light corner vignettes — keep video readable) */}
-        <div className="absolute inset-0 transition-opacity duration-700 bg-[radial-gradient(1200px_700px_at_50%_30%,rgba(0,0,0,0.14),transparent_58%),radial-gradient(900px_600px_at_0%_0%,rgba(0,0,0,0.32),transparent_58%),radial-gradient(900px_600px_at_100%_0%,rgba(0,0,0,0.32),transparent_58%),radial-gradient(900px_600px_at_0%_100%,rgba(0,0,0,0.26),transparent_62%),radial-gradient(900px_600px_at_100%_100%,rgba(0,0,0,0.26),transparent_62%)]" />
-        {/* Bottom: blend video into page + soft white lift (light) / gentle haze (dark) */}
+
+        <HeroDecorativePaths />
+
+        <div className="absolute inset-0 z-[2] transition-opacity duration-700 bg-[radial-gradient(1200px_700px_at_50%_30%,rgba(0,0,0,0.14),transparent_58%),radial-gradient(900px_600px_at_0%_0%,rgba(0,0,0,0.32),transparent_58%),radial-gradient(900px_600px_at_100%_0%,rgba(0,0,0,0.32),transparent_58%),radial-gradient(900px_600px_at_0%_100%,rgba(0,0,0,0.26),transparent_62%),radial-gradient(900px_600px_at_100%_100%,rgba(0,0,0,0.26),transparent_62%)]" />
         <div className="pointer-events-none absolute inset-x-0 bottom-0 z-[2] h-21 bg-gradient-to-t from-background via-background/15 to-transparent sm:h-36 dark:from-background dark:via-background/85" />
         <div
           className="pointer-events-none absolute inset-x-0 bottom-0 z-[2] h-24 bg-gradient-to-t from-white/25 via-white/0 to-transparent sm:h-32 dark:from-white/[0.07] dark:via-white/[0.02]"
           aria-hidden
         />
-        <div
-          className="pointer-events-none absolute inset-x-0 bottom-0 z-[2] h-16 "
-          aria-hidden
-        />
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 z-[2] h-16" aria-hidden />
       </div>
 
-      {/* Mobile logo (top-center) */}
-      <Link href={homeHref} className="lg:hidden absolute top-5 left-1/2 -translate-x-1/2 z-30 group">
-        <Image
-          src="/logo-2.png"
-          alt="DreamTeam Technology"
-          width={420}
-          height={420}
-          className="h-18 w-auto sm:h-14 grayscale transition-all group-hover:grayscale-0 dark:invert drop-shadow-[0_8px_24px_rgba(0,0,0,0.75)]"
-          priority
-        />
-      </Link>
-
-      {/* Content */}
-      <div className="relative z-20 flex w-full flex-col items-center justify-center text-center px-4 max-w-5xl mx-auto mt-[6.75rem] sm:mt-32 pb-8 sm:pb-10 lg:mt-0 lg:pb-0">
-        <h1 className="font-heading font-extrabold text-4xl leading-[1.06] sm:text-5xl md:text-7xl lg:text-8xl tracking-tight md:leading-[1.03] mb-6 sm:mb-8 text-white animate-in slide-in-from-bottom-8 fade-in duration-700 delay-100 fill-mode-both ">
-          {t.hero.titleBefore}
-          <span className="text-hero-accent">{t.hero.titleGlow}</span>
-          {t.hero.titleAfter}
-        </h1>
-
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 animate-in slide-in-from-bottom-8 fade-in duration-700 delay-700 fill-mode-both w-full sm:w-auto max-w-md sm:max-w-none mx-auto">
-          <Link 
-            href="#contact"
-            className={cn(
-              buttonVariants({ variant: "default", size: "lg" }),
-              "w-full sm:w-auto rounded-full transition-all font-semibold tracking-wide h-14 px-10 shadow-elevated-soft hover:scale-105 active:scale-95 text-base"
-            )}
+      <div className="relative z-20 mx-auto mt-24 flex w-full max-w-5xl flex-col items-center justify-center px-4 pb-8 text-center sm:mt-28 sm:pb-10 lg:mt-0 lg:pb-0">
+        <motion.h1
+          className="mb-8 font-heading text-4xl font-extrabold leading-[1.06] tracking-tight text-white sm:mb-10 sm:text-5xl md:text-7xl md:leading-[1.03] lg:text-8xl"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.45 }}
+        >
+          <motion.span
+            className="inline-block"
+            initial={{ y: 28, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.08, duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
           >
-            {t.hero.cta1}
-          </Link>
-          <Link 
-            href="#portfolio" 
-            className={cn(
-               buttonVariants({ variant: "outline", size: "lg" }),
-              "w-full sm:w-auto rounded-full transition-all font-semibold tracking-wide h-14 px-10 border-border/30 bg-background/20 text-foreground dark:text-white liquid-glass-header hover:scale-105 active:scale-95 text-base shadow-elevated-soft"
-            )}
+            {t.hero.titleBefore}
+          </motion.span>
+          <span className="inline-block">
+            {t.hero.titleGlow.split("").map((letter, i) => (
+              <motion.span
+                key={`glow-${i}-${letter}`}
+                className="inline-block text-hero-accent"
+                initial={{ y: 48, opacity: 0, rotateX: -80 }}
+                animate={{ y: 0, opacity: 1, rotateX: 0 }}
+                transition={{
+                  delay: 0.12 + i * 0.045,
+                  type: "spring",
+                  stiffness: 110,
+                  damping: 20,
+                }}
+              >
+                {letter === " " ? "\u00A0" : letter}
+              </motion.span>
+            ))}
+          </span>
+          <motion.span
+            className="inline-block"
+            initial={{ y: 28, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{
+              delay: 0.12 + t.hero.titleGlow.length * 0.045 + 0.08,
+              duration: 0.55,
+              ease: [0.22, 1, 0.36, 1],
+            }}
           >
-             {t.hero.cta2}
-          </Link>
-        </div>
+            {t.hero.titleAfter}
+          </motion.span>
+        </motion.h1>
 
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.45, duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+          className="flex w-full max-w-full justify-center sm:max-w-none"
+        >
+          <GlassShell className="w-full max-w-full p-2 sm:w-fit sm:max-w-none sm:p-2">
+            <div className="flex w-full flex-col items-stretch gap-1 sm:gap-2 sm:w-auto sm:flex-row sm:items-center sm:justify-center">
+              <motion.div
+                className="w-full sm:w-auto"
+                initial={{ opacity: 0, scale: 0.96 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.58, type: "spring", stiffness: 120, damping: 18 }}
+              >
+                <Link
+                  href={contactHref}
+                  className={cn(
+                    buttonVariants({ variant: "default", size: "default" }),
+                    "flex h-11 w-full items-center justify-center gap-1.5 rounded-full px-5 text-sm font-semibold sm:w-auto sm:min-w-[9.5rem]"
+                  )}
+                >
+                  <IconMailFilled className="h-4 w-4 shrink-0" aria-hidden />
+                  {t.hero.cta1}
+                </Link>
+              </motion.div>
+
+              <Link
+                href={portfolioHref}
+                className={cn(
+                  buttonVariants({ variant: "outline", size: "default" }),
+                  "flex h-11 w-full items-center justify-center gap-1.5 rounded-full border-0 bg-transparent px-5 text-sm font-semibold text-foreground shadow-none backdrop-blur-none transition-[transform,background-color] duration-200 hover:scale-[1.02] hover:bg-white/10 active:scale-[0.98] dark:border dark:border-white/15 dark:bg-white/10 dark:text-white dark:shadow-elevated-soft dark:backdrop-blur-sm sm:w-auto"
+                )}
+              >
+                <IconVideoFilled className="h-4 w-4 shrink-0" aria-hidden />
+                {t.hero.cta2}
+              </Link>
+            </div>
+          </GlassShell>
+        </motion.div>
       </div>
 
-
-      {/* Scroll Indicator */}
-      <div className="absolute bottom-24 left-1/2 -translate-x-1/2 z-20 animate-bounce lg:bottom-8">
-        <div className="w-[30px] h-[50px] rounded-full border-2 border-white/35 flex items-start justify-center p-2 liquid-glass">
+      <div className="absolute bottom-24 left-1/2 z-20 -translate-x-1/2 animate-bounce lg:bottom-8">
+        <div className="flex h-[50px] w-[30px] items-start justify-center rounded-full border-2 border-white/35 p-2 liquid-glass">
           <div className="h-1.5 w-1.5 animate-[float_2s_ease-in-out_infinite] rounded-full bg-primary shadow-[0_0_14px_var(--primary-soft-glow)]" />
         </div>
       </div>
