@@ -33,12 +33,12 @@ export function SiteHeader() {
           isScrolled ? "scale-[0.98]" : "scale-100"
         }`}
       >
-        <GlassShell className="flex items-center justify-between gap-3 px-4 py-2.5">
+        <GlassShell className="flex items-center justify-between gap-3 px-6 py-3">
           <Link href={homeHref} className="group flex min-w-0 shrink items-center">
             <img
               src="/logo-1.png"
               alt="DreamTeam Technology"
-              className="h-9 w-auto grayscale transition-all group-hover:grayscale-0 dark:invert sm:h-10"
+              className="h-12 w-auto grayscale transition-all group-hover:grayscale-0 dark:invert sm:h-11"
             />
           </Link>
           <ThemeToggle className="shrink-0" />

@@ -108,7 +108,7 @@ export function HeroSection() {
           className="flex w-full max-w-full justify-center sm:max-w-none"
         >
           <GlassShell className="w-full max-w-full p-2 sm:w-fit sm:max-w-none sm:p-2">
-            <div className="flex w-full flex-col items-stretch gap-1 sm:gap-2 sm:w-auto sm:flex-row sm:items-center sm:justify-center">
+            <div className="flex w-full flex-col items-stretch gap-2  sm:w-auto sm:flex-row sm:items-center sm:justify-center">
               <motion.div
                 className="w-full sm:w-auto"
                 initial={{ opacity: 0, scale: 0.96 }}
