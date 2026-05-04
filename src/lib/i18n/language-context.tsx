@@ -5,7 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { en } from "./en";
 import { bg } from "./bg";
 
-type Language = "en" | "bg";
+export type Language = "en" | "bg";
 type Dictionary = typeof en;
 
 interface LanguageContextType {
@@ -21,6 +21,7 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const routeLanguage = useMemo<Language>(() => {
     if (pathname?.startsWith("/bg")) return "bg";
+    if (pathname?.startsWith("/en")) return "en";
     return "en";
   }, [pathname]);
 
@@ -48,14 +49,21 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     }
 
     const toBg = (path: string) => {
-      if (path === "/") return "/bg";
-      return `/bg${path}`;
+      if (path.startsWith("/bg")) return path;
+      if (path.startsWith("/en")) {
+        const rest = path.slice(3);
+        return rest === "" ? "/bg" : `/bg${rest}`;
+      }
+      return path;
     };
 
     const toEn = (path: string) => {
-      if (!path.startsWith("/bg")) return path;
-      const next = path.slice(3);
-      return next.length ? next : "/";
+      if (path.startsWith("/en")) return path;
+      if (path.startsWith("/bg")) {
+        const rest = path.slice(3);
+        return rest === "" ? "/en" : `/en${rest}`;
+      }
+      return path;
     };
 
     const nextPath = lang === "bg" ? toBg(pathname || "/") : toEn(pathname || "/");

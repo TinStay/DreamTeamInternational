@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   alternates: {
     canonical: "/bg",
     languages: {
-      en: "/",
+      en: "/en",
       bg: "/bg",
     },
   },

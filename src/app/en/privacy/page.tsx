@@ -21,7 +21,7 @@ export const metadata: Metadata = {
 export default function PrivacyPageEn() {
   return (
     <LegalPageShell
-      homeHref="/"
+      homeHref="/en"
       homeLabel={en.legal.home}
       docTitle={en.legal.privacyTitle}
       lastUpdatedLabel={en.legal.lastUpdated}

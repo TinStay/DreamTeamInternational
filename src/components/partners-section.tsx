@@ -103,7 +103,7 @@ const PARTNERS: Partner[] = [
 ];
 
 const imgClass =
-  "h-24 w-auto min-h-24 min-w-[200px] max-w-[min(320px,42vw)] object-contain transition-transform duration-200 group-hover:scale-[1.06] sm:h-28 sm:min-h-28 sm:min-w-[220px] sm:max-w-[min(360px,38vw)] md:h-32 md:min-h-32 md:min-w-[240px] md:max-w-[380px]";
+  "h-20 w-auto min-h-20 min-w-[170px] max-w-[min(280px,40vw)] object-contain transition-transform duration-200 group-hover:scale-[1.05] sm:h-24 sm:min-h-24 sm:min-w-[190px] sm:max-w-[min(320px,36vw)] md:h-28 md:min-h-28 md:min-w-[210px] md:max-w-[340px]";
 
 function PartnerLogo({ p }: { p: Partner }) {
   if (p.light && p.dark) {

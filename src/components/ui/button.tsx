@@ -3,13 +3,16 @@ import { cva, type VariantProps } from "class-variance-authority"
 
 import { cn } from "@/lib/utils"
 
+/** Same surface as `buttonVariants({ variant: "default" })` — use on `<Link>` / `motion.a` when a real Button is not used. Borderless gradient; hover nudges scale and lightens the ramp slightly. */
+export const primaryGradientInteractiveClassName =
+  "border-0 bg-gradient-to-r from-[var(--primary-gradient-start)] to-[var(--primary-gradient-end)] text-primary-foreground shadow-[0_8px_22px_var(--primary-elevated-shadow)] transition-[transform,box-shadow,background-image] duration-200 ease-out hover:scale-[1.03] hover:shadow-[0_12px_30px_var(--primary-elevated-shadow)] hover:from-[color-mix(in_srgb,var(--primary-gradient-start)_86%,white)] hover:to-[color-mix(in_srgb,var(--primary-gradient-end)_84%,#f3ecff)] active:scale-[0.98] [a]:hover:scale-[1.03] [a]:hover:from-[color-mix(in_srgb,var(--primary-gradient-start)_86%,white)] [a]:hover:to-[color-mix(in_srgb,var(--primary-gradient-end)_84%,#f3ecff)]"
+
 const buttonVariants = cva(
   "group/button inline-flex shrink-0 items-center justify-center rounded-lg border border-transparent bg-clip-padding text-sm font-medium whitespace-nowrap transition-all outline-none select-none cursor-pointer shadow-[0_6px_18px_rgba(15,23,42,0.12)] hover:shadow-[0_10px_28px_rgba(15,23,42,0.14)] focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
   {
     variants: {
       variant: {
-        default:
-          "border border-white/15 bg-gradient-to-br from-primary via-primary to-[var(--primary-gradient-end)] text-primary-foreground shadow-[0_8px_22px_var(--primary-elevated-shadow)] hover:brightness-[1.06] active:brightness-[0.96] [a]:hover:brightness-[1.06]",
+        default: primaryGradientInteractiveClassName,
         outline:
           "border-border bg-background hover:bg-muted hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground dark:border-input dark:bg-input/30 dark:hover:bg-input/50",
         secondary:

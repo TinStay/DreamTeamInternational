@@ -6,18 +6,21 @@ import { LanguageDropdown } from "./language-dropdown";
 import { IconBook, IconHome, IconMail, IconMenu2, IconVideo } from "@tabler/icons-react";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
 import { useLanguage } from "@/lib/i18n/language-context";
-import { buttonVariants } from "@/components/ui/button";
+import { buttonVariants, primaryGradientInteractiveClassName } from "@/components/ui/button";
+import { GlassShell } from "@/components/ui/glass-shell";
+import { contactProcessPath, homePath } from "@/lib/routes";
 import { cn } from "@/lib/utils";
 
 export function MobileNav() {
   const [isOpen, setIsOpen] = useState(false);
   const { t, language } = useLanguage();
-  const homeHref = language === "bg" ? "/bg" : "/";
+  const homeHref = homePath(language);
   const trainingHref = language === "bg" ? "/bg/training" : "/en/training";
+  const contactHref = contactProcessPath(language);
 
   return (
     <>
-      <div className="lg:hidden fixed bottom-5 left-1/2 -translate-x-1/2 z-50 w-[92%] max-w-md rounded-[2.25rem] liquid-glass px-3 py-2.5 flex items-center gap-1.5 border border-border/30 bg-background/90 backdrop-blur-md ring-1 ring-black/10 dark:ring-white/10 shadow-[0_22px_60px_rgba(0,0,0,0.42),0_10px_28px_rgba(0,0,0,0.28)] dark:shadow-[0_24px_70px_rgba(0,0,0,0.65),0_12px_36px_rgba(0,0,0,0.45)]">
+      <GlassShell className="lg:hidden fixed bottom-5 left-1/2 z-50 flex w-[92%] max-w-md -translate-x-1/2 items-center gap-1.5 px-3 py-2.5">
         <Link
           href={homeHref}
           className="group flex flex-1 select-none flex-col items-center justify-center gap-1 text-muted-foreground transition-colors hover:text-foreground"
@@ -27,7 +30,7 @@ export function MobileNav() {
         </Link>
 
         <Link
-          href="#portfolio"
+          href={`${homeHref}#portfolio`}
           className="group flex flex-1 select-none flex-col items-center justify-center gap-1 text-muted-foreground transition-colors hover:text-foreground"
         >
           <IconVideo className="h-[26px] w-[26px] text-neutral-800 transition-transform group-hover:scale-110 dark:text-neutral-200" />
@@ -35,7 +38,7 @@ export function MobileNav() {
         </Link>
 
         <Link
-          href="#contact"
+          href={contactHref}
           className="group flex flex-1 select-none flex-col items-center justify-center gap-1 text-muted-foreground transition-colors hover:text-foreground"
         >
           <IconMail className="h-[26px] w-[26px] text-neutral-800 transition-transform group-hover:scale-110 dark:text-neutral-200" />
@@ -45,7 +48,12 @@ export function MobileNav() {
         <Sheet open={isOpen} onOpenChange={setIsOpen}>
           <SheetTrigger
             render={
-              <button className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full border border-white/15 bg-gradient-to-br from-primary via-primary to-[var(--primary-gradient-end)] text-white shadow-[0_8px_22px_var(--primary-elevated-shadow)] outline-none transition-all hover:scale-105 hover:brightness-110 active:scale-95" />
+              <button
+                className={cn(
+                  primaryGradientInteractiveClassName,
+                  "flex h-14 w-14 shrink-0 items-center justify-center rounded-full text-white outline-none active:scale-95"
+                )}
+              />
             }
           >
             <IconMenu2 className="h-[26px] w-[26px] drop-shadow-sm" />
@@ -72,7 +80,7 @@ export function MobileNav() {
                   <span className="transition-colors group-hover:text-primary">{t.mobileNav.home}</span>
                 </Link>
                 <Link
-                  href="#portfolio"
+                  href={`${homeHref}#portfolio`}
                   onClick={() => setIsOpen(false)}
                   className="group flex select-none items-center gap-4 text-foreground/80 transition-colors"
                 >
@@ -80,7 +88,7 @@ export function MobileNav() {
                   <span className="transition-colors group-hover:text-primary">{t.mobileNav.work}</span>
                 </Link>
                 <Link
-                  href="#contact"
+                  href={contactHref}
                   onClick={() => setIsOpen(false)}
                   className="group flex select-none items-center gap-4 text-foreground/80 transition-colors"
                 >
@@ -100,11 +108,11 @@ export function MobileNav() {
 
               <div className="mt-auto pt-8">
                 <Link
-                  href="#contact"
+                  href={contactHref}
                   onClick={() => setIsOpen(false)}
                   className={cn(
                     buttonVariants({ variant: "default", size: "lg" }),
-                    "w-full h-14 rounded-full flex items-center justify-center font-bold text-lg select-none"
+                    "flex h-14 w-full select-none items-center justify-center rounded-full text-lg font-bold"
                   )}
                 >
                   {t.header.chat}
@@ -113,7 +121,7 @@ export function MobileNav() {
             </div>
           </SheetContent>
         </Sheet>
-      </div>
+      </GlassShell>
     </>
   );
 }

@@ -5,6 +5,8 @@ import { SiteHeader } from "@/components/site-header";
 import { MobileNav } from "@/components/mobile-nav";
 import { Footer } from "@/components/footer";
 import { buttonVariants } from "@/components/ui/button";
+import { GradientBlurPageBg } from "@/components/ui/gradient-blur-bg";
+import { MAIN_WITH_FIXED_PAGE_BG_CLASS } from "@/lib/page-shell";
 import { cn } from "@/lib/utils";
 
 type LegalPageShellProps = {
@@ -27,12 +29,14 @@ export function LegalPageShell({
   children,
 }: LegalPageShellProps) {
   return (
-    <main className="flex min-h-screen flex-col bg-background">
+    <main className={cn(MAIN_WITH_FIXED_PAGE_BG_CLASS, "bg-background")}>
+      <div className="fixed inset-0 z-[-1]">
+        <GradientBlurPageBg className="h-full w-full" />
+      </div>
+
       <SiteHeader />
 
-      <div className="relative flex-1 w-full pt-24 pb-28 px-4 lg:pt-32">
-        <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(ellipse_90%_55%_at_50%_-20%,rgba(99,102,241,0.14),transparent),radial-gradient(ellipse_70%_45%_at_100%_40%,rgba(112,51,255,0.08),transparent),radial-gradient(ellipse_55%_38%_at_0%_55%,rgba(14,165,233,0.06),transparent)]" />
-
+      <div className="relative z-10 flex w-full flex-1 px-4 pb-28 pt-24 lg:pt-32">
         <div className="mx-auto w-full max-w-4xl">
           <nav
             className="mb-5 flex items-center gap-2 text-sm text-muted-foreground"
@@ -89,7 +93,9 @@ export function LegalPageShell({
         </div>
       </div>
 
-      <Footer />
+      <div className="relative z-10">
+        <Footer />
+      </div>
       <MobileNav />
     </main>
   );

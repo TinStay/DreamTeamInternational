@@ -11,9 +11,13 @@ export const en = {
     titleBefore: "Your ",
     titleGlow: "imagination",
     titleAfter: " is the limit.",
-    subtitle: "At DreamTeam, we strive to achieve the balance between human nature and the new technology that is here to assist us.",
-    cta1: "Contact",
+    cta1: "Contact us",
     cta2: "View Our Work"
+  },
+  contactPage: {
+    metaTitle: "Contact & Process | DreamTeam Technology",
+    metaDescription:
+      "How we work from brief to delivery, and how to reach DreamTeam Technology for AI video production.",
   },
   process: {
     title1: "Our",
@@ -192,6 +196,7 @@ export const en = {
     title: "Trainings built for real shoots",
     subtitle:
       "From first prompt to final grade: we teach the workflows we use on client work — prompting, look development, editing, and delivery — in the format that matches your pace.",
+    comingSoon: "Coming soon",
     cards: {
       consultation: {
         title: "Individual lessons",

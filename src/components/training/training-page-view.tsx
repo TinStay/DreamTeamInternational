@@ -8,14 +8,17 @@ import { Footer } from "@/components/footer";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/lib/i18n/language-context";
+import { contactProcessPath, homePath } from "@/lib/routes";
+import { GradientBlurPageBg } from "@/components/ui/gradient-blur-bg";
+import { MAIN_WITH_FIXED_PAGE_BG_CLASS } from "@/lib/page-shell";
 import { TrainingExpandableCards, type TrainingExpandableCard } from "./training-expandable-cards";
 import { TrainingModalRich } from "./training-modal-rich";
 
 export function TrainingPageView() {
   const { t, language } = useLanguage();
   const tr = t.training;
-  const homeHref = language === "bg" ? "/bg" : "/";
-  const contactHref = `${homeHref}#contact`;
+  const homeHref = homePath(language);
+  const contactHref = contactProcessPath(language);
 
   const cards: TrainingExpandableCard[] = [
     {
@@ -34,6 +37,8 @@ export function TrainingPageView() {
       src: tr.cards.skool.image,
       ctaText: tr.cards.skool.cta,
       ctaLink: tr.skoolUrl,
+      comingSoon: true,
+      comingSoonLabel: tr.comingSoon,
       content: <TrainingModalRich copy={tr.cards.skool} />,
     },
     {
@@ -48,13 +53,15 @@ export function TrainingPageView() {
   ];
 
   return (
-    <main className="flex min-h-screen flex-col bg-background">
+    <main className={MAIN_WITH_FIXED_PAGE_BG_CLASS}>
+      <div className="fixed inset-0 z-[-1]">
+        <GradientBlurPageBg className="h-full w-full" />
+      </div>
+
       <SiteHeader />
 
-      <div className="relative flex-1 w-full px-4 pb-28 pt-24 lg:pb-32 lg:pt-32">
-        <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(ellipse_90%_55%_at_50%_-20%,rgba(99,102,241,0.14),transparent),radial-gradient(ellipse_70%_45%_at_100%_40%,rgba(112,51,255,0.08),transparent),radial-gradient(ellipse_55%_38%_at_0%_55%,rgba(14,165,233,0.06),transparent)]" />
-
-        <div className="mx-auto w-full max-w-5xl">
+      <div className="relative z-10 flex w-full flex-1 px-4 pb-28 pt-24 lg:pb-32 lg:pt-32">
+        <div className="mx-auto w-full max-w-7xl">
           <Link
             href={homeHref}
             className={cn(
@@ -76,7 +83,9 @@ export function TrainingPageView() {
         </div>
       </div>
 
-      <Footer />
+      <div className="relative z-10">
+        <Footer />
+      </div>
       <MobileNav />
     </main>
   );

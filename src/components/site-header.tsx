@@ -4,15 +4,18 @@ import Link from "next/link";
 import { ThemeToggle } from "./theme-toggle";
 // import { LanguageDropdown } from "./language-dropdown";
 import { buttonVariants } from "@/components/ui/button";
+import { GlassShell } from "@/components/ui/glass-shell";
 import { cn } from "@/lib/utils";
 import { useEffect, useState } from "react";
 import { useLanguage } from "@/lib/i18n/language-context";
+import { contactProcessPath, homePath } from "@/lib/routes";
 import { IconMailFilled } from "@tabler/icons-react";
 
 export function SiteHeader() {
   const [isScrolled, setIsScrolled] = useState(false);
   const { t, language } = useLanguage();
-  const homeHref = language === "bg" ? "/bg" : "/";
+  const homeHref = homePath(language);
+  const contactHref = contactProcessPath(language);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -30,7 +33,7 @@ export function SiteHeader() {
           isScrolled ? "scale-[0.98]" : "scale-100"
         }`}
       >
-        <div className="flex items-center justify-between gap-3 rounded-[2.25rem] border border-border/30 bg-background/90 px-4 py-2.5 shadow-[0_22px_60px_rgba(0,0,0,0.42),0_10px_28px_rgba(0,0,0,0.28)] ring-1 ring-black/10 backdrop-blur-md dark:shadow-[0_24px_70px_rgba(0,0,0,0.65),0_12px_36px_rgba(0,0,0,0.45)] dark:ring-white/10 liquid-glass">
+        <GlassShell className="flex items-center justify-between gap-3 px-4 py-2.5">
           <Link href={homeHref} className="group flex min-w-0 shrink items-center">
             <img
               src="/logo-1.png"
@@ -39,7 +42,7 @@ export function SiteHeader() {
             />
           </Link>
           <ThemeToggle className="shrink-0" />
-        </div>
+        </GlassShell>
       </header>
 
     <header
@@ -53,17 +56,14 @@ export function SiteHeader() {
           <img
             src="/logo-1.png"
             alt="DreamTeam Technology"
-            className="h-11 w-auto grayscale group-hover:grayscale-0 transition-all dark:invert"
+            className="h-[3.25rem] w-auto grayscale group-hover:grayscale-0 transition-all dark:invert md:h-14"
           />
         </Link>
 
-        {/* Center nav — Portfolio, Process, Contact */}
+        {/* Center nav — Portfolio, Training, Contact */}
         <nav className="flex items-center justify-center gap-6 lg:gap-10 font-semibold text-sm lg:text-base text-foreground/80 min-w-0 px-2">
-          <Link href="#portfolio" className="hover:text-primary transition-colors whitespace-nowrap">
+          <Link href={`${homeHref}#portfolio`} className="hover:text-primary transition-colors whitespace-nowrap">
             {t.header.portfolio}
-          </Link>
-          <Link href="#process" className="hover:text-primary transition-colors whitespace-nowrap">
-            {t.header.process}
           </Link>
           <Link
             href={language === "bg" ? "/bg/training" : "/en/training"}
@@ -71,7 +71,7 @@ export function SiteHeader() {
           >
             {t.header.training}
           </Link>
-          <Link href="#contact" className="hover:text-primary transition-colors whitespace-nowrap">
+          <Link href={contactHref} className="hover:text-primary transition-colors whitespace-nowrap">
             {t.header.contact}
           </Link>
         </nav>
@@ -81,7 +81,7 @@ export function SiteHeader() {
           {/* <LanguageDropdown /> */}
           <ThemeToggle className="shrink-0" />
           <Link
-            href="#contact"
+            href={contactHref}
             className={cn(
               buttonVariants({ variant: "default", size: "lg" }),
               "rounded-full transition-all font-semibold h-11 px-6 text-base shadow-lg gap-2 cursor-pointer"

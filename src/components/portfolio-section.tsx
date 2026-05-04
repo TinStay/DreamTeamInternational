@@ -561,7 +561,7 @@ export function PortfolioSection() {
       "border border-transparent !shadow-none hover:!shadow-none focus-visible:!shadow-none active:!shadow-none",
       "transition-[background-color,border-color,color,box-shadow,transform] duration-200 ease-out will-change-transform",
       active
-        ? "border-white/15 bg-gradient-to-br from-primary via-primary to-[var(--primary-gradient-end)] text-primary-foreground hover:brightness-[1.06] hover:text-primary-foreground"
+        ? "border-0 bg-gradient-to-r from-[var(--primary-gradient-start)] to-[var(--primary-gradient-end)] text-primary-foreground shadow-none transition-[transform,box-shadow,background-image] duration-200 hover:scale-[1.03] hover:from-[color-mix(in_srgb,var(--primary-gradient-start)_86%,white)] hover:to-[color-mix(in_srgb,var(--primary-gradient-end)_84%,#f3ecff)] hover:text-primary-foreground"
         : cn(
             "border-border/50 bg-background/80 text-foreground dark:border-border/40 dark:bg-input/25",
             "hover:-translate-y-[1px] hover:bg-muted/60 hover:shadow-[0_10px_30px_rgba(15,23,42,0.08)] dark:hover:shadow-[0_10px_30px_rgba(0,0,0,0.25)]",
@@ -638,9 +638,9 @@ export function PortfolioSection() {
                       aria-label={t.portfolio.format.all}
                       className={cn(
                         "cursor-pointer flex-none rounded-2xl border border-transparent px-1.5 py-1 text-[10px] font-semibold sm:px-2 sm:py-1 sm:text-[11px]",
-                        "data-active:border-white/15 data-active:bg-gradient-to-br data-active:from-primary data-active:via-primary data-active:to-[var(--primary-gradient-end)] data-active:text-white data-active:!shadow-none",
+                        "data-active:border-0 data-active:bg-gradient-to-r data-active:from-[var(--primary-gradient-start)] data-active:to-[var(--primary-gradient-end)] data-active:text-white data-active:!shadow-none",
                         "[&_svg]:icon-on-brand data-active:[&_svg]:text-white data-active:[&_svg]:filter-none",
-                        "hover:text-foreground data-active:hover:brightness-[1.06] data-active:hover:text-white"
+                        "hover:text-foreground data-active:hover:scale-[1.03] data-active:hover:from-[color-mix(in_srgb,var(--primary-gradient-start)_86%,white)] data-active:hover:to-[color-mix(in_srgb,var(--primary-gradient-end)_84%,#f3ecff)] data-active:hover:text-white"
                       )}
                     >
                       <IconLayoutGrid className="h-3.5 w-3.5 shrink-0 sm:h-4 sm:w-4" />
@@ -650,9 +650,9 @@ export function PortfolioSection() {
                       aria-label={t.portfolio.format.desktop}
                       className={cn(
                         "cursor-pointer flex-none gap-0.5 rounded-2xl border border-transparent px-1.5 py-1 text-[10px] font-semibold sm:px-2 sm:py-1 sm:text-[11px]",
-                        "data-active:border-white/15 data-active:bg-gradient-to-br data-active:from-primary data-active:via-primary data-active:to-[var(--primary-gradient-end)] data-active:text-white data-active:!shadow-none",
+                        "data-active:border-0 data-active:bg-gradient-to-r data-active:from-[var(--primary-gradient-start)] data-active:to-[var(--primary-gradient-end)] data-active:text-white data-active:!shadow-none",
                         "[&_svg]:icon-on-brand data-active:[&_svg]:text-white data-active:[&_svg]:filter-none",
-                        "hover:text-foreground data-active:hover:brightness-[1.06] data-active:hover:text-white"
+                        "hover:text-foreground data-active:hover:scale-[1.03] data-active:hover:from-[color-mix(in_srgb,var(--primary-gradient-start)_86%,white)] data-active:hover:to-[color-mix(in_srgb,var(--primary-gradient-end)_84%,#f3ecff)] data-active:hover:text-white"
                       )}
                     >
                       <IconDeviceDesktop className="h-3.5 w-3.5 shrink-0 sm:h-4 sm:w-4" />
@@ -663,9 +663,9 @@ export function PortfolioSection() {
                       aria-label={t.portfolio.format.mobile}
                       className={cn(
                         "cursor-pointer flex-none gap-0.5 rounded-2xl border border-transparent px-1.5 py-1 text-[10px] font-semibold shadow-none sm:px-2 sm:py-1 sm:text-[11px]",
-                        "data-active:border-white/15 data-active:bg-gradient-to-br data-active:from-primary data-active:via-primary data-active:to-[var(--primary-gradient-end)] data-active:text-white data-active:!shadow-none",
+                        "data-active:border-0 data-active:bg-gradient-to-r data-active:from-[var(--primary-gradient-start)] data-active:to-[var(--primary-gradient-end)] data-active:text-white data-active:!shadow-none",
                         "[&_svg]:icon-on-brand data-active:[&_svg]:text-white data-active:[&_svg]:filter-none",
-                        "hover:text-foreground data-active:hover:brightness-[1.06] data-active:hover:text-white"
+                        "hover:text-foreground data-active:hover:scale-[1.03] data-active:hover:from-[color-mix(in_srgb,var(--primary-gradient-start)_86%,white)] data-active:hover:to-[color-mix(in_srgb,var(--primary-gradient-end)_84%,#f3ecff)] data-active:hover:text-white"
                       )}
                     >
                       <IconDeviceMobile className="h-3.5 w-3.5 shrink-0 sm:h-4 sm:w-4" />

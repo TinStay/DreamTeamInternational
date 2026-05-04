@@ -15,9 +15,9 @@ import {
 import {
   IconAlertTriangle,
   IconCircleCheck,
-  IconMail,
-  IconMapPin,
-  IconPhone,
+  IconMailFilled,
+  IconMapPinFilled,
+  IconPhoneFilled,
   IconSend,
 } from "@tabler/icons-react";
 import { useLanguage } from "@/lib/i18n/language-context";
@@ -92,6 +92,9 @@ function SocialIcon({
     />
   );
 }
+
+const contactInfoIconCircle =
+  "flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-card shadow-sm ring-1 ring-border/40 dark:shadow-[0_10px_28px_rgba(0,0,0,0.45)] dark:ring-white/10";
 
 function FieldLabel({
   children,
@@ -199,7 +202,7 @@ export function ContactSection() {
   }
 
   return (
-    <section id="contact" className="py-24 relative overflow-hidden">
+    <section id="contact" className="relative overflow-hidden pt-10 pb-20 sm:pt-12 sm:pb-24 lg:pt-14 lg:pb-28">
       
       <div className="max-w-7xl mx-auto px-4 z-10 relative">
         <div className="mb-10 lg:mb-12">
@@ -337,8 +340,8 @@ export function ContactSection() {
             <div className="space-y-6 mb-10">
               {/* Email */}
               <a href="mailto:info@dreamteam.technology" className="flex items-center gap-4 group cursor-pointer">
-                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white shadow-[0_10px_30px_rgba(15,23,42,0.12)] ring-1 ring-black/5">
-                  <IconMail className="h-5 w-5 text-primary" />
+                <div className={contactInfoIconCircle}>
+                  <IconMailFilled className="h-5 w-5 text-primary" />
                 </div>
                 <div>
                   <div className="text-sm text-muted-foreground">{t.contact.email}</div>
@@ -348,8 +351,8 @@ export function ContactSection() {
 
               {/* Phone 1 */}
               <a href="tel:+359878757930" className="flex items-center gap-4 group cursor-pointer">
-                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white shadow-[0_10px_30px_rgba(15,23,42,0.12)] ring-1 ring-black/5">
-                  <IconPhone className="h-5 w-5 text-primary" />
+                <div className={contactInfoIconCircle}>
+                  <IconPhoneFilled className="h-5 w-5 text-primary" />
                 </div>
                 <div>
                   <div className="text-sm text-muted-foreground">{t.contact.phone}</div>
@@ -359,8 +362,8 @@ export function ContactSection() {
 
               {/* Phone 2 */}
               <a href="tel:+359882367100" className="flex items-center gap-4 group cursor-pointer">
-                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white shadow-[0_10px_30px_rgba(15,23,42,0.12)] ring-1 ring-black/5">
-                  <IconPhone className="h-5 w-5 text-primary" />
+                <div className={contactInfoIconCircle}>
+                  <IconPhoneFilled className="h-5 w-5 text-primary" />
                 </div>
                 <div>
                   <div className="text-sm text-muted-foreground">{t.contact.phone}</div>
@@ -376,8 +379,13 @@ export function ContactSection() {
                 aria-label="Copy address"
                 title="Copy address"
               >
-                <div className="mt-0.5 flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-white shadow-[0_10px_30px_rgba(15,23,42,0.12)] ring-1 ring-black/5 transition-transform hover:scale-[1.04] active:scale-[0.98]">
-                  <IconMapPin className="h-5 w-5 text-primary" />
+                <div
+                  className={cn(
+                    contactInfoIconCircle,
+                    "mt-0.5 transition-transform hover:scale-[1.04] active:scale-[0.98]"
+                  )}
+                >
+                  <IconMapPinFilled className="h-5 w-5 text-primary" />
                 </div>
                 <div className="min-w-0">
                   <div className="text-sm text-muted-foreground mb-1">{t.contact.address}</div>
