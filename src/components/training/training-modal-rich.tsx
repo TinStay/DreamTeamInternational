@@ -19,8 +19,7 @@ import {
   IconVideoFilled,
 } from "@tabler/icons-react";
 import { motion } from "motion/react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs as AceternityTabs } from "@/components/ui/aceternity-tabs";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 
 const FEATURE_ICONS: Record<string, ElementType<{ className?: string }>> = {
@@ -98,29 +97,20 @@ function IntroBlock({ copy }: { copy: TrainingModalRichCopy }) {
 
 function OutcomesCard({ copy }: { copy: TrainingModalRichCopy }) {
   return (
-    <Card
-      size="sm"
-      className="h-full border-lime-500/15 bg-gradient-to-b from-card to-lime-500/[0.04] dark:from-card dark:to-lime-400/[0.05]"
-    >
-      <CardHeader className="border-b border-border/30 pb-3">
-        <CardTitle className="text-base">{copy.outcomesTitle}</CardTitle>
-        <CardDescription className="text-xs">{copy.outcomesSubtitle}</CardDescription>
-      </CardHeader>
-      <CardContent className="flex flex-col gap-3 pt-2">
-        {copy.outcomes.map((row, i) => (
-          <motion.div
-            key={`${row.text}-${i}`}
-            initial={{ opacity: 0, x: -6 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.05 * i, duration: 0.3 }}
-            className="flex gap-2.5 text-sm text-muted-foreground"
-          >
-            <FeatureIcon name={row.icon} />
-            <span className="text-foreground/85">{row.text}</span>
-          </motion.div>
-        ))}
-      </CardContent>
-    </Card>
+    <ul className="space-y-3">
+      {copy.outcomes.map((row, i) => (
+        <motion.li
+          key={`${row.text}-${i}`}
+          initial={{ opacity: 0, x: -6 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.05 * i, duration: 0.3 }}
+          className="flex gap-3 text-sm leading-relaxed text-muted-foreground"
+        >
+          <FeatureIcon name={row.icon} />
+          <span className="text-foreground/85">{row.text}</span>
+        </motion.li>
+      ))}
+    </ul>
   );
 }
 
@@ -157,8 +147,14 @@ function HighlightsPanel({ copy }: { copy: TrainingModalRichCopy }) {
 }
 
 function MorePanel({ copy }: { copy: TrainingModalRichCopy }) {
+  const showLogistics = Boolean(copy.logisticsTitle) && copy.logistics.length > 0;
   return (
-    <div className="grid gap-4 md:grid-cols-2 md:gap-5 lg:gap-6">
+    <div
+      className={cn(
+        "grid gap-4 md:gap-5 lg:gap-6",
+        showLogistics ? "md:grid-cols-2" : "md:grid-cols-1"
+      )}
+    >
       <motion.div
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
@@ -166,60 +162,49 @@ function MorePanel({ copy }: { copy: TrainingModalRichCopy }) {
       >
         <OutcomesCard copy={copy} />
       </motion.div>
-      <motion.div
-        initial={{ opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.35, delay: 0.08, ease: "easeOut" }}
-      >
-        <LogisticsCard copy={copy} />
-      </motion.div>
+      {showLogistics ? (
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.35, delay: 0.08, ease: "easeOut" }}
+        >
+          <LogisticsCard copy={copy} />
+        </motion.div>
+      ) : null}
     </div>
   );
 }
 
 const sectionHeadingClass =
-  "font-heading text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground";
+  "font-heading text-xs font-semibold uppercase tracking-[0.18em] text-foreground/80";
+
+export function TrainingModalIncludes({ copy }: { copy: TrainingModalRichCopy }) {
+  return (
+    <section className="space-y-4" aria-labelledby="training-modal-includes">
+      <h2 id="training-modal-includes" className={sectionHeadingClass}>
+        {copy.modalTabs.highlights}
+      </h2>
+      <HighlightsPanel copy={copy} />
+    </section>
+  );
+}
+
+export function TrainingModalDetails({ copy }: { copy: TrainingModalRichCopy }) {
+  return (
+    <section className="space-y-4" aria-labelledby="training-modal-details">
+      <h2 id="training-modal-details" className={sectionHeadingClass}>
+        {copy.modalTabs.more}
+      </h2>
+      <MorePanel copy={copy} />
+    </section>
+  );
+}
 
 export function TrainingModalRich({ copy }: { copy: TrainingModalRichCopy }) {
   return (
-    <div className="flex flex-col gap-0 md:gap-0">
-      {/* Mobile: compact tabs */}
-      <div className="md:hidden">
-        <AceternityTabs
-          className="max-w-full items-stretch"
-          tabsClassName="rounded-2xl"
-          contentClassName="mt-5"
-          tabs={[
-            {
-              value: "highlights",
-              title: copy.modalTabs.highlights,
-              content: <HighlightsPanel copy={copy} />,
-            },
-            {
-              value: "more",
-              title: copy.modalTabs.more,
-              content: <MorePanel copy={copy} />,
-            },
-          ]}
-        />
-      </div>
-
-      {/* Desktop: scannable sections (no tab chrome) */}
-      <div className="hidden md:flex md:flex-col md:gap-10">
-        <section className="space-y-4" aria-labelledby="training-modal-highlights">
-          <h2 id="training-modal-highlights" className={sectionHeadingClass}>
-            {copy.modalTabs.highlights}
-          </h2>
-          <HighlightsPanel copy={copy} />
-        </section>
-
-        <section className="space-y-4" aria-labelledby="training-modal-details">
-          <h2 id="training-modal-details" className={sectionHeadingClass}>
-            {copy.modalTabs.more}
-          </h2>
-          <MorePanel copy={copy} />
-        </section>
-      </div>
+    <div className="flex flex-col gap-10">
+      <TrainingModalIncludes copy={copy} />
+      <TrainingModalDetails copy={copy} />
     </div>
   );
 }

@@ -1,79 +1,14 @@
 "use client";
 
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  IconAlertTriangle,
-  IconCircleCheck,
   IconMailFilled,
   IconMapPinFilled,
   IconPhoneFilled,
-  IconSend,
 } from "@tabler/icons-react";
 import { useLanguage } from "@/lib/i18n/language-context";
-import Link from "next/link";
-import { useMemo, useState } from "react";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
-
-function SendResultCard({
-  variant,
-  title,
-  description,
-}: {
-  variant: "success" | "error";
-  title: string;
-  description: string;
-}) {
-  const isOk = variant === "success";
-  return (
-    <output
-      aria-live="polite"
-      className={cn(
-        "mt-5 flex gap-4 overflow-hidden rounded-2xl border p-4 sm:p-5 text-left shadow-lg animate-in fade-in slide-in-from-bottom-2 duration-500",
-        isOk
-          ? "border-emerald-500/25 bg-gradient-to-br from-emerald-500/10 via-background to-background dark:from-emerald-500/15"
-          : "border-destructive/25 bg-gradient-to-br from-destructive/10 via-background to-background dark:from-destructive/15"
-      )}
-    >
-      <div
-        className={cn(
-          "flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border",
-          isOk
-            ? "border-emerald-500/30 bg-emerald-500/15 text-emerald-700 dark:text-emerald-300"
-            : "border-destructive/30 bg-destructive/10 text-destructive"
-        )}
-      >
-        {isOk ? (
-          <IconCircleCheck className="h-5 w-5" stroke={2.25} />
-        ) : (
-          <IconAlertTriangle className="h-5 w-5" stroke={2.25} />
-        )}
-      </div>
-      <div className="min-w-0 flex-1 space-y-1">
-        <p
-          className={cn(
-            "font-heading text-base font-semibold tracking-tight",
-            isOk ? "text-emerald-900 dark:text-emerald-100" : "text-destructive"
-          )}
-        >
-          {title}
-        </p>
-        <p className="text-sm leading-relaxed text-muted-foreground">{description}</p>
-      </div>
-    </output>
-  );
-}
+import { ContactInquiryForm } from "@/components/contact-inquiry-form";
 
 function SocialIcon({
   src,
@@ -96,88 +31,8 @@ function SocialIcon({
 const contactInfoIconCircle =
   "flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-card shadow-sm ring-1 ring-border/40 dark:shadow-[0_10px_28px_rgba(0,0,0,0.45)] dark:ring-white/10";
 
-function FieldLabel({
-  children,
-  required,
-}: {
-  children: React.ReactNode;
-  required?: boolean;
-}) {
-  return (
-    <Label className="text-foreground inline-flex items-baseline gap-0.5">
-      <span>{children}</span>
-      {required ? (
-        <span className="text-section-accent text-xs font-semibold leading-none" aria-hidden>
-          *
-        </span>
-      ) : null}
-    </Label>
-  );
-}
-
-export function ContactSection() {
-  const { t, language } = useLanguage();
-  const [foundUs, setFoundUs] = useState<string>("");
-  const [termsAccepted, setTermsAccepted] = useState(false);
-  const [phoneNumber, setPhoneNumber] = useState<string>("");
-  const [name, setName] = useState<string>("");
-  const [email, setEmail] = useState<string>("");
-  const [message, setMessage] = useState<string>("");
-  const [isSending, setIsSending] = useState(false);
-  const [sendResult, setSendResult] = useState<null | "ok" | "error">(null);
-
-  const termsHref = language === "bg" ? "/bg/terms" : "/en/terms";
-  const foundUsOptions = useMemo(() => {
-    const opts = t.contact.foundUsOptions;
-    return [
-      { value: "google", label: opts.google },
-      { value: "social", label: opts.social },
-      { value: "instagram", label: opts.instagram },
-      { value: "tiktok", label: opts.tiktok },
-      { value: "youtube", label: opts.youtube },
-      { value: "referral", label: opts.referral },
-      { value: "event", label: opts.event },
-      { value: "other", label: opts.other },
-    ];
-  }, [t.contact.foundUsOptions]);
-
-  const selectedFoundUsLabel =
-    foundUsOptions.find((o) => o.value === foundUs)?.label ?? "";
-
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    if (!termsAccepted || isSending) return;
-    if (!message.trim() || !name.trim() || !email.trim()) return;
-
-    setIsSending(true);
-    setSendResult(null);
-    try {
-      const res = await fetch("/api/contact", {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({
-          name,
-          email,
-          phone: phoneNumber,
-          foundUs,
-          message,
-        }),
-      });
-
-      if (!res.ok) throw new Error("Request failed");
-      setSendResult("ok");
-      setMessage("");
-      setFoundUs("");
-      setPhoneNumber("");
-      setName("");
-      setEmail("");
-      setTermsAccepted(false);
-    } catch {
-      setSendResult("error");
-    } finally {
-      setIsSending(false);
-    }
-  }
+export function ContactSection({ className }: { className?: string }) {
+  const { t } = useLanguage();
 
   const addressText =
     "ул. Николай Коперник № 27-29, ет. 2, офис 17, кв. Гео Милев, София, България";
@@ -202,180 +57,76 @@ export function ContactSection() {
   }
 
   return (
-    <section id="contact" className="relative overflow-hidden pt-10 pb-20 sm:pt-12 sm:pb-24 lg:pt-14 lg:pb-28">
-      
-      <div className="max-w-7xl mx-auto px-4 z-10 relative">
+    <section
+      id="contact"
+      className={cn(
+        "relative overflow-hidden pt-10 pb-20 sm:pt-12 sm:pb-24 lg:pt-14 lg:pb-28",
+        className
+      )}
+    >
+      <div className="relative z-10 mx-auto max-w-7xl px-4">
         <div className="mb-10 lg:mb-12">
-          <h2 className="font-heading font-bold text-4xl md:text-5xl mb-6 text-foreground">
+          <h2 className="mb-6 font-heading text-4xl font-bold text-foreground md:text-5xl">
             {t.contact.title1}{" "}
             <span className="text-section-accent">{t.contact.title2}</span>
           </h2>
-          <p className="text-muted-foreground text-lg max-w-2xl">
-            {t.contact.subtitle}
-          </p>
+          <p className="max-w-2xl text-lg text-muted-foreground">{t.contact.subtitle}</p>
         </div>
 
-        <div className="grid gap-12 lg:gap-16 items-start lg:grid-cols-[minmax(0,60%)_minmax(0,40%)]">
-          {/* Column 1: Form */}
-          <div className="rounded-3xl p-8 border border-border/30 animate-in slide-in-from-left-12 fade-in duration-1000 bg-card text-card-foreground shadow-elevated-soft">            
-            <form className="space-y-4" onSubmit={handleSubmit}>
-              <div className="space-y-2">
-                <FieldLabel required>{t.contact.message}</FieldLabel>
-                <Textarea
-                  value={message}
-                  onChange={(e) => setMessage(e.target.value)}
-                  placeholder={t.contact.messagePh}
-                  required
-                  className="min-h-[120px] text-sm bg-background/40 border-border/40 focus:border-primary/50 transition-colors"
-                />
-              </div>
+        <div className="grid items-start gap-12 lg:grid-cols-[minmax(0,60%)_minmax(0,40%)] lg:gap-16">
+          <ContactInquiryForm variant="card" />
 
-              <div className="grid grid-cols-2 gap-2 sm:gap-4">
-                <div className="space-y-2">
-                  <FieldLabel required>{t.contact.name}</FieldLabel>
-                  <Input
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    placeholder={t.contact.name}
-                    required
-                    autoComplete="name"
-                    className="h-9 text-sm bg-background/40 border-border/40 focus:border-primary/50 transition-colors"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <FieldLabel>{t.contact.phoneLbl}</FieldLabel>
-                  <Input
-                    type="tel"
-                    value={phoneNumber}
-                    onChange={(e) => setPhoneNumber(e.target.value)}
-                    autoComplete="tel"
-                    className="h-9 text-sm bg-background/40 border-border/40 focus:border-primary/50 transition-colors"
-                  />
-                </div>
-              </div>
-
-              <div className="grid gap-2 sm:gap-4 sm:grid-cols-2">
-                <div className="space-y-2">
-                  <FieldLabel required>{t.contact.emailLbl}</FieldLabel>
-                  <Input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder={t.contact.emailLbl}
-                    required
-                    autoComplete="email"
-                    className="h-9 text-sm bg-background/40 border-border/40 focus:border-primary/50 transition-colors"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <FieldLabel>{t.contact.foundUs}</FieldLabel>
-                  <Select value={foundUs} onValueChange={(v) => setFoundUs(v ?? "")}>
-                    <SelectTrigger className="w-full h-9 px-2.5 text-sm bg-background/40 border-border/40 focus:border-primary/50 transition-colors">
-                      <SelectValue
-                        placeholder={
-                          t.contact.foundUsPh.trim() === "" ? undefined : t.contact.foundUsPh
-                        }
-                      >
-                        {foundUs !== "" ? selectedFoundUsLabel : null}
-                      </SelectValue>
-                    </SelectTrigger>
-                    <SelectContent>
-                      {foundUsOptions.map((opt) => (
-                        <SelectItem key={opt.value} value={opt.value} className="py-1.5 text-sm">
-                          {opt.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-3 pt-2">
-                <Checkbox
-                  checked={termsAccepted}
-                  onCheckedChange={(v) => setTermsAccepted(Boolean(v))}
-                  className="mt-0.5"
-                />
-                <div className="text-sm text-muted-foreground leading-relaxed">
-                  <span>{t.contact.terms.prefix} </span>
-                  <Link
-                    href={termsHref}
-                    className="text-section-accent underline-offset-4 hover:underline"
-                  >
-                    {t.contact.terms.link}
-                  </Link>
-                  <span>{t.contact.terms.suffix}</span>
-                </div>
-              </div>
-
-              <Button
-                type="submit"
-                disabled={!termsAccepted || isSending}
-                className="w-full rounded-full font-bold h-10 text-sm mt-4 shadow-lg hover:scale-105 active:scale-95 transition-all disabled:hover:scale-100"
+          <div className="animate-in fade-in slide-in-from-right-12 duration-1000 delay-200">
+            <div className="mb-10 space-y-6">
+              <a
+                href="mailto:info@dreamteam.technology"
+                className="group flex cursor-pointer items-center gap-4"
               >
-                {isSending ? t.contact.sending : t.contact.send}{" "}
-                <IconSend className="ml-2 h-4 w-4" stroke={2.25} />
-              </Button>
-
-              {sendResult === "ok" && (
-                <SendResultCard
-                  variant="success"
-                  title={t.contact.sendSuccessTitle}
-                  description={t.contact.sendSuccessBody}
-                />
-              )}
-              {sendResult === "error" && (
-                <SendResultCard
-                  variant="error"
-                  title={t.contact.sendErrorTitle}
-                  description={t.contact.sendErrorBody}
-                />
-              )}
-            </form>
-          </div>
-
-          {/* Column 2: Contact info */}
-          <div className="animate-in slide-in-from-right-12 fade-in duration-1000 delay-200">
-            <div className="space-y-6 mb-10">
-              {/* Email */}
-              <a href="mailto:info@dreamteam.technology" className="flex items-center gap-4 group cursor-pointer">
                 <div className={contactInfoIconCircle}>
                   <IconMailFilled className="h-5 w-5 text-primary" />
                 </div>
                 <div>
                   <div className="text-sm text-muted-foreground">{t.contact.email}</div>
-                  <div className="font-semibold text-foreground group-hover:text-primary transition-colors">info@dreamteam.technology</div>
+                  <div className="font-semibold text-foreground transition-colors group-hover:text-primary">
+                    info@dreamteam.technology
+                  </div>
                 </div>
               </a>
 
-              {/* Phone 1 */}
-              <a href="tel:+359878757930" className="flex items-center gap-4 group cursor-pointer">
+              <a
+                href="tel:+359878757930"
+                className="group flex cursor-pointer items-center gap-4"
+              >
                 <div className={contactInfoIconCircle}>
                   <IconPhoneFilled className="h-5 w-5 text-primary" />
                 </div>
                 <div>
                   <div className="text-sm text-muted-foreground">{t.contact.phone}</div>
-                  <div className="font-semibold text-foreground group-hover:text-primary transition-colors">+359 87 875 7930</div>
+                  <div className="font-semibold text-foreground transition-colors group-hover:text-primary">
+                    +359 87 875 7930
+                  </div>
                 </div>
               </a>
 
-              {/* Phone 2 */}
-              <a href="tel:+359882367100" className="flex items-center gap-4 group cursor-pointer">
+              <a
+                href="tel:+359882367100"
+                className="group flex cursor-pointer items-center gap-4"
+              >
                 <div className={contactInfoIconCircle}>
                   <IconPhoneFilled className="h-5 w-5 text-primary" />
                 </div>
                 <div>
                   <div className="text-sm text-muted-foreground">{t.contact.phone}</div>
-                  <div className="font-semibold text-foreground group-hover:text-primary transition-colors">+359 88 236 7100</div>
+                  <div className="font-semibold text-foreground transition-colors group-hover:text-primary">
+                    +359 88 236 7100
+                  </div>
                 </div>
               </a>
 
-              {/* Address */}
               <button
                 type="button"
                 onClick={copyAddress}
-                className="flex w-full items-start gap-4 text-left cursor-pointer"
+                className="flex w-full cursor-pointer items-start gap-4 text-left"
                 aria-label="Copy address"
                 title="Copy address"
               >
@@ -388,8 +139,8 @@ export function ContactSection() {
                   <IconMapPinFilled className="h-5 w-5 text-primary" />
                 </div>
                 <div className="min-w-0">
-                  <div className="text-sm text-muted-foreground mb-1">{t.contact.address}</div>
-                  <div className="font-semibold text-foreground leading-relaxed">
+                  <div className="mb-1 text-sm text-muted-foreground">{t.contact.address}</div>
+                  <div className="font-semibold leading-relaxed text-foreground">
                     ул. Николай Коперник № 27-29, ет. 2, офис 17<br />
                     кв. Гео Милев, София, България
                   </div>
@@ -397,8 +148,7 @@ export function ContactSection() {
               </button>
             </div>
 
-            {/* Social links */}
-            <div className="flex items-center gap-5">
+            <div className="flex items-center gap-10">
               <a
                 href="https://www.facebook.com/profile.php?id=61585919836260"
                 target="_blank"
@@ -433,7 +183,6 @@ export function ContactSection() {
               </a>
             </div>
           </div>
-
         </div>
       </div>
     </section>

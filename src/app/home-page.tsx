@@ -3,6 +3,8 @@ import { MobileNav } from "@/components/mobile-nav";
 import { HeroSection } from "@/components/hero-section";
 import { PortfolioSection } from "@/components/portfolio-section";
 import { PartnersSection } from "@/components/partners-section";
+import { ContactSection } from "@/components/contact-section";
+import { ProcessSection } from "@/components/process-section";
 import { Footer } from "@/components/footer";
 import { GradientBlurPageBg } from "@/components/ui/gradient-blur-bg";
 import { MAIN_WITH_FIXED_PAGE_BG_CLASS } from "@/lib/page-shell";
@@ -26,6 +28,14 @@ export function HomePage() {
 
         <div className="relative">
           <PortfolioSection />
+        </div>
+
+        <div className="relative">
+          <ContactSection />
+        </div>
+
+        <div className="relative">
+          <ProcessSection />
         </div>
       </div>
 

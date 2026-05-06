@@ -56,7 +56,7 @@ export function HeroSection() {
 
       <div className="relative z-20 mx-auto mt-24 flex w-full max-w-5xl flex-col items-center justify-center px-4 pb-8 text-center sm:mt-28 sm:pb-10 lg:mt-0 lg:pb-0">
         <motion.h1
-          className="mb-8 font-heading text-4xl font-extrabold leading-[1.06] tracking-tight text-white sm:mb-10 sm:text-5xl md:text-7xl md:leading-[1.03] lg:text-8xl"
+          className="mb-8 w-full min-w-0 max-w-full px-1 font-heading text-[clamp(1.75rem,6.2vw+0.35rem,2.25rem)] font-extrabold leading-[1.08] tracking-tight text-balance text-white [overflow-wrap:anywhere] break-words sm:mb-10 sm:text-5xl sm:leading-[1.06] md:text-6xl md:leading-[1.03] lg:text-7xl"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.45 }}
@@ -140,12 +140,6 @@ export function HeroSection() {
             </div>
           </GlassShell>
         </motion.div>
-      </div>
-
-      <div className="absolute bottom-24 left-1/2 z-20 -translate-x-1/2 animate-bounce lg:bottom-8">
-        <div className="flex h-[50px] w-[30px] items-start justify-center rounded-full border-2 border-white/35 p-2 liquid-glass">
-          <div className="h-1.5 w-1.5 animate-[float_2s_ease-in-out_infinite] rounded-full bg-primary shadow-[0_0_14px_var(--primary-soft-glow)]" />
-        </div>
       </div>
     </section>
   );

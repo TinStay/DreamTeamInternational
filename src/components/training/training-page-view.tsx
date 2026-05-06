@@ -1,23 +1,19 @@
 "use client";
 
-import Link from "next/link";
-import { IconChevronLeft } from "@tabler/icons-react";
 import { SiteHeader } from "@/components/site-header";
 import { MobileNav } from "@/components/mobile-nav";
 import { Footer } from "@/components/footer";
-import { buttonVariants } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
 import { useLanguage } from "@/lib/i18n/language-context";
-import { contactProcessPath, homePath } from "@/lib/routes";
+import { contactProcessPath } from "@/lib/routes";
 import { GradientBlurPageBg } from "@/components/ui/gradient-blur-bg";
 import { MAIN_WITH_FIXED_PAGE_BG_CLASS } from "@/lib/page-shell";
+import { PageBreadcrumbs } from "@/components/page-breadcrumbs";
 import { TrainingExpandableCards, type TrainingExpandableCard } from "./training-expandable-cards";
-import { TrainingModalRich } from "./training-modal-rich";
+import { TrainingModalDetails, TrainingModalIncludes } from "./training-modal-rich";
 
 export function TrainingPageView() {
   const { t, language } = useLanguage();
   const tr = t.training;
-  const homeHref = homePath(language);
   const contactHref = contactProcessPath(language);
 
   const cards: TrainingExpandableCard[] = [
@@ -28,7 +24,8 @@ export function TrainingPageView() {
       src: tr.cards.consultation.image,
       ctaText: tr.cards.consultation.cta,
       ctaLink: contactHref,
-      content: <TrainingModalRich copy={tr.cards.consultation} />,
+      includes: <TrainingModalIncludes copy={tr.cards.consultation} />,
+      details: <TrainingModalDetails copy={tr.cards.consultation} />,
     },
     {
       id: "skool",
@@ -39,7 +36,8 @@ export function TrainingPageView() {
       ctaLink: tr.skoolUrl,
       comingSoon: true,
       comingSoonLabel: tr.comingSoon,
-      content: <TrainingModalRich copy={tr.cards.skool} />,
+      includes: <TrainingModalIncludes copy={tr.cards.skool} />,
+      details: <TrainingModalDetails copy={tr.cards.skool} />,
     },
     {
       id: "corporate",
@@ -48,7 +46,8 @@ export function TrainingPageView() {
       src: tr.cards.corporate.image,
       ctaText: tr.cards.corporate.cta,
       ctaLink: contactHref,
-      content: <TrainingModalRich copy={tr.cards.corporate} />,
+      includes: <TrainingModalIncludes copy={tr.cards.corporate} />,
+      details: <TrainingModalDetails copy={tr.cards.corporate} />,
     },
   ];
 
@@ -61,17 +60,8 @@ export function TrainingPageView() {
       <SiteHeader />
 
       <div className="relative z-10 flex w-full flex-1 px-4 pb-28 pt-24 lg:pb-32 lg:pt-32">
-        <div className="mx-auto w-full max-w-7xl">
-          <Link
-            href={homeHref}
-            className={cn(
-              buttonVariants({ variant: "ghost", size: "sm" }),
-              "-ml-2 mb-6 inline-flex items-center text-muted-foreground hover:text-primary"
-            )}
-          >
-            <IconChevronLeft className="mr-1 h-4 w-4" />
-            {t.legal.backToHome}
-          </Link>
+        <div className="mx-auto w-full max-w-7xl xl:max-w-[86rem] 2xl:max-w-[96rem]">
+          <PageBreadcrumbs className="mb-6" />
 
           <header className="mb-12 text-center md:mb-14 md:text-left">
             <p className="mb-2 text-xs font-semibold uppercase tracking-[0.2em] text-primary">{tr.eyebrow}</p>

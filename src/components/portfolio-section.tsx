@@ -4,6 +4,7 @@ import { memo, useEffect, useMemo, useRef, useState } from "react";
 import { useLanguage } from "@/lib/i18n/language-context";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { primaryGradientInteractiveClassName } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   ANIMATED_SHORT,
@@ -34,10 +35,17 @@ import {
   IconLayoutGrid,
   IconHome2Filled,
   IconMickeyFilled,
+  IconChevronLeft,
+  IconChevronRight,
 } from "@tabler/icons-react";
 
 /** Generous margin so tiles near the fold still get a callback; four-value form for Safari. */
 const LAZY_IFRAME_ROOT_MARGIN = "200px 0px 200px 0px";
+
+// Page size tuned to show one more row vs previous values.
+const PORTFOLIO_SEGMENTS_PER_PAGE = 3; // “All” layout rows
+const PORTFOLIO_MOBILE_PER_PAGE = 9; // +1 row (3-up on lg)
+const PORTFOLIO_DESKTOP_PER_PAGE = 6; // +1 row (2-up on lg)
 
 /** YouTube iframe mounts when near viewport (or immediately if `priority`). */
 function LazyYouTubeIframe({
@@ -211,10 +219,12 @@ const PortfolioTabBody = memo(function PortfolioTabBody({
   wideEmbeds,
   shortEmbeds,
   format,
+  page,
 }: {
   wideEmbeds: YouTubeEmbed[];
   shortEmbeds: YouTubeEmbed[];
   format: "all" | "desktop" | "mobile";
+  page: number;
 }) {
   const isMobileOnly = format === "mobile";
 
@@ -223,6 +233,24 @@ const PortfolioTabBody = memo(function PortfolioTabBody({
       format === "all" ? buildAllFormatSegments(wideEmbeds, shortEmbeds) : [],
     [format, wideEmbeds, shortEmbeds]
   );
+
+  const visibleAllSegments = useMemo(() => {
+    if (format !== "all") return [];
+    const start = page * PORTFOLIO_SEGMENTS_PER_PAGE;
+    return allSegments.slice(start, start + PORTFOLIO_SEGMENTS_PER_PAGE);
+  }, [format, allSegments, page]);
+
+  const visibleShortEmbeds = useMemo(() => {
+    if (format !== "mobile") return shortEmbeds;
+    const start = page * PORTFOLIO_MOBILE_PER_PAGE;
+    return shortEmbeds.slice(start, start + PORTFOLIO_MOBILE_PER_PAGE);
+  }, [format, shortEmbeds, page]);
+
+  const visibleWideEmbeds = useMemo(() => {
+    if (format !== "desktop") return wideEmbeds;
+    const start = page * PORTFOLIO_DESKTOP_PER_PAGE;
+    return wideEmbeds.slice(start, start + PORTFOLIO_DESKTOP_PER_PAGE);
+  }, [format, wideEmbeds, page]);
 
   return (
     <div className="w-full">
@@ -236,7 +264,7 @@ const PortfolioTabBody = memo(function PortfolioTabBody({
       <div>
         {format === "all" ? (
           <div className="flex flex-col gap-10 lg:gap-12">
-            {allSegments.map((seg) => {
+            {visibleAllSegments.map((seg) => {
               if (seg.kind === "triple") {
                 const { wide, left, right, rowIdx } = seg;
                 return (
@@ -389,7 +417,7 @@ const PortfolioTabBody = memo(function PortfolioTabBody({
           </div>
         ) : isMobileOnly ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
-            {shortEmbeds.map((embed, idx) => (
+            {visibleShortEmbeds.map((embed, idx) => (
               <div
                 key={`short-${idx}`}
                 className="flex flex-col gap-3"
@@ -415,7 +443,7 @@ const PortfolioTabBody = memo(function PortfolioTabBody({
           </div>
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-10">
-            {wideEmbeds.map((embed, idx) => (
+            {visibleWideEmbeds.map((embed, idx) => (
               <div
                 key={`wide-${idx}`}
                 className="flex flex-col gap-3"
@@ -531,6 +559,7 @@ export function PortfolioSection() {
   const { t } = useLanguage();
   const [format, setFormat] = useState<"all" | "desktop" | "mobile">("all");
   const [activeCategory, setActiveCategory] = useState<string>("all");
+  const [portfolioPage, setPortfolioPage] = useState(0);
 
   const CATEGORIES: { key: string; label: string; icon: React.ReactNode }[] = useMemo(
     () => [
@@ -551,6 +580,29 @@ export function PortfolioSection() {
     () => (activeCategory === "all" ? embedsForAll() : embedsForCategory(activeCategory)),
     [activeCategory]
   );
+
+  const totalPortfolioPages = useMemo(() => {
+    if (format === "all") {
+      const segs = buildAllFormatSegments(embeds.wide, embeds.short);
+      return Math.max(1, Math.ceil(segs.length / PORTFOLIO_SEGMENTS_PER_PAGE));
+    }
+    if (format === "mobile") {
+      return Math.max(1, Math.ceil(embeds.short.length / PORTFOLIO_MOBILE_PER_PAGE));
+    }
+    return Math.max(1, Math.ceil(embeds.wide.length / PORTFOLIO_DESKTOP_PER_PAGE));
+  }, [format, embeds.wide, embeds.short]);
+
+  const safePortfolioPage = Math.min(
+    portfolioPage,
+    Math.max(0, totalPortfolioPages - 1)
+  );
+
+  const scrollPortfolioIntoView = () => {
+    document.getElementById("portfolio")?.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
+  };
 
   const isActiveTab = (key: string) => key === activeCategory;
 
@@ -596,7 +648,10 @@ export function PortfolioSection() {
                         type="button"
                         variant="ghost"
                         size="sm"
-                        onClick={() => setActiveCategory(cat.key)}
+                        onClick={() => {
+                          setActiveCategory(cat.key);
+                          setPortfolioPage(0);
+                        }}
                         className={categoryChipClass(isActiveTab(cat.key))}
                       >
                         <span
@@ -622,6 +677,7 @@ export function PortfolioSection() {
                   onValueChange={(v) => {
                     if (v === "all" || v === "desktop" || v === "mobile") {
                       setFormat(v);
+                      setPortfolioPage(0);
                     }
                   }}
                   className="w-auto"
@@ -681,7 +737,58 @@ export function PortfolioSection() {
               wideEmbeds={embeds.wide}
               shortEmbeds={embeds.short}
               format={format}
+              page={safePortfolioPage}
             />
+
+            {totalPortfolioPages > 1 ? (
+              <div className="flex flex-col items-center justify-center gap-3 sm:flex-row sm:gap-4">
+                <div className="flex items-center gap-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="default"
+                    disabled={safePortfolioPage <= 0}
+                    className="h-11 gap-1 rounded-full px-5 text-sm font-semibold"
+                    onClick={() => {
+                      setPortfolioPage((p) => Math.max(0, p - 1));
+                      scrollPortfolioIntoView();
+                    }}
+                  >
+                    <IconChevronLeft className="h-4 w-4" aria-hidden />
+                    {t.portfolio.pagination.previous}
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="default"
+                    size="default"
+                    disabled={safePortfolioPage >= totalPortfolioPages - 1}
+                    className={cn(
+                      "h-11 gap-1 rounded-full px-5 text-sm font-semibold",
+                      primaryGradientInteractiveClassName
+                    )}
+                    onClick={() => {
+                      setPortfolioPage((p) =>
+                        Math.min(totalPortfolioPages - 1, p + 1)
+                      );
+                      scrollPortfolioIntoView();
+                    }}
+                  >
+                    {t.portfolio.pagination.next}
+                    <IconChevronRight className="h-4 w-4" aria-hidden />
+                  </Button>
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  {t.portfolio.pagination.page}{" "}
+                  <span className="font-semibold text-foreground">
+                    {safePortfolioPage + 1}
+                  </span>
+                  {" / "}
+                  <span className="font-semibold text-foreground">
+                    {totalPortfolioPages}
+                  </span>
+                </p>
+              </div>
+            ) : null}
           </div>
 
           {/*

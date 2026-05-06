@@ -58,11 +58,23 @@
   --radius-xl: calc(var(--radius) * 1.4);
 
   --animate-float: float 6s ease-in-out infinite;
+  --animate-ai-assistant-pop-in: ai-assistant-pop-in 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
 
   @keyframes float {
     0%, 100% { transform: translateY(0px) rotate(0deg); }
     33% { transform: translateY(-15px) rotate(3deg); }
     66% { transform: translateY(-8px) rotate(-2deg); }
+  }
+
+  @keyframes ai-assistant-pop-in {
+    0% {
+      opacity: 0;
+      transform: scale(0.8) translateY(20px);
+    }
+    100% {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+    }
   }
 }
 

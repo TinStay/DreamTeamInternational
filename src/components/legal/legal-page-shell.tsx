@@ -8,6 +8,7 @@ import { buttonVariants } from "@/components/ui/button";
 import { GradientBlurPageBg } from "@/components/ui/gradient-blur-bg";
 import { MAIN_WITH_FIXED_PAGE_BG_CLASS } from "@/lib/page-shell";
 import { cn } from "@/lib/utils";
+import { PageBreadcrumbs } from "@/components/page-breadcrumbs";
 
 type LegalPageShellProps = {
   homeHref: string;
@@ -38,23 +39,7 @@ export function LegalPageShell({
 
       <div className="relative z-10 flex w-full flex-1 px-4 pb-28 pt-24 lg:pt-32">
         <div className="mx-auto w-full max-w-4xl">
-          <nav
-            className="mb-5 flex items-center gap-2 text-sm text-muted-foreground"
-            aria-label="Breadcrumb"
-          >
-            <Link
-              href={homeHref}
-              className="inline-flex items-center rounded-full border border-border/30 bg-background/70 px-3 py-1 transition-colors hover:text-primary backdrop-blur"
-            >
-              {homeLabel}
-            </Link>
-            <span className="text-border" aria-hidden>
-              /
-            </span>
-            <span className="rounded-full border border-border/20 bg-background/50 px-3 py-1 text-foreground/90 backdrop-blur">
-              {docTitle}
-            </span>
-          </nav>
+          <PageBreadcrumbs />
 
           <Link
             href={homeHref}

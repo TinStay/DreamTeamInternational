@@ -27,7 +27,7 @@ const PARTNERS: Partner[] = [
     id: "boleron",
     light: "boleron_logo_light.png",
     dark: null,
-    href: "https://asiaeventagency.com/",
+    href: "https://boleron.bg/",
     ariaLabel: "Boleron",
   },
   {
