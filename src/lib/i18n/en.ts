@@ -206,34 +206,34 @@ export const en = {
       whyPlaceholder: "What are you trying to achieve / ship?",
     },
     cards: {
-      consultation: {
+      individual: {
         title: "Individual lessons",
         suitableFor:
-          "Best for creators and teams who want direct feedback on a real project — scripts, prompts, tooling, and edit decisions.",
+          "1:1 training for people who want to learn how to create AI videos — from idea and script to prompts, look, editing, and delivery.",
         cta: "Contact us",
         image: "/trainings/individual_banner.jpeg",
         modalIntro:
-          "1:1 sessions focused on your exact use‑case. Bring a brief, references, and a rough cut — we’ll turn it into a repeatable workflow your team can reuse.",
+          "Personal step-by-step lessons. We work on your style (or a sample brief) and teach you how to produce AI videos yourself with clear exercises and homework.",
         features: [
-          { icon: "video", text: "60–90 min calls tailored to your brief, references, and deadline" },
-          { icon: "wand", text: "Prompt + storyboard coaching for photoreal, stylized, or hybrid looks" },
-          { icon: "tool", text: "Tool selection: what to use in production and what to skip" },
-          { icon: "message", text: "Review on pacing, VO, captions, brand tone, and disclosure practices" },
-          { icon: "checklist", text: "Action plan after each session (next steps, assets, checkpoints)" },
+          { icon: "book", text: "From zero to a finished AI video: script → shots → edit → export" },
+          { icon: "wand", text: "Prompts + style: consistent characters/looks and better shot control" },
+          { icon: "tool", text: "Tools & settings: what to use and how to set it up for your goals" },
+          { icon: "message", text: "Feedback on your videos with concrete fixes (pace, VO, captions, composition)" },
+          { icon: "checklist", text: "Homework + a repeatable checklist you can follow after the lesson" },
         ],
         modalTabs: { highlights: "What's included", more: "Practical details" },
         outcomesTitle: "",
         outcomesSubtitle: "",
         outcomes: [
-          { icon: "wand", text: "A tailored set of prompts + shots for your project’s look, ready to reuse." },
-          { icon: "tool", text: "A clear tool/setup map: what to use, how to set it up, and how the steps connect." },
-          { icon: "checklist", text: "A next-deliverables plan with timelines, revision hygiene, and QC checkpoints." },
+          { icon: "sparkles", text: "Your first AI video created by you (with guidance during the lesson)." },
+          { icon: "stack", text: "A mini-system: brief/script templates + a prompt & shot structure you can reuse." },
+          { icon: "shield", text: "Basics for brand, rights, and disclosure so you can ship safer, publish-ready versions." },
         ],
         logisticsTitle: "How it works",
         logistics: [
-          "60–90 minutes on Google Meet/Zoom. Optional recording + written recap.",
-          "English or Bulgarian. Share screen, cuts, prompts, and references live.",
-          "Best results: book 2–4 sessions so feedback compounds between calls.",
+          "60–90 minutes on Google Meet/Zoom. Optional recording + short recap after.",
+          "Beginner-friendly and advanced-friendly — we adapt the pace to your level.",
+          "Best results: book 2–4 sessions so practice compounds between calls.",
         ],
       },
       skool: {

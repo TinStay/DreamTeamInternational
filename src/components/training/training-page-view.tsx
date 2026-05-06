@@ -18,14 +18,14 @@ export function TrainingPageView() {
 
   const cards: TrainingExpandableCard[] = [
     {
-      id: "consultation",
-      title: tr.cards.consultation.title,
-      description: tr.cards.consultation.suitableFor,
-      src: tr.cards.consultation.image,
-      ctaText: tr.cards.consultation.cta,
+      id: "individual",
+      title: tr.cards.individual.title,
+      description: tr.cards.individual.suitableFor,
+      src: tr.cards.individual.image,
+      ctaText: tr.cards.individual.cta,
       ctaLink: contactHref,
-      includes: <TrainingModalIncludes copy={tr.cards.consultation} />,
-      details: <TrainingModalDetails copy={tr.cards.consultation} />,
+      includes: <TrainingModalIncludes copy={tr.cards.individual} />,
+      details: <TrainingModalDetails copy={tr.cards.individual} />,
     },
     {
       id: "skool",

@@ -27,8 +27,8 @@ function segmentToLabel(
       return t.header.contact;
     case "training":
       return t.header.training;
-    case "consultation":
-      return t.training.cards.consultation.title;
+    case "individual":
+      return t.training.cards.individual.title;
     case "skool":
       return t.training.cards.skool.title;
     case "corporate":
@@ -63,7 +63,7 @@ export function PageBreadcrumbs({ className }: { className?: string }) {
   });
 
   return (
-    <Breadcrumb className={cn("mb-5", className)}>
+    <Breadcrumb className={cn("mt-2 mb-5 sm:mt-0", className)}>
       <BreadcrumbList>
         <BreadcrumbItem>
           <BreadcrumbLink asChild>

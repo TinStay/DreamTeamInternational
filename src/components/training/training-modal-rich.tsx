@@ -20,7 +20,6 @@ import {
 } from "@tabler/icons-react";
 import { motion } from "motion/react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { cn } from "@/lib/utils";
 
 const FEATURE_ICONS: Record<string, ElementType<{ className?: string }>> = {
   video: IconVideoFilled,
@@ -118,7 +117,7 @@ function LogisticsCard({ copy }: { copy: TrainingModalRichCopy }) {
   return (
     <Card size="sm" className="h-full border-border/40 bg-card/90">
       <CardHeader className="border-b border-border/30 pb-3">
-        <CardTitle className="text-base">{copy.logisticsTitle}</CardTitle>
+        <CardTitle className="text-base font-bold">{copy.logisticsTitle}</CardTitle>
       </CardHeader>
       <CardContent className="flex flex-col gap-3 pt-2">
         {copy.logistics.map((para, i) => (
@@ -149,12 +148,7 @@ function HighlightsPanel({ copy }: { copy: TrainingModalRichCopy }) {
 function MorePanel({ copy }: { copy: TrainingModalRichCopy }) {
   const showLogistics = Boolean(copy.logisticsTitle) && copy.logistics.length > 0;
   return (
-    <div
-      className={cn(
-        "grid gap-4 md:gap-5 lg:gap-6",
-        showLogistics ? "md:grid-cols-2" : "md:grid-cols-1"
-      )}
-    >
+    <div className="flex flex-col gap-4 md:gap-5 lg:gap-6">
       <motion.div
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}

@@ -2,6 +2,7 @@
 
 import { useMemo, useRef } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { IconChevronLeft, IconExternalLink } from "@tabler/icons-react";
 import { SiteHeader } from "@/components/site-header";
 import { MobileNav } from "@/components/mobile-nav";
@@ -16,18 +17,28 @@ import { cn } from "@/lib/utils";
 import { ContactInquiryForm } from "@/components/contact-inquiry-form";
 import { TrainingModalDetails, TrainingModalIncludes } from "./training-modal-rich";
 
-type TrainingSlug = "consultation" | "skool" | "corporate";
+function getSlugFromPathname(pathname: string) {
+  const parts = pathname.split("/").filter(Boolean);
+  const trainingIdx = parts.indexOf("training");
+  if (trainingIdx === -1) return null;
+  const raw = parts[trainingIdx + 1] ?? null;
+  return raw ? decodeURIComponent(raw).toLowerCase() : null;
+}
 
-export function TrainingDetailPageView({ slug }: { slug: TrainingSlug }) {
+export function TrainingDetailPageView({ slug: slugProp }: { slug?: string }) {
   const { t, language } = useLanguage();
   const tr = t.training;
   const homeHref = homePath(language);
   const formRef = useRef<HTMLDivElement>(null);
+  const pathname = usePathname() ?? "";
+
+  const slug = (slugProp?.toLowerCase() ?? getSlugFromPathname(pathname) ?? "").trim();
 
   const copy = useMemo(() => {
-    if (slug === "consultation") return tr.cards.consultation;
+    if (slug === "individual") return tr.cards.individual;
     if (slug === "skool") return tr.cards.skool;
-    return tr.cards.corporate;
+    if (slug === "corporate") return tr.cards.corporate;
+    return tr.cards.individual;
   }, [slug, tr.cards]);
 
   const isComingSoon = slug === "skool";
@@ -128,7 +139,7 @@ export function TrainingDetailPageView({ slug }: { slug: TrainingSlug }) {
             </aside>
           </div>
 
-          <div className="mt-10">
+          <div className="mt-10 flex flex-wrap items-center gap-3">
             <Button
               type="button"
               className={cn(
@@ -139,14 +150,14 @@ export function TrainingDetailPageView({ slug }: { slug: TrainingSlug }) {
                 formRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
               }}
             >
-              {tr.cards.consultation.cta}
+              {tr.cards.individual.cta}
             </Button>
 
             <Link
               href={homeHref}
               className={cn(
                 buttonVariants({ variant: "ghost", size: "default" }),
-                "ml-2 h-11 rounded-full px-5 font-semibold cursor-pointer"
+                "h-11 rounded-full px-5 font-semibold cursor-pointer"
               )}
             >
               <IconChevronLeft className="mr-2 h-4 w-4" aria-hidden />

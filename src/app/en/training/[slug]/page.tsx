@@ -2,16 +2,18 @@ import type { Metadata } from "next";
 import { en } from "@/lib/i18n/en";
 import { TrainingDetailPageView } from "@/components/training/training-detail-page-view";
 
-type Params = { slug: "consultation" | "skool" | "corporate" };
+type Params = { slug: string };
 
 export function generateMetadata({ params }: { params: Params }): Metadata {
   const map = en.training.cards;
   const title =
-    params.slug === "consultation"
-      ? map.consultation.title
+    params.slug === "individual"
+      ? map.individual.title
       : params.slug === "skool"
         ? map.skool.title
-        : map.corporate.title;
+        : params.slug === "corporate"
+          ? map.corporate.title
+          : map.individual.title;
 
   return {
     title: `${title} | ${en.training.metaTitle}`,
