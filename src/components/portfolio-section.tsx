@@ -699,7 +699,11 @@ export function PortfolioSection() {
                         "hover:text-foreground data-active:hover:scale-[1.03] data-active:hover:from-[color-mix(in_srgb,var(--primary-gradient-start)_86%,white)] data-active:hover:to-[color-mix(in_srgb,var(--primary-gradient-end)_84%,#f3ecff)] data-active:hover:text-white"
                       )}
                     >
-                      <IconLayoutGrid className="h-3.5 w-3.5 shrink-0 sm:h-4 sm:w-4" />
+                      <IconLayoutGrid
+                        className="h-3.5 w-3.5 shrink-0 sm:h-4 sm:w-4"
+                        fill="currentColor"
+                        stroke="none"
+                      />
                     </TabsTrigger>
                     <TabsTrigger
                       value="desktop"
@@ -711,7 +715,11 @@ export function PortfolioSection() {
                         "hover:text-foreground data-active:hover:scale-[1.03] data-active:hover:from-[color-mix(in_srgb,var(--primary-gradient-start)_86%,white)] data-active:hover:to-[color-mix(in_srgb,var(--primary-gradient-end)_84%,#f3ecff)] data-active:hover:text-white"
                       )}
                     >
-                      <IconDeviceDesktop className="h-3.5 w-3.5 shrink-0 sm:h-4 sm:w-4" />
+                      <IconDeviceDesktop
+                        className="h-3.5 w-3.5 shrink-0 sm:h-4 sm:w-4"
+                        fill="currentColor"
+                        stroke="none"
+                      />
                       <span className="pl-0.5">{t.portfolio.format.ratio169}</span>
                     </TabsTrigger>
                     <TabsTrigger
@@ -724,7 +732,11 @@ export function PortfolioSection() {
                         "hover:text-foreground data-active:hover:scale-[1.03] data-active:hover:from-[color-mix(in_srgb,var(--primary-gradient-start)_86%,white)] data-active:hover:to-[color-mix(in_srgb,var(--primary-gradient-end)_84%,#f3ecff)] data-active:hover:text-white"
                       )}
                     >
-                      <IconDeviceMobile className="h-3.5 w-3.5 shrink-0 sm:h-4 sm:w-4" />
+                      <IconDeviceMobile
+                        className="h-3.5 w-3.5 shrink-0 sm:h-4 sm:w-4"
+                        fill="currentColor"
+                        stroke="none"
+                      />
                       <span className="pl-0.5">{t.portfolio.format.ratio916}</span>
                     </TabsTrigger>
                   </TabsList>

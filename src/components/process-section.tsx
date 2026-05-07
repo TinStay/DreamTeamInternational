@@ -75,7 +75,7 @@ export function ProcessSection() {
                     <div className="absolute -right-1 -top-1 h-3 w-3 animate-pulse rounded-full bg-primary shadow-[0_0_12px_var(--primary-soft-glow)]" />
                   </div>
 
-                  <h3 className="font-heading font-semibold text-xl mb-3 text-foreground group-hover:text-primary transition-colors">
+                  <h3 className="font-heading font-semibold text-xl mb-3 text-foreground transition-all group-hover:bg-gradient-to-r group-hover:from-[var(--primary-gradient-start)] group-hover:to-[var(--primary-gradient-end)] group-hover:bg-clip-text group-hover:text-transparent">
                     {step.title}
                   </h3>
                   <p className="text-sm text-muted-foreground leading-relaxed px-2">

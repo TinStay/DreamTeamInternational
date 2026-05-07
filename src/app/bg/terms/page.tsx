@@ -6,7 +6,7 @@ import { bg } from "@/lib/i18n/bg";
 const LAST_UPDATED = "February 20, 2026";
 
 export const metadata: Metadata = {
-  title: "Общи условия | DreamTeam Technology",
+  title: "Общи условия | DreamTeam",
   description: "Общи условия за услугите на DreamTeam (AI видео продукция).",
   alternates: {
     canonical: "/bg/terms",

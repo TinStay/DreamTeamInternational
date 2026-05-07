@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 
 export const metadata: Metadata = {
-  title: "Privacy Policy | DreamTeam Technology",
+  title: "Privacy Policy | DreamTeam",
   alternates: { canonical: "/en/privacy" },
 };
 

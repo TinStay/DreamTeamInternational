@@ -310,7 +310,7 @@ export function ContactInquiryForm({
         className="mt-2 h-10 w-full rounded-full text-sm font-bold shadow-lg transition-all hover:scale-105 active:scale-95 disabled:hover:scale-100"
       >
         {isSending ? t.contact.sending : t.contact.send}{" "}
-        <IconSend className="ml-2 h-4 w-4" stroke={2.25} />
+        <IconSend className="ml-2 h-4 w-4" fill="currentColor" stroke="none" />
       </Button>
 
       {sendResult === "ok" && (

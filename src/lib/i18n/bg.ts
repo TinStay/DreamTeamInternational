@@ -15,9 +15,9 @@ export const bg = {
     cta2: "Виж Нашата Работа"
   },
   contactPage: {
-    metaTitle: "Контакти и процес | DreamTeam Technology",
+    metaTitle: "Контакти и процес | DreamTeam",
     metaDescription:
-      "Как работим от бриф до доставка и как да се свържете с DreamTeam Technology за AI видео продукция.",
+      "Как работим от бриф до доставка и как да се свържете с DreamTeam за AI видео продукция.",
   },
   process: {
     title1: "Нашият",
@@ -173,12 +173,12 @@ export const bg = {
     sendErrorBody: "Не успяхме да изпратим съобщението. Опитайте отново след малко или ни пишете директно на имейл."
   },
   footer: {
-    desc: "В DreamTeam Technology се занимаваме с цялостната изработка на видеа, използвайки най-новите AI технологии.",
+    desc: "В DreamTeam се занимаваме с цялостната изработка на видеа, използвайки най-новите AI технологии.",
     links: "Линкове",
     legal: "Правна ИНФО",
     terms: "Общи условия",
     privacy: "Политика за поверителност",
-    copy: "DreamTeam Technology. Всички права запазени.",
+    copy: "DreamTeam. Всички права запазени.",
     made: "Направено с ♥ и AI."
   },
   legal: {
@@ -189,9 +189,9 @@ export const bg = {
     termsTitle: "Общи условия",
   },
   training: {
-    metaTitle: "Обучения | DreamTeam Technology",
+    metaTitle: "Обучения | DreamTeam",
     metaDescription:
-      "Индивидуални онлайн консултации за AI видео, курс в Skool и корпоративни обучения от DreamTeam Technology.",
+      "Индивидуални онлайн консултации за AI видео, курс в Skool и корпоративни обучения от DreamTeam.",
     eyebrow: "Практическо обучение по AI видео",
     title: "Обучение за реална продукция",
     subtitle:

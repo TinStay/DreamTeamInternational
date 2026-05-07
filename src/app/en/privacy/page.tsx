@@ -6,7 +6,7 @@ import { en } from "@/lib/i18n/en";
 const LAST_UPDATED = "February 20, 2026";
 
 export const metadata: Metadata = {
-  title: "Privacy Policy | DreamTeam Technology",
+  title: "Privacy Policy | DreamTeam",
   description:
     "How DreamTeam collects and uses personal data, cookies, analytics, and your GDPR rights.",
   alternates: {

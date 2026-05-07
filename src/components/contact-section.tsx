@@ -1,14 +1,10 @@
 "use client";
 
-import {
-  IconMailFilled,
-  IconMapPinFilled,
-  IconPhoneFilled,
-} from "@tabler/icons-react";
 import { useLanguage } from "@/lib/i18n/language-context";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
 import { ContactInquiryForm } from "@/components/contact-inquiry-form";
+import { GradientMailIcon, GradientMapPinIcon, GradientPhoneIcon } from "@/components/ui/gradient-icons";
 
 function SocialIcon({
   src,
@@ -83,7 +79,7 @@ export function ContactSection({ className }: { className?: string }) {
                 className="group flex cursor-pointer items-center gap-4"
               >
                 <div className={contactInfoIconCircle}>
-                  <IconMailFilled className="h-5 w-5 text-primary" />
+                  <GradientMailIcon className="h-5 w-5" />
                 </div>
                 <div>
                   <div className="text-sm text-muted-foreground">{t.contact.email}</div>
@@ -98,7 +94,7 @@ export function ContactSection({ className }: { className?: string }) {
                 className="group flex cursor-pointer items-center gap-4"
               >
                 <div className={contactInfoIconCircle}>
-                  <IconPhoneFilled className="h-5 w-5 text-primary" />
+                  <GradientPhoneIcon className="h-5 w-5" />
                 </div>
                 <div>
                   <div className="text-sm text-muted-foreground">{t.contact.phone}</div>
@@ -113,7 +109,7 @@ export function ContactSection({ className }: { className?: string }) {
                 className="group flex cursor-pointer items-center gap-4"
               >
                 <div className={contactInfoIconCircle}>
-                  <IconPhoneFilled className="h-5 w-5 text-primary" />
+                  <GradientPhoneIcon className="h-5 w-5" />
                 </div>
                 <div>
                   <div className="text-sm text-muted-foreground">{t.contact.phone}</div>
@@ -136,7 +132,7 @@ export function ContactSection({ className }: { className?: string }) {
                     "mt-0.5 transition-transform hover:scale-[1.04] active:scale-[0.98]"
                   )}
                 >
-                  <IconMapPinFilled className="h-5 w-5 text-primary" />
+                  <GradientMapPinIcon className="h-5 w-5" />
                 </div>
                 <div className="min-w-0">
                   <div className="mb-1 text-sm text-muted-foreground">{t.contact.address}</div>

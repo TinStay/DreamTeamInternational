@@ -234,9 +234,12 @@
       0 22px 70px rgba(15, 23, 42, 0.14);
   }
 
-  /** Accent word in section headings — color + soft glow from --primary */
+  /** Accent word in section headings — primary gradient text */
   .text-section-accent {
-    color: var(--primary);
+    background-image: linear-gradient(90deg, var(--primary-gradient-start), var(--primary-gradient-end));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
     text-shadow: none;
   }
 
@@ -258,6 +261,11 @@
   .icon-on-brand {
     color: var(--primary);
     filter: drop-shadow(0 2px 8px var(--primary-soft-glow));
+  }
+
+  /** Gradient background chip/circle (for icon containers, badges, etc.) */
+  .bg-primary-gradient {
+    background-image: linear-gradient(90deg, var(--primary-gradient-start), var(--primary-gradient-end));
   }
 
   /**
@@ -286,6 +294,7 @@
   }
   body {
     @apply bg-background text-foreground;
+    transition: background-color 200ms ease, color 200ms ease;
   }
   html {
     scroll-behavior: smooth;

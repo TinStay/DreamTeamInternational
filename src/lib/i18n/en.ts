@@ -8,16 +8,16 @@ export const en = {
     training: "Training"
   },
   hero: {
-    titleBefore: "Your ",
+    titleBefore: "Your",
     titleGlow: "imagination",
     titleAfter: " is the limit.",
     cta1: "Contact us",
     cta2: "View Our Work"
   },
   contactPage: {
-    metaTitle: "Contact & Process | DreamTeam Technology",
+    metaTitle: "Contact & Process | DreamTeam",
     metaDescription:
-      "How we work from brief to delivery, and how to reach DreamTeam Technology for AI video production.",
+      "How we work from brief to delivery, and how to reach DreamTeam for AI video production.",
   },
   process: {
     title1: "Our",
@@ -173,12 +173,12 @@ export const en = {
     sendErrorBody: "We could not send your message. Please try again in a moment or email us directly."
   },
   footer: {
-    desc: "At DreamTeam Technology, we handle end-to-end video production using the latest AI technologies.",
+    desc: "At DreamTeam, we handle end-to-end video production using the latest AI technologies.",
     links: "Links",
     legal: "Legal",
     terms: "Terms and Conditions",
     privacy: "Privacy Policy",
-    copy: "DreamTeam Technology. All rights reserved.",
+    copy: "DreamTeam. All rights reserved.",
     made: "Made with ♥ and AI."
   },
   legal: {
@@ -189,9 +189,9 @@ export const en = {
     termsTitle: "Terms and Conditions",
   },
   training: {
-    metaTitle: "Training | DreamTeam Technology",
+    metaTitle: "Training | DreamTeam",
     metaDescription:
-      "Individual AI video consultations, Skool community courses, and corporate workshops from DreamTeam Technology.",
+      "Individual AI video consultations, Skool community courses, and corporate workshops from DreamTeam.",
     eyebrow: "Hands-on AI video training",
     title: "Training built for real production",
     subtitle:

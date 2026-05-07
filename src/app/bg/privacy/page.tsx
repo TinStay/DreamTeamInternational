@@ -6,7 +6,7 @@ import { bg } from "@/lib/i18n/bg";
 const LAST_UPDATED = "February 20, 2026";
 
 export const metadata: Metadata = {
-  title: "Политика за поверителност | DreamTeam Technology",
+  title: "Политика за поверителност | DreamTeam",
   description: "Политика за поверителност на DreamTeam.",
   alternates: {
     canonical: "/bg/privacy",

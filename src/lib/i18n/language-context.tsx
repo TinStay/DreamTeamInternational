@@ -67,7 +67,7 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     };
 
     const nextPath = lang === "bg" ? toBg(pathname || "/") : toEn(pathname || "/");
-    router.push(`${nextPath}${hash}`);
+    router.push(`${nextPath}${hash}`, { scroll: false });
     setLanguage(lang);
     localStorage.setItem("app-lang", lang);
   };

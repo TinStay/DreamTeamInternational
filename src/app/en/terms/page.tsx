@@ -6,7 +6,7 @@ import { en } from "@/lib/i18n/en";
 const LAST_UPDATED = "February 20, 2026";
 
 export const metadata: Metadata = {
-  title: "Terms and Conditions | DreamTeam Technology",
+  title: "Terms and Conditions | DreamTeam",
   description:
     "Terms and conditions for DreamTeam AI video production services, payments, revisions, and portfolio use.",
   alternates: {

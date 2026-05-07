@@ -37,7 +37,7 @@ export function SiteHeader() {
           <Link href={homeHref} className="group flex min-w-0 shrink items-center">
             <img
               src="/logo-1.png"
-              alt="DreamTeam Technology"
+              alt="DreamTeam"
               className="h-12 w-auto grayscale transition-all group-hover:grayscale-0 dark:invert sm:h-11"
             />
           </Link>
@@ -55,7 +55,7 @@ export function SiteHeader() {
         <Link href={homeHref} className="flex items-center gap-2 group justify-self-start min-w-0">
           <img
             src="/logo-1.png"
-            alt="DreamTeam Technology"
+            alt="DreamTeam"
             className="h-[3.25rem] w-auto grayscale group-hover:grayscale-0 transition-all dark:invert md:h-14"
           />
         </Link>

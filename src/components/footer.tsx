@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { Sphere } from "./iridescent-shapes";
-import { LanguageDropdown } from "./language-dropdown";
+import { LanguageToggle } from "./language-toggle";
 import { useLanguage } from "@/lib/i18n/language-context";
 import { contactProcessPath, homePath } from "@/lib/routes";
 
@@ -21,11 +21,11 @@ export function Footer() {
           {/* Brand column */}
           <div className="flex flex-col items-center md:items-start gap-4">
             <Link href={homeHref} className="font-heading font-bold text-2xl tracking-tight">
-              <img src="/logo-1.png" alt="DreamTeam Technology" className="h-8 w-auto grayscale dark:invert transition-all" />
+              <img src="/logo-1.png" alt="DreamTeam" className="h-8 w-auto grayscale dark:invert transition-all" />
             </Link>
             <p className="text-sm text-muted-foreground max-w-xs">{t.footer.desc}</p>
             <div className="flex items-center gap-3 mt-1">
-              <LanguageDropdown />
+              <LanguageToggle />
             </div>
           </div>
 

@@ -19,6 +19,7 @@ export function HeroSection() {
   const { t, language } = useLanguage();
   const contactHref = contactProcessPath(language);
   const portfolioHref = `${homePath(language)}#portfolio`;
+  const shouldRenderTitleGap = Boolean(t.hero.titleBefore) && Boolean(t.hero.titleGlow);
 
   return (
     <section
@@ -69,6 +70,7 @@ export function HeroSection() {
           >
             {t.hero.titleBefore}
           </motion.span>
+          {shouldRenderTitleGap ? " " : null}
           <span className="inline-block">
             {t.hero.titleGlow.split("").map((letter, i) => (
               <motion.span
@@ -119,7 +121,7 @@ export function HeroSection() {
                   href={contactHref}
                   className={cn(
                     buttonVariants({ variant: "default", size: "default" }),
-                    "flex h-11 w-full items-center justify-center gap-1.5 rounded-full px-5 text-sm font-semibold sm:w-auto sm:min-w-[9.5rem]"
+                    "flex h-11 w-full items-center justify-center gap-1.5 rounded-full px-5 text-sm font-semibold transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] sm:w-auto sm:min-w-[9.5rem]"
                   )}
                 >
                   <IconMailFilled className="h-4 w-4 shrink-0" aria-hidden />

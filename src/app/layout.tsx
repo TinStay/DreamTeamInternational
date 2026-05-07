@@ -17,9 +17,9 @@ const syne = Syne({
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://dreamteam.technology"),
-  title: "DreamTeam Technology | AI Video Production Agency",
-  description: "DreamTeam Technology creates high-impact AI-generated videos for brands worldwide — from realistic to animated. Custom scripts, global clients, fast turnarounds.",
-  keywords: "AI video production, 3D animation, brand videos, AI-generated scenes, product videos, DreamTeam Technology",
+  title: "DreamTeam | AI Video Production Agency",
+  description: "DreamTeam creates high-impact AI-generated videos for brands worldwide — from realistic to animated. Custom scripts, global clients, fast turnarounds.",
+  keywords: "AI video production, 3D animation, brand videos, AI-generated scenes, product videos, DreamTeam",
   alternates: {
     canonical: "/bg",
     languages: {
@@ -28,14 +28,14 @@ export const metadata: Metadata = {
     },
   },
   openGraph: {
-    title: "DreamTeam Technology | AI Video Production",
+    title: "DreamTeam | AI Video Production",
     description: "End-to-end AI video production — photorealistic, animated, or hybrid. Serving global clients with custom scripts and diverse budgets.",
     type: "website",
     images: [{ url: "/og-image.jpg", width: 1200, height: 630 }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "DreamTeam Technology",
+    title: "DreamTeam",
     description: "AI-powered video production for modern brands.",
   },
   icons: {
@@ -60,7 +60,7 @@ export default function RootLayout({
               attribute="class"
               defaultTheme="light"
               enableSystem={false}
-              disableTransitionOnChange
+              disableTransitionOnChange={false}
             >
               <LanguageProvider>
                 <Suspense fallback={null}>
