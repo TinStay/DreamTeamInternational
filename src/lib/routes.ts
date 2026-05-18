@@ -9,3 +9,8 @@ export function homePath(language: Language) {
 export function contactProcessPath(language: Language) {
   return language === "bg" ? "/bg/contact" : "/en/contact";
 }
+
+/** Localized training hub path. */
+export function trainingPath(language: Language) {
+  return language === "bg" ? "/bg/training" : "/en/training";
+}

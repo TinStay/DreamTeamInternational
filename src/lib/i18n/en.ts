@@ -297,7 +297,7 @@ export const en = {
         ],
       },
     },
-    skoolUrl: "https://www.skool.com",
+    skoolUrl: "https://www.skool.com/dream-team-ai-video-2879/about",
   },
   mobileNav: {
     home: "Home",

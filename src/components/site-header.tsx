@@ -8,7 +8,7 @@ import { GlassShell } from "@/components/ui/glass-shell";
 import { cn } from "@/lib/utils";
 import { useEffect, useState } from "react";
 import { useLanguage } from "@/lib/i18n/language-context";
-import { contactProcessPath, homePath } from "@/lib/routes";
+import { contactProcessPath, homePath, trainingPath } from "@/lib/routes";
 import { IconMailFilled } from "@tabler/icons-react";
 
 export function SiteHeader() {
@@ -66,7 +66,7 @@ export function SiteHeader() {
             {t.header.portfolio}
           </Link>
           <Link
-            href={language === "bg" ? "/bg/training" : "/en/training"}
+            href={trainingPath(language)}
             className="hover:text-primary transition-colors whitespace-nowrap"
           >
             {t.header.training}

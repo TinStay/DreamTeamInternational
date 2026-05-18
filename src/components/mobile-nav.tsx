@@ -7,7 +7,7 @@ import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/s
 import { useLanguage } from "@/lib/i18n/language-context";
 import { buttonVariants, primaryGradientInteractiveClassName } from "@/components/ui/button";
 import { GlassShell } from "@/components/ui/glass-shell";
-import { contactProcessPath, homePath } from "@/lib/routes";
+import { contactProcessPath, homePath, trainingPath } from "@/lib/routes";
 import { cn } from "@/lib/utils";
 import { LanguageToggle } from "./language-toggle";
 import { ThemeToggle } from "./theme-toggle";
@@ -16,26 +16,19 @@ export function MobileNav() {
   const [isOpen, setIsOpen] = useState(false);
   const { t, language } = useLanguage();
   const homeHref = homePath(language);
-  const trainingHref = language === "bg" ? "/bg/training" : "/en/training";
+  const trainingHref = trainingPath(language);
   const contactHref = contactProcessPath(language);
+  const portfolioHref = `${homeHref}#portfolio`;
 
   return (
     <>
       <GlassShell className="lg:hidden fixed bottom-5 left-1/2 z-50 flex w-[92%] max-w-md -translate-x-1/2 items-center gap-1.5 px-3 py-2.5">
         <Link
-          href={homeHref}
-          className="group flex flex-1 select-none flex-col items-center justify-center gap-1 text-muted-foreground transition-colors hover:text-foreground"
-        >
-          <IconHome className="h-[26px] w-[26px] text-neutral-800 transition-transform group-hover:scale-110 dark:text-neutral-200" />
-          <span className="text-xs font-semibold tracking-wide">{t.mobileNav.home}</span>
-        </Link>
-
-        <Link
-          href={`${homeHref}#portfolio`}
+          href={portfolioHref}
           className="group flex flex-1 select-none flex-col items-center justify-center gap-1 text-muted-foreground transition-colors hover:text-foreground"
         >
           <IconVideo className="h-[26px] w-[26px] text-neutral-800 transition-transform group-hover:scale-110 dark:text-neutral-200" />
-          <span className="text-xs font-semibold tracking-wide">{t.mobileNav.work}</span>
+          <span className="text-xs font-semibold tracking-wide">{t.header.portfolio}</span>
         </Link>
 
         <Link
@@ -43,7 +36,15 @@ export function MobileNav() {
           className="group flex flex-1 select-none flex-col items-center justify-center gap-1 text-muted-foreground transition-colors hover:text-foreground"
         >
           <IconMail className="h-[26px] w-[26px] text-neutral-800 transition-transform group-hover:scale-110 dark:text-neutral-200" />
-          <span className="text-xs font-semibold tracking-wide">{t.mobileNav.contact}</span>
+          <span className="text-xs font-semibold tracking-wide">{t.header.contact}</span>
+        </Link>
+
+        <Link
+          href={trainingHref}
+          className="group flex flex-1 select-none flex-col items-center justify-center gap-1 text-muted-foreground transition-colors hover:text-foreground"
+        >
+          <IconBook className="h-[26px] w-[26px] text-neutral-800 transition-transform group-hover:scale-110 dark:text-neutral-200" />
+          <span className="text-xs font-semibold tracking-wide">{t.header.training}</span>
         </Link>
 
         <Sheet open={isOpen} onOpenChange={setIsOpen}>
@@ -81,12 +82,12 @@ export function MobileNav() {
                   <span className="transition-colors group-hover:text-primary">{t.mobileNav.home}</span>
                 </Link>
                 <Link
-                  href={`${homeHref}#portfolio`}
+                  href={portfolioHref}
                   onClick={() => setIsOpen(false)}
                   className="group flex select-none items-center gap-4 text-foreground/80 transition-colors"
                 >
                   <IconVideo className="h-6 w-6 shrink-0 text-neutral-800 dark:text-neutral-200" />
-                  <span className="transition-colors group-hover:text-primary">{t.mobileNav.work}</span>
+                  <span className="transition-colors group-hover:text-primary">{t.header.portfolio}</span>
                 </Link>
                 <Link
                   href={contactHref}
@@ -94,7 +95,7 @@ export function MobileNav() {
                   className="group flex select-none items-center gap-4 text-foreground/80 transition-colors"
                 >
                   <IconMail className="h-6 w-6 shrink-0 text-neutral-800 dark:text-neutral-200" />
-                  <span className="transition-colors group-hover:text-primary">{t.mobileNav.contact}</span>
+                  <span className="transition-colors group-hover:text-primary">{t.header.contact}</span>
                 </Link>
                 <Link
                   href={trainingHref}
@@ -102,9 +103,8 @@ export function MobileNav() {
                   className="group flex select-none items-center gap-4 text-foreground/80 transition-colors"
                 >
                   <IconBook className="h-6 w-6 shrink-0 text-neutral-800 dark:text-neutral-200" />
-                  <span className="transition-colors group-hover:text-primary">{t.mobileNav.training}</span>
+                  <span className="transition-colors group-hover:text-primary">{t.header.training}</span>
                 </Link>
-                {/* Location (maps): was a separate row here — restore with IconMapPin + maps URL when needed */}
               </div>
 
               <div className="mt-auto pt-8">

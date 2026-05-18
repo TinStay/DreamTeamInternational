@@ -34,8 +34,6 @@ export function TrainingPageView() {
       src: tr.cards.skool.image,
       ctaText: tr.cards.skool.cta,
       ctaLink: tr.skoolUrl,
-      comingSoon: true,
-      comingSoonLabel: tr.comingSoon,
       includes: <TrainingModalIncludes copy={tr.cards.skool} />,
       details: <TrainingModalDetails copy={tr.cards.skool} />,
     },

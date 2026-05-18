@@ -41,7 +41,7 @@ export function TrainingDetailPageView({ slug: slugProp }: { slug?: string }) {
     return tr.cards.individual;
   }, [slug, tr.cards]);
 
-  const isComingSoon = slug === "skool";
+  const isSkool = slug === "skool";
 
   return (
     <main className={MAIN_WITH_FIXED_PAGE_BG_CLASS}>
@@ -95,20 +95,21 @@ export function TrainingDetailPageView({ slug: slugProp }: { slug?: string }) {
                 ref={formRef}
                 className="rounded-3xl bg-background p-4 shadow-sm ring-1 ring-border/20 sm:p-6"
               >
-                {isComingSoon ? (
+                {isSkool ? (
                   <div className="flex flex-col gap-3">
                     <h2 className="font-heading text-lg font-semibold tracking-tight text-foreground">
-                      {tr.comingSoon}
+                      {tr.cards.skool.cta}
                     </h2>
                     <p className="text-sm leading-relaxed text-muted-foreground">
-                      {tr.modalInquirySubtitle}
+                      {copy.modalIntro}
                     </p>
                     <Link
                       href={tr.skoolUrl}
                       target="_blank"
                       rel="noopener noreferrer"
                       className={cn(
-                        buttonVariants({ variant: "outline", size: "default" }),
+                        buttonVariants({ variant: "default", size: "default" }),
+                        primaryGradientInteractiveClassName,
                         "h-11 rounded-full px-5 font-semibold cursor-pointer"
                       )}
                     >
