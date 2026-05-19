@@ -191,11 +191,12 @@ export const en = {
   training: {
     metaTitle: "Training | DreamTeam",
     metaDescription:
-      "Individual AI video consultations, Skool community courses, and corporate workshops from DreamTeam.",
+      "Individual AI video consultations, Skool community courses, and team workshops from DreamTeam.",
     eyebrow: "Hands-on AI video training",
-    title: "Training built for real production",
+    title: "Training for AI production",
     subtitle:
       "Learn the workflows we ship for clients — from briefing and prompt design to look development, editing, and delivery. Pick the format that matches your pace and team size.",
+    viewAll: "View all programs",
     comingSoon: "Coming soon",
     modalInquiryTitle: "Interested in this program?",
     modalInquirySubtitle: "Leave your details and we'll get back to you shortly.",
@@ -208,6 +209,9 @@ export const en = {
     cards: {
       individual: {
         title: "Individual lessons",
+        featureTag: "Private lessons",
+        featureSummary:
+          "Personal lessons to learn AI video creation — from idea and script to prompts, look, editing, and delivery.",
         suitableFor:
           "1:1 training for people who want to learn how to create AI videos — from idea and script to prompts, look, editing, and delivery.",
         cta: "Contact us",
@@ -238,6 +242,9 @@ export const en = {
       },
       skool: {
         title: "Online course (Skool)",
+        featureTag: "SKOOL",
+        featureSummary:
+          "Structured path with modules, templates, and community critique as you build real AI video projects.",
         suitableFor:
           "For learners who want a structured path with templates and community critique between milestones.",
         cta: "Open Skool",
@@ -266,34 +273,37 @@ export const en = {
           "Materials include Notion templates, shot lists, and export checklists you can clone.",
         ],
       },
-      corporate: {
-        title: "Corporate training",
+      team: {
+        title: "Team training",
+        featureTag: "TEAM",
+        featureSummary:
+          "Workshops for groups: design ideas, generate scene images and clips, edit together, and keep style consistent.",
         suitableFor:
-          "For marketing/comms/agency teams adopting AI video at scale — shared standards, approvals, and repeatable execution.",
+          "For teams learning how to create AI videos together — from shaping an idea to a finished edit, with shared steps everyone can repeat.",
         cta: "Request a proposal",
         image: "/trainings/corporate_banner.jpeg",
         modalIntro:
-          "Private enablement for teams: shared vocabulary, governance, and a production-ready workflow aligned to your brand rules and markets.",
+          "Hands-on workshops for your group: design and iterate on concepts, generate scene images and video clips, edit them into one piece, and keep look, characters, and pacing consistent.",
         features: [
-          { icon: "users", text: "Role-based tracks: producers, editors, strategists, legal reviewers" },
-          { icon: "wand", text: "Prompt libraries, shot lists, and revision hygiene workshops" },
-          { icon: "shield", text: "Disclosure + rights-safe guidance (talent, archive, approvals)" },
-          { icon: "video", text: "Hands-on labs using your product stories (NDA-friendly)" },
-          { icon: "checklist", text: "Optional playbook: intake → storyboard → generation → QC → delivery" },
+          { icon: "wand", text: "Ideation & iteration: briefs, story beats, and feedback until the concept is clear" },
+          { icon: "sparkles", text: "Scene images: prompts and settings for stills that match your look and shot list" },
+          { icon: "video", text: "Video clips: generate motion shots, pick takes, and line them up for edit" },
+          { icon: "tool", text: "Editing together: cuts, VO, captions, pacing, and export-ready delivery" },
+          { icon: "book", text: "Consistency: lock characters, wardrobe, color, and style across every scene" },
         ],
         modalTabs: { highlights: "What's included", more: "Practical details" },
         outcomesTitle: "",
         outcomesSubtitle: "",
         outcomes: [
-          { icon: "shield", text: "Shared governance for rights, approvals, and disclosure (brand-safe and audit-friendly)." },
-          { icon: "chart", text: "Production metrics: throughput, rework, and quality across teams/vendors." },
-          { icon: "users", text: "Internal champions + trainers-of-trainers so the system sticks after the program." },
+          { icon: "stack", text: "A shared workflow your team can repeat: idea → images → clips → edit → export." },
+          { icon: "users", text: "Everyone aligned on prompts, shot lists, and QC so outputs stay on-brand." },
+          { icon: "checklist", text: "Templates and checklists for consistency checks before you ship." },
         ],
-        logisticsTitle: "Delivery options",
+        logisticsTitle: "How it works",
         logistics: [
-          "Modular agendas: half-day intensives, multi-week programs, or hybrid remote + on-site.",
-          "We tailor labs to your DAM, PIM, and review tools where possible.",
-          "Legal and comms stakeholders can join dedicated governance sessions.",
+          "Live sessions on Google Meet/Zoom — remote, on-site, or hybrid.",
+          "We work from your real briefs or sample campaigns (NDA-friendly).",
+          "Flexible format: half-day intensives or multi-week programs for teams of any size.",
         ],
       },
     },

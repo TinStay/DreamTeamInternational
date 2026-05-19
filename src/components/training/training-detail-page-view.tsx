@@ -37,7 +37,7 @@ export function TrainingDetailPageView({ slug: slugProp }: { slug?: string }) {
   const copy = useMemo(() => {
     if (slug === "individual") return tr.cards.individual;
     if (slug === "skool") return tr.cards.skool;
-    if (slug === "corporate") return tr.cards.corporate;
+    if (slug === "team" || slug === "corporate") return tr.cards.team;
     return tr.cards.individual;
   }, [slug, tr.cards]);
 

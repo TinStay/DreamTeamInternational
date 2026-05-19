@@ -4,50 +4,14 @@ import { SiteHeader } from "@/components/site-header";
 import { MobileNav } from "@/components/mobile-nav";
 import { Footer } from "@/components/footer";
 import { useLanguage } from "@/lib/i18n/language-context";
-import { contactProcessPath } from "@/lib/routes";
 import { GradientBlurPageBg } from "@/components/ui/gradient-blur-bg";
 import { MAIN_WITH_FIXED_PAGE_BG_CLASS } from "@/lib/page-shell";
 import { PageBreadcrumbs } from "@/components/page-breadcrumbs";
-import { TrainingExpandableCards, type TrainingExpandableCard } from "./training-expandable-cards";
-import { TrainingModalDetails, TrainingModalIncludes } from "./training-modal-rich";
+import { TrainingCardsGrid } from "./training-cards-grid";
 
 export function TrainingPageView() {
-  const { t, language } = useLanguage();
+  const { t } = useLanguage();
   const tr = t.training;
-  const contactHref = contactProcessPath(language);
-
-  const cards: TrainingExpandableCard[] = [
-    {
-      id: "individual",
-      title: tr.cards.individual.title,
-      description: tr.cards.individual.suitableFor,
-      src: tr.cards.individual.image,
-      ctaText: tr.cards.individual.cta,
-      ctaLink: contactHref,
-      includes: <TrainingModalIncludes copy={tr.cards.individual} />,
-      details: <TrainingModalDetails copy={tr.cards.individual} />,
-    },
-    {
-      id: "skool",
-      title: tr.cards.skool.title,
-      description: tr.cards.skool.suitableFor,
-      src: tr.cards.skool.image,
-      ctaText: tr.cards.skool.cta,
-      ctaLink: tr.skoolUrl,
-      includes: <TrainingModalIncludes copy={tr.cards.skool} />,
-      details: <TrainingModalDetails copy={tr.cards.skool} />,
-    },
-    {
-      id: "corporate",
-      title: tr.cards.corporate.title,
-      description: tr.cards.corporate.suitableFor,
-      src: tr.cards.corporate.image,
-      ctaText: tr.cards.corporate.cta,
-      ctaLink: contactHref,
-      includes: <TrainingModalIncludes copy={tr.cards.corporate} />,
-      details: <TrainingModalDetails copy={tr.cards.corporate} />,
-    },
-  ];
 
   return (
     <main className={MAIN_WITH_FIXED_PAGE_BG_CLASS}>
@@ -67,7 +31,7 @@ export function TrainingPageView() {
             <p className="mx-auto mt-4 max-w-2xl text-base text-muted-foreground md:mx-0">{tr.subtitle}</p>
           </header>
 
-          <TrainingExpandableCards cards={cards} />
+          <TrainingCardsGrid />
         </div>
       </div>
 

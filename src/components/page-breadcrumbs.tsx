@@ -31,8 +31,9 @@ function segmentToLabel(
       return t.training.cards.individual.title;
     case "skool":
       return t.training.cards.skool.title;
+    case "team":
     case "corporate":
-      return t.training.cards.corporate.title;
+      return t.training.cards.team.title;
     case "privacy":
       return t.legal.privacyTitle;
     case "terms":

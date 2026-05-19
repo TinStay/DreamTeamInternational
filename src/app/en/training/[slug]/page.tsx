@@ -11,8 +11,8 @@ export function generateMetadata({ params }: { params: Params }): Metadata {
       ? map.individual.title
       : params.slug === "skool"
         ? map.skool.title
-        : params.slug === "corporate"
-          ? map.corporate.title
+        : params.slug === "team" || params.slug === "corporate"
+          ? map.team.title
           : map.individual.title;
 
   return {
