@@ -67,7 +67,7 @@ export function StatsSection({ headline, subline, items, className }: StatsSecti
         </motion.div>
 
         <motion.div
-          className="grid gap-12 divide-y *:text-center md:grid-cols-3 md:gap-2 md:divide-x md:divide-y-0 md:divide-border"
+          className="grid divide-y divide-border *:text-center md:grid-cols-3 md:gap-2 md:divide-x md:divide-y-0"
           initial="hidden"
           whileInView="visible"
           viewport={viewport}
@@ -80,7 +80,7 @@ export function StatsSection({ headline, subline, items, className }: StatsSecti
             <motion.div
               key={item.label}
               variants={statItem}
-              className="space-y-4 pt-12 first:pt-0 md:pt-0"
+              className="space-y-4 py-12 md:py-0"
             >
               <div className={statValueClassName}>{item.value}</div>
               <p className="text-muted-foreground">{item.label}</p>
