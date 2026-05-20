@@ -72,6 +72,16 @@ export const en = {
   partners: {
     title: "Trusted By"
   },
+  stats: {
+    headline: "Videos that reach new dimensions.",
+    subline:
+      "The AI video production industry is evolving fast. Together with you, we are shaping its future.",
+    items: [
+      { value: "30M+", label: "Views" },
+      { value: "50+", label: "Clients" },
+      { value: "270+", label: "Realized Projects" },
+    ],
+  },
   order: {
     title1: "Get a",
     title2: "Quote",

@@ -5,6 +5,7 @@ import { PortfolioSection } from "@/components/portfolio-section";
 import { PartnersSection } from "@/components/partners-section";
 import { ContactSection } from "@/components/contact-section";
 import { ProcessSection } from "@/components/process-section";
+import { CompanyStatsSection } from "@/components/company-stats-section";
 import { TrainingSection } from "@/components/training/training-section";
 import { Footer } from "@/components/footer";
 import { GradientBlurPageBg } from "@/components/ui/gradient-blur-bg";
@@ -29,6 +30,10 @@ export function HomePage() {
 
         <div className="relative">
           <PortfolioSection />
+        </div>
+
+        <div className="relative">
+          <CompanyStatsSection />
         </div>
 
         <div className="relative">
