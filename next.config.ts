@@ -9,6 +9,7 @@ const nextConfig: NextConfig = {
       { source: "/individual", destination: "/bg/training/individual", permanent: true },
       { source: "/en/individual", destination: "/en/training/individual", permanent: true },
       { source: "/bg/individual", destination: "/bg/training/individual", permanent: true },
+      { source: "/zh/individual", destination: "/zh/training/individual", permanent: true },
     ];
   },
 };

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { LegalPageShell } from "@/components/legal/legal-page-shell";
 import { PrivacyEnglishContent } from "@/components/legal/privacy-english-content";
 import { en } from "@/lib/i18n/en";
+import { localeAlternates } from "@/lib/routes";
 
 const LAST_UPDATED = "February 20, 2026";
 
@@ -11,10 +12,7 @@ export const metadata: Metadata = {
     "How DreamTeam collects and uses personal data, cookies, analytics, and your GDPR rights.",
   alternates: {
     canonical: "/en/privacy",
-    languages: {
-      en: "/en/privacy",
-      bg: "/bg/privacy",
-    },
+    languages: localeAlternates("/privacy"),
   },
 };
 

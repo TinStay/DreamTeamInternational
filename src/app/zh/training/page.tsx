@@ -1,17 +1,17 @@
 import type { Metadata } from "next";
 import { TrainingPageView } from "@/components/training/training-page-view";
-import { bg } from "@/lib/i18n/bg";
+import { zh } from "@/lib/i18n/zh";
 import { localeAlternates } from "@/lib/routes";
 
 export const metadata: Metadata = {
-  title: bg.training.metaTitle,
-  description: bg.training.metaDescription,
+  title: zh.training.metaTitle,
+  description: zh.training.metaDescription,
   alternates: {
-    canonical: "/bg/training",
+    canonical: "/zh/training",
     languages: localeAlternates("/training"),
   },
 };
 
-export default function TrainingPageBg() {
+export default function ZhTrainingPage() {
   return <TrainingPageView />;
 }

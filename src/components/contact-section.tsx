@@ -30,8 +30,7 @@ const contactInfoIconCircle =
 export function ContactSection({ className }: { className?: string }) {
   const { t } = useLanguage();
 
-  const addressText =
-    "ул. Николай Коперник № 27-29, ет. 2, офис 17, кв. Гео Милев, София, България";
+  const addressText = t.contact.addressVal;
 
   async function copyAddress() {
     try {
@@ -123,8 +122,8 @@ export function ContactSection({ className }: { className?: string }) {
                 type="button"
                 onClick={copyAddress}
                 className="flex w-full cursor-pointer items-start gap-4 text-left"
-                aria-label="Copy address"
-                title="Copy address"
+                aria-label={t.contact.copyAddress}
+                title={t.contact.copyAddress}
               >
                 <div
                   className={cn(
@@ -136,10 +135,7 @@ export function ContactSection({ className }: { className?: string }) {
                 </div>
                 <div className="min-w-0">
                   <div className="mb-1 text-sm text-muted-foreground">{t.contact.address}</div>
-                  <div className="font-semibold leading-relaxed text-foreground">
-                    ул. Николай Коперник № 27-29, ет. 2, офис 17<br />
-                    кв. Гео Милев, София, България
-                  </div>
+                  <div className="font-semibold leading-relaxed text-foreground">{addressText}</div>
                 </div>
               </button>
             </div>

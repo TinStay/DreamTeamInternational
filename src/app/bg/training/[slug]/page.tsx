@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { bg } from "@/lib/i18n/bg";
 import { TrainingDetailPageView } from "@/components/training/training-detail-page-view";
+import { localeAlternates } from "@/lib/routes";
 
 type Params = { slug: string };
 
@@ -20,10 +21,7 @@ export function generateMetadata({ params }: { params: Params }): Metadata {
     description: bg.training.metaDescription,
     alternates: {
       canonical: `/bg/training/${params.slug}`,
-      languages: {
-        en: `/en/training/${params.slug}`,
-        bg: `/bg/training/${params.slug}`,
-      },
+      languages: localeAlternates(`/training/${params.slug}`),
     },
   };
 }

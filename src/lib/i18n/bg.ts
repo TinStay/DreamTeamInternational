@@ -142,6 +142,9 @@ export const bg = {
     address: "Адрес",
     hours: "Работно време",
     hoursVal: "Пон-Пет, 9:00 - 18:00",
+    addressVal:
+      "ул. Николай Коперник № 27-29, ет. 2, офис 17, кв. Гео Милев, София, България",
+    copyAddress: "Копирай адреса",
     formTitle: "Изпратете Съобщение",
     name: "Име",
     emailLbl: "Имейл",
@@ -209,6 +212,8 @@ export const bg = {
     comingSoon: "Очаквайте скоро",
     modalInquiryTitle: "Интересувате се от тази програма?",
     modalInquirySubtitle: "Оставете данните си и ще се свържем с вас скоро.",
+    inquirySubjectPrefix: "Запитване за обучение:",
+    inquiryFormStatePrefix: "Форма: Обучения (страница) — ",
     inquiryForm: {
       targetLabel: "Какво искате да научите?",
       targetPlaceholder: "напр. промптване, монтаж, продукция на реклами…",
@@ -324,5 +329,13 @@ export const bg = {
     work: "Портфолио",
     contact: "Контакти",
     training: "Обучения"
-  }
+  },
+  a11y: {
+    language: "Език",
+    bulgarian: "Български",
+    english: "Английски",
+    chinese: "Китайски",
+    toggleTheme: "Смени цветовата тема",
+    menu: "Меню",
+  },
 };

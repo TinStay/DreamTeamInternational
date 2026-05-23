@@ -143,6 +143,9 @@ export const en = {
     address: "Address",
     hours: "Hours",
     hoursVal: "Mon-Fri, 9am - 6pm",
+    addressVal:
+      "27–29 Nikola Kopernik St., Floor 2, Office 17, Geo Milev, Sofia, Bulgaria",
+    copyAddress: "Copy address",
     formTitle: "Send a Message",
     name: "Name",
     emailLbl: "Email",
@@ -210,6 +213,8 @@ export const en = {
     comingSoon: "Coming soon",
     modalInquiryTitle: "Interested in this program?",
     modalInquirySubtitle: "Leave your details and we'll get back to you shortly.",
+    inquirySubjectPrefix: "Training inquiry:",
+    inquiryFormStatePrefix: "Form: Training (page) — ",
     inquiryForm: {
       targetLabel: "What do you want to learn?",
       targetPlaceholder: "e.g. prompt workflows, editing, producing short ads…",
@@ -325,5 +330,13 @@ export const en = {
     work: "Work",
     contact: "Contact",
     training: "Training"
-  }
+  },
+  a11y: {
+    language: "Language",
+    bulgarian: "Bulgarian",
+    english: "English",
+    chinese: "Chinese",
+    toggleTheme: "Toggle color theme",
+    menu: "Menu",
+  },
 };

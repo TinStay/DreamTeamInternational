@@ -4,9 +4,30 @@ import React, { createContext, useContext, useEffect, useMemo, useState } from "
 import { usePathname, useRouter } from "next/navigation";
 import { en } from "./en";
 import { bg } from "./bg";
+import { zh } from "./zh";
 
-export type Language = "en" | "bg";
+export const LOCALES = ["en", "bg", "zh"] as const;
+export type Language = (typeof LOCALES)[number];
 type Dictionary = typeof en;
+
+const dictionaries: Record<Language, Dictionary> = { en, bg, zh };
+
+function getRouteLanguage(pathname: string | null): Language {
+  if (pathname?.startsWith("/zh")) return "zh";
+  if (pathname?.startsWith("/bg")) return "bg";
+  if (pathname?.startsWith("/en")) return "en";
+  return "en";
+}
+
+function switchLocalePath(path: string, target: Language): string {
+  for (const locale of LOCALES) {
+    if (path === `/${locale}`) return `/${target}`;
+    if (path.startsWith(`/${locale}/`)) {
+      return `/${target}${path.slice(`/${locale}`.length)}`;
+    }
+  }
+  return `/${target}`;
+}
 
 interface LanguageContextType {
   language: Language;
@@ -19,11 +40,7 @@ const LanguageContext = createContext<LanguageContextType | undefined>(undefined
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
-  const routeLanguage = useMemo<Language>(() => {
-    if (pathname?.startsWith("/bg")) return "bg";
-    if (pathname?.startsWith("/en")) return "en";
-    return "en";
-  }, [pathname]);
+  const routeLanguage = useMemo(() => getRouteLanguage(pathname), [pathname]);
 
   useEffect(() => {
     localStorage.setItem("app-lang", routeLanguage);
@@ -36,7 +53,7 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
   }, [routeLanguage]);
 
   useEffect(() => {
-    document.documentElement.lang = language;
+    document.documentElement.lang = language === "zh" ? "zh-CN" : language;
   }, [language]);
 
   const handleSetLanguage = (lang: Language) => {
@@ -48,35 +65,14 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
       return;
     }
 
-    const toBg = (path: string) => {
-      if (path.startsWith("/bg")) return path;
-      if (path.startsWith("/en")) {
-        const rest = path.slice(3);
-        return rest === "" ? "/bg" : `/bg${rest}`;
-      }
-      return path;
-    };
-
-    const toEn = (path: string) => {
-      if (path.startsWith("/en")) return path;
-      if (path.startsWith("/bg")) {
-        const rest = path.slice(3);
-        return rest === "" ? "/en" : `/en${rest}`;
-      }
-      return path;
-    };
-
-    const nextPath = lang === "bg" ? toBg(pathname || "/") : toEn(pathname || "/");
+    const nextPath = switchLocalePath(pathname || "/", lang);
     router.push(`${nextPath}${hash}`, { scroll: false });
     setLanguage(lang);
     localStorage.setItem("app-lang", lang);
   };
 
-  const t = language === "en" ? en : bg;
+  const t = dictionaries[language];
 
-  // We always wrap with Provider to ensure useLanguage doesn't throw.
-  // We avoid wrapping children in a visible/hidden div unless we need strict hydration.
-  // Just rendering children directly resolves the next-theme script DOM issues.
   return (
     <LanguageContext.Provider value={{ language, setLanguage: handleSetLanguage, t }}>
       {children}

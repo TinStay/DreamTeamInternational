@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { LegalPageShell } from "@/components/legal/legal-page-shell";
 import { TermsBulgarianContent } from "@/components/legal/terms-bulgarian-content";
 import { bg } from "@/lib/i18n/bg";
+import { localeAlternates } from "@/lib/routes";
 
 const LAST_UPDATED = "February 20, 2026";
 
@@ -10,10 +11,7 @@ export const metadata: Metadata = {
   description: "Общи условия за услугите на DreamTeam (AI видео продукция).",
   alternates: {
     canonical: "/bg/terms",
-    languages: {
-      en: "/en/terms",
-      bg: "/bg/terms",
-    },
+    languages: localeAlternates("/terms"),
   },
 };
 

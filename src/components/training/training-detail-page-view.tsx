@@ -120,8 +120,8 @@ export function TrainingDetailPageView({ slug: slugProp }: { slug?: string }) {
                 ) : (
                   <ContactInquiryForm
                     variant="plain"
-                    subject={`Training inquiry: ${copy.title}`}
-                    formStateBg={`Форма: Обучения (страница) — ${copy.title}`}
+                    subject={`${tr.inquirySubjectPrefix} ${copy.title}`}
+                    formStateBg={`${tr.inquiryFormStatePrefix}${copy.title}`}
                     showTrainingTarget
                     heading={
                       <>

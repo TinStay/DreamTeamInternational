@@ -20,6 +20,7 @@ import {
   IconSend,
 } from "@tabler/icons-react";
 import { useLanguage } from "@/lib/i18n/language-context";
+import { termsPath } from "@/lib/routes";
 import { cn } from "@/lib/utils";
 
 function SendResultCard({
@@ -131,7 +132,7 @@ export function ContactInquiryForm({
   const [isSending, setIsSending] = useState(false);
   const [sendResult, setSendResult] = useState<null | "ok" | "error">(null);
 
-  const termsHref = language === "bg" ? "/bg/terms" : "/en/terms";
+  const termsHref = termsPath(language);
   const foundUsOptions = useMemo(() => {
     const opts = t.contact.foundUsOptions;
     return [

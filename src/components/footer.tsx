@@ -4,14 +4,14 @@ import Link from "next/link";
 import { Sphere } from "./iridescent-shapes";
 import { LanguageToggle } from "./language-toggle";
 import { useLanguage } from "@/lib/i18n/language-context";
-import { contactProcessPath, homePath } from "@/lib/routes";
+import { contactProcessPath, homePath, privacyPath, termsPath, trainingPath } from "@/lib/routes";
 
 export function Footer() {
   const { t, language } = useLanguage();
   const homeHref = homePath(language);
-  const termsHref = language === "bg" ? "/bg/terms" : "/en/terms";
-  const privacyHref = language === "bg" ? "/bg/privacy" : "/en/privacy";
-  const trainingHref = language === "bg" ? "/bg/training" : "/en/training";
+  const termsHref = termsPath(language);
+  const privacyHref = privacyPath(language);
+  const trainingHref = trainingPath(language);
   const contactHref = contactProcessPath(language);
 
   return (

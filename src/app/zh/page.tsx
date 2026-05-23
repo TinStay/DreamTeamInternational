@@ -3,15 +3,15 @@ import { HomePage } from "@/app/home-page";
 import { localeAlternates } from "@/lib/routes";
 
 export const metadata: Metadata = {
-  title: "DreamTeam | AI Video Production",
+  title: "DreamTeam | AI 视频制作",
   description:
-    "DreamTeam creates high-impact AI video for brands worldwide — photoreal, stylized, or hybrid. Scripting, production, and fast turnaround.",
+    "DreamTeam 为全球品牌打造高影响力 AI 视频——写实、动画或混合风格。脚本策划、视频制作、快速交付。",
   alternates: {
-    canonical: "/en",
+    canonical: "/zh",
     languages: localeAlternates(),
   },
 };
 
-export default function EnHomePage() {
+export default function ZhHomePage() {
   return <HomePage />;
 }
