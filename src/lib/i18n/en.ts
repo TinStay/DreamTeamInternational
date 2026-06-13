@@ -2,6 +2,7 @@ export const en = {
   header: {
     process: "Process",
     portfolio: "Portfolio",
+    services: "Services",
     pricing: "Get a Quote",
     contact: "Contact",
     chat: "Chat With Us",
@@ -71,6 +72,218 @@ export const en = {
   },
   partners: {
     title: "Trusted By"
+  },
+  services: {
+    title1: "Our",
+    title2: "Services",
+    subtitle: "End-to-end AI production - from video and mascots to stills and automated pipelines.",
+    learnMore: "Learn more",
+    modal: {
+      close: "Close",
+      contactCta: "Get a quote",
+    },
+    items: [
+      {
+        title: "AI Video Production",
+        imgSrc: "https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?w=400&q=80",
+        imgAlt: "Video production studio equipment",
+        modal: {
+          eyebrow: "AI Video Production",
+          title: "AI videos from product shots or built from scratch",
+          description:
+            "We produce AI-generated videos from your product images, scene references, or a fresh brief - ideal for ads, tutorials, personalized gifts, and internal company communications.",
+          stats: ["Ads & campaigns", "Tutorials & explainers", "Gifts & internal video"],
+          steps: [
+            {
+              id: "ai-video-1",
+              title: "Brief & references",
+              text: "Share product photos, mood boards, or just an idea. Together we define style, length, and the message you want to land.",
+            },
+            {
+              id: "ai-video-2",
+              title: "AI production & editing",
+              text: "Scenes are generated, refined, and edited to match your brand - photorealistic, animated, or hybrid, with your feedback at every stage.",
+            },
+            {
+              id: "ai-video-3",
+              title: "Ready-to-publish delivery",
+              text: "Export-ready files for web, social, presentations, or broadcast - with revisions until the result feels right.",
+            },
+          ],
+          tabs: [
+            {
+              value: "ads",
+              label: "Ads",
+              src: "https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?w=1200&q=80",
+              alt: "Video production for advertising",
+            },
+            {
+              value: "tutorials",
+              label: "Tutorials",
+              src: "https://images.unsplash.com/photo-1536240478700-b869070f9279?w=1200&q=80",
+              alt: "Tutorial and explainer video",
+            },
+            {
+              value: "corporate",
+              label: "Internal",
+              src: "https://images.unsplash.com/photo-1492619375914-88005aa9e8fb?w=1200&q=80",
+              alt: "Corporate internal video",
+            },
+          ],
+          defaultTab: "ads",
+        },
+      },
+      {
+        title: "Brand Mascot",
+        imgSrc: "https://images.unsplash.com/photo-1611162617474-5b21e939e113?w=400&q=80",
+        imgAlt: "Colorful character illustration",
+        modal: {
+          eyebrow: "AI Brand Mascot",
+          title: "A talisman your audience will remember",
+          description:
+            "A custom brand mascot that lives across campaigns, your website, social posts, and videos - presenting your products and benefits in a friendly, consistent voice. The goal: be remembered and build trust.",
+          stats: ["Brand recall", "Website & social", "Spokesperson videos"],
+          steps: [
+            {
+              id: "mascot-1",
+              title: "Character & personality",
+              text: "We design a mascot that fits your brand tone - look, voice, and attitude that resonates with your target audience.",
+            },
+            {
+              id: "mascot-2",
+              title: "Everywhere your brand shows up",
+              text: "Use your mascot on the site, in posts, stories, and campaign assets - always on-brand and instantly recognizable.",
+            },
+            {
+              id: "mascot-3",
+              title: "Videos that explain & convince",
+              text: "Put your mascot in AI-generated videos that walk through products, benefits, and offers - building familiarity and confidence over time.",
+            },
+          ],
+          tabs: [
+            {
+              value: "campaign",
+              label: "Campaigns",
+              src: "https://images.unsplash.com/photo-1611162617474-5b21e939e113?w=1200&q=80",
+              alt: "Brand mascot campaign visual",
+            },
+            {
+              value: "website",
+              label: "Website",
+              src: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=1200&q=80",
+              alt: "Mascot on website",
+            },
+            {
+              value: "social",
+              label: "Social",
+              src: "https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=1200&q=80",
+              alt: "Mascot in social content",
+            },
+          ],
+          defaultTab: "campaign",
+        },
+      },
+      {
+        title: "AI Images",
+        imgSrc: "https://images.unsplash.com/photo-1542038784456-1ea8e935640e?w=400&q=80",
+        imgAlt: "Camera and photography setup",
+        modal: {
+          eyebrow: "AI Imagery",
+          title: "Images crafted for every touchpoint",
+          description:
+            "High-impact AI visuals for posters, web design, social media posts, stories, and document layouts - consistent style across every asset your brand publishes.",
+          stats: ["Posters & print", "Web & UI", "Social & stories"],
+          steps: [
+            {
+              id: "images-1",
+              title: "Style & references",
+              text: "We lock palette, composition, and mood from your brand kit or reference images so every asset feels cohesive.",
+            },
+            {
+              id: "images-2",
+              title: "Channel-ready formats",
+              text: "Deliverables sized and cropped for feeds, stories, hero banners, slide decks, and print-ready posters.",
+            },
+            {
+              id: "images-3",
+              title: "Fast iteration",
+              text: "Explore variations quickly - swap scenes, products, or backgrounds without a full reshoot.",
+            },
+          ],
+          tabs: [
+            {
+              value: "posters",
+              label: "Posters",
+              src: "https://images.unsplash.com/photo-1542038784456-1ea8e935640e?w=1200&q=80",
+              alt: "Poster and print design",
+            },
+            {
+              value: "social",
+              label: "Social",
+              src: "https://images.unsplash.com/photo-1614850717567-1cedcd31430c?w=1200&q=80",
+              alt: "Social media visuals",
+            },
+            {
+              value: "web",
+              label: "Web",
+              src: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1200&q=80",
+              alt: "Web and document design",
+            },
+          ],
+          defaultTab: "posters",
+        },
+      },
+      {
+        title: "Video & Image Automation",
+        imgSrc: "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=400&q=80",
+        imgAlt: "Robotics and automation concept",
+        modal: {
+          eyebrow: "AI Video Automation",
+          title: "From a few images to video - the same way every time",
+          description:
+            "Automated pipelines that turn a small set of product or scene images into finished videos in a consistent look and structure - perfect when you need volume without sacrificing quality.",
+          stats: ["Repeatable output", "Batch-ready", "Template-driven"],
+          steps: [
+            {
+              id: "auto-1",
+              title: "Define the template",
+              text: "We set shot order, pacing, captions, and brand rules so every run follows the same proven structure.",
+            },
+            {
+              id: "auto-2",
+              title: "Drop in new inputs",
+              text: "Swap product photos or scenes - the pipeline generates a new video in the same style as your last batch.",
+            },
+            {
+              id: "auto-3",
+              title: "Scale with confidence",
+              text: "Ideal for catalogs, seasonal promos, and multi-SKU campaigns where consistency and speed both matter.",
+            },
+          ],
+          tabs: [
+            {
+              value: "inputs",
+              label: "Inputs",
+              src: "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=1200&q=80",
+              alt: "Source images for automation",
+            },
+            {
+              value: "pipeline",
+              label: "Pipeline",
+              src: "https://images.unsplash.com/photo-1555949963-aa79dcee981c?w=1200&q=80",
+              alt: "Automated video pipeline",
+            },
+            {
+              value: "output",
+              label: "Output",
+              src: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=1200&q=80",
+              alt: "Consistent video output",
+            },
+          ],
+          defaultTab: "pipeline",
+        },
+      },
+    ],
   },
   stats: {
     headline: "Videos that reach new dimensions.",
@@ -328,6 +541,7 @@ export const en = {
     home: "Home",
     process: "Process",
     work: "Work",
+    services: "Services",
     contact: "Contact",
     training: "Training"
   },

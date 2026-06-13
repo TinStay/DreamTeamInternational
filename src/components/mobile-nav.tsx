@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { IconBook, IconHome, IconMail, IconMenu2, IconVideo } from "@tabler/icons-react";
+import { IconBook, IconHome, IconMail, IconMenu2, IconSparkles, IconVideo } from "@tabler/icons-react";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
 import { useLanguage } from "@/lib/i18n/language-context";
 import { buttonVariants, primaryGradientInteractiveClassName } from "@/components/ui/button";
@@ -19,6 +19,7 @@ export function MobileNav() {
   const trainingHref = trainingPath(language);
   const contactHref = contactProcessPath(language);
   const portfolioHref = `${homeHref}#portfolio`;
+  const servicesHref = `${homeHref}#services`;
 
   return (
     <>
@@ -40,11 +41,11 @@ export function MobileNav() {
         </Link>
 
         <Link
-          href={trainingHref}
+          href={servicesHref}
           className="group flex flex-1 select-none flex-col items-center justify-center gap-1 text-muted-foreground transition-colors hover:text-foreground"
         >
-          <IconBook className="h-[26px] w-[26px] text-neutral-800 transition-transform group-hover:scale-110 dark:text-neutral-200" />
-          <span className="text-xs font-semibold tracking-wide">{t.header.training}</span>
+          <IconSparkles className="h-[26px] w-[26px] text-neutral-800 transition-transform group-hover:scale-110 dark:text-neutral-200" />
+          <span className="text-xs font-semibold tracking-wide">{t.header.services}</span>
         </Link>
 
         <Sheet open={isOpen} onOpenChange={setIsOpen}>
@@ -88,6 +89,14 @@ export function MobileNav() {
                 >
                   <IconVideo className="h-6 w-6 shrink-0 text-neutral-800 dark:text-neutral-200" />
                   <span className="transition-colors group-hover:text-primary">{t.header.portfolio}</span>
+                </Link>
+                <Link
+                  href={servicesHref}
+                  onClick={() => setIsOpen(false)}
+                  className="group flex select-none items-center gap-4 text-foreground/80 transition-colors"
+                >
+                  <IconSparkles className="h-6 w-6 shrink-0 text-neutral-800 dark:text-neutral-200" />
+                  <span className="transition-colors group-hover:text-primary">{t.header.services}</span>
                 </Link>
                 <Link
                   href={contactHref}

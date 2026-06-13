@@ -60,10 +60,13 @@ export function SiteHeader() {
           />
         </Link>
 
-        {/* Center nav — Portfolio, Training, Contact */}
-        <nav className="flex items-center justify-center gap-6 lg:gap-10 font-semibold text-sm lg:text-base text-foreground/80 min-w-0 px-2">
+        {/* Center nav — Portfolio, Services, Training, Contact */}
+        <nav className="flex items-center justify-center gap-5 xl:gap-8 font-semibold text-sm lg:text-base text-foreground/80 min-w-0 px-2">
           <Link href={`${homeHref}#portfolio`} className="hover:text-primary transition-colors whitespace-nowrap">
             {t.header.portfolio}
+          </Link>
+          <Link href={`${homeHref}#services`} className="hover:text-primary transition-colors whitespace-nowrap">
+            {t.header.services}
           </Link>
           <Link
             href={trainingPath(language)}

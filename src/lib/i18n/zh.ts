@@ -2,6 +2,7 @@ export const zh = {
   header: {
     process: "服务流程",
     portfolio: "案例展示",
+    services: "服务",
     pricing: "获取报价",
     contact: "联系我们",
     chat: "在线咨询",
@@ -88,6 +89,218 @@ export const zh = {
   },
   partners: {
     title: "合作品牌",
+  },
+  services: {
+    title1: "我们的",
+    title2: "服务",
+    subtitle: "一站式 AI 制作 - 涵盖视频、吉祥物、图像与自动化流程。",
+    learnMore: "了解更多",
+    modal: {
+      close: "关闭",
+      contactCta: "获取报价",
+    },
+    items: [
+      {
+        title: "AI 视频制作",
+        imgSrc: "https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?w=400&q=80",
+        imgAlt: "视频制作设备",
+        modal: {
+          eyebrow: "AI 视频制作",
+          title: "从产品图或从零开始制作 AI 视频",
+          description:
+            "我们根据产品图片、场景参考或全新创意制作 AI 视频 - 适用于广告、教程、定制礼物和企业内部宣传视频。",
+          stats: ["广告与营销", "教程与讲解", "礼物与内部视频"],
+          steps: [
+            {
+              id: "ai-video-1",
+              title: "需求与参考",
+              text: "提供产品图、情绪板或创意想法，共同确定风格、时长与核心信息。",
+            },
+            {
+              id: "ai-video-2",
+              title: "AI 制作与剪辑",
+              text: "生成并优化场景，匹配品牌调性 - 写实、动画或混合风格，全程可反馈调整。",
+            },
+            {
+              id: "ai-video-3",
+              title: "交付发布",
+              text: "输出适用于网站、社交媒体、演示或播出的成片文件，支持修改直至满意。",
+            },
+          ],
+          tabs: [
+            {
+              value: "ads",
+              label: "广告",
+              src: "https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?w=1200&q=80",
+              alt: "广告视频制作",
+            },
+            {
+              value: "tutorials",
+              label: "教程",
+              src: "https://images.unsplash.com/photo-1536240478700-b869070f9279?w=1200&q=80",
+              alt: "教程讲解视频",
+            },
+            {
+              value: "corporate",
+              label: "内部",
+              src: "https://images.unsplash.com/photo-1492619375914-88005aa9e8fb?w=1200&q=80",
+              alt: "企业内部视频",
+            },
+          ],
+          defaultTab: "ads",
+        },
+      },
+      {
+        title: "品牌吉祥物",
+        imgSrc: "https://images.unsplash.com/photo-1611162617474-5b21e939e113?w=400&q=80",
+        imgAlt: "彩色角色插画",
+        modal: {
+          eyebrow: "AI 品牌吉祥物",
+          title: "让观众记住的品牌吉祥物",
+          description:
+            "定制品牌吉祥物，贯穿营销活动、官网、社交帖与视频 - 以亲切一致的形象介绍产品与优势。目标是被记住，并建立信任。",
+          stats: ["品牌记忆点", "官网与社交", "代言式视频"],
+          steps: [
+            {
+              id: "mascot-1",
+              title: "角色与个性",
+              text: "设计符合品牌气质的吉祥物 - 外形、语气与性格，贴近目标受众。",
+            },
+            {
+              id: "mascot-2",
+              title: "全渠道露出",
+              text: "用于网站、帖子、Stories 与 campaign 素材，始终保持统一可识别。",
+            },
+            {
+              id: "mascot-3",
+              title: "讲解型视频",
+              text: "让吉祥物出现在 AI 视频中，讲解产品、优势与优惠，持续积累熟悉感与信任。",
+            },
+          ],
+          tabs: [
+            {
+              value: "campaign",
+              label: "营销",
+              src: "https://images.unsplash.com/photo-1611162617474-5b21e939e113?w=1200&q=80",
+              alt: "吉祥物营销活动",
+            },
+            {
+              value: "website",
+              label: "官网",
+              src: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=1200&q=80",
+              alt: "官网吉祥物展示",
+            },
+            {
+              value: "social",
+              label: "视频",
+              src: "https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=1200&q=80",
+              alt: "社交媒体视频",
+            },
+          ],
+          defaultTab: "campaign",
+        },
+      },
+      {
+        title: "AI 图像",
+        imgSrc: "https://images.unsplash.com/photo-1542038784456-1ea8e935640e?w=400&q=80",
+        imgAlt: "相机与摄影场景",
+        modal: {
+          eyebrow: "AI 图像",
+          title: "为每个触点打造视觉素材",
+          description:
+            "高影响力 AI 图像，适用于海报、网页设计、社交帖、Stories 与文档排版 - 品牌发布素材风格统一。",
+          stats: ["海报印刷", "网页 UI", "社交与 Stories"],
+          steps: [
+            {
+              id: "images-1",
+              title: "风格与参考",
+              text: "根据品牌规范或参考图确定配色、构图与氛围，保证素材协调一致。",
+            },
+            {
+              id: "images-2",
+              title: "多渠道尺寸",
+              text: "按信息流、Stories、横幅、幻灯片与印刷海报输出对应规格。",
+            },
+            {
+              id: "images-3",
+              title: "快速迭代",
+              text: "快速尝试不同版本 - 更换场景、产品或背景，无需重新拍摄。",
+            },
+          ],
+          tabs: [
+            {
+              value: "posters",
+              label: "海报",
+              src: "https://images.unsplash.com/photo-1542038784456-1ea8e935640e?w=1200&q=80",
+              alt: "海报设计",
+            },
+            {
+              value: "social",
+              label: "社交",
+              src: "https://images.unsplash.com/photo-1614850717567-1cedcd31430c?w=1200&q=80",
+              alt: "社交媒体视觉",
+            },
+            {
+              value: "web",
+              label: "网页",
+              src: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1200&q=80",
+              alt: "网页与文档设计",
+            },
+          ],
+          defaultTab: "posters",
+        },
+      },
+      {
+        title: "视频/图片自动化",
+        imgSrc: "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=400&q=80",
+        imgAlt: "机器人与自动化概念",
+        modal: {
+          eyebrow: "AI 视频自动化",
+          title: "几张图片，每次同样方式生成视频",
+          description:
+            "自动化流程将少量产品或场景图片转化为成片，保持统一的视觉风格与结构 - 适合需要批量产出且质量稳定的场景。",
+          stats: ["稳定输出", "支持批量", "模板驱动"],
+          steps: [
+            {
+              id: "auto-1",
+              title: "定义模板",
+              text: "设定镜头顺序、节奏、字幕与品牌规则，每次生成都遵循同一结构。",
+            },
+            {
+              id: "auto-2",
+              title: "替换输入素材",
+              text: "更换产品图或场景，流程会按相同风格生成新视频。",
+            },
+            {
+              id: "auto-3",
+              title: "放心规模化",
+              text: "适用于产品目录、季节性促销与多 SKU  campaign，兼顾效率与一致性。",
+            },
+          ],
+          tabs: [
+            {
+              value: "inputs",
+              label: "输入",
+              src: "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=1200&q=80",
+              alt: "自动化输入图片",
+            },
+            {
+              value: "pipeline",
+              label: "流程",
+              src: "https://images.unsplash.com/photo-1555949963-aa79dcee981c?w=1200&q=80",
+              alt: "自动化视频流程",
+            },
+            {
+              value: "output",
+              label: "输出",
+              src: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=1200&q=80",
+              alt: "一致的视频输出",
+            },
+          ],
+          defaultTab: "pipeline",
+        },
+      },
+    ],
   },
   stats: {
     headline: "让视频触达全新维度。",
@@ -345,6 +558,7 @@ export const zh = {
     home: "首页",
     process: "流程",
     work: "案例",
+    services: "服务",
     contact: "联系",
     training: "培训",
   },
