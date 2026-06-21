@@ -23,20 +23,7 @@ const PARTNERS: Partner[] = [
     href: "https://asiaeventagency.com/",
     ariaLabel: "Asia Event Agency",
   },
-  {
-    id: "boleron",
-    light: "boleron_logo_light.png",
-    dark: null,
-    href: "https://boleron.bg/",
-    ariaLabel: "Boleron",
-  },
-  {
-    id: "designedbygg",
-    light: "designedbygg_logo_light.png",
-    dark: "designedbygg_logo_dark.png",
-    href: "http://designedby.gg/",
-    ariaLabel: "Designed by GG",
-  },
+  
   {
     id: "emblema",
     light: "emblema_logo_light.png",
@@ -71,6 +58,13 @@ const PARTNERS: Partner[] = [
     dark: "infinity_logo_dark.png",
     href: "https://infinityproperty.bg/",
     ariaLabel: "Infinity Property",
+  },
+  {
+    id: "boleron",
+    light: "boleron_logo_light.png",
+    dark: null,
+    href: "https://boleron.bg/",
+    ariaLabel: "Boleron",
   },
   {
     id: "oikia",
@@ -113,6 +107,13 @@ const PARTNERS: Partner[] = [
     dark: "valtcan_logo_dark.png",
     href: "https://www.valtcan.com/",
     ariaLabel: "Valtcan",
+  },
+  {
+    id: "designedbygg",
+    light: "designedbygg_logo_light.png",
+    dark: "designedbygg_logo_dark.png",
+    href: "http://designedby.gg/",
+    ariaLabel: "Designed by GG",
   },
 ];
 
