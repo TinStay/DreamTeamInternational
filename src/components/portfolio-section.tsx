@@ -2,6 +2,7 @@
 
 import { memo, useEffect, useMemo, useRef, useState } from "react";
 import { useLanguage } from "@/lib/i18n/language-context";
+import { PORTFOLIO_NAVIGATE_EVENT, type PortfolioNavigateDetail } from "@/lib/portfolio-navigation";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { primaryGradientInteractiveClassName } from "@/components/ui/button";
@@ -560,6 +561,17 @@ export function PortfolioSection() {
   const [format, setFormat] = useState<"all" | "desktop" | "mobile">("all");
   const [activeCategory, setActiveCategory] = useState<string>("all");
   const [portfolioPage, setPortfolioPage] = useState(0);
+
+  useEffect(() => {
+    const handlePortfolioNavigate = (event: Event) => {
+      const { category } = (event as CustomEvent<PortfolioNavigateDetail>).detail ?? {};
+      setActiveCategory(category ?? "all");
+      setPortfolioPage(0);
+    };
+
+    window.addEventListener(PORTFOLIO_NAVIGATE_EVENT, handlePortfolioNavigate);
+    return () => window.removeEventListener(PORTFOLIO_NAVIGATE_EVENT, handlePortfolioNavigate);
+  }, []);
 
   const CATEGORIES: { key: string; label: string; icon: React.ReactNode }[] = useMemo(
     () => [

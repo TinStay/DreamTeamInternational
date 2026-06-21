@@ -81,206 +81,334 @@ export const en = {
     modal: {
       close: "Close",
       contactCta: "Get a quote",
+      goToPortfolio: "View portfolio",
     },
     items: [
       {
         title: "AI Video Production",
-        imgSrc: "https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?w=400&q=80",
+        imgSrc: "/services/icons/ai_video.png",
         imgAlt: "Video production studio equipment",
         modal: {
           eyebrow: "AI Video Production",
           title: "AI videos from product shots or built from scratch",
           description:
-            "We produce AI-generated videos from your product images, scene references, or a fresh brief - ideal for ads, tutorials, personalized gifts, and internal company communications.",
-          stats: ["Ads & campaigns", "Tutorials & explainers", "Gifts & internal video"],
+            "We create AI videos for TV ads, social media campaigns, tutorials, internal communications, and stories in settings traditional filming can't easily reach - from product scenes to AI avatars in unique environments.",
+          stats: ["TV ads", "Social ads", "Tutorials", "AI avatars"],
           steps: [
             {
-              id: "ai-video-1",
-              title: "Brief & references",
-              text: "Share product photos, mood boards, or just an idea. Together we define style, length, and the message you want to land.",
+              id: "ai-video-use",
+              title: "Use cases",
+              text: "AI video for product and service advertising - including TV and social media campaigns - plus educational tutorials and internal campaigns. For example, showing your team in creative settings (Olympics, football match, and more).",
             },
             {
-              id: "ai-video-2",
-              title: "AI production & editing",
-              text: "Scenes are generated, refined, and edited to match your brand - photorealistic, animated, or hybrid, with your feedback at every stage.",
+              id: "ai-video-scenes",
+              title: "What's possible",
+              text: "We place your products in environments that are hard or costly to shoot in real life.",
+              items: [
+                {
+                  id: "ai-video-scenes-1",
+                  title: "Project visualization",
+                  content:
+                    "Show how a building is constructed and how it will look finished inside and out - before it's built.",
+                },
+                {
+                  id: "ai-video-scenes-2",
+                  title: "Stories with AI avatars",
+                  content:
+                    "Tell your story through AI characters who move through the space, interact, and explain your offer.",
+                },
+              ],
             },
             {
-              id: "ai-video-3",
-              title: "Ready-to-publish delivery",
-              text: "Export-ready files for web, social, presentations, or broadcast - with revisions until the result feels right.",
+              id: "ai-video-benefits",
+              title: "Benefits",
+              items: [
+                {
+                  id: "ai-video-benefits-1",
+                  title: "Unique settings",
+                  content:
+                    "Your products and services appear in memorable environments that help you stand out in your industry.",
+                },
+                {
+                  id: "ai-video-benefits-2",
+                  title: "More accessible pricing",
+                  content:
+                    "No film crews, extras, or props to hire - achieve a high-end look at a lower production cost.",
+                },
+              ],
+            },
+            {
+              id: "ai-video-needs",
+              title: "What we need from you",
+              items: [
+                {
+                  id: "ai-video-needs-1",
+                  title: "Idea and message",
+                  content:
+                    "Your concept - or we propose one that fits your company and audience.",
+                },
+                {
+                  id: "ai-video-needs-2",
+                  title: "Assets",
+                  content: "Product photos, brand guidelines, logo, and details about your services.",
+                },
+                {
+                  id: "ai-video-needs-3",
+                  title: "Style and feedback",
+                  content:
+                    "Expectations for look - realistic, animated, or with VFX - plus feedback at key production stages.",
+                },
+                {
+                  id: "ai-video-needs-4",
+                  title: "Industry context",
+                  content: "Sector-specific information so we communicate your message clearly and accurately.",
+                },
+              ],
+            },
+            {
+              id: "ai-video-pricing",
+              title: "Pricing and scope",
+              text: "We work across industries and styles. Pricing is tailored to complexity and video length. After discussing your needs, we send a personalized quote.",
             },
           ],
           tabs: [
             {
-              value: "ads",
-              label: "Ads",
-              src: "https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?w=1200&q=80",
-              alt: "Video production for advertising",
+              value: "products",
+              label: "Products",
+              src: "/services/video/video1.jpeg",
+              alt: "Product AI video",
             },
             {
-              value: "tutorials",
-              label: "Tutorials",
-              src: "https://images.unsplash.com/photo-1536240478700-b869070f9279?w=1200&q=80",
-              alt: "Tutorial and explainer video",
+              value: "services",
+              label: "Services",
+              src: "/services/video/video2.jpeg",
+              alt: "Services AI video",
             },
             {
               value: "corporate",
-              label: "Internal",
-              src: "https://images.unsplash.com/photo-1492619375914-88005aa9e8fb?w=1200&q=80",
-              alt: "Corporate internal video",
+              label: "Corporate",
+              src: "/services/video/video3.jpeg",
+              alt: "Corporate AI video",
             },
           ],
-          defaultTab: "ads",
+          defaultTab: "products",
         },
       },
       {
         title: "Brand Mascot",
-        imgSrc: "https://images.unsplash.com/photo-1611162617474-5b21e939e113?w=400&q=80",
+        imgSrc: "/services/icons/ai_mascot.png",
         imgAlt: "Colorful character illustration",
         modal: {
           eyebrow: "AI Brand Mascot",
           title: "A talisman your audience will remember",
           description:
-            "A custom brand mascot that lives across campaigns, your website, social posts, and videos - presenting your products and benefits in a friendly, consistent voice. The goal: be remembered and build trust.",
-          stats: ["Brand recall", "Website & social", "Spokesperson videos"],
+            "We create mascots that carry your company message, showcase your products, and capture attention - one of the most effective ways for people to remember your brand.",
+          stats: ["Animated", "Realistic", "Photos & video", "Male & female voice"],
           steps: [
             {
-              id: "mascot-1",
-              title: "Character & personality",
-              text: "We design a mascot that fits your brand tone - look, voice, and attitude that resonates with your target audience.",
+              id: "mascot-why",
+              title: "Why a mascot",
+              text: "A mascot gives your brand a face and personality - used in campaigns, on your site, in social content and videos to build recognition and trust.",
             },
             {
-              id: "mascot-2",
-              title: "Everywhere your brand shows up",
-              text: "Use your mascot on the site, in posts, stories, and campaign assets - always on-brand and instantly recognizable.",
+              id: "mascot-options",
+              title: "Capabilities",
+              items: [
+                {
+                  id: "mascot-options-1",
+                  title: "Style",
+                  content: "Animated or realistic look - matched to your brand tone and target audience.",
+                },
+                {
+                  id: "mascot-options-2",
+                  title: "Formats",
+                  content: "Ready for stills, posts, stories, and AI video with one consistent, recognizable character.",
+                },
+                {
+                  id: "mascot-options-3",
+                  title: "Voice",
+                  content: "Multiple voice options - male and female - for video and spoken content.",
+                },
+              ],
             },
             {
-              id: "mascot-3",
-              title: "Videos that explain & convince",
-              text: "Put your mascot in AI-generated videos that walk through products, benefits, and offers - building familiarity and confidence over time.",
+              id: "mascot-process",
+              title: "Process",
+              items: [
+                {
+                  id: "mascot-process-1",
+                  title: "Brief and quote",
+                  content: "Tell us the type and style you want. We send a personalized quote and start after approval.",
+                },
+                {
+                  id: "mascot-process-2",
+                  title: "Looks and voices",
+                  content: "We present several visual directions and suitable voice options to choose from.",
+                },
+                {
+                  id: "mascot-process-3",
+                  title: "Finalization",
+                  content: "You confirm the final look and voice. We develop the chosen style across different settings.",
+                },
+                {
+                  id: "mascot-process-4",
+                  title: "Handover",
+                  content: "You receive finished image assets and voice files of the mascot for ongoing use.",
+                },
+              ],
             },
           ],
           tabs: [
             {
-              value: "campaign",
-              label: "Campaigns",
-              src: "https://images.unsplash.com/photo-1611162617474-5b21e939e113?w=1200&q=80",
-              alt: "Brand mascot campaign visual",
+              value: "animated",
+              label: "Animated",
+              src: "/services/mascot/mascot1.jpeg",
+              alt: "Animated brand mascot",
             },
             {
-              value: "website",
-              label: "Website",
-              src: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=1200&q=80",
-              alt: "Mascot on website",
+              value: "influencer",
+              label: "Influencer",
+              src: "/services/mascot/mascot2.jpeg",
+              alt: "Influencer mascot",
             },
             {
-              value: "social",
-              label: "Social",
-              src: "https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=1200&q=80",
-              alt: "Mascot in social content",
+              value: "semi-realistic",
+              label: "Semi-realistic",
+              src: "/services/mascot/mascot3.jpeg",
+              alt: "Semi-realistic brand mascot",
             },
           ],
-          defaultTab: "campaign",
+          defaultTab: "animated",
         },
       },
       {
-        title: "AI Images",
-        imgSrc: "https://images.unsplash.com/photo-1542038784456-1ea8e935640e?w=400&q=80",
+        title: "AI Graphic Design",
+        imgSrc: "/services/icons/ai_images.png",
         imgAlt: "Camera and photography setup",
         modal: {
-          eyebrow: "AI Imagery",
+          eyebrow: "AI Graphic Design",
           title: "Images crafted for every touchpoint",
           description:
-            "High-impact AI visuals for posters, web design, social media posts, stories, and document layouts - consistent style across every asset your brand publishes.",
-          stats: ["Posters & print", "Web & UI", "Social & stories"],
+            "We create AI graphic design for online posts, stories, websites, presentations, logos, and any visual material your brand needs - aligned with your identity.",
+          stats: ["Posts", "Stories", "Web", "Logos", "Documents"],
           steps: [
             {
-              id: "images-1",
-              title: "Style & references",
-              text: "We lock palette, composition, and mood from your brand kit or reference images so every asset feels cohesive.",
+              id: "images-what",
+              title: "What we create",
+              text: "Visuals for social, web, ads, and corporate documents - ready to publish in the sizes and formats you need.",
             },
             {
-              id: "images-2",
-              title: "Channel-ready formats",
-              text: "Deliverables sized and cropped for feeds, stories, hero banners, slide decks, and print-ready posters.",
-            },
-            {
-              id: "images-3",
-              title: "Fast iteration",
-              text: "Explore variations quickly - swap scenes, products, or backgrounds without a full reshoot.",
+              id: "images-process",
+              title: "Process",
+              items: [
+                {
+                  id: "images-process-1",
+                  title: "Brief and assets",
+                  content:
+                    "Share what you need and send materials - logo, colors, references, and brand tone guidelines.",
+                },
+                {
+                  id: "images-process-2",
+                  title: "Quote and kickoff",
+                  content: "We send a personalized quote and begin work after your confirmation.",
+                },
+                {
+                  id: "images-process-3",
+                  title: "Delivery and revisions",
+                  content:
+                    "We deliver finished images and refine based on your feedback until you're satisfied.",
+                },
+              ],
             },
           ],
           tabs: [
             {
-              value: "posters",
-              label: "Posters",
-              src: "https://images.unsplash.com/photo-1542038784456-1ea8e935640e?w=1200&q=80",
-              alt: "Poster and print design",
+              value: "products",
+              label: "Products",
+              src: "/services/images/image1.jpeg",
+              alt: "Product AI imagery",
             },
             {
-              value: "social",
-              label: "Social",
-              src: "https://images.unsplash.com/photo-1614850717567-1cedcd31430c?w=1200&q=80",
-              alt: "Social media visuals",
+              value: "logos",
+              label: "Logos",
+              src: "/services/images/image2.jpeg",
+              alt: "AI logo design",
             },
             {
-              value: "web",
-              label: "Web",
-              src: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1200&q=80",
-              alt: "Web and document design",
+              value: "graphics",
+              label: "Graphics",
+              src: "/services/images/image3.jpeg",
+              alt: "AI graphic design",
             },
           ],
-          defaultTab: "posters",
+          defaultTab: "products",
         },
       },
       {
         title: "Video & Image Automation",
-        imgSrc: "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=400&q=80",
+        imgSrc: "/services/icons/ai_automation.png",
         imgAlt: "Robotics and automation concept",
         modal: {
           eyebrow: "AI Video Automation",
           title: "From a few images to video - the same way every time",
           description:
-            "Automated pipelines that turn a small set of product or scene images into finished videos in a consistent look and structure - perfect when you need volume without sacrificing quality.",
-          stats: ["Repeatable output", "Batch-ready", "Template-driven"],
+            "When you have many products to show in a uniform, standardized way, we build a workflow that simplifies your work and quickly generates images and videos to the same standard.",
+          stats: ["Catalogs", "Social media", "Templates", "Batch output"],
           steps: [
             {
-              id: "auto-1",
-              title: "Define the template",
-              text: "We set shot order, pacing, captions, and brand rules so every run follows the same proven structure.",
+              id: "auto-what",
+              title: "What it's for",
+              text: "Automations are ideal for online catalogs, social posts, seasonal campaigns, and anywhere volume and consistent style matter equally.",
             },
             {
-              id: "auto-2",
-              title: "Drop in new inputs",
-              text: "Swap product photos or scenes - the pipeline generates a new video in the same style as your last batch.",
-            },
-            {
-              id: "auto-3",
-              title: "Scale with confidence",
-              text: "Ideal for catalogs, seasonal promos, and multi-SKU campaigns where consistency and speed both matter.",
+              id: "auto-process",
+              title: "Process",
+              items: [
+                {
+                  id: "auto-process-1",
+                  title: "Consultation",
+                  content: "We define scope, goals, and the level of automation you need.",
+                },
+                {
+                  id: "auto-process-2",
+                  title: "Quote",
+                  content: "We send a personalized quote based on complexity and project volume.",
+                },
+                {
+                  id: "auto-process-3",
+                  title: "Workflow design",
+                  content:
+                    "We define the pipeline, templates, and brand rules - similar to video production, but built for repeatable output.",
+                },
+                {
+                  id: "auto-process-4",
+                  title: "Testing and feedback",
+                  content: "We test with your real assets, refine, and finalize before handover.",
+                },
+                {
+                  id: "auto-process-5",
+                  title: "Handover and support",
+                  content:
+                    "You receive documentation, a setup guide, and a ready-to-use tool. We also offer long-term support and improvements.",
+                },
+              ],
             },
           ],
           tabs: [
             {
-              value: "inputs",
-              label: "Inputs",
-              src: "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=1200&q=80",
-              alt: "Source images for automation",
+              value: "video",
+              label: "Video",
+              src: "/services/automation/automation1.jpeg",
+              alt: "Automated AI video",
             },
             {
-              value: "pipeline",
-              label: "Pipeline",
-              src: "https://images.unsplash.com/photo-1555949963-aa79dcee981c?w=1200&q=80",
-              alt: "Automated video pipeline",
-            },
-            {
-              value: "output",
-              label: "Output",
-              src: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=1200&q=80",
-              alt: "Consistent video output",
+              value: "photos",
+              label: "Photos",
+              src: "/services/automation/automation2.jpeg",
+              alt: "Automated AI photos",
             },
           ],
-          defaultTab: "pipeline",
+          defaultTab: "video",
         },
       },
     ],

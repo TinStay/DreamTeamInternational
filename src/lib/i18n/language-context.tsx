@@ -4,16 +4,14 @@ import React, { createContext, useContext, useEffect, useMemo, useState } from "
 import { usePathname, useRouter } from "next/navigation";
 import { en } from "./en";
 import { bg } from "./bg";
-import { zh } from "./zh";
 
-export const LOCALES = ["en", "bg", "zh"] as const;
+export const LOCALES = ["en", "bg"] as const;
 export type Language = (typeof LOCALES)[number];
 type Dictionary = typeof en;
 
-const dictionaries: Record<Language, Dictionary> = { en, bg, zh };
+const dictionaries: Record<Language, Dictionary> = { en, bg };
 
 function getRouteLanguage(pathname: string | null): Language {
-  if (pathname?.startsWith("/zh")) return "zh";
   if (pathname?.startsWith("/bg")) return "bg";
   if (pathname?.startsWith("/en")) return "en";
   return "en";
@@ -53,7 +51,7 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
   }, [routeLanguage]);
 
   useEffect(() => {
-    document.documentElement.lang = language === "zh" ? "zh-CN" : language;
+    document.documentElement.lang = language;
   }, [language]);
 
   const handleSetLanguage = (lang: Language) => {

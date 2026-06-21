@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 
 export function LanguageDropdown({ className = "" }: { className?: string }) {
   const { language, setLanguage, t } = useLanguage();
-  const flag = language === "bg" ? "🇧🇬" : language === "zh" ? "🇨🇳" : "🇺🇸";
+  const flag = language === "bg" ? "🇧🇬" : "🇺🇸";
 
   return (
     <Select value={language} onValueChange={(v) => setLanguage(v as Language)}>
@@ -23,7 +23,7 @@ export function LanguageDropdown({ className = "" }: { className?: string }) {
       <SelectContent>
         <SelectItem value="bg">🇧🇬 Български</SelectItem>
         <SelectItem value="en">🇺🇸 English</SelectItem>
-        <SelectItem value="zh">🇨🇳 简体中文</SelectItem>
+        {/* <SelectItem value="zh">🇨🇳 简体中文</SelectItem> */}
       </SelectContent>
     </Select>
   );

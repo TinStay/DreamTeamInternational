@@ -102,29 +102,83 @@ export const zh = {
     items: [
       {
         title: "AI 视频制作",
-        imgSrc: "https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?w=400&q=80",
+        imgSrc: "/services/icons/ai_video.png",
         imgAlt: "视频制作设备",
         modal: {
           eyebrow: "AI 视频制作",
           title: "从产品图或从零开始制作 AI 视频",
           description:
-            "我们根据产品图片、场景参考或全新创意制作 AI 视频 - 适用于广告、教程、定制礼物和企业内部宣传视频。",
-          stats: ["广告与营销", "教程与讲解", "礼物与内部视频"],
+            "我们为电视广告、社交媒体、教程、内部宣传与创意叙事制作 AI 视频，呈现传统拍摄难以实现的场景 - 从产品展示到 AI 虚拟人物在独特环境中的故事。",
+          stats: ["电视广告", "社交广告", "教程", "AI 虚拟人物"],
           steps: [
             {
-              id: "ai-video-1",
-              title: "需求与参考",
-              text: "提供产品图、情绪板或创意想法，共同确定风格、时长与核心信息。",
+              id: "ai-video-use",
+              title: "应用场景",
+              text: "适用于产品与服务的广告视频 - 包括电视广告与社交媒体 campaign - 以及教学教程、讲解内容和内部宣传。例如展示团队在不同场景中的形象（奥运会、足球赛等）。",
             },
             {
-              id: "ai-video-2",
-              title: "AI 制作与剪辑",
-              text: "生成并优化场景，匹配品牌调性 - 写实、动画或混合风格，全程可反馈调整。",
+              id: "ai-video-scenes",
+              title: "可以实现什么",
+              text: "将产品置于真实拍摄难以实现或成本极高的环境中。",
+              items: [
+                {
+                  id: "ai-video-scenes-1",
+                  title: "项目可视化",
+                  content: "展示建筑从施工到完工的内外效果 - 在实际建成之前即可呈现。",
+                },
+                {
+                  id: "ai-video-scenes-2",
+                  title: "AI 虚拟人物叙事",
+                  content: "通过 AI 角色在空间中移动、互动并讲解，传递品牌故事与产品价值。",
+                },
+              ],
             },
             {
-              id: "ai-video-3",
-              title: "交付发布",
-              text: "输出适用于网站、社交媒体、演示或播出的成片文件，支持修改直至满意。",
+              id: "ai-video-benefits",
+              title: "核心优势",
+              items: [
+                {
+                  id: "ai-video-benefits-1",
+                  title: "独特场景",
+                  content: "产品在令人印象深刻的环境中展示，帮助品牌在行业中脱颖而出。",
+                },
+                {
+                  id: "ai-video-benefits-2",
+                  title: "更高性价比",
+                  content: "无需租赁拍摄团队、演员与道具，以更低成本获得高品质视觉效果。",
+                },
+              ],
+            },
+            {
+              id: "ai-video-needs",
+              title: "我们需要您提供",
+              items: [
+                {
+                  id: "ai-video-needs-1",
+                  title: "创意与信息",
+                  content: "您的创意方向 - 或由我们提出符合企业与受众的方案。",
+                },
+                {
+                  id: "ai-video-needs-2",
+                  title: "素材",
+                  content: "产品图片、品牌规范、Logo 与服务说明。",
+                },
+                {
+                  id: "ai-video-needs-3",
+                  title: "风格与反馈",
+                  content: "写实、动画或特效等风格期望，以及在关键制作阶段的反馈意见。",
+                },
+                {
+                  id: "ai-video-needs-4",
+                  title: "行业背景",
+                  content: "行业相关信息，确保信息传达准确清晰。",
+                },
+              ],
+            },
+            {
+              id: "ai-video-pricing",
+              title: "价格与范围",
+              text: "我们服务各行业、各风格。价格根据复杂度与时长单独报价。了解需求后，我们将发送个性化方案。",
             },
           ],
           tabs: [
@@ -152,29 +206,66 @@ export const zh = {
       },
       {
         title: "品牌吉祥物",
-        imgSrc: "https://images.unsplash.com/photo-1611162617474-5b21e939e113?w=400&q=80",
+        imgSrc: "/services/icons/ai_mascot.png",
         imgAlt: "彩色角色插画",
         modal: {
           eyebrow: "AI 品牌吉祥物",
           title: "让观众记住的品牌吉祥物",
           description:
-            "定制品牌吉祥物，贯穿营销活动、官网、社交帖与视频 - 以亲切一致的形象介绍产品与优势。目标是被记住，并建立信任。",
-          stats: ["品牌记忆点", "官网与社交", "代言式视频"],
+            "我们打造传递企业信息、展示产品并吸引注意的吉祥物 - 让用户记住品牌最有效的方式之一。",
+          stats: ["动画", "写实", "图片与视频", "男声与女声"],
           steps: [
             {
-              id: "mascot-1",
-              title: "角色与个性",
-              text: "设计符合品牌气质的吉祥物 - 外形、语气与性格，贴近目标受众。",
+              id: "mascot-why",
+              title: "为什么需要吉祥物",
+              text: "吉祥物为品牌赋予人格 - 用于营销、官网、社交内容与视频，建立识别度与信任感。",
             },
             {
-              id: "mascot-2",
-              title: "全渠道露出",
-              text: "用于网站、帖子、Stories 与 campaign 素材，始终保持统一可识别。",
+              id: "mascot-options",
+              title: "能力范围",
+              items: [
+                {
+                  id: "mascot-options-1",
+                  title: "风格",
+                  content: "动画或写实风格 - 匹配品牌调性与目标受众。",
+                },
+                {
+                  id: "mascot-options-2",
+                  title: "应用形式",
+                  content: "可用于图片、帖子、Stories 与 AI 视频，保持统一可识别形象。",
+                },
+                {
+                  id: "mascot-options-3",
+                  title: "配音",
+                  content: "提供男声与女声等多种配音选项，用于视频与口播内容。",
+                },
+              ],
             },
             {
-              id: "mascot-3",
-              title: "讲解型视频",
-              text: "让吉祥物出现在 AI 视频中，讲解产品、优势与优惠，持续积累熟悉感与信任。",
+              id: "mascot-process",
+              title: "流程",
+              items: [
+                {
+                  id: "mascot-process-1",
+                  title: "需求与报价",
+                  content: "告知期望的类型与风格。我们发送个性化报价，确认后开始制作。",
+                },
+                {
+                  id: "mascot-process-2",
+                  title: "视觉与配音",
+                  content: "提供多种视觉方案与合适的配音供您选择。",
+                },
+                {
+                  id: "mascot-process-3",
+                  title: "定稿",
+                  content: "确认最终形象与配音。我们在不同场景中完善选定风格。",
+                },
+                {
+                  id: "mascot-process-4",
+                  title: "交付",
+                  content: "交付吉祥物的图片素材与配音文件，供后续持续使用。",
+                },
+              ],
             },
           ],
           tabs: [
@@ -202,29 +293,40 @@ export const zh = {
       },
       {
         title: "AI 图像",
-        imgSrc: "https://images.unsplash.com/photo-1542038784456-1ea8e935640e?w=400&q=80",
+        imgSrc: "/services/icons/ai_images.png",
         imgAlt: "相机与摄影场景",
         modal: {
           eyebrow: "AI 图像",
           title: "为每个触点打造视觉素材",
           description:
-            "高影响力 AI 图像，适用于海报、网页设计、社交帖、Stories 与文档排版 - 品牌发布素材风格统一。",
-          stats: ["海报印刷", "网页 UI", "社交与 Stories"],
+            "我们制作适用于社交帖、Stories、网站、演示文稿等各类视觉材料的 AI 图像，风格与品牌一致。",
+          stats: ["帖子", "Stories", "网页", "文档"],
           steps: [
             {
-              id: "images-1",
-              title: "风格与参考",
-              text: "根据品牌规范或参考图确定配色、构图与氛围，保证素材协调一致。",
+              id: "images-what",
+              title: "我们制作什么",
+              text: "社交、网页、广告与企业文档用视觉素材 - 按所需尺寸与格式交付，可直接发布。",
             },
             {
-              id: "images-2",
-              title: "多渠道尺寸",
-              text: "按信息流、Stories、横幅、幻灯片与印刷海报输出对应规格。",
-            },
-            {
-              id: "images-3",
-              title: "快速迭代",
-              text: "快速尝试不同版本 - 更换场景、产品或背景，无需重新拍摄。",
+              id: "images-process",
+              title: "流程",
+              items: [
+                {
+                  id: "images-process-1",
+                  title: "需求与素材",
+                  content: "说明需求并提供 Logo、品牌色、参考图与调性说明等素材。",
+                },
+                {
+                  id: "images-process-2",
+                  title: "报价与启动",
+                  content: "发送个性化报价，确认后开始制作。",
+                },
+                {
+                  id: "images-process-3",
+                  title: "交付与修改",
+                  content: "交付成品并根据反馈调整，直至满意。",
+                },
+              ],
             },
           ],
           tabs: [
@@ -252,29 +354,50 @@ export const zh = {
       },
       {
         title: "视频/图片自动化",
-        imgSrc: "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=400&q=80",
+        imgSrc: "/services/icons/ai_automation.png",
         imgAlt: "机器人与自动化概念",
         modal: {
           eyebrow: "AI 视频自动化",
           title: "几张图片，每次同样方式生成视频",
           description:
-            "自动化流程将少量产品或场景图片转化为成片，保持统一的视觉风格与结构 - 适合需要批量产出且质量稳定的场景。",
-          stats: ["稳定输出", "支持批量", "模板驱动"],
+            "当您需要以统一标准展示大量产品时，我们搭建自动化流程，简化工作并快速生成风格一致的图片与视频。",
+          stats: ["目录", "社交媒体", "模板", "批量产出"],
           steps: [
             {
-              id: "auto-1",
-              title: "定义模板",
-              text: "设定镜头顺序、节奏、字幕与品牌规则，每次生成都遵循同一结构。",
+              id: "auto-what",
+              title: "适用场景",
+              text: "适合在线产品目录、社交帖、季节性 campaign 等需要批量产出且风格统一的场景。",
             },
             {
-              id: "auto-2",
-              title: "替换输入素材",
-              text: "更换产品图或场景，流程会按相同风格生成新视频。",
-            },
-            {
-              id: "auto-3",
-              title: "放心规模化",
-              text: "适用于产品目录、季节性促销与多 SKU  campaign，兼顾效率与一致性。",
+              id: "auto-process",
+              title: "流程",
+              items: [
+                {
+                  id: "auto-process-1",
+                  title: "咨询",
+                  content: "明确项目范围、目标与所需自动化程度。",
+                },
+                {
+                  id: "auto-process-2",
+                  title: "报价",
+                  content: "根据复杂度与规模发送个性化报价。",
+                },
+                {
+                  id: "auto-process-3",
+                  title: "流程设计",
+                  content: "定义工作流、模板与品牌规则 - 类似视频制作，但面向可重复的标准化输出。",
+                },
+                {
+                  id: "auto-process-4",
+                  title: "测试与反馈",
+                  content: "使用真实素材测试、优化并定稿后交付。",
+                },
+                {
+                  id: "auto-process-5",
+                  title: "交付与支持",
+                  content: "提供文档、配置指南与可用工具。也可提供长期维护与优化服务。",
+                },
+              ],
             },
           ],
           tabs: [

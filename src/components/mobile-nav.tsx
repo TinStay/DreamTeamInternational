@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { IconBook, IconHome, IconMail, IconMenu2, IconSparkles, IconVideo } from "@tabler/icons-react";
+import { IconBook, IconBriefcase, IconHome, IconMail, IconMenu2, IconVideo } from "@tabler/icons-react";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
 import { useLanguage } from "@/lib/i18n/language-context";
 import { buttonVariants, primaryGradientInteractiveClassName } from "@/components/ui/button";
@@ -23,7 +23,7 @@ export function MobileNav() {
 
   return (
     <>
-      <GlassShell className="lg:hidden fixed bottom-5 left-1/2 z-50 flex w-[92%] max-w-md -translate-x-1/2 items-center gap-1.5 px-3 py-2.5">
+      <GlassShell className="service-mobile-dock lg:hidden fixed bottom-5 left-1/2 z-50 flex w-[92%] max-w-md -translate-x-1/2 items-center gap-1.5 px-3 py-2.5">
         <Link
           href={portfolioHref}
           className="group flex flex-1 select-none flex-col items-center justify-center gap-1 text-muted-foreground transition-colors hover:text-foreground"
@@ -44,7 +44,7 @@ export function MobileNav() {
           href={servicesHref}
           className="group flex flex-1 select-none flex-col items-center justify-center gap-1 text-muted-foreground transition-colors hover:text-foreground"
         >
-          <IconSparkles className="h-[26px] w-[26px] text-neutral-800 transition-transform group-hover:scale-110 dark:text-neutral-200" />
+          <IconBriefcase className="h-[26px] w-[26px] text-neutral-800 transition-transform group-hover:scale-110 dark:text-neutral-200" />
           <span className="text-xs font-semibold tracking-wide">{t.header.services}</span>
         </Link>
 
@@ -95,7 +95,7 @@ export function MobileNav() {
                   onClick={() => setIsOpen(false)}
                   className="group flex select-none items-center gap-4 text-foreground/80 transition-colors"
                 >
-                  <IconSparkles className="h-6 w-6 shrink-0 text-neutral-800 dark:text-neutral-200" />
+                  <IconBriefcase className="h-6 w-6 shrink-0 text-neutral-800 dark:text-neutral-200" />
                   <span className="transition-colors group-hover:text-primary">{t.header.services}</span>
                 </Link>
                 <Link

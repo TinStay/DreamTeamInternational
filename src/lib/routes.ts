@@ -30,6 +30,5 @@ export function localeAlternates(pathSuffix = "") {
   return {
     en: `/en${pathSuffix}`,
     bg: `/bg${pathSuffix}`,
-    zh: `/zh${pathSuffix}`,
   };
 }

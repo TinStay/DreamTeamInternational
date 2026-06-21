@@ -2,23 +2,36 @@
 
 import Link from "next/link";
 import { FeatureShowcase } from "@/components/ui/feature-showcase";
-import { ModalContent, ModalFooter, ModalClose } from "@/components/ui/animated-modal";
+import { ModalContent, ModalFooter, useModal } from "@/components/ui/animated-modal";
 import { primaryCtaClassName, secondaryCtaClassName } from "@/components/ui/button";
 import { useLanguage } from "@/lib/i18n/language-context";
 import { contactProcessPath } from "@/lib/routes";
-
-import type { en } from "@/lib/i18n/en";
-
-type ServiceItem = (typeof en.services.items)[number];
+import { navigateToPortfolio } from "@/lib/portfolio-navigation";
+import {
+  getServicePortfolioLink,
+  SERVICE_MODAL_PANEL_MIN_HEIGHT,
+  SERVICE_MODAL_PORTFOLIO_NAV_DELAY_MS,
+} from "@/lib/services/constants";
+import type { ServiceItem } from "@/lib/services/types";
 
 export function ServiceModalContent({ service }: { service: ServiceItem }) {
   const { t, language } = useLanguage();
+  const { setOpen } = useModal();
   const contactHref = contactProcessPath(language);
   const { modal } = service;
+  const portfolioLink = getServicePortfolioLink(service.imgSrc);
+
+  const handleGoToPortfolio = () => {
+    setOpen(false);
+    window.setTimeout(
+      () => navigateToPortfolio(portfolioLink?.category),
+      SERVICE_MODAL_PORTFOLIO_NAV_DELAY_MS
+    );
+  };
 
   return (
     <>
-      <ModalContent className="flex min-h-0 flex-1 flex-col px-4 pt-4 pb-3 sm:px-5 sm:pt-5 lg:pb-3">
+      <ModalContent className="bg-white dark:bg-neutral-950 max-lg:px-5 max-lg:pt-5 max-lg:pb-4 sm:max-lg:px-6 lg:min-h-0 lg:overflow-hidden lg:pb-3">
         <FeatureShowcase
           variant="modal"
           title={service.title}
@@ -27,12 +40,16 @@ export function ServiceModalContent({ service }: { service: ServiceItem }) {
           steps={modal.steps}
           tabs={modal.tabs}
           defaultTab={modal.defaultTab}
-          panelMinHeight={560}
+          panelMinHeight={SERVICE_MODAL_PANEL_MIN_HEIGHT}
         />
       </ModalContent>
 
-      <ModalFooter className="gap-4 py-3 pt-2 lg:py-3 ">
-        <ModalClose className={secondaryCtaClassName}>{t.services.modal.close}</ModalClose>
+      <ModalFooter className="flex-wrap gap-3 border-t border-border/60 bg-gray-100 px-5 py-3 pt-3 dark:border-neutral-800 dark:bg-neutral-950 max-lg:pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:max-lg:px-6 lg:py-3">
+        {portfolioLink ? (
+          <button type="button" onClick={handleGoToPortfolio} className={secondaryCtaClassName}>
+            {t.services.modal.goToPortfolio}
+          </button>
+        ) : null}
         <Link href={contactHref} className={primaryCtaClassName}>
           {t.services.modal.contactCta}
         </Link>

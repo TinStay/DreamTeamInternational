@@ -5,9 +5,8 @@ import { ServiceCard } from "@/components/ui/service-card";
 import { Modal, ModalBody, ModalTrigger } from "@/components/ui/animated-modal";
 import { ServiceModalContent } from "@/components/service-modal-content";
 import { useLanguage } from "@/lib/i18n/language-context";
+import { getServiceCardVariant } from "@/lib/services/constants";
 import { cn } from "@/lib/utils";
-
-const SERVICE_VARIANTS = ["red", "default", "gray", "blue"] as const;
 
 export function ServicesSection({ className }: { className?: string }) {
   const { t } = useLanguage();
@@ -16,7 +15,7 @@ export function ServicesSection({ className }: { className?: string }) {
     () =>
       t.services.items.map((item, index) => ({
         ...item,
-        variant: SERVICE_VARIANTS[index] ?? "default",
+        variant: getServiceCardVariant(index),
       })),
     [t.services.items]
   );
@@ -34,7 +33,7 @@ export function ServicesSection({ className }: { className?: string }) {
 
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
           {cards.map((service) => (
-            <Modal key={service.title}>
+            <Modal key={service.imgSrc}>
               <ModalTrigger className="block w-full rounded-xl">
                 <ServiceCard
                   title={service.title}

@@ -15,7 +15,7 @@ export function LanguageToggle({ className = "" }: { className?: string }) {
       selectedKeys={[language]}
       onSelectionChange={(keys) => {
         const next = Array.from(keys)[0];
-        if (next === "bg" || next === "en" || next === "zh") setLanguage(next as Language);
+        if (next === "bg" || next === "en") setLanguage(next as Language);
       }}
       className={cn(
         "inline-flex items-center gap-1 rounded-full border border-border/20 bg-muted/60 p-0.5 shadow-[0_6px_18px_rgba(15,23,42,0.10)]",
@@ -80,6 +80,7 @@ export function LanguageToggle({ className = "" }: { className?: string }) {
         </span>
       </Toggle>
 
+      {/* Chinese locale disabled — not in use
       <Toggle
         id="zh"
         aria-label={t.a11y.chinese}
@@ -108,6 +109,7 @@ export function LanguageToggle({ className = "" }: { className?: string }) {
           </span>
         </span>
       </Toggle>
+      */}
     </ToggleButtonGroup>
   );
 }

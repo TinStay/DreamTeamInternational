@@ -79,11 +79,14 @@ export const ModalBody = ({
   useEffect(() => {
     if (open) {
       document.body.style.overflow = "hidden";
+      document.body.classList.add("service-modal-open");
     } else {
       document.body.style.overflow = "";
+      document.body.classList.remove("service-modal-open");
     }
     return () => {
       document.body.style.overflow = "";
+      document.body.classList.remove("service-modal-open");
     };
   }, [open]);
 
@@ -106,7 +109,7 @@ export const ModalBody = ({
           <motion.div
             ref={modalRef}
             className={cn(
-              "relative flex max-h-[95vh] w-[94vw] max-w-[94vw] shrink-0 flex-col overflow-hidden rounded-2xl border border-transparent bg-white dark:border-neutral-800 dark:bg-neutral-950 md:w-[60vw] md:max-w-[60vw]",
+              "relative flex max-h-[96vh] min-h-[88vh] w-[94vw] max-w-[94vw] shrink-0 flex-col overflow-hidden rounded-2xl border border-transparent bg-white dark:border-neutral-800 dark:bg-neutral-950 md:w-[78vw] md:max-w-[78vw] lg:min-h-[85vh]",
               MODAL_CONTENT_Z,
               className
             )}
@@ -132,7 +135,16 @@ export const ModalContent = ({
   children: ReactNode;
   className?: string;
 }) => {
-  return <div className={cn("flex min-h-0 flex-1 flex-col overflow-y-auto p-6 md:p-8", className)}>{children}</div>;
+  return (
+    <div
+      className={cn(
+        "flex min-h-0 min-w-0 flex-1 flex-col overflow-y-auto overscroll-y-contain p-6 md:p-8",
+        className
+      )}
+    >
+      {children}
+    </div>
+  );
 };
 
 export const ModalFooter = ({
@@ -143,7 +155,9 @@ export const ModalFooter = ({
   className?: string;
 }) => {
   return (
-    <div className={cn("flex justify-end gap-3 bg-gray-100 p-4 dark:bg-neutral-900", className)}>{children}</div>
+    <div className={cn("flex shrink-0 flex-none justify-end gap-3 bg-gray-100 p-4 dark:bg-neutral-900", className)}>
+      {children}
+    </div>
   );
 };
 

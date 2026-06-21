@@ -300,3 +300,9 @@
     scroll-behavior: smooth;
   }
 }
+
+/* Hide bottom mobile dock while a service modal is open (avoids visual overlap). */
+body.service-modal-open .service-mobile-dock {
+  visibility: hidden;
+  pointer-events: none;
+}
