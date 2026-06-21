@@ -11,14 +11,14 @@ import {
 } from "@/lib/services/constants";
 
 const cardVariants = cva(
-  "relative flex flex-col justify-between w-full p-6 overflow-hidden rounded-xl shadow-sm transition-shadow duration-300 ease-in-out group hover:shadow-lg cursor-pointer",
+  "relative flex flex-col justify-between w-full p-5 overflow-hidden rounded-xl shadow-[0_4px_18px_rgba(15,23,42,0.07)] transition-shadow duration-300 ease-in-out group cursor-pointer hover:shadow-[0_8px_28px_rgba(15,23,42,0.12)] dark:shadow-[0_4px_18px_rgba(0,0,0,0.28)] dark:hover:shadow-[0_8px_28px_rgba(0,0,0,0.38)]",
   {
     variants: {
       variant: {
         default: "bg-card text-card-foreground",
         red: "bg-red-500/90 text-primary-foreground",
         orange:
-          "bg-orange-100/95 text-orange-700 [&_h3]:text-orange-900 dark:bg-orange-950/50 dark:text-orange-300 dark:[&_h3]:text-orange-100",
+          "bg-orange-200 text-orange-800 [&_h3]:text-orange-950 dark:bg-orange-950 dark:text-orange-300 dark:[&_h3]:text-orange-100",
         blue: "bg-blue-500/90 text-primary-foreground",
         gray: "bg-secondary text-secondary-foreground",
       },
@@ -68,14 +68,14 @@ const ServiceCard = React.forwardRef<HTMLDivElement, ServiceCardProps>(
 
     return (
       <motion.div
-        className={cn(cardVariants({ variant, className }), "min-h-[200px]")}
+        className={cn(cardVariants({ variant, className }), "min-h-[228px]")}
         ref={ref}
         variants={cardAnimation}
         whileHover="hover"
       >
-        <div className="relative z-10 flex min-h-[200px] flex-1 flex-col pr-[52%]">
-          <h3 className="text-2xl font-bold tracking-tight">{title}</h3>
-          <span className="mt-auto flex items-center pt-4 text-sm font-semibold group-hover:underline">
+        <div className="relative z-10 flex min-h-[168px] flex-1 flex-col pr-[52%]">
+          <h3 className="text-xl font-bold tracking-tight sm:text-2xl">{title}</h3>
+          <span className="mt-auto flex items-center pt-3 text-sm font-semibold group-hover:underline">
             {linkLabel}
             <motion.div variants={arrowAnimation}>
               <ArrowRight className="ml-2 h-4 w-4" />
@@ -85,7 +85,7 @@ const ServiceCard = React.forwardRef<HTMLDivElement, ServiceCardProps>(
 
         <div className="pointer-events-none absolute inset-y-0 right-0 z-0 flex w-[52%] items-center justify-center p-2 sm:p-3">
           <motion.div
-            className="h-56 w-56 max-h-full max-w-full opacity-90 group-hover:opacity-100 sm:h-72 sm:w-72"
+            className="h-48 w-48 max-h-full max-w-full opacity-90 group-hover:opacity-100 sm:h-56 sm:w-60"
             variants={imageAnimation}
           >
             <Image

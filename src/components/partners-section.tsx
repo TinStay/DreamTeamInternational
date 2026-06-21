@@ -23,7 +23,6 @@ const PARTNERS: Partner[] = [
     href: "https://asiaeventagency.com/",
     ariaLabel: "Asia Event Agency",
   },
-  
   {
     id: "emblema",
     light: "emblema_logo_light.png",
@@ -118,7 +117,7 @@ const PARTNERS: Partner[] = [
 ];
 
 const imgClass =
-  "h-20 w-auto min-h-20 min-w-[170px] max-w-[min(280px,40vw)] object-contain transition-transform duration-200 group-hover:scale-[1.05] sm:h-24 sm:min-h-24 sm:min-w-[190px] sm:max-w-[min(320px,36vw)] md:h-28 md:min-h-28 md:min-w-[210px] md:max-w-[340px]";
+  "h-[4.5rem] w-auto min-h-[4.5rem] min-w-[130px] max-w-[min(200px,34vw)] object-contain transition-transform duration-200 group-hover:scale-[1.05] sm:h-[5.5rem] sm:min-h-[5.5rem] sm:min-w-[150px] sm:max-w-[min(240px,30vw)] md:h-[6.5rem] md:min-h-[6.5rem] md:min-w-[165px] md:max-w-[260px]";
 
 function PartnerLogo({ p }: { p: Partner }) {
   if (p.light && p.dark) {
@@ -225,7 +224,7 @@ export function PartnersSection() {
   return (
     <section className="relative overflow-x-hidden overflow-y-visible pt-10 pb-4 md:pt-12 md:pb-6">
       <div className="relative z-10 mx-auto mb-4 max-w-6xl px-4 md:mb-5">
-        <h2 className="text-center font-heading text-base font-semibold uppercase tracking-widest text-muted-foreground/70 md:text-lg">
+        <h2 className="text-center font-heading text-sm font-semibold uppercase tracking-widest text-muted-foreground/70 md:text-base">
           {t.partners.title}
         </h2>
       </div>

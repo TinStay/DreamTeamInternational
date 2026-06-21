@@ -14,8 +14,8 @@ export type ServiceCardVariant = (typeof SERVICE_CARD_VARIANTS)[number];
 /** Render size passed to Next.js Image (icons are 2048×2048; displayed smaller via CSS). */
 export const SERVICE_CARD_ICON_PX = 256;
 
-/** Matches `h-56` / `sm:h-72` display sizes in ServiceCard. */
-export const SERVICE_CARD_ICON_SIZES = "(max-width: 640px) 224px, 288px";
+/** Matches `h-48` / `sm:h-60` display sizes in ServiceCard. */
+export const SERVICE_CARD_ICON_SIZES = "(max-width: 640px) 1024px, 2048px";
 
 /** Default desktop carousel column height in service modals. */
 export const SERVICE_MODAL_PANEL_MIN_HEIGHT = 640;
