@@ -38,11 +38,25 @@ const PARTNERS: Partner[] = [
     ariaLabel: "Designed by GG",
   },
   {
+    id: "emblema",
+    light: "emblema_logo_light.png",
+    dark: null,
+    href: "https://emblema.bg/",
+    ariaLabel: "Emblema",
+  },
+  {
     id: "hubchev",
     light: null,
     dark: "hubchev_logo_dark.png",
     href: "https://hubchevproperties.com/",
     ariaLabel: "Hubchev Properties",
+  },
+  {
+    id: "hus-estate",
+    light: "hus_estate_logo_light.png",
+    dark: "hus_estate_logo_dark.png",
+    href: "https://husestate.com/bg/home",
+    ariaLabel: "Hus Estate",
   },
   {
     id: "imotalert",
