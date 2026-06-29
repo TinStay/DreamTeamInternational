@@ -2,14 +2,11 @@
 
 import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { en } from "./en";
-import { bg } from "./bg";
+import { LOCALES, dictionaries, type Language, type Dictionary } from "./config";
 
-export const LOCALES = ["en", "bg"] as const;
-export type Language = (typeof LOCALES)[number];
-type Dictionary = typeof en;
-
-const dictionaries: Record<Language, Dictionary> = { en, bg };
+// Re-exported so existing imports from "@/lib/i18n/language-context" keep working.
+export { LOCALES };
+export type { Language };
 
 function getRouteLanguage(pathname: string | null): Language {
   if (pathname?.startsWith("/bg")) return "bg";

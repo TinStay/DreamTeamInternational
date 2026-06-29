@@ -79,37 +79,6 @@ export function LanguageToggle({ className = "" }: { className?: string }) {
           </span>
         </span>
       </Toggle>
-
-      {/* Chinese locale disabled — not in use
-      <Toggle
-        id="zh"
-        aria-label={t.a11y.chinese}
-        variant="default"
-        size="default"
-        className={cn(
-          "relative h-8 w-8 cursor-pointer rounded-full px-0",
-          "data-[selected]:bg-gradient-to-r data-[selected]:from-[var(--primary-gradient-start)] data-[selected]:to-[var(--primary-gradient-end)]",
-          "data-[selected]:shadow-[0_10px_24px_rgba(0,0,0,0.18)]",
-          "data-[hovered]:bg-muted/80 data-[hovered]:text-foreground",
-          "[&_.flag]:transition-[box-shadow,ring-color] [&_.flag]:duration-200 [&[data-selected]_.flag]:ring-white [&[data-selected]_.flag]:shadow-[0_10px_24px_rgba(0,0,0,0.18)]"
-        )}
-      >
-        <span className="grid h-full w-full place-items-center">
-          <span className="flag grid h-5.5 w-5.5 place-items-center overflow-hidden rounded-full ring-2 ring-transparent">
-            <Image
-              src="/flags/chinese_flag.png"
-              alt=""
-              width={150}
-              height={150}
-              sizes="150px"
-              quality={100}
-              className="h-full w-full object-cover"
-              priority={false}
-            />
-          </span>
-        </span>
-      </Toggle>
-      */}
     </ToggleButtonGroup>
   );
 }

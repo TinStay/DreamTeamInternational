@@ -1,36 +1,44 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# DreamTeam Web
 
-## Getting Started
+Marketing site for **DreamTeam**, an AI video production agency. Built with Next.js 16 (App Router) and React 19.
 
-First, run the development server:
+## Stack
+
+- **Next.js 16** (App Router, Turbopack) + **React 19**, TypeScript
+- **Tailwind CSS v4** with shadcn-style UI primitives in `src/components/ui`
+- **Motion** (`motion` / `framer-motion`) for animation
+- **Resend** for contact & training inquiry emails
+- **PostHog** + **Vercel Analytics**
+
+## Getting started
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+npm run dev      # http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+The root path redirects `/` → `/bg`. Localized pages live under `src/app/[lang]` and support `bg` and `en`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Environment
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Create a `.env.local` file:
 
-## Learn More
+```bash
+RESEND_API_KEY=...                      # required for the contact form to send mail
+RESEND_FROM=info@dreamteam.technology   # optional; defaults to this address
+```
 
-To learn more about Next.js, take a look at the following resources:
+## Scripts
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- `npm run dev` — start the dev server
+- `npm run build` — production build
+- `npm run start` — serve the production build
+- `npm run lint` — run ESLint
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Project layout
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- `src/app/[lang]/` — locale-aware pages (home, contact, training, privacy, terms)
+- `src/app/api/contact/` — contact & training inquiry endpoint (Resend)
+- `src/app/sitemap.ts`, `robots.ts`, `opengraph-image.tsx` — SEO/social metadata
+- `src/components/` — page sections and UI components
+- `src/lib/i18n/` — dictionaries (`bg.ts`, `en.ts`), `config.ts`, and the language context

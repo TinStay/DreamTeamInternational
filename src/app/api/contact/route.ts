@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { Resend } from "resend";
 
+export const runtime = "nodejs";
+
 type Payload = {
   name?: string;
   email?: string;
@@ -13,7 +15,29 @@ type Payload = {
   trainingTarget?: string;
   trainingWhy?: string;
   message?: string;
+  /** Honeypot — must stay empty for real users. */
+  website?: string;
 };
+
+/** Per-field length caps to bound payload size and email content. */
+const MAX = {
+  name: 200,
+  email: 320,
+  phone: 60,
+  subject: 200,
+  foundUs: 80,
+  formStateBg: 120,
+  trainingTarget: 2000,
+  trainingWhy: 2000,
+  message: 5000,
+} as const;
+
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+/** Trim, coerce to string, and cap length. */
+function clean(value: unknown, max: number): string {
+  return typeof value === "string" ? value.trim().slice(0, max) : "";
+}
 
 function escapeHtml(input: string) {
   return input
@@ -24,12 +48,80 @@ function escapeHtml(input: string) {
     .replaceAll("'", "&#39;");
 }
 
+// Best-effort in-memory rate limit. Resets on cold start and is per-instance,
+// so it only blunts bursts from a single source — not a substitute for a real
+// distributed rate limiter, but enough to slow trivial form spam.
+const RATE_LIMIT_WINDOW_MS = 60_000;
+const RATE_LIMIT_MAX = 5;
+const recentHits = new Map<string, number[]>();
+
+function isRateLimited(ip: string, now: number): boolean {
+  const windowStart = now - RATE_LIMIT_WINDOW_MS;
+  const hits = (recentHits.get(ip) ?? []).filter((t) => t > windowStart);
+  hits.push(now);
+  recentHits.set(ip, hits);
+  return hits.length > RATE_LIMIT_MAX;
+}
+
 export async function POST(req: Request) {
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) {
+    console.error("contact: RESEND_API_KEY is not set");
     return NextResponse.json(
-      { ok: false, error: "Missing RESEND_API_KEY" },
+      { ok: false, error: "Email service is not configured." },
       { status: 500 }
+    );
+  }
+
+  let body: Payload;
+  try {
+    body = (await req.json()) as Payload;
+  } catch {
+    return NextResponse.json(
+      { ok: false, error: "Invalid request body." },
+      { status: 400 }
+    );
+  }
+
+  // Honeypot: bots fill hidden fields. Pretend success so they don't retry.
+  if (clean(body.website, 100)) {
+    return NextResponse.json({ ok: true, id: null });
+  }
+
+  const now = Date.now();
+  const ip =
+    req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+    req.headers.get("x-real-ip") ||
+    "unknown";
+  if (isRateLimited(ip, now)) {
+    return NextResponse.json(
+      { ok: false, error: "Too many requests. Please try again shortly." },
+      { status: 429 }
+    );
+  }
+
+  const name = clean(body.name, MAX.name);
+  const email = clean(body.email, MAX.email);
+  const phone = clean(body.phone, MAX.phone);
+  const subjectField = clean(body.subject, MAX.subject);
+  const foundUs = clean(body.foundUs, MAX.foundUs);
+  const formStateBg = clean(body.formStateBg, MAX.formStateBg);
+  const trainingTarget = clean(body.trainingTarget, MAX.trainingTarget);
+  const trainingWhy = clean(body.trainingWhy, MAX.trainingWhy);
+  const message = clean(body.message, MAX.message);
+
+  const invalidFields: string[] = [];
+  if (!name) invalidFields.push("name");
+  if (!email || !EMAIL_RE.test(email)) invalidFields.push("email");
+  if (!message) invalidFields.push("message");
+  if (invalidFields.length > 0) {
+    return NextResponse.json(
+      {
+        ok: false,
+        error: "Please fill out the required fields.",
+        fields: invalidFields,
+      },
+      { status: 422 }
     );
   }
 
@@ -37,32 +129,30 @@ export async function POST(req: Request) {
   // Always deliver training/contact inquiries to the main inbox.
   const to = ["info@dreamteam.technology"];
 
-  const data = (await req.json().catch(() => ({}))) as Payload;
-
-  const subject = `Website contact${data.subject ? `: ${data.subject}` : ""}`;
+  const subject = `Website contact${subjectField ? `: ${subjectField}` : ""}`;
   const text = [
-    `Name: ${data.name ?? "-"}`,
-    `Email: ${data.email ?? "-"}`,
-    `Phone: ${data.phone ?? "-"}`,
-    `Subject: ${data.subject ?? "-"}`,
-    `Found us: ${data.foundUs ?? "-"}`,
-    `Form (BG, internal): ${data.formStateBg ?? "-"}`,
-    `Training target: ${data.trainingTarget ?? "-"}`,
-    `Training why: ${data.trainingWhy ?? "-"}`,
+    `Name: ${name}`,
+    `Email: ${email}`,
+    `Phone: ${phone || "-"}`,
+    `Subject: ${subjectField || "-"}`,
+    `Found us: ${foundUs || "-"}`,
+    `Form (BG, internal): ${formStateBg || "-"}`,
+    `Training target: ${trainingTarget || "-"}`,
+    `Training why: ${trainingWhy || "-"}`,
     "",
     "Message:",
-    data.message ?? "-",
+    message,
   ].join("\n");
 
   const rows: Array<[string, string]> = [
-    ["Name", data.name ?? "-"],
-    ["Email", data.email ?? "-"],
-    ["Phone", data.phone ?? "-"],
-    ["Subject", data.subject ?? "-"],
-    ["Found us", data.foundUs ?? "-"],
-    ["Форма (вътрешно)", data.formStateBg ?? "-"],
-    ["Training target", data.trainingTarget ?? "-"],
-    ["Training why", data.trainingWhy ?? "-"],
+    ["Name", name],
+    ["Email", email],
+    ["Phone", phone || "-"],
+    ["Subject", subjectField || "-"],
+    ["Found us", foundUs || "-"],
+    ["Форма (вътрешно)", formStateBg || "-"],
+    ["Training target", trainingTarget || "-"],
+    ["Training why", trainingWhy || "-"],
   ];
 
   const html = `<!doctype html>
@@ -103,7 +193,7 @@ export async function POST(req: Request) {
           <div style="margin-top:6px;padding:14px 14px;border-radius:18px;background:#f9fafb;border:1px solid rgba(15,23,42,0.10);">
             <div style="font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial;font-size:12px;font-weight:900;color:rgba(15,23,42,0.80);text-transform:uppercase;letter-spacing:0.14em;">Message</div>
             <div style="margin-top:10px;font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial;font-size:14px;line-height:1.55;color:rgba(15,23,42,0.92);white-space:pre-wrap;">${escapeHtml(
-              data.message ?? "-"
+              message
             )}</div>
           </div>
         </div>
@@ -116,14 +206,30 @@ export async function POST(req: Request) {
 </html>`;
 
   const resend = new Resend(apiKey);
-  const result = await resend.emails.send({
-    from,
-    to,
-    subject,
-    text,
-    html,
-  });
+  try {
+    const result = await resend.emails.send({
+      from,
+      to,
+      subject,
+      text,
+      html,
+      replyTo: email,
+    });
 
-  return NextResponse.json({ ok: true, id: result.data?.id ?? null });
+    if (result.error) {
+      console.error("contact: Resend returned an error", result.error);
+      return NextResponse.json(
+        { ok: false, error: "Could not send your message. Please try again." },
+        { status: 502 }
+      );
+    }
+
+    return NextResponse.json({ ok: true, id: result.data?.id ?? null });
+  } catch (err) {
+    console.error("contact: failed to send email", err);
+    return NextResponse.json(
+      { ok: false, error: "Could not send your message. Please try again." },
+      { status: 502 }
+    );
+  }
 }
-

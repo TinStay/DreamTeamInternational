@@ -23,7 +23,6 @@ export function LanguageDropdown({ className = "" }: { className?: string }) {
       <SelectContent>
         <SelectItem value="bg">🇧🇬 Български</SelectItem>
         <SelectItem value="en">🇺🇸 English</SelectItem>
-        {/* <SelectItem value="zh">🇨🇳 简体中文</SelectItem> */}
       </SelectContent>
     </Select>
   );

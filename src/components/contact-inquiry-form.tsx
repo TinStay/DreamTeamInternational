@@ -128,6 +128,8 @@ export function ContactInquiryForm({
   const [name, setName] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [message, setMessage] = useState<string>("");
+  // Honeypot: hidden from users; only bots fill it. Server rejects when set.
+  const [website, setWebsite] = useState<string>("");
   const [trainingTargetValue, setTrainingTargetValue] = useState<string>(trainingTarget ?? "");
   const [isSending, setIsSending] = useState(false);
   const [sendResult, setSendResult] = useState<null | "ok" | "error">(null);
@@ -168,6 +170,7 @@ export function ContactInquiryForm({
           phone: phoneNumber,
           foundUs,
           message,
+          website,
           subject: subject?.trim() || undefined,
           formStateBg: formStateBg?.trim() || undefined,
           trainingTarget: (showTrainingTarget ? trainingTargetValue : trainingTarget)?.trim() || undefined,
@@ -198,6 +201,23 @@ export function ContactInquiryForm({
 
   const inner = (
     <form className={cn("space-y-3.5", variant === "plain" && "space-y-3")} onSubmit={handleSubmit}>
+      {/* Honeypot: hidden from users, catches bots that fill every field. */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -left-[9999px] h-0 w-0 overflow-hidden opacity-0"
+      >
+        <label htmlFor="contact-website">Company website</label>
+        <input
+          id="contact-website"
+          type="text"
+          name="website"
+          tabIndex={-1}
+          autoComplete="off"
+          value={website}
+          onChange={(e) => setWebsite(e.target.value)}
+        />
+      </div>
+
       {heading ? (
         <div className="mb-1 border-b border-border/25 pb-4 text-left">{heading}</div>
       ) : null}
