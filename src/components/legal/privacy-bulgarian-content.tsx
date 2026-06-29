@@ -3,8 +3,8 @@ export function PrivacyBulgarianContent() {
     <>
       <p className="not-prose text-[0.9375rem] leading-relaxed text-muted-foreground">
         Ние от &ldquo;DreamTeam&rdquo;, достъпни на{" "}
-        <a href="https://dreamteam.technology" className="text-primary underline-offset-4 hover:underline">
-          https://dreamteam.technology
+        <a href="https://dreamteam.video" className="text-primary underline-offset-4 hover:underline">
+          https://dreamteam.video
         </a>
         , уважаваме вашата поверителност и сме ангажирани с опазването на личните ви данни. Настоящата
         политика описва как обработваме информацията, събирана чрез нашия уебсайт.
@@ -21,7 +21,7 @@ export function PrivacyBulgarianContent() {
           <a href="mailto:info@dreamteam.technology">info@dreamteam.technology</a>
         </li>
         <li>
-          <strong>Дейност:</strong> Агенция за създаване на видео съдържание с помощта на изкуствен
+          <strong>Дейност:</strong> Компания за създаване на видео съдържание с помощта на изкуствен
           интелект.
         </li>
       </ul>
@@ -74,7 +74,7 @@ export function PrivacyBulgarianContent() {
       </ul>
 
       <h2>5. Изкуствен интелект и вашите данни</h2>
-      <p>Като агенция за AI видео продукция гарантираме, че:</p>
+      <p>Като компания за AI видео продукция гарантираме, че:</p>
       <p>
         В рамките на информационния ни уебсайт не се качват и не се обработват клиентски файлове (изображения,
         видеа, гласови записи) за обучение на AI модели, освен ако това не е изрично договорено в индивидуален

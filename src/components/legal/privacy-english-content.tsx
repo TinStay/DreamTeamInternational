@@ -3,8 +3,8 @@ export function PrivacyEnglishContent() {
     <>
       <p className="not-prose text-[0.9375rem] leading-relaxed text-muted-foreground">
         We at &ldquo;DreamTeam&rdquo;, accessible at{" "}
-        <a href="https://dreamteam.technology" className="text-primary underline-offset-4 hover:underline">
-          https://dreamteam.technology
+        <a href="https://dreamteam.video" className="text-primary underline-offset-4 hover:underline">
+          https://dreamteam.video
         </a>
         , respect your privacy and are committed to protecting your personal data. This policy
         describes how we process information collected through our website.
@@ -21,7 +21,7 @@ export function PrivacyEnglishContent() {
           <a href="mailto:info@dreamteam.technology">info@dreamteam.technology</a>
         </li>
         <li>
-          <strong>Activity:</strong> Agency for creating video content using artificial intelligence.
+          <strong>Activity:</strong> Company creating video content using artificial intelligence.
         </li>
       </ul>
 
@@ -74,7 +74,7 @@ export function PrivacyEnglishContent() {
       </ul>
 
       <h2>5. Artificial Intelligence and Your Data</h2>
-      <p>As an AI video production agency, we guarantee that:</p>
+      <p>As an AI video production company, we guarantee that:</p>
       <p>
         On our informational website, no client files are uploaded or processed (images, videos,
         voice recordings) for training AI models unless this is explicitly agreed upon in an

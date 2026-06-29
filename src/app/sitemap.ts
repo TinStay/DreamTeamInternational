@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
 import { LOCALES } from "@/lib/i18n/config";
 
-const BASE_URL = "https://dreamteam.technology";
+const BASE_URL = "https://dreamteam.video";
 
 /** Path suffixes (relative to a locale root) that should be indexed. */
 const PATHS = [

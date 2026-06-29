@@ -2,7 +2,7 @@ import { ImageResponse } from "next/og";
 
 // Branded fallback social-share image, generated at build/request time.
 // Replaces the previously-referenced `/og-image.jpg`, which did not exist.
-export const alt = "DreamTeam — AI Video Production Agency";
+export const alt = "DreamTeam — AI Video Production";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -42,7 +42,7 @@ export default function OpengraphImage() {
             maxWidth: 900,
           }}
         >
-          AI Video Production Agency
+          AI Video Production
         </div>
         <div
           style={{

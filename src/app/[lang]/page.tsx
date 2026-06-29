@@ -10,16 +10,41 @@ export function generateStaticParams() {
   return LOCALES.map((lang) => ({ lang }));
 }
 
-const META: Record<Language, { title: string; description: string }> = {
+const META: Record<
+  Language,
+  { title: string; description: string; keywords: string[] }
+> = {
   en: {
     title: "DreamTeam | AI Video Production",
     description:
-      "DreamTeam creates high-impact AI video for brands worldwide — photoreal, stylized, or hybrid. Scripting, production, and fast turnaround.",
+      "DreamTeam is an AI video production company creating AI-generated video ads, product videos, brand mascots, and AI-avatar stories for brands in Bulgaria and worldwide. Fast turnaround, accessible pricing.",
+    keywords: [
+      "AI video production",
+      "AI video company",
+      "AI video ads",
+      "product videos",
+      "brand mascots",
+      "AI avatars",
+      "social media video",
+      "corporate video",
+      "DreamTeam",
+    ],
   },
   bg: {
-    title: "DreamTeam | AI Видео Продукция",
+    title: "DreamTeam | AI Видео Продукция за Брандове",
     description:
-      "DreamTeam създава високоефективни AI видеа за брандове по света — реалистични, анимирани или хибридни. Сценарий, продукция и бързи срокове.",
+      "DreamTeam е компания за AI видео продукция — рекламни видеа с изкуствен интелект, продуктови видеа, корпоративно видео, AI аватари и талисмани за брандове в България и по света. Бързи срокове и достъпни цени.",
+    keywords: [
+      "AI видео продукция",
+      "рекламни видеа с изкуствен интелект",
+      "видео реклами за бизнес",
+      "продуктови видеа",
+      "корпоративно видео",
+      "AI аватари",
+      "AI талисмани",
+      "видео за социални мрежи",
+      "генериране на видео с изкуствен интелект",
+    ],
   },
 };
 
@@ -33,6 +58,7 @@ export async function generateMetadata({
   return {
     title: META[lang].title,
     description: META[lang].description,
+    keywords: META[lang].keywords,
     alternates: { canonical: `/${lang}`, languages: localeAlternates() },
   };
 }

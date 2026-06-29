@@ -1,6 +1,6 @@
 # DreamTeam Web
 
-Marketing site for **DreamTeam**, an AI video production agency. Built with Next.js 16 (App Router) and React 19.
+Marketing site for **DreamTeam**, an AI video production company. Built with Next.js 16 (App Router) and React 19.
 
 ## Stack
 
