@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import Image from "next/image";
 import { motion } from "motion/react";
 import { cn } from "@/lib/utils";
 
@@ -74,11 +75,15 @@ const AnimatedFeatureCard = React.forwardRef<HTMLDivElement, AnimatedFeatureCard
           }}
           transition={{ type: "spring", stiffness: 200, damping: 15 }}
         >
-          <img
-            src={imageSrc}
-            alt={tag}
-            className="h-[min(240px,42vw)] w-full max-w-[min(100%,300px)] rounded-xl object-cover object-center shadow-md sm:h-[250px]"
-          />
+          <div className="relative h-[min(240px,42vw)] w-full max-w-[min(100%,300px)] overflow-hidden rounded-xl shadow-md sm:h-[250px]">
+            <Image
+              src={imageSrc}
+              alt={tag}
+              fill
+              sizes="300px"
+              className="object-cover object-center"
+            />
+          </div>
         </motion.div>
 
         <div className="relative z-20 mt-auto shrink-0 rounded-xl border border-border/40 bg-[#f6f4f0] p-3.5 dark:border-border/30 dark:bg-background/75">

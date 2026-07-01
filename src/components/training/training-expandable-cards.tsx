@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { IconHourglassFilled } from "@tabler/icons-react";
 import { motion } from "motion/react";
 import { useLanguage } from "@/lib/i18n/language-context";
@@ -82,11 +83,12 @@ export function TrainingExpandableCards({ cards, className }: TrainingExpandable
                   variants={imageHoverVariants}
                   transition={cardHoverTransition}
                 >
-                  <img
+                  <Image
                     width={560}
                     height={360}
                     src={card.src}
                     alt={card.title}
+                    sizes="(max-width: 768px) 100vw, 33vw"
                     className="h-52 w-full object-cover object-center sm:h-56 md:h-60"
                   />
                 </motion.div>

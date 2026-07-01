@@ -5,8 +5,14 @@ import { useEffect, useState } from "react";
 
 export function PlasmaBackground() {
   const { theme } = useTheme();
-  const [mounted] = useState(() => typeof window !== "undefined");
+  const [mounted, setMounted] = useState(false);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+
+  // Render only after mount so server and first client render agree (null),
+  // avoiding a hydration mismatch from theme/window-dependent output.
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {

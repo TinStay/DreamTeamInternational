@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { ThemeToggle } from "./theme-toggle";
 // import { LanguageDropdown } from "./language-dropdown";
 import { buttonVariants } from "@/components/ui/button";
@@ -35,9 +36,12 @@ export function SiteHeader() {
       >
         <GlassShell className="flex items-center justify-between gap-3 px-6 py-3">
           <Link href={homeHref} className="group flex min-w-0 shrink items-center">
-            <img
+            <Image
               src="/logo-1.png"
               alt="DreamTeam"
+              width={1024}
+              height={416}
+              sizes="120px"
               className="h-12 w-auto grayscale transition-all group-hover:grayscale-0 dark:invert sm:h-11"
             />
           </Link>
@@ -53,9 +57,13 @@ export function SiteHeader() {
       <div className="liquid-glass-header shadow-elevated-soft rounded-full px-6 py-3 grid w-full grid-cols-[auto_1fr_auto] items-center gap-4 lg:gap-6">
         {/* Logo */}
         <Link href={homeHref} className="flex items-center gap-2 group justify-self-start min-w-0">
-          <img
+          <Image
             src="/logo-1.png"
             alt="DreamTeam"
+            width={1024}
+            height={416}
+            sizes="160px"
+            priority
             className="h-[3.25rem] w-auto grayscale group-hover:grayscale-0 transition-all dark:invert md:h-14"
           />
         </Link>

@@ -14,7 +14,7 @@ import {
   IconBolt,
 } from "@tabler/icons-react";
 import { useLanguage } from "@/lib/i18n/language-context";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence } from "motion/react";
 
 // ─── Pricing Data ─────────────────────────────────────────────────────────────
 const PLANS = [

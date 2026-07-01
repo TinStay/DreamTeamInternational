@@ -1,7 +1,7 @@
 import * as React from "react";
 import Image from "next/image";
 import { cva, type VariantProps } from "class-variance-authority";
-import { motion } from "framer-motion";
+import { motion } from "motion/react";
 import { ArrowRight } from "lucide-react";
 
 import { cn } from "@/lib/utils";

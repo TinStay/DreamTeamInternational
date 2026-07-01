@@ -1,13 +1,13 @@
 "use client";
 
 import React, { useEffect, useId, useRef, useState } from "react";
-import type { MotionValue } from "framer-motion";
+import type { MotionValue } from "motion/react";
 import {
   motion,
   useMotionValue,
   useMotionTemplate,
   useAnimationFrame,
-} from "framer-motion";
+} from "motion/react";
 import { cn } from "@/lib/utils";
 
 type GridPatternProps = {

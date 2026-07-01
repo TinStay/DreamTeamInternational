@@ -2,6 +2,7 @@
 
 import { useMemo, useRef } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { IconChevronLeft, IconExternalLink } from "@tabler/icons-react";
 import { SiteHeader } from "@/components/site-header";
@@ -59,11 +60,12 @@ export function TrainingDetailPageView({ slug: slugProp }: { slug?: string }) {
             {/* Left */}
             <section className="rounded-3xl bg-background p-5 shadow-sm ring-1 ring-border/25 sm:p-7">
               <div className="overflow-hidden rounded-3xl shadow-[0_20px_60px_rgba(15,23,42,0.14)]">
-                <img
+                <Image
                   src={copy.image}
                   alt={copy.title}
                   width={1200}
                   height={800}
+                  sizes="(max-width: 1024px) 100vw, 50vw"
                   className="h-60 w-full object-cover object-center sm:h-72 lg:h-80"
                 />
               </div>

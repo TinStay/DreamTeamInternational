@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Syne } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
-import { StyledComponentsRegistry } from "@/lib/styled-components-registry";
 import { LanguageProvider } from "@/lib/i18n/language-context";
 // import { FloatingAiAssistant } from "@/components/ui/glowing-ai-chat-assistant";
 import { Analytics } from "@vercel/analytics/next";
@@ -171,8 +170,7 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(STRUCTURED_DATA) }}
         />
         <PostHogProvider>
-          <StyledComponentsRegistry>
-            <ThemeProvider
+          <ThemeProvider
               attribute="class"
               defaultTheme="light"
               enableSystem={false}
@@ -188,7 +186,6 @@ export default function RootLayout({
                 </div>
               </LanguageProvider>
             </ThemeProvider>
-          </StyledComponentsRegistry>
           <Analytics />
         </PostHogProvider>
       </body>

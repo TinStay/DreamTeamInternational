@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { Sphere } from "./iridescent-shapes";
 import { LanguageToggle } from "./language-toggle";
 import { useLanguage } from "@/lib/i18n/language-context";
@@ -21,7 +22,7 @@ export function Footer() {
           {/* Brand column */}
           <div className="flex flex-col items-center md:items-start gap-4">
             <Link href={homeHref} className="font-heading font-bold text-2xl tracking-tight">
-              <img src="/logo-1.png" alt="DreamTeam" className="h-8 w-auto grayscale dark:invert transition-all" />
+              <Image src="/logo-1.png" alt="DreamTeam" width={1024} height={416} sizes="80px" className="h-8 w-auto grayscale dark:invert transition-all" />
             </Link>
             <p className="text-sm text-muted-foreground max-w-xs">{t.footer.desc}</p>
             <div className="flex items-center gap-3 mt-1">

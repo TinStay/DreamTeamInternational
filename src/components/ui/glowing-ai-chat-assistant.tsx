@@ -29,8 +29,14 @@ export function FloatingAiAssistant() {
   const [message, setMessage] = useState("");
   const [charCount, setCharCount] = useState(0);
   const [showSendModal, setShowSendModal] = useState(false);
-  const [mounted] = useState(() => typeof document !== "undefined");
+  const [mounted, setMounted] = useState(false);
   const chatRef = useRef<HTMLDivElement>(null);
+
+  // Portal target exists only on the client; defer to after mount so server
+  // and first client render agree (null) and hydration stays consistent.
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     if (!showSendModal) return;

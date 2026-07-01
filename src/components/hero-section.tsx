@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion } from "motion/react";
 import Link from "next/link";
 import { IconMailFilled, IconVideoFilled } from "@tabler/icons-react";
 import { buttonVariants } from "@/components/ui/button";

@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import Image from "next/image";
 import { motion } from "motion/react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card } from "@/components/ui/card";
@@ -70,11 +71,13 @@ function ModalCarouselTabs({
               whileHover={{ scale: 1.02 }}
               transition={{ duration: 0.35, ease: "easeOut" }}
             >
-              <img
+              <Image
                 src={t.src}
                 alt={t.alt ?? t.label}
-                className="h-full w-full object-cover transition-transform duration-500 ease-out group-hover/image:scale-110"
-                loading={idx === 0 ? "eager" : "lazy"}
+                fill
+                sizes="(max-width: 768px) 100vw, 600px"
+                priority={idx === 0}
+                className="object-cover transition-transform duration-500 ease-out group-hover/image:scale-110"
               />
             </motion.div>
           </TabsContent>
