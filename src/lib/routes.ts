@@ -15,6 +15,16 @@ export function trainingPath(language: Language) {
   return `/${language}/training`;
 }
 
+/** Localized services hub path. */
+export function servicesPath(language: Language) {
+  return `/${language}/services`;
+}
+
+/** Localized path for a single service page. */
+export function servicePath(language: Language, slug: string) {
+  return `/${language}/services/${slug}`;
+}
+
 /** Localized terms page path. */
 export function termsPath(language: Language) {
   return `/${language}/terms`;

@@ -11,7 +11,7 @@ export type { Language };
 function getRouteLanguage(pathname: string | null): Language {
   if (pathname?.startsWith("/bg")) return "bg";
   if (pathname?.startsWith("/en")) return "en";
-  return "en";
+  return "bg"; // Bulgarian is the primary locale (root redirects to /bg).
 }
 
 function switchLocalePath(path: string, target: Language): string {

@@ -9,7 +9,8 @@ export type StatsSectionItem = {
 };
 
 export type StatsSectionProps = {
-  headline: string;
+  title1: string;
+  title2: string;
   subline: string;
   items: StatsSectionItem[];
   className?: string;
@@ -41,12 +42,12 @@ const statValueClassName =
 
 const viewport = { once: true, margin: "-80px 0px -60px 0px" } as const;
 
-export function StatsSection({ headline, subline, items, className }: StatsSectionProps) {
+export function StatsSection({ title1, title2, subline, items, className }: StatsSectionProps) {
   return (
     <section className={cn("py-12 md:py-20", className)}>
-      <div className="mx-auto max-w-6xl space-y-8 px-6 md:space-y-12">
+      <div className="mx-auto max-w-7xl space-y-8 px-4 md:space-y-12">
         <motion.div
-          className="relative z-10 mx-auto max-w-2xl space-y-6 text-center"
+          className="relative z-10 max-w-2xl space-y-3"
           initial="hidden"
           whileInView="visible"
           viewport={viewport}
@@ -57,11 +58,11 @@ export function StatsSection({ headline, subline, items, className }: StatsSecti
         >
           <motion.h2
             variants={fadeUp}
-            className="font-heading text-4xl font-medium text-foreground lg:text-5xl"
+            className="font-heading text-4xl font-bold text-foreground md:text-5xl"
           >
-            {headline}
+            <span className="text-section-accent">{title1}</span> {title2}
           </motion.h2>
-          <motion.p variants={fadeUp} className="text-base text-muted-foreground md:text-lg">
+          <motion.p variants={fadeUp} className="text-lg text-muted-foreground">
             {subline}
           </motion.p>
         </motion.div>

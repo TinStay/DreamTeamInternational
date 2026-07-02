@@ -29,7 +29,7 @@ const MODAL_TAB_TRIGGER =
 
 export type FeatureShowcaseProps = {
   eyebrow?: string;
-  title: string;
+  title?: string;
   description?: string;
   stats?: string[];
   steps?: ServiceStep[];
@@ -38,6 +38,7 @@ export type FeatureShowcaseProps = {
   panelMinHeight?: number;
   className?: string;
   variant?: "section" | "modal";
+  titleAs?: "h1" | "h2";
 };
 
 function ModalCarouselTabs({
@@ -136,10 +137,12 @@ export function FeatureShowcase({
   panelMinHeight,
   className,
   variant = "section",
+  titleAs = "h2",
 }: FeatureShowcaseProps) {
   const initial = defaultTab ?? tabs[0]?.value ?? "tab-0";
   const [activeTab, setActiveTab] = React.useState(initial);
   const isModal = variant === "modal";
+  const TitleTag = titleAs;
   const resolvedPanelHeight = panelMinHeight ?? (isModal ? 620 : 720);
   const tabIndicatorId = isModal ? "feature-showcase-modal-tab" : "feature-showcase-section-tab";
 
@@ -162,7 +165,7 @@ export function FeatureShowcase({
           "mx-auto grid grid-cols-1 gap-8",
           isModal
             ? "max-w-none gap-4 max-lg:block max-lg:flex-none max-lg:pb-0 lg:grid lg:min-h-0 lg:flex-1 lg:h-full lg:grid-cols-2 lg:gap-5 lg:pb-0"
-            : "container max-w-7xl gap-10 md:grid-cols-12 lg:gap-14"
+            : "w-full max-w-none gap-6 md:grid-cols-12 lg:gap-8"
         )}
       >
         <div className={cn(isModal ? "flex flex-col lg:min-h-0 lg:flex-1 lg:overflow-hidden" : "md:col-span-6")}>
@@ -172,22 +175,24 @@ export function FeatureShowcase({
             </Badge>
           ) : null}
 
-          <h2
-            className={cn(
-              "text-balance font-bold leading-tight",
-              isModal
-                ? "font-heading text-3xl sm:text-4xl lg:text-[2.75rem] lg:leading-[1.1]"
-                : "text-4xl leading-[0.95] sm:text-5xl md:text-6xl"
-            )}
-          >
-            {title}
-          </h2>
+          {title ? (
+            <TitleTag
+              className={cn(
+                "text-balance font-bold leading-tight",
+                isModal
+                  ? "font-heading text-3xl sm:text-4xl lg:text-[2.75rem] lg:leading-[1.1]"
+                  : "font-heading text-3xl tracking-tight sm:text-4xl md:text-5xl"
+              )}
+            >
+              {title}
+            </TitleTag>
+          ) : null}
 
           {description ? (
             <p
               className={cn(
                 "mt-4 text-muted-foreground",
-                isModal ? "text-sm leading-relaxed sm:text-base" : "mt-6 max-w-xl"
+                isModal ? "text-sm leading-relaxed sm:text-base" : "mt-3"
               )}
             >
               {description}
@@ -200,8 +205,9 @@ export function FeatureShowcase({
                 <Chip
                   key={label}
                   color={STAT_CHIP_COLORS[index % STAT_CHIP_COLORS.length]}
-                  size={isModal ? "md" : "sm"}
+                  size="md"
                   variant={isModal ? "primary" : "secondary"}
+                  className={isModal ? undefined : "px-3.5 tracking-wide"}
                 >
                   {label}
                 </Chip>
@@ -212,7 +218,7 @@ export function FeatureShowcase({
           {steps.length > 0 && (
             <div
               className={cn(
-                isModal ? "mt-5 flex flex-col lg:min-h-0 lg:flex-1 lg:overflow-hidden" : "mt-10 max-w-xl"
+                isModal ? "mt-5 flex flex-col lg:min-h-0 lg:flex-1 lg:overflow-hidden" : "mt-8 w-full"
               )}
             >
               <ServiceStepsAccordion
@@ -222,7 +228,7 @@ export function FeatureShowcase({
                 className={cn(
                   isModal &&
                     "max-lg:overflow-visible lg:min-h-0 lg:flex-1 lg:overflow-y-auto lg:overscroll-y-contain lg:pr-3",
-                  !isModal && "max-w-xl"
+                  !isModal && "w-full"
                 )}
               />
             </div>

@@ -9,11 +9,12 @@ export function TrainingSection() {
 
   return (
     <section id="training" className="relative w-full overflow-visible pt-12 pb-20 sm:pt-16 sm:pb-24">
-      <div className="relative z-10 mx-auto w-full max-w-none px-4 sm:px-6 lg:px-10">
-        <header className="mb-6 md:mb-8">
-          <p className="mb-2 text-xs font-semibold uppercase tracking-[0.2em] text-primary">{tr.eyebrow}</p>
-          <h2 className="font-heading mb-3 text-4xl font-bold text-foreground md:text-5xl">{tr.title}</h2>
-          <p className="max-w-xl text-base text-muted-foreground md:text-lg">{tr.subtitle}</p>
+      <div className="relative z-10 mx-auto w-full max-w-7xl px-4">
+        <header className="mb-10 lg:mb-12">
+          <h2 className="mb-6 font-heading text-4xl font-bold text-foreground md:text-5xl">
+            <span className="text-section-accent">{tr.title1}</span> {tr.title2}
+          </h2>
+          <p className="max-w-2xl text-lg text-muted-foreground">{tr.subtitle}</p>
         </header>
 
         <TrainingCardsGrid />

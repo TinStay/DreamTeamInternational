@@ -77,7 +77,7 @@ export function TrainingExpandableCards({ cards, className }: TrainingExpandable
               variants={cardHoverVariants}
               transition={cardHoverTransition}
             >
-              <motion.div className="flex w-full flex-col gap-3.5 md:gap-4">
+              <motion.div className="flex w-full flex-1 flex-col gap-3.5 md:gap-4">
                 <motion.div
                   className="overflow-hidden rounded-lg"
                   variants={imageHoverVariants}

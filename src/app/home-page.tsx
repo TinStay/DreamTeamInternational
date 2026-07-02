@@ -8,6 +8,8 @@ import { ContactSection } from "@/components/contact-section";
 import { ProcessSection } from "@/components/process-section";
 import { CompanyStatsSection } from "@/components/company-stats-section";
 import { TrainingSection } from "@/components/training/training-section";
+import { ReviewsSection } from "@/components/reviews-section";
+import { FaqSection } from "@/components/faq-section";
 import { Footer } from "@/components/footer";
 import { GradientBlurPageBg } from "@/components/ui/gradient-blur-bg";
 import { MAIN_WITH_FIXED_PAGE_BG_CLASS } from "@/lib/page-shell";
@@ -42,6 +44,10 @@ export function HomePage() {
         </div>
 
         <div className="relative">
+          <ReviewsSection />
+        </div>
+
+        <div className="relative">
           <TrainingSection />
         </div>
 
@@ -51,6 +57,10 @@ export function HomePage() {
 
         <div className="relative">
           <ProcessSection />
+        </div>
+
+        <div className="relative">
+          <FaqSection />
         </div>
       </div>
 

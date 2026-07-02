@@ -112,7 +112,6 @@ export function ServiceStepsAccordion({
       )}
     >
       <Accordion
-        multiple
         defaultValue={firstId ? [firstId] : []}
         className="w-full space-y-2"
       >

@@ -6,6 +6,7 @@ import { Home } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/lib/i18n/language-context";
 import { homePath } from "@/lib/routes";
+import { getServiceIconBySlug } from "@/lib/services/constants";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -28,6 +29,8 @@ function segmentToLabel(
       return t.header.contact;
     case "training":
       return t.header.training;
+    case "services":
+      return t.header.services;
     case "individual":
       return t.training.cards.individual.title;
     case "skool":
@@ -39,11 +42,18 @@ function segmentToLabel(
       return t.legal.privacyTitle;
     case "terms":
       return t.legal.termsTitle;
-    default:
+    default: {
+      // Service slug -> service title (e.g. "ai-video" -> "AI Видео Продукция").
+      const icon = getServiceIconBySlug(segment);
+      const service = icon
+        ? t.services.items.find((item) => item.imgSrc === icon)
+        : undefined;
+      if (service) return service.title;
       return segment
         .split("-")
         .map((s) => s.slice(0, 1).toUpperCase() + s.slice(1))
         .join(" ");
+    }
   }
 }
 

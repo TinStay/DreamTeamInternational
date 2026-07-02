@@ -41,12 +41,12 @@ export function ProcessSection() {
     <section id="process" className="relative overflow-hidden pt-12 pb-20 sm:pt-16 sm:pb-24" ref={ref}>
       <div className="max-w-7xl mx-auto px-4 z-10 relative">
         
-        <div className={`text-center mb-16 transition-all duration-1000 transform ${isInView ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"}`}>
-          <h2 className="font-heading font-bold text-4xl md:text-5xl mb-4 text-foreground">
+        <div className={`mb-16 transition-all duration-1000 transform ${isInView ? "translate-y-0 opacity-100" : "translate-y-10 opacity-0"}`}>
+          <h2 className="font-heading font-bold text-4xl md:text-5xl mb-6 text-foreground">
             {t.process.title1}{" "}
             <span className="text-section-accent">{t.process.title2}</span>
           </h2>
-          <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+          <p className="text-muted-foreground text-lg max-w-2xl">
             {t.process.subtitle}
           </p>
         </div>

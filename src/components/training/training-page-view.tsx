@@ -25,10 +25,11 @@ export function TrainingPageView() {
         <div className="mx-auto w-full max-w-7xl xl:max-w-[86rem] 2xl:max-w-[96rem]">
           <PageBreadcrumbs className="mb-6" />
 
-          <header className="mb-12 text-center md:mb-14 md:text-left">
-            <p className="mb-2 text-xs font-semibold uppercase tracking-[0.2em] text-primary">{tr.eyebrow}</p>
-            <h1 className="font-heading text-3xl font-bold tracking-tight text-foreground md:text-4xl">{tr.title}</h1>
-            <p className="mx-auto mt-4 max-w-2xl text-base text-muted-foreground md:mx-0">{tr.subtitle}</p>
+          <header className="mb-10 lg:mb-12">
+            <h1 className="mb-6 font-heading text-4xl font-bold text-foreground md:text-5xl">
+              <span className="text-section-accent">{tr.title1}</span> {tr.title2}
+            </h1>
+            <p className="max-w-2xl text-lg text-muted-foreground">{tr.subtitle}</p>
           </header>
 
           <TrainingCardsGrid />

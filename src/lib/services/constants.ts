@@ -44,3 +44,29 @@ export function getServicePortfolioLink(iconSrc: string) {
 export function getServiceCardVariant(index: number): ServiceCardVariant | "default" {
   return SERVICE_CARD_VARIANTS[index] ?? "default";
 }
+
+/** SEO-friendly, locale-independent URL slug per service, keyed to the stable icon path. */
+export const SERVICE_SLUG_BY_ICON: Record<string, string> = {
+  [SERVICE_ICONS.video]: "ai-video",
+  [SERVICE_ICONS.mascot]: "brand-mascots",
+  [SERVICE_ICONS.images]: "ai-images",
+  [SERVICE_ICONS.automation]: "ai-automation",
+};
+
+/** Reverse lookup: slug -> icon path. */
+export const SERVICE_ICON_BY_SLUG: Record<string, string> = Object.fromEntries(
+  Object.entries(SERVICE_SLUG_BY_ICON).map(([icon, slug]) => [slug, icon])
+);
+
+/** All service slugs, in card order. */
+export const SERVICE_SLUGS = Object.values(SERVICE_SLUG_BY_ICON);
+
+/** Slug for a service, looked up by its icon path (the stable identifier). */
+export function getServiceSlug(iconSrc: string): string | undefined {
+  return SERVICE_SLUG_BY_ICON[iconSrc];
+}
+
+/** Icon path (service identifier) for a URL slug. */
+export function getServiceIconBySlug(slug: string): string | undefined {
+  return SERVICE_ICON_BY_SLUG[slug];
+}

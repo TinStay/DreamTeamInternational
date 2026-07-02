@@ -9,7 +9,7 @@ import { GlassShell } from "@/components/ui/glass-shell";
 import { cn } from "@/lib/utils";
 import { useEffect, useState } from "react";
 import { useLanguage } from "@/lib/i18n/language-context";
-import { contactProcessPath, homePath, trainingPath } from "@/lib/routes";
+import { contactProcessPath, homePath, servicesPath, trainingPath } from "@/lib/routes";
 import { IconMailFilled } from "@tabler/icons-react";
 
 export function SiteHeader() {
@@ -73,7 +73,7 @@ export function SiteHeader() {
           <Link href={`${homeHref}#portfolio`} className="hover:text-primary transition-colors whitespace-nowrap">
             {t.header.portfolio}
           </Link>
-          <Link href={`${homeHref}#services`} className="hover:text-primary transition-colors whitespace-nowrap">
+          <Link href={servicesPath(language)} className="hover:text-primary transition-colors whitespace-nowrap">
             {t.header.services}
           </Link>
           <Link

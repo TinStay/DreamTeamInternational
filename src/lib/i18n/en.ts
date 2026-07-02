@@ -12,6 +12,8 @@ export const en = {
     titleBefore: "Your",
     titleGlow: "imagination",
     titleAfter: " is the limit.",
+    seoHeading:
+      "DreamTeam - AI video production and AI-powered video ads for brands in Bulgaria and worldwide",
     cta1: "Contact us",
     cta2: "View Our Work"
   },
@@ -78,6 +80,12 @@ export const en = {
     title2: "Services",
     subtitle: "End-to-end AI production - from video and mascots to stills and automated pipelines.",
     learnMore: "Learn more",
+    metaTitle: "AI Video Services for Business | DreamTeam",
+    metaDescription:
+      "AI video production, brand mascots, AI images, and automations. AI-powered video ads for brands in Bulgaria and worldwide.",
+    ctaHeading: "Ready to get started?",
+    ctaSubtitle:
+      "Tell us your idea and we'll send a personalized quote for your video.",
     modal: {
       close: "Close",
       contactCta: "Get a quote",
@@ -88,6 +96,9 @@ export const en = {
         title: "AI Video Production",
         imgSrc: "/services/icons/ai_video.png",
         imgAlt: "Video production studio equipment",
+        seoTitle: "AI Video Production | DreamTeam",
+        seoDescription:
+          "AI-powered video ads for TV, social media, product and corporate video. AI avatars and unique scenes on a smaller budget.",
         modal: {
           eyebrow: "AI Video Production",
           title: "AI videos from product shots or built from scratch",
@@ -198,6 +209,9 @@ export const en = {
         title: "Brand Mascot",
         imgSrc: "/services/icons/ai_mascot.png",
         imgAlt: "Colorful character illustration",
+        seoTitle: "AI Brand Mascots | DreamTeam",
+        seoDescription:
+          "We create AI mascots that carry your brand message - animated or realistic, with male and female voice, for posts, stories, and video.",
         modal: {
           eyebrow: "AI Brand Mascot",
           title: "A talisman your audience will remember",
@@ -285,6 +299,9 @@ export const en = {
         title: "AI Graphic Design",
         imgSrc: "/services/icons/ai_images.png",
         imgAlt: "Camera and photography setup",
+        seoTitle: "AI Images & Graphic Design | DreamTeam",
+        seoDescription:
+          "AI images and AI graphic design for posts, stories, web, presentations, logos, and brand documents - matched to your brand style.",
         modal: {
           eyebrow: "AI Graphic Design",
           title: "Images crafted for every touchpoint",
@@ -348,6 +365,9 @@ export const en = {
         title: "Video & Image Automation",
         imgSrc: "/services/icons/ai_automation.png",
         imgAlt: "Robotics and automation concept",
+        seoTitle: "Video & Image Automation | DreamTeam",
+        seoDescription:
+          "A repeatable process for generating AI video and AI images in a uniform style - ideal for catalogs, social feeds, and seasonal campaigns.",
         modal: {
           eyebrow: "AI Video Automation",
           title: "From a few images to video - the same way every time",
@@ -413,8 +433,57 @@ export const en = {
       },
     ],
   },
+  faq: {
+    title1: "Frequently",
+    title2: "Asked Questions",
+    subtitle:
+      "Answers to the questions clients ask us most - about pricing, timelines, rights, and how we work.",
+    items: [
+      {
+        q: "How much does an AI video cost?",
+        a: "The price depends on the complexity and length of the video, so we work with individual quotes rather than fixed packages. Describe your project through the quote form and you get a specific price for your case.",
+      },
+      {
+        q: "Which tools and AI models do you use?",
+        a: "We use the best tools on the market and pick the right one for each scenario. We work with different AI and video models and know the strengths and weaknesses of each, so we choose the one that fits your project.",
+      },
+      {
+        q: "How long does a video take?",
+        a: "Usually between 5 and 12 working days depending on the video's complexity, length, and revisions. If you need it sooner, we offer a paid priority option. If you want the highest quality, we take the time it needs — meeting your expectations always comes first.",
+      },
+      {
+        q: "What types of videos can you make?",
+        a: "We make AI-powered video ads for TV and social media (TikTok, Instagram, Reels, YouTube), product videos, corporate video, tutorials, and stories with AI avatars. We can show your product in settings traditional filming can't easily reach.",
+      },
+      {
+        q: "Is AI video cheaper than traditional filming?",
+        a: "In most cases, yes. There are no film crews, extras, locations, or props to hire, so you get a high-end look on a smaller budget. It's especially cost-effective for scenes that would be expensive or hard to shoot in real life.",
+      },
+      {
+        q: "Do I get full commercial usage rights to the video?",
+        a: "Yes. After final delivery the video is yours to use for advertising, social media, your website, TV, and any commercial purpose. We put the details in the quote so everything is clear before we start.",
+      },
+      {
+        q: "Do you work with clients across Bulgaria and abroad?",
+        a: "Yes. We are based in Sofia but work fully online with clients across Bulgaria and around the world. The whole process - from brief to delivery - runs remotely, with no need to meet in person.",
+      },
+      {
+        q: "What do you need from me to get started?",
+        a: "Your idea or message and a few assets are enough - product photos, logo, and brand guidelines. If you don't have a concept ready, we propose one that fits your company and audience.",
+      },
+      {
+        q: "Can you match my brand style and provide voiceover?",
+        a: "Yes. We work from your colors, logo, and tone so the video looks like part of your brand. We also provide professional voiceover with a male or female voice in Bulgarian, English, and other languages when needed.",
+      },
+    ],
+  },
+  reviews: {
+    title1: "What our",
+    title2: "clients say",
+  },
   stats: {
-    headline: "Videos that reach new dimensions.",
+    title1: "DreamTeam",
+    title2: "in numbers",
     subline:
       "The AI video production industry is evolving fast. Together with you, we are shaping its future.",
     items: [
@@ -548,6 +617,8 @@ export const en = {
       "Individual AI video consultations, Skool community courses, and team workshops from DreamTeam.",
     eyebrow: "Hands-on AI video training",
     title: "Training for AI production",
+    title1: "Training",
+    title2: "for AI production",
     subtitle:
       "Learn the workflows we ship for clients — from briefing and prompt design to look development, editing, and delivery. Pick the format that matches your pace and team size.",
     viewAll: "View all programs",
@@ -602,7 +673,7 @@ export const en = {
         featureSummary:
           "Structured path with modules, templates, and community critique as you build real AI video projects.",
         suitableFor:
-          "For learners who want a structured path with templates and community critique between milestones.",
+          "For learners who want a structured path with templates and community critique while building their first real AI videos.",
         cta: "Open Skool",
         image: "/trainings/skool_banner.jpeg",
         modalIntro:

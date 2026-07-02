@@ -8,7 +8,7 @@ import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/s
 import { useLanguage } from "@/lib/i18n/language-context";
 import { buttonVariants, primaryGradientInteractiveClassName } from "@/components/ui/button";
 import { GlassShell } from "@/components/ui/glass-shell";
-import { contactProcessPath, homePath, trainingPath } from "@/lib/routes";
+import { contactProcessPath, homePath, servicesPath, trainingPath } from "@/lib/routes";
 import { cn } from "@/lib/utils";
 import { LanguageToggle } from "./language-toggle";
 import { ThemeToggle } from "./theme-toggle";
@@ -20,7 +20,7 @@ export function MobileNav() {
   const trainingHref = trainingPath(language);
   const contactHref = contactProcessPath(language);
   const portfolioHref = `${homeHref}#portfolio`;
-  const servicesHref = `${homeHref}#services`;
+  const servicesHref = servicesPath(language);
 
   return (
     <>

@@ -1,15 +1,15 @@
 "use client";
 
 import { useMemo } from "react";
+import Link from "next/link";
 import { ServiceCard } from "@/components/ui/service-card";
-import { Modal, ModalBody, ModalTrigger } from "@/components/ui/animated-modal";
-import { ServiceModalContent } from "@/components/service-modal-content";
 import { useLanguage } from "@/lib/i18n/language-context";
-import { getServiceCardVariant } from "@/lib/services/constants";
+import { servicePath } from "@/lib/routes";
+import { getServiceCardVariant, getServiceSlug } from "@/lib/services/constants";
 import { cn } from "@/lib/utils";
 
 export function ServicesSection({ className }: { className?: string }) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
 
   const cards = useMemo(
     () =>
@@ -22,7 +22,7 @@ export function ServicesSection({ className }: { className?: string }) {
 
   return (
     <section id="services" className={cn("relative w-full overflow-visible py-10 sm:py-14", className)}>
-      <div className="relative z-10 mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-10">
+      <div className="relative z-10 mx-auto w-full max-w-7xl px-4">
         <div className="mb-8 sm:mb-10">
           <h2 className="font-heading mb-3 text-4xl font-bold text-foreground md:text-5xl">
             {t.services.title1}{" "}
@@ -32,9 +32,14 @@ export function ServicesSection({ className }: { className?: string }) {
         </div>
 
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-          {cards.map((service) => (
-            <Modal key={service.imgSrc}>
-              <ModalTrigger className="block w-full rounded-xl">
+          {cards.map((service) => {
+            const slug = getServiceSlug(service.imgSrc);
+            return (
+              <Link
+                key={service.imgSrc}
+                href={slug ? servicePath(language, slug) : "#"}
+                className="block w-full rounded-xl"
+              >
                 <ServiceCard
                   title={service.title}
                   imgSrc={service.imgSrc}
@@ -43,12 +48,9 @@ export function ServicesSection({ className }: { className?: string }) {
                   linkLabel={t.services.learnMore}
                   className="w-full"
                 />
-              </ModalTrigger>
-              <ModalBody>
-                <ServiceModalContent service={service} />
-              </ModalBody>
-            </Modal>
-          ))}
+              </Link>
+            );
+          })}
         </div>
       </div>
     </section>

@@ -3,7 +3,6 @@ import { Syne } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { LanguageProvider } from "@/lib/i18n/language-context";
-// import { FloatingAiAssistant } from "@/components/ui/glowing-ai-chat-assistant";
 import { Analytics } from "@vercel/analytics/next";
 import { PostHogProvider } from "@/components/posthog-provider";
 import { PostHogPageView } from "@/components/posthog-pageview";
@@ -86,6 +85,12 @@ const STRUCTURED_DATA = {
       description:
         "AI video production company creating AI-generated video for brands — TV and social ads, product videos, brand mascots, explainer videos, and AI avatars. Serving Bulgaria and worldwide.",
       email: "info@dreamteam.technology",
+      sameAs: [
+        "https://www.facebook.com/profile.php?id=61585919836260",
+        "https://www.instagram.com/dreamteam.video.ai/",
+        "https://www.linkedin.com/company/109344952",
+        "https://www.youtube.com/@DreamTeamVideo",
+      ],
       knowsLanguage: ["bg", "en"],
       areaServed: [{ "@type": "Country", name: "Bulgaria" }, "Worldwide"],
       address: {
@@ -182,7 +187,6 @@ export default function RootLayout({
                 </Suspense>
                 <div className="relative z-10">
                   {children}
-                  {/* <FloatingAiAssistant /> */}
                 </div>
               </LanguageProvider>
             </ThemeProvider>

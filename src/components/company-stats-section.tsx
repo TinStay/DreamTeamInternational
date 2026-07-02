@@ -10,7 +10,8 @@ export function CompanyStatsSection({ className }: { className?: string }) {
   return (
     <section id="stats" className={cn("relative w-full overflow-visible", className)}>
       <StatsSection
-        headline={t.stats.headline}
+        title1={t.stats.title1}
+        title2={t.stats.title2}
         subline={t.stats.subline}
         items={t.stats.items}
       />

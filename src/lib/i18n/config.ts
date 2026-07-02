@@ -4,8 +4,8 @@
 import { en } from "./en";
 import { bg } from "./bg";
 
-/** Supported locales. The first entry is treated as the default. */
-export const LOCALES = ["en", "bg"] as const;
+/** Supported locales. Bulgarian is primary (first) — the site defaults to /bg. */
+export const LOCALES = ["bg", "en"] as const;
 export type Language = (typeof LOCALES)[number];
 export type Dictionary = typeof en;
 
