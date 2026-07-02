@@ -11,7 +11,7 @@ export const en = {
   hero: {
     titleBefore: "Your",
     titleGlow: "imagination",
-    titleAfter: " is the limit.",
+    titleAfter: "is the limit.",
     seoHeading:
       "DreamTeam - AI video production and AI-powered video ads for brands in Bulgaria and worldwide",
     cta1: "Contact us",

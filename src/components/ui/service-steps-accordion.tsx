@@ -57,7 +57,7 @@ type ServiceStepsAccordionProps = {
   scrollable?: boolean;
 };
 
-const STEP_CONTENT_BG = "bg-neutral-50/40 dark:bg-neutral-900/50";
+const STEP_CONTENT_BG = "bg-neutral-50/40 dark:bg-slate-800/40";
 
 function StepBody({ step }: { step: ServiceStep }) {
   const hasItems = Boolean(step.items?.length);
@@ -80,7 +80,7 @@ function StepBody({ step }: { step: ServiceStep }) {
           className="border-t border-border/60 first:border-t-0"
           defaultOpen={false}
         >
-          <CollapsibleTrigger className="flex w-full cursor-pointer items-center gap-2 px-4 py-3 text-left text-sm font-medium text-foreground hover:bg-neutral-100/50 dark:hover:bg-neutral-800/30 [&[data-open]>svg]:rotate-180">
+          <CollapsibleTrigger className="flex w-full cursor-pointer items-center gap-2 px-4 py-3 text-left text-sm font-medium text-foreground hover:bg-neutral-100/50 dark:hover:bg-slate-800/50 [&[data-open]>svg]:rotate-180">
             <ChevronDown
               aria-hidden
               className="size-4 shrink-0 opacity-60 transition-transform duration-200"
@@ -123,7 +123,7 @@ export function ServiceStepsAccordion({
             <AccordionItem
               key={step.id}
               value={step.id}
-              className="overflow-hidden rounded-lg border border-border/60 bg-white dark:border-neutral-800 dark:bg-neutral-950"
+              className="overflow-hidden rounded-lg border border-border/60 bg-card dark:border-slate-800"
             >
               <AccordionTrigger className="group/accordion-trigger shrink-0 cursor-pointer px-4 py-3 hover:no-underline [&_[data-slot=accordion-trigger-icon]]:hidden">
                 <div className="flex w-full items-center justify-between gap-3">

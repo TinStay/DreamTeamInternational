@@ -19,6 +19,10 @@ export function HeroSection() {
   const contactHref = contactProcessPath(language);
   const portfolioHref = `${homePath(language)}#portfolio`;
   const shouldRenderTitleGap = Boolean(t.hero.titleBefore) && Boolean(t.hero.titleGlow);
+  // Space must live OUTSIDE the inline-block spans — leading whitespace inside
+  // an inline-block is trimmed by CSS, which glued the words together.
+  const shouldRenderAfterGap =
+    Boolean(t.hero.titleAfter) && Boolean(t.hero.titleGlow || t.hero.titleBefore);
 
   return (
     <section
@@ -90,6 +94,7 @@ export function HeroSection() {
               </motion.span>
             ))}
           </span>
+          {shouldRenderAfterGap ? " " : null}
           <motion.span
             className="inline-block"
             initial={{ y: 28, opacity: 0 }}

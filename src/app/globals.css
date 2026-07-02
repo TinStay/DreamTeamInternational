@@ -140,7 +140,10 @@
 }
 
 .dark {
-  --card: #222327;
+  /* Standard dark surface for text cards — dark navy (slate-900), matching the
+     footer glass. Build new cards with `bg-card` (or `bg-card/NN`) so they
+     automatically follow this standard. */
+  --card: #0f172a;
   --ring: #f87171;
   --input: #33353a;
   --muted: #2a2c33;
@@ -152,7 +155,7 @@
   --chart-3: #fca5a5;
   --chart-4: #5993f4;
   --chart-5: #a0a0a0;
-  --popover: #222327;
+  --popover: #0f172a;
   --primary: #db4e4e;
   --sidebar: #161618;
   --spacing: 0.27rem;

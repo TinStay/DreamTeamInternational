@@ -58,7 +58,7 @@ export function TrainingDetailPageView({ slug: slugProp }: { slug?: string }) {
 
           <div className="grid gap-5 lg:grid-cols-2 lg:gap-6">
             {/* Left */}
-            <section className="rounded-3xl bg-background p-5 shadow-sm ring-1 ring-border/25 sm:p-7">
+            <section className="rounded-3xl bg-card p-5 shadow-sm ring-1 ring-border/25 sm:p-7">
               <div className="overflow-hidden rounded-3xl shadow-[0_20px_60px_rgba(15,23,42,0.14)]">
                 <Image
                   src={copy.image}
@@ -89,13 +89,13 @@ export function TrainingDetailPageView({ slug: slugProp }: { slug?: string }) {
 
             {/* Right */}
             <aside className="flex flex-col gap-4">
-              <div className="rounded-3xl bg-background p-4 shadow-sm ring-1 ring-border/20 sm:p-6">
+              <div className="rounded-3xl bg-card p-4 shadow-sm ring-1 ring-border/20 sm:p-6">
                 <TrainingModalDetails copy={copy} />
               </div>
 
               <div
                 ref={formRef}
-                className="rounded-3xl bg-background p-4 shadow-sm ring-1 ring-border/20 sm:p-6"
+                className="rounded-3xl bg-card p-4 shadow-sm ring-1 ring-border/20 sm:p-6"
               >
                 {isSkool ? (
                   <div className="flex flex-col gap-3">

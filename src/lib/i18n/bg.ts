@@ -11,7 +11,7 @@ export const bg = {
   hero: {
     titleBefore: "",
     titleGlow: "Въображението",
-    titleAfter: " е твоят лимит.",
+    titleAfter: "е твоят лимит.",
     seoHeading:
       "DreamTeam - AI видео продукция и рекламни видеа с изкуствен интелект за брандове в България и по света",
     cta1: "Свържете се с нас",
