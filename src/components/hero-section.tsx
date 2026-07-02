@@ -4,7 +4,6 @@ import { motion } from "motion/react";
 import Link from "next/link";
 import { IconMailFilled, IconVideoFilled } from "@tabler/icons-react";
 import { buttonVariants } from "@/components/ui/button";
-import HeroDecorativePaths from "@/components/ui/modern-background-paths";
 import { GlassShell } from "@/components/ui/glass-shell";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/lib/i18n/language-context";
@@ -48,8 +47,6 @@ export function HeroSection() {
           />
         </div>
 
-        <HeroDecorativePaths />
-
         <div className="absolute inset-0 z-[2] transition-opacity duration-700 bg-[radial-gradient(1200px_700px_at_50%_30%,rgba(0,0,0,0.14),transparent_58%),radial-gradient(900px_600px_at_0%_0%,rgba(0,0,0,0.32),transparent_58%),radial-gradient(900px_600px_at_100%_0%,rgba(0,0,0,0.32),transparent_58%),radial-gradient(900px_600px_at_0%_100%,rgba(0,0,0,0.26),transparent_62%),radial-gradient(900px_600px_at_100%_100%,rgba(0,0,0,0.26),transparent_62%)]" />
         <div className="pointer-events-none absolute inset-x-0 bottom-0 z-[2] h-21 bg-gradient-to-t from-background via-background/15 to-transparent sm:h-36 dark:from-background dark:via-background/85" />
         <div
@@ -61,7 +58,7 @@ export function HeroSection() {
 
       <div className="relative z-20 mx-auto mt-24 flex w-full max-w-5xl flex-col items-center justify-center px-4 pb-8 text-center sm:mt-28 sm:pb-10 lg:mt-0 lg:pb-0">
         <motion.p
-          className="mb-8 w-full min-w-0 max-w-full px-1 font-heading text-[clamp(1.75rem,6.2vw+0.35rem,2.25rem)] font-extrabold leading-[1.08] tracking-tight text-balance text-white [overflow-wrap:anywhere] break-words sm:mb-10 sm:text-5xl sm:leading-[1.06] md:text-6xl md:leading-[1.03] lg:text-7xl"
+          className="mb-8 w-full min-w-0 max-w-full px-1 font-heading text-[clamp(1.75rem,6.2vw+0.35rem,2.25rem)] font-extrabold leading-[1.08] tracking-tight text-balance text-white [overflow-wrap:anywhere] break-words [text-shadow:0_2px_14px_rgba(0,0,0,0.35)] sm:mb-10 sm:text-5xl sm:leading-[1.06] md:text-6xl md:leading-[1.03] lg:text-7xl"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.45 }}

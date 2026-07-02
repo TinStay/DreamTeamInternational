@@ -41,13 +41,17 @@ export function FaqSection({ className }: { className?: string }) {
           </p>
         </div>
 
-        <Accordion className="rounded-2xl border border-border/30 bg-card/60 px-4 shadow-sm backdrop-blur-sm sm:px-6">
+        <Accordion className="space-y-3 sm:space-y-4">
           {faq.items.map((item, i) => (
-            <AccordionItem key={item.q} value={`faq-${i}`}>
-              <AccordionTrigger className="py-4 text-base font-semibold text-foreground">
+            <AccordionItem
+              key={item.q}
+              value={`faq-${i}`}
+              className="overflow-hidden rounded-2xl border border-border/40 bg-card/70 px-6 shadow-sm backdrop-blur-sm sm:rounded-3xl sm:px-8"
+            >
+              <AccordionTrigger className="py-5 text-base font-semibold text-foreground sm:py-6 sm:text-lg">
                 {item.q}
               </AccordionTrigger>
-              <AccordionContent className="text-[0.95rem] leading-relaxed text-muted-foreground">
+              <AccordionContent className="pb-5 text-[0.95rem] leading-relaxed text-muted-foreground sm:text-base">
                 <p>{item.a}</p>
               </AccordionContent>
             </AccordionItem>
