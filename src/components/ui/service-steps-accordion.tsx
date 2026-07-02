@@ -57,7 +57,9 @@ type ServiceStepsAccordionProps = {
   scrollable?: boolean;
 };
 
-const STEP_CONTENT_BG = "bg-neutral-50/40 dark:bg-slate-800/40";
+// Expanded step body sits visually "recessed" — slightly darker than the card
+// surface (`--card` dark navy) in dark mode.
+const STEP_CONTENT_BG = "bg-neutral-50/40 dark:bg-slate-950/50";
 
 function StepBody({ step }: { step: ServiceStep }) {
   const hasItems = Boolean(step.items?.length);

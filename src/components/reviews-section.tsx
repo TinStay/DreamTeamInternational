@@ -3,7 +3,6 @@
 import { motion } from "motion/react";
 import { useLanguage } from "@/lib/i18n/language-context";
 import { Testimonial } from "@/components/ui/testimonial";
-import { REVIEWS } from "@/lib/reviews";
 import { cn } from "@/lib/utils";
 
 const MARQUEE_DURATION_SEC = 90;
@@ -12,7 +11,7 @@ export function ReviewsSection({ className }: { className?: string }) {
   const { t } = useLanguage();
   const r = t.reviews;
   // Duplicated so the marquee loops seamlessly (translate 0% -> -50%).
-  const items = [...REVIEWS, ...REVIEWS];
+  const items = [...r.items, ...r.items];
 
   return (
     <section
@@ -40,6 +39,7 @@ export function ReviewsSection({ className }: { className?: string }) {
             <Testimonial
               key={`${review.name}-${idx}`}
               name={review.name}
+              role={review.role}
               text={review.text}
               rating={review.rating}
               initials={review.initials}
