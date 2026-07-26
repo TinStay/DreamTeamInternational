@@ -10,6 +10,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   ANIMATED_SHORT,
   ANIMATED_WIDE,
+  AVATARS_SHORT,
   AVATARS_WIDE,
   CARS_SHORT,
   CARS_WIDE,
@@ -44,9 +45,9 @@ import {
 const LAZY_IFRAME_ROOT_MARGIN = "200px 0px 200px 0px";
 
 // Page size tuned to show one more row vs previous values.
-const PORTFOLIO_SEGMENTS_PER_PAGE = 3; // “All” layout rows
-const PORTFOLIO_MOBILE_PER_PAGE = 9; // +1 row (3-up on lg)
-const PORTFOLIO_DESKTOP_PER_PAGE = 6; // +1 row (2-up on lg)
+const PORTFOLIO_SEGMENTS_PER_PAGE = 4; // “All” layout rows
+const PORTFOLIO_MOBILE_PER_PAGE = 12; // +1 row (3-up on lg)
+const PORTFOLIO_DESKTOP_PER_PAGE = 8; // +1 row (2-up on lg)
 
 /** YouTube iframe mounts when near viewport (or immediately if `priority`). */
 function LazyYouTubeIframe({
@@ -479,7 +480,7 @@ function embedsForCategory(category: string) {
     case "construction":
       return { wide: CONSTRUCTION_WIDE, short: CONSTRUCTION_SHORT };
     case "mascots": // avatars
-      return { wide: AVATARS_WIDE, short: [] as YouTubeEmbed[] };
+      return { wide: AVATARS_WIDE, short: AVATARS_SHORT };
     case "cars":
       return { wide: CARS_WIDE, short: CARS_SHORT };
     case "tv":
@@ -501,13 +502,14 @@ function embedsForCategory(category: string) {
  */
 function embedsForAll() {
   const { wide: wCon, short: sCon } = embedsForCategory("construction");
-  const { wide: wMas } = embedsForCategory("mascots");
+  const { wide: wMas, short: sMas } = embedsForCategory("mascots");
   const { wide: wCar, short: sCar } = embedsForCategory("cars");
   const { wide: wTv, short: sTv } = embedsForCategory("tv");
   const { wide: wPr, short: sPr } = embedsForCategory("product");
   const { wide: wSer, short: sSer } = embedsForCategory("services");
   const { short: sAnim } = embedsForCategory("animated");
 
+  // Lead rows: the first (newest) wide video of every category, then the rest.
   const wide = [
     wTv[0],
     wMas[0],
@@ -522,33 +524,42 @@ function embedsForAll() {
     wCon[3],
     wPr[7],
     wSer[3],
-    wSer[4],
+    wMas[2],
+    wCon[4],
   ].filter((e): e is YouTubeEmbed => Boolean(e));
 
-  // Short column order: swap 1st ↔ 4th vertical (was sTv[0] / sCon[0])
+  // Lead columns: the first (newest) short of every category, then the rest interleaved.
   const short = [
     sCon[0],
     sPr[0],
-    sPr[1],
-    sPr[2],
-    sCar[0],
-    sCar[1],
-    sTv[0],
+    sMas[0],
     sSer[0],
-    sSer[1],
+    sCar[0],
+    sTv[0],
+    sPr[1],
+    sMas[1],
+    sPr[2],
     sCon[1],
+    sSer[1],
+    sMas[2],
+    sCar[1],
     sCon[2],
     sTv[1],
-    sCon[3],
-    sCon[4],
-    sTv[2],
+    sMas[3],
     sPr[3],
-    sPr[4],
-    sPr[5],
-    sPr[6],
+    sCon[3],
     sSer[2],
+    sMas[4],
+    sTv[2],
+    sPr[4],
+    sCon[4],
+    sPr[5],
     sTv[3],
+    sSer[3],
+    sCon[5],
+    sPr[6],
     sTv[4],
+    sPr[7],
     sAnim[0],
   ].filter((e): e is YouTubeEmbed => Boolean(e));
 

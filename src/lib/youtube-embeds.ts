@@ -30,50 +30,83 @@ export const PORTFOLIO_DEFAULT_SHORT: YouTubeEmbed = {
 // Construction category (16:9) - store exact embed src with si tokens as provided
 export const CONSTRUCTION_WIDE: YouTubeEmbed[] = [
   {
-    src: "https://www.youtube.com/embed/qizKXT8PDGY?si=_8yd3oeNoUS9wHvn",
+    src: "https://www.youtube.com/embed/8dw7O71wawY",
     title: "Construction (wide) 1",
   },
   {
-    src: "https://www.youtube.com/embed/rVMKCSCJfF4?si=ZqTARanF3e5hGzgl",
+    src: "https://www.youtube.com/embed/qizKXT8PDGY?si=_8yd3oeNoUS9wHvn",
     title: "Construction (wide) 2",
   },
   {
-    src: "https://www.youtube.com/embed/jdbcZ0noPI0?si=iagITF3S-W2QaeaK",
+    src: "https://www.youtube.com/embed/rVMKCSCJfF4?si=ZqTARanF3e5hGzgl",
     title: "Construction (wide) 3",
   },
   {
-    src: "https://www.youtube.com/embed/L-TYLYZO_Tc",
+    src: "https://www.youtube.com/embed/jdbcZ0noPI0?si=iagITF3S-W2QaeaK",
     title: "Construction (wide) 4",
+  },
+  {
+    src: "https://www.youtube.com/embed/L-TYLYZO_Tc",
+    title: "Construction (wide) 5",
   },
 ];
 
 // Construction category (9:16 Shorts)
 // Shorts embed technique: use /embed/VIDEO_ID (not /shorts/).
 export const CONSTRUCTION_SHORT: YouTubeEmbed[] = [
-  { src: "https://www.youtube.com/embed/RssEcjOuIXQ", title: "Construction (short) 1" },
-  { src: "https://www.youtube.com/embed/LnAw3nnzpbc", title: "Construction (short) 2" },
-  { src: "https://www.youtube.com/embed/BhdbyyMSxy8", title: "Construction (short) 3" },
-  { src: "https://www.youtube.com/embed/2OJ1YgUpzKo", title: "Construction (short) 4" },
-  { src: "https://www.youtube.com/embed/O8zto3d9Xv4", title: "Construction (short) 5" },
+  { src: "https://www.youtube.com/embed/wwhzehmqiAY", title: "Construction (short) 1" },
+  { src: "https://www.youtube.com/embed/RssEcjOuIXQ", title: "Construction (short) 2" },
+  { src: "https://www.youtube.com/embed/LnAw3nnzpbc", title: "Construction (short) 3" },
+  { src: "https://www.youtube.com/embed/BhdbyyMSxy8", title: "Construction (short) 4" },
+  { src: "https://www.youtube.com/embed/2OJ1YgUpzKo", title: "Construction (short) 5" },
+  { src: "https://www.youtube.com/embed/O8zto3d9Xv4", title: "Construction (short) 6" },
 ];
 
 // Avatars (mapped to "mascots" category in this app)
 export const AVATARS_WIDE: YouTubeEmbed[] = [
   {
-    src: "https://www.youtube.com/embed/q4ZrE0VEzyE?si=-zzzksLE_b-N1OuL",
+    src: "https://www.youtube.com/embed/I6EmmL9u678",
     title: "Avatars (wide) 1",
   },
   {
-    src: "https://www.youtube.com/embed/MN3Y-LbeBAI?si=U8UspQdb6lJvWdZQ",
+    src: "https://www.youtube.com/embed/q4ZrE0VEzyE?si=-zzzksLE_b-N1OuL",
     title: "Avatars (wide) 2",
   },
   {
-    src: "https://www.youtube.com/embed/xxigf7G2gVQ?si=fkoy2ur2vC3abdJk",
+    src: "https://www.youtube.com/embed/MN3Y-LbeBAI?si=U8UspQdb6lJvWdZQ",
     title: "Avatars (wide) 3",
   },
   {
-    src: "https://www.youtube.com/embed/jBjzJqQxa7k?si=b-GEwbcJPtYU6sin",
+    src: "https://www.youtube.com/embed/xxigf7G2gVQ?si=fkoy2ur2vC3abdJk",
     title: "Avatars (wide) 4",
+  },
+  {
+    src: "https://www.youtube.com/embed/jBjzJqQxa7k?si=b-GEwbcJPtYU6sin",
+    title: "Avatars (wide) 5",
+  },
+];
+
+/** Avatars / mascots category (9:16 Shorts) */
+export const AVATARS_SHORT: YouTubeEmbed[] = [
+  {
+    src: "https://www.youtube.com/embed/i-0pVR3S1S8",
+    title: "Avatars (short) 1",
+  },
+  {
+    src: "https://www.youtube.com/embed/Gmux1tj5mlo",
+    title: "Avatars (short) 2",
+  },
+  {
+    src: "https://www.youtube.com/embed/-xfEuhvBUFc",
+    title: "Avatars (short) 3",
+  },
+  {
+    src: "https://www.youtube.com/embed/7ry0zuyIgrY",
+    title: "Avatars (short) 4",
+  },
+  {
+    src: "https://www.youtube.com/embed/XsKRWZRUeXw",
+    title: "Avatars (short) 5",
   },
 ];
 
@@ -183,32 +216,36 @@ export const PRODUCT_WIDE: YouTubeEmbed[] = [
 /** Product category (9:16 Shorts) */
 export const PRODUCT_SHORT: YouTubeEmbed[] = [
   {
-    src: "https://www.youtube.com/embed/ERFq46M0MJQ?si=RLc4e53ViJ_YqjN4",
+    src: "https://www.youtube.com/embed/NItwP80QwJ4",
     title: "Product (short) 1",
   },
   {
-    src: "https://www.youtube.com/embed/MxS7NWl22dU?si=urE_dho0NTRMi5D-",
+    src: "https://www.youtube.com/embed/ERFq46M0MJQ?si=RLc4e53ViJ_YqjN4",
     title: "Product (short) 2",
   },
   {
-    src: "https://www.youtube.com/embed/T40vemPjBJY?si=0brqU6akCOkI5EfW",
+    src: "https://www.youtube.com/embed/MxS7NWl22dU?si=urE_dho0NTRMi5D-",
     title: "Product (short) 3",
   },
   {
-    src: "https://www.youtube.com/embed/sppnJ1zTcTg",
+    src: "https://www.youtube.com/embed/T40vemPjBJY?si=0brqU6akCOkI5EfW",
     title: "Product (short) 4",
   },
   {
-    src: "https://www.youtube.com/embed/y9Sk-7PU89k",
+    src: "https://www.youtube.com/embed/sppnJ1zTcTg",
     title: "Product (short) 5",
   },
   {
-    src: "https://www.youtube.com/embed/U83f4Ku5xa4",
+    src: "https://www.youtube.com/embed/y9Sk-7PU89k",
     title: "Product (short) 6",
   },
   {
-    src: "https://www.youtube.com/embed/getNNKJZfaU",
+    src: "https://www.youtube.com/embed/U83f4Ku5xa4",
     title: "Product (short) 7",
+  },
+  {
+    src: "https://www.youtube.com/embed/getNNKJZfaU",
+    title: "Product (short) 8",
   },
 ];
 
@@ -235,16 +272,20 @@ export const SERVICES_WIDE: YouTubeEmbed[] = [
 /** Services category (9:16 Shorts) */
 export const SERVICES_SHORT: YouTubeEmbed[] = [
   {
-    src: "https://www.youtube.com/embed/UvGVxF-zzOM?si=M2P3JfppgkDFgfyR",
+    src: "https://www.youtube.com/embed/0_oD5Pr54KE",
     title: "Services (short) 1",
   },
   {
-    src: "https://www.youtube.com/embed/mw9KUBHfkjM",
+    src: "https://www.youtube.com/embed/UvGVxF-zzOM?si=M2P3JfppgkDFgfyR",
     title: "Services (short) 2",
   },
   {
-    src: "https://www.youtube.com/embed/KNI6lZXqdzw",
+    src: "https://www.youtube.com/embed/mw9KUBHfkjM",
     title: "Services (short) 3",
+  },
+  {
+    src: "https://www.youtube.com/embed/KNI6lZXqdzw",
+    title: "Services (short) 4",
   },
 ];
 

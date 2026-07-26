@@ -80,6 +80,13 @@ const PARTNERS: Partner[] = [
     ariaLabel: "Palltex",
   },
   {
+    id: "plasico",
+    light: "plasico_logo_light.png",
+    dark: null,
+    href: "https://plasico.bg/",
+    ariaLabel: "Plasico IT Superstore",
+  },
+  {
     id: "rsg",
     light: "rsg_logo_light.png",
     dark: "rsg_logo_dark.png",

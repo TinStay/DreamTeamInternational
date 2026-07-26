@@ -32,11 +32,11 @@ export function HomePage() {
         </div>
 
         <div className="relative">
-          <PortfolioSection />
+          <ServicesSection />
         </div>
 
         <div className="relative">
-          <ServicesSection />
+          <PortfolioSection />
         </div>
 
         <div className="relative">
