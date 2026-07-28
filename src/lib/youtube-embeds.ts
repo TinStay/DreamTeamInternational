@@ -112,20 +112,24 @@ export const AVATARS_SHORT: YouTubeEmbed[] = [
 
 export const CARS_WIDE: YouTubeEmbed[] = [
   {
-    src: "https://www.youtube.com/embed/NZEvmRdCyk4?si=gU-ezFmYxlLruDEC",
+    src: "https://www.youtube.com/embed/VYqnblPpknE",
     title: "Cars (wide) 1",
   },
   {
-    src: "https://www.youtube.com/embed/jnyQrfLk0Lo",
-    title: "Services (wide) 2",
+    src: "https://www.youtube.com/embed/NZEvmRdCyk4?si=gU-ezFmYxlLruDEC",
+    title: "Cars (wide) 2",
   },
   {
-    src: "https://www.youtube.com/embed/oEkHqaeBsik?si=Xutqw9O7FZkFwzwI",
+    src: "https://www.youtube.com/embed/jnyQrfLk0Lo",
     title: "Cars (wide) 3",
   },
   {
-    src: "https://www.youtube.com/embed/BMoPhk-U35w?si=K36oEJh1RKLrh7iT",
+    src: "https://www.youtube.com/embed/oEkHqaeBsik?si=Xutqw9O7FZkFwzwI",
     title: "Cars (wide) 4",
+  },
+  {
+    src: "https://www.youtube.com/embed/BMoPhk-U35w?si=K36oEJh1RKLrh7iT",
+    title: "Cars (wide) 5",
   },
 ];
 
@@ -144,10 +148,13 @@ export const CARS_SHORT: YouTubeEmbed[] = [
 /** Кино Реклама / TV category (16:9) */
 export const TV_WIDE: YouTubeEmbed[] = [
   {
-    src: "https://www.youtube.com/embed/fznYCs6dvQI?si=4Hn-P0ozS1KgdFjX",
+    src: "https://www.youtube.com/embed/ob_VQOeBP9Y",
     title: "Кино реклама (wide) 1",
   },
-
+  {
+    src: "https://www.youtube.com/embed/fznYCs6dvQI?si=4Hn-P0ozS1KgdFjX",
+    title: "Кино реклама (wide) 2",
+  },
   {
     src: "https://www.youtube.com/embed/L81ngoOb-Xg?si=FFJYN0GcjYE1fjnd",
     title: "Кино реклама (wide) 3",
@@ -180,123 +187,176 @@ export const TV_SHORT: YouTubeEmbed[] = [
 
 export const PRODUCT_WIDE: YouTubeEmbed[] = [
   {
-    src: "https://www.youtube.com/embed/ZLld8y9aVzk?si=AZWoyOWCE1SJWVNs",
+    src: "https://www.youtube.com/embed/dvqlJZPQynw",
     title: "Product (wide) 1",
   },
   {
-    src: "https://www.youtube.com/embed/db_4Us57TeE?si=6fho3tA9PPNaynKa",
+    src: "https://www.youtube.com/embed/ZLld8y9aVzk?si=AZWoyOWCE1SJWVNs",
     title: "Product (wide) 2",
   },
   {
-    src: "https://www.youtube.com/embed/38pIUDtV83Q?si=cEQtYYMQapD8B_eU",
+    src: "https://www.youtube.com/embed/db_4Us57TeE?si=6fho3tA9PPNaynKa",
     title: "Product (wide) 3",
   },
   {
-    src: "https://www.youtube.com/embed/_49Z32qr58Y?si=vIImdf220x8r23mY",
+    src: "https://www.youtube.com/embed/38pIUDtV83Q?si=cEQtYYMQapD8B_eU",
     title: "Product (wide) 4",
   },
   {
-    src: "https://www.youtube.com/embed/OrgF3MCq9rQ?si=OuGw5LDYD7WmGwBv",
+    src: "https://www.youtube.com/embed/_49Z32qr58Y?si=vIImdf220x8r23mY",
     title: "Product (wide) 5",
   },
   {
-    src: "https://www.youtube.com/embed/FvysLofa9zU?si=jh4zybJsslEOX22g",
+    src: "https://www.youtube.com/embed/OrgF3MCq9rQ?si=OuGw5LDYD7WmGwBv",
     title: "Product (wide) 6",
   },
   {
-    src: "https://www.youtube.com/embed/jj_LSOIpg58?si=QBjjv2VuSji_a8WJ",
+    src: "https://www.youtube.com/embed/FvysLofa9zU?si=jh4zybJsslEOX22g",
     title: "Product (wide) 7",
   },
   {
-    src: "https://www.youtube.com/embed/6vIDrUkpPEM",
+    src: "https://www.youtube.com/embed/jj_LSOIpg58?si=QBjjv2VuSji_a8WJ",
     title: "Product (wide) 8",
+  },
+  {
+    src: "https://www.youtube.com/embed/6vIDrUkpPEM",
+    title: "Product (wide) 9",
   },
 ];
 
 /** Product category (9:16 Shorts) */
 export const PRODUCT_SHORT: YouTubeEmbed[] = [
   {
-    src: "https://www.youtube.com/embed/NItwP80QwJ4",
+    src: "https://www.youtube.com/embed/W_zkdem99bo",
     title: "Product (short) 1",
   },
   {
-    src: "https://www.youtube.com/embed/ERFq46M0MJQ?si=RLc4e53ViJ_YqjN4",
+    src: "https://www.youtube.com/embed/Ufr8ZBXw9hk",
     title: "Product (short) 2",
   },
   {
-    src: "https://www.youtube.com/embed/MxS7NWl22dU?si=urE_dho0NTRMi5D-",
+    src: "https://www.youtube.com/embed/8yCJwRuoA9w",
     title: "Product (short) 3",
   },
   {
-    src: "https://www.youtube.com/embed/T40vemPjBJY?si=0brqU6akCOkI5EfW",
+    src: "https://www.youtube.com/embed/lN3LHKoa6bg",
     title: "Product (short) 4",
   },
   {
-    src: "https://www.youtube.com/embed/sppnJ1zTcTg",
+    src: "https://www.youtube.com/embed/vh8dh2Oev80",
     title: "Product (short) 5",
   },
   {
-    src: "https://www.youtube.com/embed/y9Sk-7PU89k",
+    src: "https://www.youtube.com/embed/NItwP80QwJ4",
     title: "Product (short) 6",
   },
   {
-    src: "https://www.youtube.com/embed/U83f4Ku5xa4",
+    src: "https://www.youtube.com/embed/ERFq46M0MJQ?si=RLc4e53ViJ_YqjN4",
     title: "Product (short) 7",
   },
   {
-    src: "https://www.youtube.com/embed/getNNKJZfaU",
+    src: "https://www.youtube.com/embed/MxS7NWl22dU?si=urE_dho0NTRMi5D-",
     title: "Product (short) 8",
+  },
+  {
+    src: "https://www.youtube.com/embed/T40vemPjBJY?si=0brqU6akCOkI5EfW",
+    title: "Product (short) 9",
+  },
+  {
+    src: "https://www.youtube.com/embed/sppnJ1zTcTg",
+    title: "Product (short) 10",
+  },
+  {
+    src: "https://www.youtube.com/embed/y9Sk-7PU89k",
+    title: "Product (short) 11",
+  },
+  {
+    src: "https://www.youtube.com/embed/U83f4Ku5xa4",
+    title: "Product (short) 12",
+  },
+  {
+    src: "https://www.youtube.com/embed/getNNKJZfaU",
+    title: "Product (short) 13",
   },
 ];
 
 /** Services category (16:9) */
 export const SERVICES_WIDE: YouTubeEmbed[] = [
   {
-    src: "https://www.youtube.com/embed/HDMaMXlJoxw?si=Wkfapvk8CF5sVqtw",
+    src: "https://www.youtube.com/embed/TVGwnZG-ZLs",
     title: "Services (wide) 1",
   },
   {
-    src: "https://www.youtube.com/embed/3zcXNedV1-0?si=iRnK-AqVr02tErxW",
+    src: "https://www.youtube.com/embed/HDMaMXlJoxw?si=Wkfapvk8CF5sVqtw",
     title: "Services (wide) 2",
   },
   {
-    src: "https://www.youtube.com/embed/OrgF3MCq9rQ?si=OuGw5LDYD7WmGwBv",
+    src: "https://www.youtube.com/embed/3zcXNedV1-0?si=iRnK-AqVr02tErxW",
     title: "Services (wide) 3",
   },
   {
-    src: "https://www.youtube.com/embed/oVU1PXHVZ8A",
+    src: "https://www.youtube.com/embed/OrgF3MCq9rQ?si=OuGw5LDYD7WmGwBv",
     title: "Services (wide) 4",
+  },
+  {
+    src: "https://www.youtube.com/embed/oVU1PXHVZ8A",
+    title: "Services (wide) 5",
   },
 ];
 
 /** Services category (9:16 Shorts) */
 export const SERVICES_SHORT: YouTubeEmbed[] = [
   {
-    src: "https://www.youtube.com/embed/0_oD5Pr54KE",
+    src: "https://www.youtube.com/embed/W5kSYsWeNog",
     title: "Services (short) 1",
   },
   {
-    src: "https://www.youtube.com/embed/UvGVxF-zzOM?si=M2P3JfppgkDFgfyR",
+    src: "https://www.youtube.com/embed/NmaniWHr2uk",
     title: "Services (short) 2",
   },
   {
-    src: "https://www.youtube.com/embed/mw9KUBHfkjM",
+    src: "https://www.youtube.com/embed/Mu5vTQYn4u4",
     title: "Services (short) 3",
   },
   {
-    src: "https://www.youtube.com/embed/KNI6lZXqdzw",
+    src: "https://www.youtube.com/embed/UvGVxF-zzOM?si=M2P3JfppgkDFgfyR",
     title: "Services (short) 4",
+  },
+  {
+    src: "https://www.youtube.com/embed/mw9KUBHfkjM",
+    title: "Services (short) 5",
+  },
+  {
+    src: "https://www.youtube.com/embed/KNI6lZXqdzw",
+    title: "Services (short) 6",
   },
 ];
 
 /** Animated category (9:16 Shorts) */
 export const ANIMATED_SHORT: YouTubeEmbed[] = [
   {
-    src: "https://www.youtube.com/embed/HnMiNTf3NGw",
+    src: "https://www.youtube.com/embed/oZ89ofdtlj0",
     title: "Animation (short) 1",
+  },
+  {
+    src: "https://www.youtube.com/embed/5ceanpoMMDE",
+    title: "Animation (short) 2",
+  },
+  {
+    src: "https://www.youtube.com/embed/HnMiNTf3NGw",
+    title: "Animation (short) 3",
   },
 ];
 
 /** Animated category (16:9) */
-export const ANIMATED_WIDE: YouTubeEmbed[] = [];
+export const ANIMATED_WIDE: YouTubeEmbed[] = [
+  {
+    src: "https://www.youtube.com/embed/kCNmslCsfkc",
+    title: "Animation (wide) 1",
+  },
+  {
+    src: "https://www.youtube.com/embed/w_Xi96J5Ky0",
+    title: "Animation (wide) 2",
+  },
+];
 

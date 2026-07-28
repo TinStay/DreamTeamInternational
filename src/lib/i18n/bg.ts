@@ -56,7 +56,7 @@ export const bg = {
     },
     pagination: {
       previous: "Назад",
-      next: "Напред",
+      next: "Виж още",
       page: "Страница"
     }
   },

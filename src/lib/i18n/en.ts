@@ -56,7 +56,7 @@ export const en = {
     },
     pagination: {
       previous: "Previous",
-      next: "Next",
+      next: "See more",
       page: "Page"
     }
   },

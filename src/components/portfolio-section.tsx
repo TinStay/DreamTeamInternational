@@ -497,70 +497,39 @@ function embedsForCategory(category: string) {
 }
 
 /**
- * Curated “All” feed: first rows mix categories (not only construction), then fills
- * remaining clips; **last row is short-only (9:16)** so it never spans full page width.
+ * Curated “All” feed — a hand-picked highlight reel, NOT every clip in the portfolio.
+ * Mascots + the first product wide lead the first rows; the full catalogue per category
+ * stays reachable through the category tabs.
  */
 function embedsForAll() {
   const { wide: wCon, short: sCon } = embedsForCategory("construction");
   const { wide: wMas, short: sMas } = embedsForCategory("mascots");
-  const { wide: wCar, short: sCar } = embedsForCategory("cars");
-  const { wide: wTv, short: sTv } = embedsForCategory("tv");
+  const { wide: wCar } = embedsForCategory("cars");
+  const { short: sTv } = embedsForCategory("tv");
   const { wide: wPr, short: sPr } = embedsForCategory("product");
   const { wide: wSer, short: sSer } = embedsForCategory("services");
-  const { short: sAnim } = embedsForCategory("animated");
 
-  // Lead rows: the first (newest) wide video of every category, then the rest.
+  // Row 0 centre = mascot horizontal 2, row 1 centre = product horizontal 1 (both “on top”).
   const wide = [
-    wTv[0],
-    wMas[0],
-    wCar[0],
-    wPr[0],
-    wSer[0],
-    wCon[0],
-    wCon[1],
-    wTv[1],
-    wCon[2],
     wMas[1],
-    wCon[3],
-    wPr[7],
+    wPr[0],
+    wCar[0],
+    wCar[1],
+    wCon[0],
+    wSer[1],
     wSer[3],
-    wMas[2],
-    wCon[4],
   ].filter((e): e is YouTubeEmbed => Boolean(e));
 
-  // Lead columns: the first (newest) short of every category, then the rest interleaved.
+  // Shorts fill the side columns two per row, in this exact running order.
   const short = [
-    sCon[0],
-    sPr[0],
-    sMas[0],
-    sSer[0],
-    sCar[0],
-    sTv[0],
-    sPr[1],
-    sMas[1],
-    sPr[2],
-    sCon[1],
-    sSer[1],
-    sMas[2],
-    sCar[1],
-    sCon[2],
-    sTv[1],
-    sMas[3],
-    sPr[3],
-    sCon[3],
-    sSer[2],
-    sMas[4],
-    sTv[2],
-    sPr[4],
-    sCon[4],
     sPr[5],
-    sTv[3],
-    sSer[3],
-    sCon[5],
-    sPr[6],
-    sTv[4],
-    sPr[7],
-    sAnim[0],
+    sTv[0],
+    sMas[1],
+    sPr[0],
+    sCon[0],
+    sSer[0],
+    sTv[2],
+    sPr[3],
   ].filter((e): e is YouTubeEmbed => Boolean(e));
 
   return { wide, short };
@@ -798,7 +767,7 @@ export function PortfolioSection() {
                     size="default"
                     disabled={safePortfolioPage >= totalPortfolioPages - 1}
                     className={cn(
-                      "h-11 gap-1 rounded-full px-5 text-sm font-semibold",
+                      "h-14 gap-2 rounded-full px-9 text-lg font-semibold [&_svg]:size-5",
                       primaryGradientInteractiveClassName
                     )}
                     onClick={() => {

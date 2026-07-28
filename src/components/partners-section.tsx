@@ -2,179 +2,14 @@
 
 import { useLanguage } from "@/lib/i18n/language-context";
 import { motion } from "motion/react";
-import Image from "next/image";
-import { cn } from "@/lib/utils";
-
-type Partner = {
-  id: string;
-  light: string | null;
-  dark: string | null;
-  href?: string;
-  ariaLabel: string;
-};
-
-const ICON_BASE = "/company_icons/";
-
-const PARTNERS: Partner[] = [
-  {
-    id: "asia",
-    light: "asia_agency_logo_light.png",
-    dark: "asia_agency_logo_dark.png",
-    href: "https://asiaeventagency.com/",
-    ariaLabel: "Asia Event Agency",
-  },
-  {
-    id: "emblema",
-    light: "emblema_logo_light.png",
-    dark: null,
-    href: "https://emblema.bg/",
-    ariaLabel: "Emblema",
-  },
-  {
-    id: "hubchev",
-    light: null,
-    dark: "hubchev_logo_dark.png",
-    href: "https://hubchevproperties.com/",
-    ariaLabel: "Hubchev Properties",
-  },
-  {
-    id: "hus-estate",
-    light: "hus_estate_logo_light.png",
-    dark: "hus_estate_logo_dark.png",
-    href: "https://husestate.com/bg/home",
-    ariaLabel: "Hus Estate",
-  },
-  {
-    id: "imotalert",
-    light: "imot_alert_logo_light.png",
-    dark: "imot_alert_logo_dark.png",
-    href: "https://www.imotalert.bg/",
-    ariaLabel: "ImotAlert",
-  },
-  {
-    id: "infinity",
-    light: "infinity_logo_light.png",
-    dark: "infinity_logo_dark.png",
-    href: "https://infinityproperty.bg/",
-    ariaLabel: "Infinity Property",
-  },
-  {
-    id: "boleron",
-    light: "boleron_logo_light.png",
-    dark: null,
-    href: "https://boleron.bg/",
-    ariaLabel: "Boleron",
-  },
-  {
-    id: "oikia",
-    light: "oikia_logo_light.png",
-    dark: "oikia_logo_dark.png",
-    href: "https://www.oikia.com/",
-    ariaLabel: "Oikia",
-  },
-  {
-    id: "palltex",
-    light: "pallteximot_logo_light.png",
-    dark: null,
-    href: "https://palltex.bg/",
-    ariaLabel: "Palltex",
-  },
-  {
-    id: "plasico",
-    light: "plasico_logo_light.png",
-    dark: null,
-    href: "https://plasico.bg/",
-    ariaLabel: "Plasico IT Superstore",
-  },
-  {
-    id: "rsg",
-    light: "rsg_logo_light.png",
-    dark: "rsg_logo_dark.png",
-    href: "https://rsgarch.com/",
-    ariaLabel: "RSG Architects",
-  },
-  {
-    id: "smartpharmacy",
-    light: "smartpharmacy_logo_light.png",
-    dark: null,
-    href: "https://smartpharmacy.bg/",
-    ariaLabel: "Smart Pharmacy",
-  },
-  {
-    id: "stroy-alliance",
-    light: "stroy_alliance_logo_light.png",
-    dark: "stroy_alliance_logo_dark.png",
-    href: "https://stroyalianceinvest.eu/",
-    ariaLabel: "Stroy Alliance Invest",
-  },
-  {
-    id: "valtcan",
-    light: "valtcan_logo_light.png",
-    dark: "valtcan_logo_dark.png",
-    href: "https://www.valtcan.com/",
-    ariaLabel: "Valtcan",
-  },
-  {
-    id: "designedbygg",
-    light: "designedbygg_logo_light.png",
-    dark: "designedbygg_logo_dark.png",
-    href: "http://designedby.gg/",
-    ariaLabel: "Designed by GG",
-  },
-];
+import { PARTNERS, type Partner } from "@/lib/partners";
+import { PartnerLogo } from "@/components/partner-logo";
 
 const imgClass =
-  "h-[4.5rem] w-auto min-h-[4.5rem] min-w-[130px] max-w-[min(200px,34vw)] object-contain transition-transform duration-200 group-hover:scale-[1.05] sm:h-[5.5rem] sm:min-h-[5.5rem] sm:min-w-[150px] sm:max-w-[min(240px,30vw)] md:h-[6.5rem] md:min-h-[6.5rem] md:min-w-[165px] md:max-w-[260px]";
-
-function PartnerLogo({ p }: { p: Partner }) {
-  if (p.light && p.dark) {
-    /* Grid stack: both images stay in layout so the strip keeps width in dark mode (absolute+hidden collapsed before). */
-    return (
-      <span className="inline-grid place-items-center [grid-template-columns:1fr] [grid-template-rows:1fr]">
-        <Image
-          src={`${ICON_BASE}${p.light}`}
-          alt={p.ariaLabel}
-          width={400}
-          height={140}
-          sizes="(max-width: 640px) 45vw, 280px"
-          className={cn(
-            imgClass,
-            "col-start-1 row-start-1 opacity-100 dark:pointer-events-none dark:opacity-0"
-          )}
-        />
-        <Image
-          src={`${ICON_BASE}${p.dark}`}
-          alt=""
-          width={400}
-          height={140}
-          sizes="(max-width: 640px) 45vw, 280px"
-          className={cn(
-            imgClass,
-            "col-start-1 row-start-1 opacity-0 pointer-events-none dark:pointer-events-auto dark:opacity-100"
-          )}
-          aria-hidden
-        />
-      </span>
-    );
-  }
-
-  const single = p.light ?? p.dark;
-  if (!single) return null;
-
-  return (
-    <Image
-      src={`${ICON_BASE}${single}`}
-      alt={p.ariaLabel}
-      width={400}
-      height={140}
-      sizes="(max-width: 640px) 45vw, 280px"
-      className={imgClass}
-    />
-  );
-}
+  "h-[3.5rem] w-auto min-h-[3.5rem] min-w-[100px] max-w-[min(160px,28vw)] object-contain transition-transform duration-200 group-hover:scale-[1.05] sm:h-[4.25rem] sm:min-h-[4.25rem] sm:min-w-[115px] sm:max-w-[min(190px,24vw)] md:h-[5rem] md:min-h-[5rem] md:min-w-[130px] md:max-w-[205px]";
 
 const innerClass =
-  "group mx-8 flex shrink-0 items-center justify-center md:mx-12 cursor-pointer opacity-80 hover:opacity-100 transition-opacity py-2";
+  "group mx-4 flex shrink-0 items-center justify-center md:mx-6 cursor-pointer opacity-80 hover:opacity-100 transition-opacity py-2";
 
 const MARQUEE_DURATION_SEC = 42;
 
@@ -209,11 +44,11 @@ function PartnerMarqueeRow({
               rel="noopener noreferrer"
               className={innerClass}
             >
-              <PartnerLogo p={p} />
+              <PartnerLogo p={p} imgClass={imgClass} sizes="(max-width: 640px) 28vw, 205px" />
             </a>
           ) : (
             <span key={`${rowKey}-${p.id}-${idx}`} className={`${innerClass} cursor-default`}>
-              <PartnerLogo p={p} />
+              <PartnerLogo p={p} imgClass={imgClass} sizes="(max-width: 640px) 28vw, 205px" />
             </span>
           )
         )}
@@ -236,7 +71,8 @@ export function PartnersSection() {
         </h2>
       </div>
 
-      <div className="relative flex w-full flex-col items-center gap-5 overflow-x-hidden overflow-y-visible py-3 md:gap-6">
+      {/* Scrolling marquee rows at every breakpoint */}
+      <div className="relative flex w-full flex-col items-center gap-4 overflow-x-hidden overflow-y-visible py-3 md:gap-5">
         <PartnerMarqueeRow partners={rowPartners} direction="left" rowKey="a" />
         {rowPartnersB.length > 0 ? (
           <PartnerMarqueeRow partners={rowPartnersB} direction="right" rowKey="b" />

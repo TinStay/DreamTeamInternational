@@ -165,7 +165,15 @@ export default function RootLayout({
   return (
     // Default to the primary locale (bg); LanguageProvider syncs the real
     // per-route language client-side. suppressHydrationWarning covers that swap.
-    <html lang="bg" suppressHydrationWarning>
+    // `class="dark"` is rendered server-side so the FIRST paint is already dark —
+    // without it the light `:root` palette flashes until next-themes' script runs.
+    // next-themes reconciles this client-side if the visitor picked light.
+    <html
+      lang="bg"
+      className="dark"
+      style={{ colorScheme: "dark" }}
+      suppressHydrationWarning
+    >
       <body
         className={`${syne.variable} font-sans antialiased relative min-h-screen`}
         suppressHydrationWarning
