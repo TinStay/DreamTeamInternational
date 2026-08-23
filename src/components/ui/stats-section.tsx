@@ -1,11 +1,14 @@
 "use client";
 
+import Image from "next/image";
 import { motion, type Variants } from "motion/react";
 import { cn } from "@/lib/utils";
 
 export type StatsSectionItem = {
   value: string;
   label: string;
+  /** Optional artwork rendered in place of the number; `value` becomes its alt. */
+  imgSrc?: string;
 };
 
 export type StatsSectionProps = {
@@ -34,6 +37,17 @@ const statItem: Variants = {
     y: 0,
     scale: 1,
     transition: { duration: 0.65, ease },
+  },
+};
+
+const statImage: Variants = {
+  hidden: { opacity: 0, scale: 0.78, y: 24, rotate: -2.5 },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    y: 0,
+    rotate: 0,
+    transition: { duration: 0.8, ease },
   },
 };
 
@@ -81,10 +95,27 @@ export function StatsSection({ title1, title2, subline, items, className }: Stat
             <motion.div
               key={item.label}
               variants={statItem}
-              className="space-y-4 py-12 md:py-0"
+              className="space-y-0 py-12 md:py-0"
             >
-              <div className={statValueClassName}>{item.value}</div>
-              <p className="text-muted-foreground">{item.label}</p>
+              {item.imgSrc ? (
+                <motion.div
+                  variants={statImage}
+                  whileHover={{ scale: 1.05, transition: { duration: 0.3, ease } }}
+                  className="relative mx-auto h-44 w-full md:h-56"
+                >
+                  <Image
+                    src={item.imgSrc}
+                    alt={item.value}
+                    fill
+                    sizes="(min-width: 768px) 420px, 320px"
+                    quality={100}
+                    className="object-contain"
+                  />
+                </motion.div>
+              ) : (
+                <div className={statValueClassName}>{item.value}</div>
+              )}
+              <p className="-mt-3 text-xl font-medium text-muted-foreground md:-mt-4 md:text-2xl">{item.label}</p>
             </motion.div>
           ))}
         </motion.div>

@@ -68,12 +68,12 @@ const ServiceCard = React.forwardRef<HTMLDivElement, ServiceCardProps>(
 
     return (
       <motion.div
-        className={cn(cardVariants({ variant, className }), "min-h-[228px]")}
+        className={cn(cardVariants({ variant, className }), "min-h-[248px]")}
         ref={ref}
         variants={cardAnimation}
         whileHover="hover"
       >
-        <div className="relative z-10 flex min-h-[168px] flex-1 flex-col pr-[52%]">
+        <div className="relative z-10 flex min-h-[168px] flex-1 flex-col pr-[54%]">
           <h3 className="text-xl font-bold tracking-tight sm:text-2xl">{title}</h3>
           <span className="mt-auto flex items-center pt-3 text-sm font-semibold group-hover:underline">
             {linkLabel}
@@ -83,9 +83,9 @@ const ServiceCard = React.forwardRef<HTMLDivElement, ServiceCardProps>(
           </span>
         </div>
 
-        <div className="pointer-events-none absolute inset-y-0 right-0 z-0 flex w-[52%] items-center justify-center p-2 sm:p-3">
+        <div className="pointer-events-none absolute inset-y-0 right-0 z-0 flex w-[54%] items-center justify-center p-2">
           <motion.div
-            className="h-48 w-48 max-h-full max-w-full opacity-90 group-hover:opacity-100 sm:h-56 sm:w-60"
+            className="h-full w-full opacity-90 group-hover:opacity-100"
             variants={imageAnimation}
           >
             <Image

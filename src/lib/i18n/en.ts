@@ -563,9 +563,9 @@ export const en = {
     subline:
       "The AI video production industry is evolving fast. Together with you, we are shaping its future.",
     items: [
-      { value: "30M+", label: "Views" },
-      { value: "50+", label: "Clients" },
-      { value: "270+", label: "Realized Projects" },
+      { id: "views", value: "30M+", label: "Views" },
+      { id: "clients", value: "50+", label: "Clients" },
+      { id: "projects", value: "270+", label: "Realized Projects" },
     ],
   },
   order: {
