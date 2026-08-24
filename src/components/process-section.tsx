@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { useLanguage } from "@/lib/i18n/language-context";
 
@@ -33,6 +34,14 @@ function useInView(threshold = 0.1) {
   return { ref, isInView };
 }
 
+/** Rendered step badges — each artwork already contains its own number. */
+const STEP_ICONS = [
+  "/process/steps_icons/first_step.png",
+  "/process/steps_icons/second_step.png",
+  "/process/steps_icons/third_step.png",
+  "/process/steps_icons/forth_step.png",
+];
+
 export function ProcessSection() {
   const { ref, isInView } = useInView();
   const { t } = useLanguage();
@@ -53,7 +62,7 @@ export function ProcessSection() {
 
         <div className="relative mt-20">
           {/* Desktop horizontal connecting line */}
-          <div className="hidden lg:block absolute top-[40px] left-[5%] right-[5%] h-px bg-border/50 z-0"></div>
+          <div className="hidden lg:block absolute top-[58px] left-[5%] right-[5%] h-px bg-border/50 z-0"></div>
           
           <div className="flex flex-col lg:flex-row items-center lg:items-start justify-between gap-12 lg:gap-4 relative z-10">
             {t.process.steps.map((step, index) => {
@@ -66,13 +75,16 @@ export function ProcessSection() {
                   }`}
                   style={{ transitionDelay: delayStr }}
                 >
-                  {/* Step Number Circle */}
-                  <div className="relative mb-6 flex h-20 w-20 items-center justify-center rounded-full border border-primary liquid-glass shadow-[0_0_15px_rgba(255,255,255,0.1),0_0_28px_var(--primary-soft-glow)] transition-all duration-300 group-hover:scale-110 group-hover:shadow-[0_0_25px_rgba(255,255,255,0.35),0_0_36px_var(--primary-soft-glow)]">
-                    <span className="font-heading text-3xl font-bold text-section-accent">
-                      {index + 1}
-                    </span>
-                    {/* Glowing dot */}
-                    <div className="absolute -right-1 -top-1 h-3 w-3 animate-pulse rounded-full bg-primary shadow-[0_0_12px_var(--primary-soft-glow)]" />
+                  {/* Step badge — the artwork carries the number and its own rim/glow. */}
+                  <div className="relative mb-6 h-28 w-28 transition-transform duration-300 group-hover:scale-110">
+                    <Image
+                      src={STEP_ICONS[index]}
+                      alt={`${index + 1}`}
+                      fill
+                      sizes="112px"
+                      quality={100}
+                      className="object-contain"
+                    />
                   </div>
 
                   <h3 className="font-heading font-semibold text-xl mb-3 text-foreground transition-all group-hover:bg-gradient-to-r group-hover:from-[var(--primary-gradient-start)] group-hover:to-[var(--primary-gradient-end)] group-hover:bg-clip-text group-hover:text-transparent">

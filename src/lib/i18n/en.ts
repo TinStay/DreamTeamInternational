@@ -27,7 +27,7 @@ export const en = {
     title2: "Process",
     subtitle: "A seamless, transparent workflow designed to turn your ideas into stunning AI-generated videos in record time.",
     steps: [
-      { title: "Request a Quote", description: "Submit your project details and we evaluate the scope, timeline, and all important requirements together." },
+      { title: "Send an Inquiry", description: "Submit your project details and we evaluate the scope, timeline, and all important requirements together." },
       { title: "Receive Your Quote", description: "We send you a tailored quote for you to review and decide on the best path forward." },
       { title: "Production", description: "We create the scenes for your video with continuous feedback from you to match your expectations." },
       { title: "Editing & Delivery", description: "We edit the footage, add appropriate effects and transitions, and deliver the final video to you." }
