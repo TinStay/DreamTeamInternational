@@ -26,6 +26,8 @@
   --color-spacing: var(--spacing);
   --color-font-mono: var(--font-mono);
   --color-font-sans: var(--font-sans);
+  /* `font-heading` utility — Uni Sans (loaded in layout.tsx), Nunito Sans fallback. */
+  --font-heading: var(--font-uni-sans), "Nunito Sans", Plus Jakarta Sans, sans-serif;
   --color-secondary: var(--secondary);
   --color-background: var(--background);
   --color-font-serif: var(--font-serif);

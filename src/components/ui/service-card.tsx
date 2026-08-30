@@ -73,17 +73,13 @@ const ServiceCard = React.forwardRef<HTMLDivElement, ServiceCardProps>(
         variants={cardAnimation}
         whileHover="hover"
       >
-        <div className="relative z-10 flex min-h-[168px] flex-1 flex-col pr-[54%]">
-          <h3 className="text-xl font-bold tracking-tight sm:text-2xl">{title}</h3>
-          <span className="mt-auto flex items-center pt-3 text-sm font-semibold group-hover:underline">
-            {linkLabel}
-            <motion.div variants={arrowAnimation}>
-              <ArrowRight className="ml-2 h-4 w-4" />
-            </motion.div>
-          </span>
-        </div>
+        {/* Mobile stacks title → icon → CTA in their own rows; sm+ keeps the
+            two-column layout with the icon absolutely placed on the right. */}
+        <h3 className="relative z-10 text-xl font-bold tracking-tight sm:pr-[54%] sm:text-2xl">
+          {title}
+        </h3>
 
-        <div className="pointer-events-none absolute inset-y-0 right-0 z-0 flex w-[54%] items-center justify-center p-2">
+        <div className="pointer-events-none relative z-0 my-4 flex h-36 w-full items-center justify-center sm:absolute sm:inset-y-0 sm:right-0 sm:my-0 sm:h-auto sm:w-[54%] sm:p-2">
           <motion.div
             className="h-full w-full opacity-90 group-hover:opacity-100"
             variants={imageAnimation}
@@ -99,6 +95,13 @@ const ServiceCard = React.forwardRef<HTMLDivElement, ServiceCardProps>(
             />
           </motion.div>
         </div>
+
+        <span className="relative z-10 mt-auto flex items-center pt-3 text-sm font-semibold group-hover:underline sm:pr-[54%]">
+          {linkLabel}
+          <motion.div variants={arrowAnimation}>
+            <ArrowRight className="ml-2 h-4 w-4" />
+          </motion.div>
+        </span>
       </motion.div>
     );
   }

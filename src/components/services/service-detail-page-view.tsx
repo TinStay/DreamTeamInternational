@@ -56,15 +56,11 @@ export function ServiceDetailPageView({ slug }: { slug: string }) {
                 variant="card"
                 subject={service.title}
                 formStateBg={`Услуга: ${service.title}`}
+                headingDivider={false}
                 heading={
-                  <>
-                    <h2 className="font-heading text-2xl font-bold tracking-tight text-foreground md:text-3xl">
-                      {t.services.ctaHeading}
-                    </h2>
-                    <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                      {t.services.ctaSubtitle}
-                    </p>
-                  </>
+                  <h2 className="font-heading text-2xl font-bold tracking-tight text-foreground md:text-3xl">
+                    {t.services.ctaHeading}
+                  </h2>
                 }
               />
             </div>

@@ -615,7 +615,7 @@ export function PortfolioSection() {
 
   return (
       <section id="portfolio" className="relative w-full overflow-visible pt-2 pb-6 sm:pt-3" ref={ref}>
-        <div className="relative z-10 mx-auto w-full max-w-none px-4 sm:px-6 lg:px-10">
+        <div className="relative z-10 mx-auto w-full max-w-none px-4 lg:px-6">
           {/* Fade title only — never wrap lazy iframes in `opacity-0` (breaks IntersectionObserver on WebKit). */}
           <div
             className={"mb-6"}
@@ -629,7 +629,7 @@ export function PortfolioSection() {
 
           {/* Sticky controls + grid stay fully opaque so lazy IO works reliably */}
           <div className="flex flex-col gap-8 pb-12">
-            <div className="sticky top-[max(0.75rem,env(safe-area-inset-top))] z-40 -mx-4 flex flex-col gap-2 px-4 sm:-mx-6 sm:px-6 sm:gap-2.5 lg:top-[7.25rem] lg:-mx-10 lg:px-10">
+            <div className="sticky top-[max(0.75rem,env(safe-area-inset-top))] z-40 -mx-4 flex flex-col gap-2 px-4 sm:gap-2.5 lg:top-[7.25rem] lg:-mx-6 lg:px-6">
               {/* Categories (top) */}
               <div className="w-fit max-w-full rounded-full border border-border/25 bg-background/95 p-1 shadow-[0_12px_40px_rgba(15,23,42,0.15)] backdrop-blur-lg supports-[backdrop-filter]:bg-background/85 dark:border-border/30 dark:shadow-[0_12px_48px_rgba(0,0,0,0.45)]">
                 <div className="relative rounded-full bg-muted/10 px-2 py-1 sm:px-2.5">

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Syne } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { LanguageProvider } from "@/lib/i18n/language-context";
@@ -8,9 +8,20 @@ import { PostHogProvider } from "@/components/posthog-provider";
 import { PostHogPageView } from "@/components/posthog-pageview";
 import { Suspense } from "react";
 
-const syne = Syne({ 
-  subsets: ["latin"],
-  variable: "--font-syne",
+/**
+ * Display font for headings (`font-heading`). Uni Sans ships only Heavy and
+ * Thin here, so 600/700 heading weights resolve up to Heavy (900) — body copy
+ * stays on Nunito Sans (`--font-sans` in globals.css).
+ */
+const uniSans = localFont({
+  src: [
+    { path: "./fonts/UniSans-Thin.otf", weight: "100", style: "normal" },
+    { path: "./fonts/UniSans-ThinItalic.otf", weight: "100", style: "italic" },
+    { path: "./fonts/UniSans-Heavy.otf", weight: "900", style: "normal" },
+    { path: "./fonts/UniSans-HeavyItalic.otf", weight: "900", style: "italic" },
+  ],
+  variable: "--font-uni-sans",
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -175,7 +186,7 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body
-        className={`${syne.variable} font-sans antialiased relative min-h-screen`}
+        className={`${uniSans.variable} font-sans antialiased relative min-h-screen`}
         suppressHydrationWarning
       >
         <script

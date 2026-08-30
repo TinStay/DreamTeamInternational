@@ -1,10 +1,37 @@
 "use client";
 
+import * as React from "react";
 import { useLanguage } from "@/lib/i18n/language-context";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
+import { motion } from "motion/react";
 import { ContactInquiryForm } from "@/components/contact-inquiry-form";
 import { GradientMailIcon, GradientMapPinIcon, GradientPhoneIcon } from "@/components/ui/gradient-icons";
+
+const MotionLink = motion.a;
+
+const EASE_OUT = [0.22, 1, 0.36, 1] as const;
+
+/**
+ * Each contact row / social icon fades up on its own, one after the other.
+ * The stagger delay lives on the enter target — a component-level `transition`
+ * would also delay the hover/tap gestures by the same amount.
+ */
+function reveal(index: number) {
+  return {
+    initial: { opacity: 0, y: 18 },
+    whileInView: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.55, delay: index * 0.11, ease: EASE_OUT },
+    },
+    viewport: { once: true, amount: 0.4 },
+  };
+}
+
+/** Snappy, delay-free gesture transitions (see `reveal`). */
+const HOVER_TRANSITION = { duration: 0.28, ease: EASE_OUT };
+const TAP_TRANSITION = { duration: 0.12, ease: EASE_OUT };
 
 function SocialIcon({
   src,
@@ -19,13 +46,37 @@ function SocialIcon({
       alt={alt}
       width={256}
       height={256}
-      className="h-12 w-12 opacity-90 transition-all group-hover:opacity-100"
+      sizes="48px"
+      // `shrink-0` + `object-contain`: never let the flex row squash the square.
+      className="h-10 w-10 shrink-0 object-contain opacity-90 transition-all group-hover:opacity-100 sm:h-12 sm:w-12"
     />
   );
 }
 
 const contactInfoIconCircle =
-  "flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-card shadow-sm ring-1 ring-border/40 dark:shadow-[0_10px_28px_rgba(0,0,0,0.45)] dark:ring-white/10";
+  "relative flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-full bg-card shadow-sm ring-1 ring-border/40 dark:shadow-[0_10px_28px_rgba(0,0,0,0.45)] dark:ring-white/10";
+
+/** Icon chip that fills with the brand gradient (and turns the glyph white) on row hover. */
+function ContactIconChip({
+  children,
+  className,
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) {
+  return (
+    <div className={cn(contactInfoIconCircle, className)}>
+      <span
+        aria-hidden
+        className="absolute inset-0 bg-primary-gradient opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+      />
+      <span className="relative flex items-center justify-center">{children}</span>
+    </div>
+  );
+}
+
+const contactIconClass =
+  "h-5 w-5 [&_g]:transition-[fill] [&_g]:duration-300 group-hover:[&_g]:fill-white";
 
 export function ContactSection({ className }: { className?: string }) {
   const { t } = useLanguage();
@@ -51,6 +102,29 @@ export function ContactSection({ className }: { className?: string }) {
     }
   }
 
+  const socials = [
+    {
+      href: "https://www.facebook.com/profile.php?id=61585919836260",
+      src: "/social_media_icons/facebook.png",
+      alt: "Facebook",
+    },
+    {
+      href: "https://www.instagram.com/dreamteam.video.ai/",
+      src: "/social_media_icons/instagram.png",
+      alt: "Instagram",
+    },
+    {
+      href: "https://www.linkedin.com/company/109344952",
+      src: "/social_media_icons/linkedin.png",
+      alt: "LinkedIn",
+    },
+    {
+      href: "https://www.youtube.com/@DreamTeamVideo",
+      src: "/social_media_icons/youtube.png",
+      alt: "YouTube",
+    },
+  ];
+
   return (
     <section
       id="contact"
@@ -71,108 +145,99 @@ export function ContactSection({ className }: { className?: string }) {
         <div className="grid items-start gap-12 lg:grid-cols-[minmax(0,60%)_minmax(0,40%)] lg:gap-16">
           <ContactInquiryForm variant="card" />
 
-          <div className="animate-in fade-in slide-in-from-right-12 duration-1000 delay-200">
+          <div>
             <div className="mb-10 space-y-6">
-              <a
+              <MotionLink
                 href="mailto:info@dreamteam.technology"
-                className="group flex cursor-pointer items-center gap-4"
+                className="group flex origin-left cursor-pointer items-center gap-4"
+                whileHover={{ scale: 1.05, transition: HOVER_TRANSITION }}
+                whileTap={{ scale: 0.99, transition: TAP_TRANSITION }}
+                {...reveal(0)}
               >
-                <div className={contactInfoIconCircle}>
-                  <GradientMailIcon className="h-5 w-5" />
-                </div>
+                <ContactIconChip>
+                  <GradientMailIcon className={contactIconClass} />
+                </ContactIconChip>
                 <div>
                   <div className="text-sm text-muted-foreground">{t.contact.email}</div>
                   <div className="font-semibold text-foreground transition-colors group-hover:text-primary">
                     info@dreamteam.technology
                   </div>
                 </div>
-              </a>
+              </MotionLink>
 
-              <a
+              <MotionLink
                 href="tel:+359878757930"
-                className="group flex cursor-pointer items-center gap-4"
+                className="group flex origin-left cursor-pointer items-center gap-4"
+                whileHover={{ scale: 1.05, transition: HOVER_TRANSITION }}
+                whileTap={{ scale: 0.99, transition: TAP_TRANSITION }}
+                {...reveal(1)}
               >
-                <div className={contactInfoIconCircle}>
-                  <GradientPhoneIcon className="h-5 w-5" />
-                </div>
+                <ContactIconChip>
+                  <GradientPhoneIcon className={contactIconClass} />
+                </ContactIconChip>
                 <div>
                   <div className="text-sm text-muted-foreground">{t.contact.phone}</div>
                   <div className="font-semibold text-foreground transition-colors group-hover:text-primary">
                     +359 87 875 7930
                   </div>
                 </div>
-              </a>
+              </MotionLink>
 
-              <a
+              <MotionLink
                 href="tel:+359882367100"
-                className="group flex cursor-pointer items-center gap-4"
+                className="group flex origin-left cursor-pointer items-center gap-4"
+                whileHover={{ scale: 1.05, transition: HOVER_TRANSITION }}
+                whileTap={{ scale: 0.99, transition: TAP_TRANSITION }}
+                {...reveal(2)}
               >
-                <div className={contactInfoIconCircle}>
-                  <GradientPhoneIcon className="h-5 w-5" />
-                </div>
+                <ContactIconChip>
+                  <GradientPhoneIcon className={contactIconClass} />
+                </ContactIconChip>
                 <div>
                   <div className="text-sm text-muted-foreground">{t.contact.phone}</div>
                   <div className="font-semibold text-foreground transition-colors group-hover:text-primary">
                     +359 88 236 7100
                   </div>
                 </div>
-              </a>
+              </MotionLink>
 
-              <button
+              <motion.button
                 type="button"
                 onClick={copyAddress}
-                className="flex w-full cursor-pointer items-start gap-4 text-left"
+                className="group flex w-full origin-left cursor-pointer items-start gap-4 text-left"
                 aria-label={t.contact.copyAddress}
                 title={t.contact.copyAddress}
+                whileHover={{ scale: 1.05, transition: HOVER_TRANSITION }}
+                whileTap={{ scale: 0.99, transition: TAP_TRANSITION }}
+                {...reveal(3)}
               >
-                <div
-                  className={cn(
-                    contactInfoIconCircle,
-                    "mt-0.5 transition-transform hover:scale-[1.04] active:scale-[0.98]"
-                  )}
-                >
-                  <GradientMapPinIcon className="h-5 w-5" />
-                </div>
+                <ContactIconChip className="mt-0.5">
+                  <GradientMapPinIcon className={contactIconClass} />
+                </ContactIconChip>
                 <div className="min-w-0">
                   <div className="mb-1 text-sm text-muted-foreground">{t.contact.address}</div>
-                  <div className="font-semibold leading-relaxed text-foreground">{addressText}</div>
+                  <div className="font-semibold leading-relaxed text-foreground transition-colors group-hover:text-primary">
+                    {addressText}
+                  </div>
                 </div>
-              </button>
+              </motion.button>
             </div>
 
-            <div className="flex items-center gap-10">
-              <a
-                href="https://www.facebook.com/profile.php?id=61585919836260"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group inline-flex items-center justify-center transition-transform hover:scale-110"
-              >
-                <SocialIcon src="/social_media_icons/facebook.png" alt="Facebook" />
-              </a>
-              <a
-                href="https://www.instagram.com/dreamteam.video.ai/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group inline-flex items-center justify-center transition-transform hover:scale-110"
-              >
-                <SocialIcon src="/social_media_icons/instagram.png" alt="Instagram" />
-              </a>
-              <a
-                href="https://www.linkedin.com/company/109344952"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group inline-flex items-center justify-center transition-transform hover:scale-110"
-              >
-                <SocialIcon src="/social_media_icons/linkedin.png" alt="LinkedIn" />
-              </a>
-              <a
-                href="https://www.youtube.com/@DreamTeamVideo"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group inline-flex items-center justify-center transition-transform hover:scale-110"
-              >
-                <SocialIcon src="/social_media_icons/youtube.png" alt="YouTube" />
-              </a>
+            <div className="flex flex-wrap items-center gap-x-6 gap-y-4 sm:gap-x-10">
+              {socials.map((s, i) => (
+                <MotionLink
+                  key={s.alt}
+                  href={s.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group inline-flex shrink-0 cursor-pointer items-center justify-center"
+                  whileHover={{ scale: 1.2, transition: HOVER_TRANSITION }}
+                  whileTap={{ scale: 0.95, transition: TAP_TRANSITION }}
+                  {...reveal(4 + i)}
+                >
+                  <SocialIcon src={s.src} alt={s.alt} />
+                </MotionLink>
+              ))}
             </div>
           </div>
         </div>

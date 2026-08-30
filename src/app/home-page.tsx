@@ -1,6 +1,7 @@
 import { SiteHeader } from "@/components/site-header";
 import { MobileNav } from "@/components/mobile-nav";
 import { HeroSection } from "@/components/hero-section";
+import { QuoteFormSection } from "@/components/quote-form/quote-form-section";
 import { PortfolioSection } from "@/components/portfolio-section";
 import { ServicesSection } from "@/components/services-section";
 import { PartnersSection } from "@/components/partners-section";
@@ -33,6 +34,10 @@ export function HomePage() {
 
         <div className="relative">
           <ServicesSection />
+        </div>
+
+        <div className="relative">
+          <QuoteFormSection />
         </div>
 
         <div className="relative">

@@ -30,6 +30,7 @@ Marketing site for **DreamTeam** — an AI video production **company** (never c
 | `src/app/layout.tsx` | Root layout: metadata, Organization/WebSite JSON-LD, providers, `defaultTheme="dark"` |
 | `src/app/sitemap.ts`, `robots.ts`, `opengraph-image.tsx` | SEO endpoints; robots explicitly allows AI crawlers |
 | `src/app/home-page.tsx` | Home composition — self-contained sections stacked in order |
+| `src/components/quote-form/` + `src/lib/quote-form/constants.ts` | Multi-step quote form (home, after services): steps in `steps/`, option keys/icons/limits in the constants file, labels in the dictionaries (`quoteForm`), submits to `/api/quote` (Resend + attachments, ≤4 MB total; email markup in `src/app/api/quote/email-template.ts`) |
 | `src/lib/youtube-embeds.ts` | Portfolio clips per category, **newest first** in each array; embed as `/embed/ID` (never `/shorts/`) |
 | `src/lib/partners.ts` + `partner-logo.tsx` | Partner list (logo filenames ↔ site URL) and the light/dark logo swap |
 | `src/components/` | Page sections (hero, services, reviews, faq, contact…) + `training/`, `services/`, `legal/` views |
@@ -61,6 +62,7 @@ Marketing site for **DreamTeam** — an AI video production **company** (never c
 - **Dark is the default theme.** Dark text-card surfaces use `bg-card` (dark navy `#0f172a`, defined once in `globals.css` `.dark`). Never hardcode dark card backgrounds (`dark:bg-neutral-950` etc.) — use `bg-card`/`bg-card/NN` so future cards inherit the standard.
   - `src/app/layout.tsx` renders `<html className="dark" style={{colorScheme:"dark"}}>` **server-side**. Keep it: `:root` is the light palette and next-themes' script runs from `<body>`, so without it the light theme flashes on every cold load (visibly, because `body` animates `background-color`). `defaultTheme="dark"` + `enableSystem={false}` handle the client side.
 - Section headers: left-aligned `h2` (`text-4xl md:text-5xl font-heading font-bold`) with an accent word in `text-section-accent`, subtitle `text-lg text-muted-foreground max-w-2xl`.
+- Fonts: body/UI is **Nunito Sans** (`--font-sans`, Google import in `globals.css`); headings use **Uni Sans** via the `font-heading` utility (`--font-heading` in `globals.css` → `--font-uni-sans`, loaded with `next/font/local` from `src/app/fonts/`). Only Heavy (900) and Thin (100) are licensed/bundled, so `font-semibold`/`font-bold` on a heading resolve up to Heavy — don't add mid-weight heading styles expecting 600/700 to render distinctly.
 - Portfolio "All" tab is a **hand-picked highlight reel** (`embedsForAll()`), not every clip — adding a video to a category does *not* put it on the home page. Category tabs show the full catalogue.
 - Partners render as scrolling marquee rows at **every** breakpoint (no static desktop grid). Keep `sizes` on the logos in step with their max rendered width.
 - Interactive elements always get `cursor-pointer` (unless disabled). Breadcrumbs on all non-home pages (automatic via `PageBreadcrumbs`). Modals: full-viewport on mobile with a top-right X close.

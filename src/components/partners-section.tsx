@@ -6,7 +6,7 @@ import { PARTNERS, type Partner } from "@/lib/partners";
 import { PartnerLogo } from "@/components/partner-logo";
 
 const imgClass =
-  "h-[3.5rem] w-auto min-h-[3.5rem] min-w-[100px] max-w-[min(160px,28vw)] object-contain transition-transform duration-200 group-hover:scale-[1.05] sm:h-[4.25rem] sm:min-h-[4.25rem] sm:min-w-[115px] sm:max-w-[min(190px,24vw)] md:h-[5rem] md:min-h-[5rem] md:min-w-[130px] md:max-w-[205px]";
+  "h-[4.25rem] w-auto min-h-[4.25rem] min-w-[120px] max-w-[min(190px,36vw)] object-contain transition-transform duration-200 group-hover:scale-[1.05] sm:h-[4.5rem] sm:min-h-[4.5rem] sm:min-w-[115px] sm:max-w-[min(190px,24vw)] md:h-[5rem] md:min-h-[5rem] md:min-w-[130px] md:max-w-[205px]";
 
 const innerClass =
   "group mx-4 flex shrink-0 items-center justify-center md:mx-6 cursor-pointer opacity-80 hover:opacity-100 transition-opacity py-2";
@@ -44,11 +44,11 @@ function PartnerMarqueeRow({
               rel="noopener noreferrer"
               className={innerClass}
             >
-              <PartnerLogo p={p} imgClass={imgClass} sizes="(max-width: 640px) 28vw, 205px" />
+              <PartnerLogo p={p} imgClass={imgClass} sizes="(max-width: 640px) 36vw, 205px" />
             </a>
           ) : (
             <span key={`${rowKey}-${p.id}-${idx}`} className={`${innerClass} cursor-default`}>
-              <PartnerLogo p={p} imgClass={imgClass} sizes="(max-width: 640px) 28vw, 205px" />
+              <PartnerLogo p={p} imgClass={imgClass} sizes="(max-width: 640px) 36vw, 205px" />
             </span>
           )
         )}
@@ -65,14 +65,14 @@ export function PartnersSection() {
 
   return (
     <section className="relative overflow-x-hidden overflow-y-visible pt-10 pb-4 md:pt-12 md:pb-6">
-      <div className="relative z-10 mx-auto mb-4 max-w-6xl px-4 md:mb-5">
-        <h2 className="text-center font-heading text-sm font-semibold uppercase tracking-widest text-muted-foreground/70 md:text-base">
+      <div className="relative z-10 mx-auto mb-1 max-w-6xl px-4 md:mb-2">
+        <h2 className="text-center font-heading text-[0.7rem] font-semibold uppercase tracking-widest text-muted-foreground/70 md:text-xs">
           {t.partners.title}
         </h2>
       </div>
 
       {/* Scrolling marquee rows at every breakpoint */}
-      <div className="relative flex w-full flex-col items-center gap-4 overflow-x-hidden overflow-y-visible py-3 md:gap-5">
+      <div className="relative flex w-full flex-col items-center gap-4 overflow-x-hidden overflow-y-visible py-1 md:gap-5 md:py-2">
         <PartnerMarqueeRow partners={rowPartners} direction="left" rowKey="a" />
         {rowPartnersB.length > 0 ? (
           <PartnerMarqueeRow partners={rowPartnersB} direction="right" rowKey="b" />

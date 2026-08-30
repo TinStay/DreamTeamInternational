@@ -109,6 +109,8 @@ export type ContactInquiryFormProps = {
   variant?: "card" | "plain";
   /** Optional title / copy above the fields */
   heading?: React.ReactNode;
+  /** Draw the separator line under `heading` (default: true) */
+  headingDivider?: boolean;
 };
 
 export function ContactInquiryForm({
@@ -120,6 +122,7 @@ export function ContactInquiryForm({
   trainingWhy,
   variant = "card",
   heading,
+  headingDivider = true,
 }: ContactInquiryFormProps) {
   const { t, language } = useLanguage();
   const [foundUs, setFoundUs] = useState<string>("");
@@ -219,7 +222,14 @@ export function ContactInquiryForm({
       </div>
 
       {heading ? (
-        <div className="mb-1 border-b border-border/25 pb-4 text-left">{heading}</div>
+        <div
+          className={cn(
+            "mb-1 text-left",
+            headingDivider && "border-b border-border/25 pb-4"
+          )}
+        >
+          {heading}
+        </div>
       ) : null}
 
       {showTrainingTarget ? (
