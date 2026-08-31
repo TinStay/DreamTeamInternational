@@ -1,23 +1,32 @@
 "use client";
 
 import * as React from "react";
+import Image from "next/image";
+import Link from "next/link";
 import { motion } from "motion/react";
 import {
   IconAlertTriangle,
   IconChevronLeft,
   IconChevronRight,
-  IconCircleCheck,
   IconLoader2,
   IconSend,
 } from "@tabler/icons-react";
 
-import { Button } from "@/components/ui/button";
+import {
+  Button,
+  ctaPillClassName,
+  primaryGradientInteractiveClassName,
+} from "@/components/ui/button";
 import { useLanguage } from "@/lib/i18n/language-context";
+import { EMAIL_RE } from "@/lib/server/form-guards";
+import { servicesPath } from "@/lib/routes";
+import { SOCIAL_LINKS } from "@/lib/social-links";
 import {
   QUOTE_FORM_DEFAULTS,
   QUOTE_STEPS,
+  isQuoteStepValid,
+  type QuoteFieldUpdater,
   type QuoteFormData,
-  type QuoteStepKey,
 } from "@/lib/quote-form/constants";
 import { cn } from "@/lib/utils";
 import { ScriptStep } from "./steps/script-step";
@@ -25,8 +34,6 @@ import { VideoStep } from "./steps/video-step";
 import { GoalStep } from "./steps/goal-step";
 import { DetailsStep } from "./steps/details-step";
 import { ContactStep } from "./steps/contact-step";
-
-const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 /**
  * Enter-only step transition. Exit animations are deliberately avoided:
@@ -36,6 +43,25 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const contentVariants = {
   hidden: { opacity: 0, x: 40 },
   visible: { opacity: 1, x: 0, transition: { duration: 0.3 } },
+};
+
+/** Staggered enter animation for the confirmation screen. */
+const successItemVariants = {
+  hidden: { opacity: 0, y: 16 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.45, ease: [0.22, 1, 0.36, 1] as const },
+  },
+};
+
+const successIconVariants = {
+  hidden: { opacity: 0, scale: 0.7 },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    transition: { duration: 0.55, ease: [0.22, 1, 0.36, 1] as const },
+  },
 };
 
 function sumBytes(files: File[]): number {
@@ -60,35 +86,27 @@ export function QuoteFormSection({ className }: { className?: string }) {
   const [submitError, setSubmitError] = React.useState(false);
   const [submitted, setSubmitted] = React.useState(false);
 
-  const update = React.useCallback(
-    <K extends keyof QuoteFormData>(field: K, value: QuoteFormData[K]) => {
-      setData((prev) => ({ ...prev, [field]: value }));
-    },
-    []
-  );
-
-  function isStepValid(step: QuoteStepKey): boolean {
-    switch (step) {
-      case "script":
-        return data.script !== "";
-      case "goal":
-        return data.goal !== "";
-      case "video":
-        return data.formats.length > 0 && data.voiceover !== "";
-      case "details":
-        return true;
-      case "contact":
-        return (
-          data.name.trim() !== "" &&
-          EMAIL_RE.test(data.email.trim()) &&
-          data.termsAccepted
-        );
-    }
-  }
+  // Stable across renders and updater-aware, so step handlers never need to
+  // close over `data` (see `QuoteFieldUpdater`). No field holds a function, so
+  // `typeof === "function"` safely discriminates value from updater.
+  const update = React.useCallback<QuoteFieldUpdater>((field, value) => {
+    setData((prev) => ({
+      ...prev,
+      [field]:
+        typeof value === "function"
+          ? (value as (p: QuoteFormData[typeof field]) => QuoteFormData[typeof field])(
+              prev[field]
+            )
+          : value,
+    }));
+  }, []);
 
   const stepKey = QUOTE_STEPS[currentStep];
   const isLastStep = currentStep === QUOTE_STEPS.length - 1;
-  const canProceed = isStepValid(stepKey);
+  const canProceed = isQuoteStepValid(stepKey, data, EMAIL_RE);
+
+  const scriptBytes = React.useMemo(() => sumBytes(scriptFiles), [scriptFiles]);
+  const refBytes = React.useMemo(() => sumBytes(refFiles), [refFiles]);
 
   // Scroll AFTER the new step commits — scrolling before the re-render loses
   // to the browser's scroll anchoring when the steps differ in height.
@@ -141,7 +159,11 @@ export function QuoteFormSection({ className }: { className?: string }) {
   }
 
   return (
-    <section id="quote" className={cn("relative w-full py-10 sm:py-14", className)}>
+    <section
+      id="quote"
+      // scroll-mt keeps the heading clear of the fixed header on #quote navigation.
+      className={cn("relative w-full scroll-mt-24 py-10 sm:py-14", className)}
+    >
       <div className="relative z-10 mx-auto w-full max-w-7xl px-4">
         <div className="mb-8 sm:mb-10">
           <h2 className="font-heading mb-3 text-4xl font-bold text-foreground md:text-5xl">
@@ -212,7 +234,11 @@ export function QuoteFormSection({ className }: { className?: string }) {
               e.preventDefault();
               if (isLastStep) void handleSubmit();
             }}
-            className="rounded-3xl border border-border/30 bg-card p-6 text-card-foreground shadow-elevated-soft sm:p-8"
+            className={cn(
+              "rounded-3xl border border-border/30 bg-card p-6 text-card-foreground shadow-elevated-soft sm:p-8",
+              // Confirmation screen: slightly tighter side padding.
+              submitted && "px-4 sm:px-6"
+            )}
           >
             {/* Honeypot: hidden from users, catches bots that fill every field. */}
             <div
@@ -233,29 +259,85 @@ export function QuoteFormSection({ className }: { className?: string }) {
 
             {submitted ? (
               <motion.div
-                initial={{ opacity: 0, scale: 0.96 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.4 }}
-                className="flex flex-col items-center py-10 text-center"
+                initial="hidden"
+                animate="visible"
+                variants={{
+                  hidden: {},
+                  visible: { transition: { staggerChildren: 0.12, delayChildren: 0.05 } },
+                }}
+                className="mx-auto grid max-w-3xl grid-cols-1 items-center gap-8 lg:grid-cols-2"
               >
-                {/* Large placeholder icon — to be swapped for a custom image. */}
-                <span className="flex size-28 items-center justify-center rounded-full bg-primary-gradient text-white shadow-[0_18px_54px_var(--primary-soft-glow)] sm:size-32">
-                  <IconCircleCheck className="size-14 sm:size-16" />
-                </span>
-                <h3 className="mt-5 font-heading text-2xl font-bold text-foreground">
-                  {q.successTitle}
-                </h3>
-                <p className="mt-2 max-w-md text-sm leading-relaxed text-muted-foreground">
-                  {q.successBody}
-                </p>
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={resetForm}
-                  className="mt-6 h-10 rounded-full px-6"
-                >
-                  {q.successAgain}
-                </Button>
+                {/* Left column: large confirmation icon (also on top on mobile). */}
+                <motion.div variants={successIconVariants} className="flex justify-center">
+                  <Image
+                    src="/request_form/confirmation_icon.png"
+                    alt=""
+                    width={512}
+                    height={512}
+                    sizes="288px"
+                    className="size-40 object-contain drop-shadow-[0_18px_54px_var(--primary-soft-glow)] sm:size-52 lg:size-72"
+                  />
+                </motion.div>
+
+                {/* Right column: text, CTAs, socials. */}
+                <div className="flex flex-col items-center text-center lg:items-start lg:text-left">
+                  <motion.h3
+                    variants={successItemVariants}
+                    className="font-heading text-xl font-bold break-words text-foreground sm:text-2xl md:text-3xl"
+                  >
+                    {q.successTitle}
+                  </motion.h3>
+                  <motion.p
+                    variants={successItemVariants}
+                    className="mt-3 max-w-md text-sm leading-relaxed text-muted-foreground"
+                  >
+                    {q.successBody}
+                  </motion.p>
+
+                  <motion.div
+                    variants={successItemVariants}
+                    className="mt-7 flex flex-col items-center gap-3 sm:flex-row"
+                  >
+                    <Link
+                      href={servicesPath(language)}
+                      className={cn(primaryGradientInteractiveClassName, ctaPillClassName)}
+                    >
+                      {q.successCta}
+                    </Link>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={resetForm}
+                      className="h-11 rounded-full px-6"
+                    >
+                      {q.successAgain}
+                    </Button>
+                  </motion.div>
+
+                  <motion.div
+                    variants={successItemVariants}
+                    className="mt-8 flex items-center gap-6"
+                  >
+                    {SOCIAL_LINKS.map((social) => (
+                      <a
+                        key={social.alt}
+                        href={social.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex shrink-0 cursor-pointer items-center justify-center transition-transform hover:scale-110"
+                      >
+                        <Image
+                          src={social.src}
+                          alt={social.alt}
+                          width={256}
+                          height={256}
+                          sizes="40px"
+                          className="size-10 shrink-0 object-contain opacity-90 transition-opacity hover:opacity-100"
+                        />
+                      </a>
+                    ))}
+                  </motion.div>
+                </div>
               </motion.div>
             ) : (
               <>
@@ -271,7 +353,7 @@ export function QuoteFormSection({ className }: { className?: string }) {
                       update={update}
                       scriptFiles={scriptFiles}
                       onScriptFiles={setScriptFiles}
-                      otherBytes={sumBytes(refFiles)}
+                      otherBytes={refBytes}
                     />
                   )}
                   {stepKey === "goal" && <GoalStep data={data} update={update} />}
@@ -281,7 +363,7 @@ export function QuoteFormSection({ className }: { className?: string }) {
                       update={update}
                       refFiles={refFiles}
                       onRefFiles={setRefFiles}
-                      otherBytes={sumBytes(scriptFiles)}
+                      otherBytes={scriptBytes}
                     />
                   )}
                   {stepKey === "details" && <DetailsStep data={data} update={update} />}

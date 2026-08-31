@@ -30,7 +30,8 @@ Marketing site for **DreamTeam** — an AI video production **company** (never c
 | `src/app/layout.tsx` | Root layout: metadata, Organization/WebSite JSON-LD, providers, `defaultTheme="dark"` |
 | `src/app/sitemap.ts`, `robots.ts`, `opengraph-image.tsx` | SEO endpoints; robots explicitly allows AI crawlers |
 | `src/app/home-page.tsx` | Home composition — self-contained sections stacked in order |
-| `src/components/quote-form/` + `src/lib/quote-form/constants.ts` | Multi-step quote form (home, after services): steps in `steps/`, option keys/icons/limits in the constants file, labels in the dictionaries (`quoteForm`), submits to `/api/quote` (Resend + attachments, ≤4 MB total; email markup in `src/app/api/quote/email-template.ts`) |
+| `src/components/quote-form/` + `src/lib/quote-form/constants.ts` | Multi-step quote form (home, after services): steps in `steps/`, option keys/icons/limits in the constants file, labels in the dictionaries (`quoteForm`), submits to `/api/quote` (Resend + attachments, ≤4.4 MB total — the Vercel body ceiling; email markup in `src/app/api/quote/email-template.ts`) |
+| `src/lib/server/form-guards.ts`, `src/lib/dates.ts`, `src/lib/found-us.ts`, `src/lib/social-links.ts` | Shared: request hygiene for both form APIs (clean/rate-limit/escape/EMAIL_RE), DD-MM-YYYY date display, the "how did you find us" key catalogue, social profile links (UI + JSON-LD) |
 | `src/lib/youtube-embeds.ts` | Portfolio clips per category, **newest first** in each array; embed as `/embed/ID` (never `/shorts/`) |
 | `src/lib/partners.ts` + `partner-logo.tsx` | Partner list (logo filenames ↔ site URL) and the light/dark logo swap |
 | `src/components/` | Page sections (hero, services, reviews, faq, contact…) + `training/`, `services/`, `legal/` views |
@@ -58,8 +59,11 @@ Marketing site for **DreamTeam** — an AI video production **company** (never c
 - New indexable routes must be added to `src/app/sitemap.ts` (`PATHS`) and get breadcrumb labels in `page-breadcrumbs.tsx` (`segmentToLabel`).
 - Keep `public/llms.txt` and dictionary SEO fields (`seoTitle`/`seoDescription`) current. Never describe DreamTeam as an "agency".
 
+### Dates
+- **All dates shown to users — UI, emails, documents — use the `DD-MM-YYYY` format** (e.g. `05-09-2026`). Internal storage/transfer can stay ISO (`yyyy-mm-dd`); convert at the display boundary.
+
 ### Theming & visual conventions
-- **Dark is the default theme.** Dark text-card surfaces use `bg-card` (dark navy `#0f172a`, defined once in `globals.css` `.dark`). Never hardcode dark card backgrounds (`dark:bg-neutral-950` etc.) — use `bg-card`/`bg-card/NN` so future cards inherit the standard.
+- **Dark is the default theme.** Dark text-card surfaces use `bg-card` (near-black slate `#0c111e`; light theme `#f7f8fb` — both defined once in `globals.css`). **Interactive surfaces** (selectable cards, dropzones, datepickers, slider boxes, form fields) use `bg-card-elevated`, which is *derived* via `color-mix()` from `--input`/`--background` over `--card` so retunes can't desync it; the nav/footer glass (`.liquid-glass*`) is likewise `color-mix()`-derived from `--card`, and standard card borders use `border-card-border`. Never hardcode dark card backgrounds (`dark:bg-neutral-950` etc.) — use these tokens so future cards inherit the standard.
   - `src/app/layout.tsx` renders `<html className="dark" style={{colorScheme:"dark"}}>` **server-side**. Keep it: `:root` is the light palette and next-themes' script runs from `<body>`, so without it the light theme flashes on every cold load (visibly, because `body` animates `background-color`). `defaultTheme="dark"` + `enableSystem={false}` handle the client side.
 - Section headers: left-aligned `h2` (`text-4xl md:text-5xl font-heading font-bold`) with an accent word in `text-section-accent`, subtitle `text-lg text-muted-foreground max-w-2xl`.
 - Fonts: body/UI is **Nunito Sans** (`--font-sans`, Google import in `globals.css`); headings use **Uni Sans** via the `font-heading` utility (`--font-heading` in `globals.css` → `--font-uni-sans`, loaded with `next/font/local` from `src/app/fonts/`). Only Heavy (900) and Thin (100) are licensed/bundled, so `font-semibold`/`font-bold` on a heading resolve up to Heavy — don't add mid-weight heading styles expecting 600/700 to render distinctly.
@@ -69,7 +73,7 @@ Marketing site for **DreamTeam** — an AI video production **company** (never c
 - Images: use `next/image` with a `sizes` hint (qualities 75/100 are configured). Raw `<img>` only with an explicit reason.
 
 ### Forms & email
-- All inquiry forms POST to `/api/contact`, which sends via Resend **to `info@dreamteam.technology`**, includes the internal Bulgarian form label (`formStateBg`), and renders HTML + plaintext.
+- Contact/training inquiry forms POST to `/api/contact` (includes the internal Bulgarian form label `formStateBg`); the home quote wizard POSTs multipart to `/api/quote` (attachments + option-keyed answers). Both send via Resend **to `info@dreamteam.technology`**, render HTML + plaintext, and share the hygiene layer in `src/lib/server/form-guards.ts`.
 - Server-side validation is the contract: required name/email/message, length caps, honeypot (`website` must stay in forms, hidden), per-IP rate limit. Check `result.error` from Resend — never report success on failure.
 
 ### Quality gates

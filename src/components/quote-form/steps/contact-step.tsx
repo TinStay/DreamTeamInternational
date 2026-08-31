@@ -13,28 +13,21 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { cn } from "@/lib/utils";
 import { useLanguage } from "@/lib/i18n/language-context";
+import { FOUND_US_KEYS } from "@/lib/found-us";
 import { termsPath } from "@/lib/routes";
-import { RequiredMark, StepHeading, type QuoteStepProps } from "./shared";
+import { QUOTE_FIELD_CLASS, RequiredMark, StepHeading, type QuoteStepProps } from "./shared";
 
 export function ContactStep({ data, update }: QuoteStepProps) {
   const { t, language } = useLanguage();
   const c = t.quoteForm.contactStep;
 
-  // Same catalogue and order as the contact form.
-  const foundUsOptions = useMemo(() => {
-    const opts = t.contact.foundUsOptions;
-    return [
-      { value: "google", label: opts.google },
-      { value: "social", label: opts.social },
-      { value: "instagram", label: opts.instagram },
-      { value: "tiktok", label: opts.tiktok },
-      { value: "youtube", label: opts.youtube },
-      { value: "referral", label: opts.referral },
-      { value: "event", label: opts.event },
-      { value: "other", label: opts.other },
-    ];
-  }, [t.contact.foundUsOptions]);
+  // Single source of truth for the catalogue — labels come from the dictionary.
+  const foundUsOptions = useMemo(
+    () => FOUND_US_KEYS.map((value) => ({ value, label: t.contact.foundUsOptions[value] })),
+    [t.contact.foundUsOptions]
+  );
 
   const selectedFoundUsLabel =
     foundUsOptions.find((o) => o.value === data.foundUs)?.label ?? "";
@@ -43,7 +36,8 @@ export function ContactStep({ data, update }: QuoteStepProps) {
     <div>
       <StepHeading title={c.title} subtitle={c.subtitle} />
 
-      <div className="grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-2">
+      {/* Row 1: name / email / phone. */}
+      <div className="grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-3">
         <div>
           <Label htmlFor="quote-name" className="mb-2.5 gap-0.5 font-semibold">
             {t.contact.name} <RequiredMark />
@@ -55,7 +49,7 @@ export function ContactStep({ data, update }: QuoteStepProps) {
             placeholder={t.contact.name}
             autoComplete="name"
             required
-            className="h-9 bg-background/40"
+            className={cn("h-9", QUOTE_FIELD_CLASS)}
             maxLength={200}
           />
         </div>
@@ -72,7 +66,7 @@ export function ContactStep({ data, update }: QuoteStepProps) {
             placeholder={t.contact.emailLbl}
             autoComplete="email"
             required
-            className="h-9 bg-background/40"
+            className={cn("h-9", QUOTE_FIELD_CLASS)}
             maxLength={320}
           />
         </div>
@@ -87,11 +81,14 @@ export function ContactStep({ data, update }: QuoteStepProps) {
             value={data.phone}
             onChange={(e) => update("phone", e.target.value)}
             autoComplete="tel"
-            className="h-9 bg-background/40"
+            className={cn("h-9", QUOTE_FIELD_CLASS)}
             maxLength={60}
           />
         </div>
+      </div>
 
+      {/* Row 2: company / how did you find us. */}
+      <div className="mt-4 grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-2">
         <div>
           <Label htmlFor="quote-company" className="mb-2.5 font-semibold">
             {c.company}
@@ -101,7 +98,7 @@ export function ContactStep({ data, update }: QuoteStepProps) {
             value={data.company}
             onChange={(e) => update("company", e.target.value)}
             autoComplete="organization"
-            className="h-9 bg-background/40"
+            className={cn("h-9", QUOTE_FIELD_CLASS)}
             maxLength={200}
           />
         </div>
@@ -112,7 +109,7 @@ export function ContactStep({ data, update }: QuoteStepProps) {
             value={data.foundUs}
             onValueChange={(value) => update("foundUs", value ?? "")}
           >
-            <SelectTrigger className="h-9 w-full bg-background/40 px-2.5 text-sm">
+            <SelectTrigger size="lg" className={cn("w-full text-sm", QUOTE_FIELD_CLASS)}>
               <SelectValue>
                 {data.foundUs !== "" ? selectedFoundUsLabel : null}
               </SelectValue>
@@ -132,6 +129,8 @@ export function ContactStep({ data, update }: QuoteStepProps) {
         <Checkbox
           checked={data.termsAccepted}
           onCheckedChange={(checked) => update("termsAccepted", Boolean(checked))}
+          // The terms copy is a sibling (it contains a link), so name the box explicitly.
+          aria-label={t.contact.terms.link}
           className="mt-0.5 cursor-pointer"
         />
         <div className="text-sm leading-relaxed text-muted-foreground">

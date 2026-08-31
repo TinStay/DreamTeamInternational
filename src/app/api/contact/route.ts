@@ -1,6 +1,14 @@
 import { NextResponse } from "next/server";
 import { Resend } from "resend";
 
+import {
+  EMAIL_RE,
+  clean,
+  clientIp,
+  createRateLimiter,
+  escapeHtml,
+} from "@/lib/server/form-guards";
+
 export const runtime = "nodejs";
 
 type Payload = {
@@ -32,36 +40,7 @@ const MAX = {
   message: 5000,
 } as const;
 
-const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-/** Trim, coerce to string, and cap length. */
-function clean(value: unknown, max: number): string {
-  return typeof value === "string" ? value.trim().slice(0, max) : "";
-}
-
-function escapeHtml(input: string) {
-  return input
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#39;");
-}
-
-// Best-effort in-memory rate limit. Resets on cold start and is per-instance,
-// so it only blunts bursts from a single source — not a substitute for a real
-// distributed rate limiter, but enough to slow trivial form spam.
-const RATE_LIMIT_WINDOW_MS = 60_000;
-const RATE_LIMIT_MAX = 5;
-const recentHits = new Map<string, number[]>();
-
-function isRateLimited(ip: string, now: number): boolean {
-  const windowStart = now - RATE_LIMIT_WINDOW_MS;
-  const hits = (recentHits.get(ip) ?? []).filter((t) => t > windowStart);
-  hits.push(now);
-  recentHits.set(ip, hits);
-  return hits.length > RATE_LIMIT_MAX;
-}
+const isRateLimited = createRateLimiter(60_000, 5);
 
 export async function POST(req: Request) {
   const apiKey = process.env.RESEND_API_KEY;
@@ -88,12 +67,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: true, id: null });
   }
 
-  const now = Date.now();
-  const ip =
-    req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
-    req.headers.get("x-real-ip") ||
-    "unknown";
-  if (isRateLimited(ip, now)) {
+  if (isRateLimited(clientIp(req), Date.now())) {
     return NextResponse.json(
       { ok: false, error: "Too many requests. Please try again shortly." },
       { status: 429 }

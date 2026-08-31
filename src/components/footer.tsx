@@ -16,7 +16,7 @@ export function Footer() {
   const contactHref = contactProcessPath(language);
 
   return (
-    <footer className="relative overflow-hidden border-t border-border/20 liquid-glass mt-20">
+    <footer className="relative overflow-hidden border-t border-card-border liquid-glass mt-20">
       <div className="max-w-6xl mx-auto px-6 py-12 relative z-10">
         <div className="grid md:grid-cols-3 gap-8 items-center md:items-start text-center md:text-left">
           {/* Brand column */}

@@ -1,5 +1,6 @@
 "use client";
 
+import * as React from "react";
 import { motion } from "motion/react";
 import { IconCheck } from "@tabler/icons-react";
 
@@ -23,8 +24,17 @@ export type OptionCardProps = {
  * Selectable card used for every choice in the quote form — icon, label and an
  * optional hint. Selection state is conveyed via a gradient icon chip, a
  * primary ring and a check badge.
+ *
+ * Memoized with a comparator that ignores `onSelect` identity, so keystrokes
+ * in sibling fields don't re-render every motion card.
+ *
+ * CONTRACT: because unchanged cards keep the `onSelect` closure from an older
+ * render, handlers must NOT read form state directly — derive the next value
+ * with the updater form of `update` (see `QuoteFieldUpdater`). Reading
+ * `data.formats`/`data.platforms` inside a handler makes a stale card clobber
+ * selections made after its last render.
  */
-export function OptionCard({
+function OptionCardImpl({
   icon: Icon,
   label,
   hint,
@@ -46,9 +56,11 @@ export function OptionCard({
         "relative flex w-full cursor-pointer items-center rounded-2xl border text-left transition-colors",
         compact ? "gap-3 p-3 sm:p-3.5" : "gap-3 p-3 sm:gap-4 sm:p-5",
         "focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50",
+        // Subtle resting shadow so cards lift off the page in both themes.
+        "shadow-[0_2px_12px_rgba(15,23,42,0.06)] dark:shadow-[0_2px_12px_rgba(0,0,0,0.28)]",
         selected
-          ? "border-primary/60 bg-card shadow-[0_10px_30px_var(--primary-soft-glow)]"
-          : "border-border/50 bg-card/60 hover:border-border hover:bg-card",
+          ? "border-primary/60 bg-card-elevated shadow-[0_10px_30px_var(--primary-soft-glow)] dark:shadow-[0_10px_30px_var(--primary-soft-glow)]"
+          : "border-border/50 bg-card-elevated hover:border-border",
         className
       )}
     >
@@ -86,18 +98,43 @@ export function OptionCard({
         ) : null}
       </span>
 
+      {/* Selection indicator: square checkbox for multi-select, radio dot otherwise.
+          Gradient fill with NO border when selected — a gradient painted under a
+          1px transparent border is what caused the red/purple hairline fringes.
+          Explicit 5px radius: the theme's rounded-md is ~18px. */}
       <span
         className={cn(
-          "flex size-5 shrink-0 items-center justify-center border transition-all",
-          multi ? "rounded-md" : "rounded-full",
+          "flex size-5 shrink-0 items-center justify-center transition-all",
+          multi ? "rounded-[5px]" : "rounded-full",
           selected
-            ? "border-transparent bg-primary-gradient text-white"
-            : "border-border bg-transparent text-transparent"
+            ? "bg-primary-gradient text-white"
+            : "border border-border bg-transparent text-transparent"
         )}
         aria-hidden
       >
-        <IconCheck className="size-3.5" stroke={3} />
+        {multi ? (
+          <IconCheck className="size-3.5" stroke={3} />
+        ) : (
+          <span
+            className={cn(
+              "size-2 rounded-full transition-colors",
+              selected ? "bg-white" : "bg-transparent"
+            )}
+          />
+        )}
       </span>
     </motion.button>
   );
 }
+
+export const OptionCard = React.memo(
+  OptionCardImpl,
+  (prev, next) =>
+    prev.icon === next.icon &&
+    prev.label === next.label &&
+    prev.hint === next.hint &&
+    prev.selected === next.selected &&
+    prev.multi === next.multi &&
+    prev.compact === next.compact &&
+    prev.className === next.className
+);

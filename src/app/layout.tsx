@@ -3,23 +3,23 @@ import localFont from "next/font/local";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { LanguageProvider } from "@/lib/i18n/language-context";
+import { SOCIAL_LINKS } from "@/lib/social-links";
 import { Analytics } from "@vercel/analytics/next";
 import { PostHogProvider } from "@/components/posthog-provider";
 import { PostHogPageView } from "@/components/posthog-pageview";
 import { Suspense } from "react";
 
 /**
- * Display font for headings (`font-heading`). Uni Sans ships only Heavy and
- * Thin here, so 600/700 heading weights resolve up to Heavy (900) — body copy
- * stays on Nunito Sans (`--font-sans` in globals.css).
+ * Display font for headings (`font-heading`) — body copy stays on Nunito Sans
+ * (`--font-sans` in globals.css). Only the Heavy face ships, declared across
+ * the whole 100–900 range so EVERY weight resolves to it: with {100, 900}
+ * faces registered separately, `font-medium` headings (dialog/card titles)
+ * would resolve DOWN to hairline Thin per CSS font-matching. This also drops
+ * ~350 KB of preloads for faces that never painted.
  */
 const uniSans = localFont({
-  src: [
-    { path: "./fonts/UniSans-Thin.otf", weight: "100", style: "normal" },
-    { path: "./fonts/UniSans-ThinItalic.otf", weight: "100", style: "italic" },
-    { path: "./fonts/UniSans-Heavy.otf", weight: "900", style: "normal" },
-    { path: "./fonts/UniSans-HeavyItalic.otf", weight: "900", style: "italic" },
-  ],
+  src: "./fonts/UniSans-Heavy.otf",
+  weight: "100 900",
   variable: "--font-uni-sans",
   display: "swap",
 });
@@ -96,12 +96,7 @@ const STRUCTURED_DATA = {
       description:
         "AI video production company creating AI-generated video for brands — TV and social ads, product videos, brand mascots, explainer videos, and AI avatars. Serving Bulgaria and worldwide.",
       email: "info@dreamteam.technology",
-      sameAs: [
-        "https://www.facebook.com/profile.php?id=61585919836260",
-        "https://www.instagram.com/dreamteam.video.ai/",
-        "https://www.linkedin.com/company/109344952",
-        "https://www.youtube.com/@DreamTeamVideo",
-      ],
+      sameAs: SOCIAL_LINKS.map((s) => s.href),
       knowsLanguage: ["bg", "en"],
       areaServed: [{ "@type": "Country", name: "Bulgaria" }, "Worldwide"],
       address: {

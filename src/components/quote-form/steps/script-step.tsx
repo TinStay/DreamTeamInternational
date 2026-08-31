@@ -1,14 +1,13 @@
 "use client";
 
-import { motion } from "motion/react";
-
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { cn } from "@/lib/utils";
 import { useLanguage } from "@/lib/i18n/language-context";
 import { SCRIPT_OPTIONS } from "@/lib/quote-form/constants";
 import { OptionCard } from "@/components/quote-form/option-card";
 import { FileUploadField } from "@/components/quote-form/file-upload";
-import { GroupLabel, StepHeading, type QuoteStepProps } from "./shared";
+import { QUOTE_FIELD_CLASS, RevealOnEnter, GroupLabel, StepHeading, type QuoteStepProps } from "./shared";
 
 export type ScriptStepProps = QuoteStepProps & {
   scriptFiles: File[];
@@ -30,7 +29,7 @@ export function ScriptStep({
 
   return (
     <div>
-      <StepHeading title={s.title} subtitle={s.subtitle} />
+      <StepHeading title={s.title} />
 
       <div role="radiogroup" aria-label={s.title} className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         {SCRIPT_OPTIONS.map((opt) => (
@@ -40,22 +39,24 @@ export function ScriptStep({
             label={s.options[opt.key].label}
             hint={s.options[opt.key].hint}
             selected={data.script === opt.key}
-            onSelect={() => update("script", opt.key)}
+            onSelect={() => {
+              update("script", opt.key);
+              // "No script" hides the details — clear them so stale text/files
+              // aren't submitted or silently counted against the upload budget.
+              if (opt.key === "none") {
+                update("scriptText", "");
+                onScriptFiles([]);
+              }
+            }}
           />
         ))}
       </div>
 
-      {/* Enter-only reveal — exit-gated unmounts hang with current motion/React. */}
       {showDetails ? (
-        <motion.div
-          key="script-details"
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3 }}
-        >
+        <RevealOnEnter>
           <div className="grid grid-cols-1 gap-8 pt-8 sm:grid-cols-2">
             <div>
-              <Label htmlFor="quote-script-text" className="mb-3 font-semibold">
+              <Label htmlFor="quote-script-text" className="mb-2.5 font-semibold">
                 {s.textLabel}
               </Label>
               <Textarea
@@ -63,12 +64,12 @@ export function ScriptStep({
                 value={data.scriptText}
                 onChange={(e) => update("scriptText", e.target.value)}
                 placeholder={s.textPh}
-                className="min-h-[140px] bg-background/40"
+                className={cn("min-h-[140px]", QUOTE_FIELD_CLASS)}
                 maxLength={5000}
               />
             </div>
             <div>
-              <GroupLabel className="mb-3">{s.uploadLabel}</GroupLabel>
+              <GroupLabel>{s.uploadLabel}</GroupLabel>
               <FileUploadField
                 id="quote-script-upload"
                 files={scriptFiles}
@@ -77,7 +78,7 @@ export function ScriptStep({
               />
             </div>
           </div>
-        </motion.div>
+        </RevealOnEnter>
       ) : null}
     </div>
   );

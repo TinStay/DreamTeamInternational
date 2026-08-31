@@ -52,7 +52,7 @@ export function Testimonial({
   return (
     <div
       className={cn(
-        "relative flex w-80 max-w-full flex-col items-center rounded-2xl border border-border/30 bg-card/80 px-6 pb-6 pt-11 text-center shadow-sm backdrop-blur-sm transition-shadow duration-300 hover:shadow-lg",
+        "relative flex w-80 max-w-full flex-col items-center rounded-2xl border border-card-border bg-card/80 px-6 pb-6 pt-11 text-center shadow-sm backdrop-blur-sm transition-shadow duration-300 hover:shadow-lg",
         className
       )}
     >

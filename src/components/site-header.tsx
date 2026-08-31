@@ -10,7 +10,6 @@ import { cn } from "@/lib/utils";
 import { useEffect, useState } from "react";
 import { useLanguage } from "@/lib/i18n/language-context";
 import { contactProcessPath, homePath, servicesPath, trainingPath } from "@/lib/routes";
-import { IconMailFilled } from "@tabler/icons-react";
 
 export function SiteHeader() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -34,15 +33,15 @@ export function SiteHeader() {
           isScrolled ? "scale-[0.98]" : "scale-100"
         }`}
       >
-        <GlassShell className="flex items-center justify-between gap-3 px-6 py-3">
-          <Link href={homeHref} className="group flex min-w-0 shrink items-center">
+        <GlassShell className="flex items-center justify-between gap-3 px-5 py-2">
+          <Link href={homeHref} className="group flex min-w-0 shrink items-center py-1 pr-2">
             <Image
               src="/logo-1.png"
               alt="DreamTeam"
               width={1024}
               height={416}
               sizes="120px"
-              className="h-12 w-auto grayscale transition-all group-hover:grayscale-0 dark:invert sm:h-11"
+              className="h-10 w-auto grayscale transition-all group-hover:grayscale-0 dark:invert"
             />
           </Link>
           <ThemeToggle className="shrink-0" />
@@ -54,9 +53,9 @@ export function SiteHeader() {
         isScrolled ? "scale-[0.98]" : "scale-100"
       }`}
     >
-      <div className="liquid-glass-header shadow-elevated-soft rounded-full px-6 py-3 grid w-full grid-cols-[auto_1fr_auto] items-center gap-4 lg:gap-6">
-        {/* Logo */}
-        <Link href={homeHref} className="flex items-center gap-2 group justify-self-start min-w-0">
+      <div className="liquid-glass-header shadow-elevated-soft rounded-full px-6 py-2 grid w-full grid-cols-[auto_1fr_auto] items-center gap-4 lg:gap-6">
+        {/* Logo — breathing room via padding so it never touches the bar edges. */}
+        <Link href={homeHref} className="flex items-center group justify-self-start min-w-0 py-1 pr-3">
           <Image
             src="/logo-1.png"
             alt="DreamTeam"
@@ -64,7 +63,7 @@ export function SiteHeader() {
             height={416}
             sizes="160px"
             priority
-            className="h-[3.25rem] w-auto grayscale group-hover:grayscale-0 transition-all dark:invert md:h-14"
+            className="h-11 w-auto grayscale group-hover:grayscale-0 transition-all dark:invert md:h-12"
           />
         </Link>
 
@@ -91,16 +90,22 @@ export function SiteHeader() {
         <div className="flex items-center justify-end gap-3 flex-shrink-0">
           {/* <LanguageDropdown /> */}
           <ThemeToggle className="shrink-0" />
-          <Link
-            href={contactHref}
-            className={cn(
-              buttonVariants({ variant: "default", size: "lg" }),
-              "rounded-full transition-all font-semibold h-11 px-6 text-base shadow-lg gap-2 cursor-pointer"
-            )}
-          >
-            <IconMailFilled className="h-5 w-5" />
-            {t.header.chat}
-          </Link>
+          <span className="relative inline-flex">
+            {/* Subtle red→purple glow around the CTA. */}
+            <span
+              aria-hidden
+              className="pointer-events-none absolute -inset-1 rounded-full bg-primary-gradient opacity-45 blur-md"
+            />
+            <Link
+              href={`${homeHref}#quote`}
+              className={cn(
+                buttonVariants({ variant: "default", size: "lg" }),
+                "relative rounded-full transition-all font-semibold h-10 px-5 text-base shadow-lg cursor-pointer"
+              )}
+            >
+              {t.header.quoteCta}
+            </Link>
+          </span>
         </div>
       </div>
     </header>

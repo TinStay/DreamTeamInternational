@@ -62,10 +62,17 @@ export function MiniCalendar({
   const days = Array.from({ length: 7 }, (_, i) => addDays(weekStart, i));
   const canGoBack = weekStart > minDay;
 
-  const monthFmt = new Intl.DateTimeFormat(locale, { month: "long", year: "numeric" });
-  const shortMonthFmt = new Intl.DateTimeFormat(locale, { month: "short" });
-  const weekdayFmt = new Intl.DateTimeFormat(locale, { weekday: "short" });
-  const dayAriaFmt = new Intl.DateTimeFormat(locale, { dateStyle: "full" });
+  // Intl.DateTimeFormat construction is expensive — memo per locale, or every
+  // keystroke in the adjacent notes field would rebuild four formatters.
+  const { monthFmt, shortMonthFmt, weekdayFmt, dayAriaFmt } = React.useMemo(
+    () => ({
+      monthFmt: new Intl.DateTimeFormat(locale, { month: "long", year: "numeric" }),
+      shortMonthFmt: new Intl.DateTimeFormat(locale, { month: "short" }),
+      weekdayFmt: new Intl.DateTimeFormat(locale, { weekday: "short" }),
+      dayAriaFmt: new Intl.DateTimeFormat(locale, { dateStyle: "full" }),
+    }),
+    [locale]
+  );
 
   const stripEnd = days[6];
   const monthLabel =
@@ -76,7 +83,7 @@ export function MiniCalendar({
   return (
     <div
       className={cn(
-        "w-full rounded-2xl border border-border/50 bg-card/60 p-3 sm:p-4",
+        "w-full rounded-2xl border border-border/50 bg-card-elevated p-3 sm:p-4",
         className
       )}
     >

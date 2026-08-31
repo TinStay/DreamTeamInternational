@@ -1,13 +1,12 @@
 "use client";
 
-import { motion } from "motion/react";
-
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { cn } from "@/lib/utils";
 import { useLanguage } from "@/lib/i18n/language-context";
 import { GOAL_OPTIONS } from "@/lib/quote-form/constants";
 import { OptionCard } from "@/components/quote-form/option-card";
-import { StepHeading, type QuoteStepProps } from "./shared";
+import { QUOTE_FIELD_CLASS, RevealOnEnter, StepHeading, type QuoteStepProps } from "./shared";
 
 /** Main goal of the video — the step title itself asks the question. */
 export function GoalStep({ data, update }: QuoteStepProps) {
@@ -26,6 +25,7 @@ export function GoalStep({ data, update }: QuoteStepProps) {
         {GOAL_OPTIONS.map((opt) => (
           <OptionCard
             key={opt.key}
+            compact
             icon={opt.icon}
             label={v.goals[opt.key]}
             selected={data.goal === opt.key}
@@ -34,14 +34,8 @@ export function GoalStep({ data, update }: QuoteStepProps) {
         ))}
       </div>
 
-      {/* Enter-only reveal — exit-gated unmounts hang with current motion/React. */}
       {data.goal === "other" ? (
-        <motion.div
-          key="goal-other"
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3 }}
-        >
+        <RevealOnEnter>
           <div className="pt-4">
             <Label htmlFor="quote-goal-other" className="mb-2.5 font-semibold">
               {v.goalOtherLabel}
@@ -51,11 +45,11 @@ export function GoalStep({ data, update }: QuoteStepProps) {
               value={data.goalOther}
               onChange={(e) => update("goalOther", e.target.value)}
               placeholder={v.goalOtherPh}
-              className="h-9 bg-background/40"
+              className={cn("h-9", QUOTE_FIELD_CLASS)}
               maxLength={300}
             />
           </div>
-        </motion.div>
+        </RevealOnEnter>
       ) : null}
     </div>
   );

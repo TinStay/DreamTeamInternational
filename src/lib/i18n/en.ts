@@ -5,7 +5,7 @@ export const en = {
     services: "Services",
     pricing: "Get a Quote",
     contact: "Contact",
-    chat: "Chat With Us",
+    quoteCta: "Get a Quote",
     training: "Training"
   },
   hero: {
@@ -681,28 +681,25 @@ export const en = {
       details: "Details",
       contact: "Contact",
     },
-    stepWord: "Step",
-    ofWord: "of",
     back: "Back",
     next: "Next",
     submit: "Send request",
     sending: "Sending…",
     script: {
       title: "Do you have a script ready?",
-      subtitle: "Don't worry if you don't - writing scripts is part of what we do.",
       options: {
         ready: {
           label: "Yes, I have a script",
           hint: "Attach it or paste it as text",
         },
         none: {
-          label: "No - I want you to write it",
+          label: "No, I want you to write it",
           hint: "We'll propose a script based on your brief",
         },
       },
       textLabel: "Describe your idea or script",
       textPh: "Tell us what should happen in the video…",
-      uploadLabel: "Attach a file",
+      uploadLabel: "Attach a file with your script or idea",
     },
     video: {
       title: "What is the main goal of the video?",
@@ -711,11 +708,11 @@ export const en = {
       goalOtherLabel: "What is the goal?",
       goalOtherPh: "Briefly describe the goal of the video",
       goals: {
-        sales: "Direct sales",
-        awareness: "Brand awareness",
-        launch: "New product/service launch",
-        trust: "Image & trust",
-        education: "Education & tutorials",
+        sales: "Increase sales",
+        awareness: "Raise brand awareness",
+        launch: "Introduce a new product/service",
+        trust: "Build image & trust",
+        education: "Educate customers or your team",
         other: "Other",
       },
       lengthLabel: "How long should the video be?",
@@ -724,7 +721,6 @@ export const en = {
       minutes: "min",
       lengthMax: "5+ min",
       formatLabel: "What format do you need?",
-      formatHint: "You can pick more than one.",
       formats: {
         vertical: { label: "Vertical", hint: "9:16 - Reels, TikTok, Stories" },
         horizontal: { label: "Horizontal", hint: "16:9 - YouTube, website, TV" },
@@ -737,16 +733,15 @@ export const en = {
         yes: "Yes",
         no: "No",
       },
-      voiceDetailsLabel: "What language and type of voice?",
-      voiceDetailsPh: "E.g. English, female, calm tone",
-      refsLabel: "Links to example videos you like",
-      refsPh: "Paste links to videos we can use as reference - your own or other ads…",
-      refsUploadLabel: "Attach example materials (images, logo, documents)",
+      refsLabel: "Do you have example videos? Share a link",
+      refsPh: "Link to an example video - your own or another ad…",
+      refsUploadLabel: "Attach materials for the video",
+      refsUploadHint:
+        "The product, person or service to be visualized in the video, or examples of the visual style.",
     },
     details: {
       title: "Distribution & timing",
       platformsLabel: "Where will the video be published?",
-      platformsHint: "You can pick more than one.",
       platforms: {
         instagram: "Instagram",
         tiktok: "TikTok",
@@ -770,16 +765,17 @@ export const en = {
     upload: {
       drop: "Drop a file here or",
       browse: "browse",
-      hint: "PDF, Word, text or images - up to 4 MB total",
+      hint: "PDF, Word, text or images - up to 4.4 MB total",
       remove: "Remove file",
-      errorTooLarge: "The files exceed the 4 MB total limit.",
+      errorTooLarge: "The files exceed the 4.4 MB total limit.",
       errorType: "This file type is not supported.",
-      errorCount: "You can attach up to 3 files.",
+      errorCount: "You can attach up to 5 files.",
     },
     successTitle: "We received your request!",
     successBody:
       "We'll review the details and send you a personalized quote as soon as possible.",
     successAgain: "New request",
+    successCta: "Explore our other services",
   },
   footer: {
     desc: "At DreamTeam, we handle end-to-end video production using the latest AI technologies.",

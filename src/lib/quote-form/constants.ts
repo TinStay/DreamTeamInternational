@@ -82,23 +82,34 @@ export const PLATFORM_OPTIONS = [
 ] as const satisfies readonly QuoteOption<string>[];
 export type PlatformOptionKey = (typeof PLATFORM_OPTIONS)[number]["key"];
 
-/** Video length slider: 5s steps; the max position renders as "5+ min". */
+/** Video length bounds; the max position renders as "5+ min". */
 export const LENGTH_SLIDER = {
   min: 5,
-  /** 300s = 5:00; the extra step (305) means "5+ minutes". */
+  /** 300s = 5:00; the extra tick (305) means "5+ minutes". */
   max: 305,
-  step: 5,
   default: 30,
 } as const;
 
 /**
- * Upload limits. Vercel serverless caps request bodies at ~4.5 MB, so the
- * whole submission (both upload fields together) must stay under 4 MB.
+ * Slider tick values (seconds): 5s steps up to 1 minute, then 10s steps to
+ * 5 minutes; the final tick (305) renders as "5+ min". The slider itself moves
+ * over tick INDICES so the step size can change mid-range.
  */
-export const UPLOAD_MAX_TOTAL_BYTES = 4 * 1024 * 1024;
-export const UPLOAD_MAX_FILES_PER_FIELD = 3;
-export const UPLOAD_ACCEPT =
-  ".pdf,.doc,.docx,.txt,.rtf,.md,.png,.jpg,.jpeg,.webp,.gif";
+export const LENGTH_TICKS: readonly number[] = [
+  ...Array.from({ length: 12 }, (_, i) => 5 + i * 5), // 5..60
+  ...Array.from({ length: 24 }, (_, i) => 70 + i * 10), // 70..300
+  LENGTH_SLIDER.max,
+];
+
+/**
+ * Upload limits. Vercel serverless HARD-rejects request bodies over 4.5 MB
+ * (platform limit — cannot be lifted from our side), so the whole submission
+ * (both upload fields together, plus multipart/JSON overhead) must stay just
+ * under it. To accept truly large files the uploads would have to go directly
+ * to blob storage (e.g. Vercel Blob) instead of through this endpoint.
+ */
+export const UPLOAD_MAX_TOTAL_BYTES = 4_400_000; // ≈4.4 MB, leaves overhead headroom
+export const UPLOAD_MAX_FILES_PER_FIELD = 5;
 export const UPLOAD_ALLOWED_EXTENSIONS = [
   "pdf",
   "doc",
@@ -112,6 +123,9 @@ export const UPLOAD_ALLOWED_EXTENSIONS = [
   "webp",
   "gif",
 ] as const;
+
+/** `accept` attribute for the file inputs — derived so the lists can't drift. */
+export const UPLOAD_ACCEPT = UPLOAD_ALLOWED_EXTENSIONS.map((e) => `.${e}`).join(",");
 
 export function isAllowedUploadName(name: string): boolean {
   const ext = name.split(".").pop()?.toLowerCase() ?? "";
@@ -130,7 +144,6 @@ export type QuoteFormData = {
   lengthFlexible: boolean;
   formats: FormatOptionKey[];
   voiceover: VoiceoverOptionKey | "";
-  voiceDetails: string;
   refLinks: string;
   platforms: PlatformOptionKey[];
   /** yyyy-mm-dd from the mini calendar; empty = not chosen. */
@@ -158,7 +171,6 @@ export const QUOTE_FORM_DEFAULTS: QuoteFormData = {
   lengthFlexible: false,
   formats: [],
   voiceover: "",
-  voiceDetails: "",
   refLinks: "",
   platforms: [],
   deadline: "",
@@ -172,6 +184,48 @@ export const QUOTE_FORM_DEFAULTS: QuoteFormData = {
   termsAccepted: false,
   website: "",
 };
+
+/**
+ * Field setter handed to every step. Accepts a value OR an updater function
+ * (like `setState`). Handlers that derive the next value from the current one
+ * — the multi-select toggles — MUST use the updater form: reading `data.x`
+ * inside a handler captures the array from that render, and `OptionCard` is
+ * memoized on props only, so an unchanged card keeps its stale closure and
+ * would clobber selections made since.
+ */
+export type QuoteFieldUpdater = <K extends keyof QuoteFormData>(
+  field: K,
+  value: QuoteFormData[K] | ((prev: QuoteFormData[K]) => QuoteFormData[K])
+) => void;
+
+/** Add/remove `key` in a multi-select array field — safe inside stale closures. */
+export function toggleInArray<T>(values: readonly T[], key: T): T[] {
+  return values.includes(key) ? values.filter((v) => v !== key) : [...values, key];
+}
+
+/** Per-step gating for the wizard's Next/Submit buttons (server mirrors this). */
+export function isQuoteStepValid(
+  step: QuoteStepKey,
+  data: QuoteFormData,
+  emailRe: RegExp
+): boolean {
+  switch (step) {
+    case "script":
+      return data.script !== "";
+    case "goal":
+      return data.goal !== "";
+    case "video":
+      return data.formats.length > 0 && data.voiceover !== "";
+    case "details":
+      return true;
+    case "contact":
+      return (
+        data.name.trim() !== "" &&
+        emailRe.test(data.email.trim()) &&
+        data.termsAccepted
+      );
+  }
+}
 
 /** Human-readable length for emails/summary: "45 сек" / "1:30 мин" / "5+ мин". */
 export function formatLengthSec(

@@ -1,24 +1,22 @@
 "use client";
 
-import { motion } from "motion/react";
-
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
-import { Textarea } from "@/components/ui/textarea";
 import { useLanguage } from "@/lib/i18n/language-context";
 import {
   FORMAT_OPTIONS,
-  LENGTH_SLIDER,
+  LENGTH_TICKS,
   VOICEOVER_OPTIONS,
   formatLengthSec,
+  toggleInArray,
   type FormatOptionKey,
 } from "@/lib/quote-form/constants";
 import { cn } from "@/lib/utils";
 import { OptionCard } from "@/components/quote-form/option-card";
 import { FileUploadField } from "@/components/quote-form/file-upload";
-import { GroupLabel, StepHeading, type QuoteStepProps } from "./shared";
+import { QUOTE_FIELD_CLASS, GroupLabel, StepHeading, type QuoteStepProps } from "./shared";
 
 export type VideoStepProps = QuoteStepProps & {
   refFiles: File[];
@@ -27,7 +25,7 @@ export type VideoStepProps = QuoteStepProps & {
   otherBytes: number;
 };
 
-/** Duration + aspect ratio + voice-over, with the style references at the bottom. */
+/** Duration + materials on the left, aspect ratio + voice-over + example links on the right. */
 export function VideoStep({
   data,
   update,
@@ -39,25 +37,68 @@ export function VideoStep({
   const v = t.quoteForm.video;
   const s = t.quoteForm.style;
 
+  // Updater form (not `data.formats`) — see `QuoteFieldUpdater`.
   function toggleFormat(key: FormatOptionKey) {
-    update(
-      "formats",
-      data.formats.includes(key)
-        ? data.formats.filter((f) => f !== key)
-        : [...data.formats, key]
-    );
+    update("formats", (prev) => toggleInArray(prev, key));
   }
+
+  // The slider moves over tick indices (5s steps below 1 min, 10s above).
+  const tickIndex = Math.max(0, LENGTH_TICKS.indexOf(data.lengthSec));
 
   return (
     <div>
       <StepHeading title={v.specsTitle} />
 
-      {/* Two aligned columns: format + duration on the left, voice-over on the right. */}
-      <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-2">
+      <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-[4fr_6fr]">
+        {/* Left column: duration on top, then video materials. */}
         <div>
-          <GroupLabel required hint={v.formatHint}>
-            {v.formatLabel}
-          </GroupLabel>
+          <div className="rounded-2xl border border-border/50 bg-card-elevated p-4 sm:p-5">
+            <GroupLabel className="mb-1">{v.lengthLabel}</GroupLabel>
+            <p
+              className={cn(
+                "font-heading text-2xl font-bold transition-opacity",
+                data.lengthFlexible ? "opacity-40" : "text-section-accent"
+              )}
+              aria-live="polite"
+            >
+              {formatLengthSec(data.lengthSec, v)}
+            </p>
+            <Slider
+              value={tickIndex}
+              onValueChange={(value) => {
+                const idx = Array.isArray(value) ? value[0] : value;
+                update("lengthSec", LENGTH_TICKS[idx] ?? LENGTH_TICKS[0]);
+              }}
+              min={0}
+              max={LENGTH_TICKS.length - 1}
+              step={1}
+              disabled={data.lengthFlexible}
+              aria-label={v.lengthLabel}
+            />
+            <Label className="mt-3 cursor-pointer items-start gap-2.5 text-sm font-normal text-muted-foreground">
+              <Checkbox
+                checked={data.lengthFlexible}
+                onCheckedChange={(checked) => update("lengthFlexible", Boolean(checked))}
+                className="mt-0.5 cursor-pointer"
+              />
+              {v.lengthFlexibleLabel}
+            </Label>
+          </div>
+
+          <div className="mt-6">
+            <GroupLabel hint={s.refsUploadHint}>{s.refsUploadLabel}</GroupLabel>
+            <FileUploadField
+              id="quote-ref-upload"
+              files={refFiles}
+              onChange={onRefFiles}
+              otherBytes={otherBytes}
+            />
+          </div>
+        </div>
+
+        {/* Right column: aspect ratio, voice-over, then example links. */}
+        <div>
+          <GroupLabel required>{v.formatLabel}</GroupLabel>
           <div
             role="group"
             aria-label={v.formatLabel}
@@ -77,111 +118,39 @@ export function VideoStep({
             ))}
           </div>
 
-          <div className="mt-6 rounded-2xl border border-border/50 bg-card/60 p-4 sm:p-5">
-            <GroupLabel className="mb-1">{v.lengthLabel}</GroupLabel>
-            <p
-              className={cn(
-                "font-heading text-2xl font-bold transition-opacity",
-                data.lengthFlexible ? "opacity-40" : "text-section-accent"
-              )}
-              aria-live="polite"
-            >
-              {formatLengthSec(data.lengthSec, v)}
-            </p>
-            <Slider
-              value={data.lengthSec}
-              onValueChange={(value) =>
-                update("lengthSec", Array.isArray(value) ? value[0] : value)
-              }
-              min={LENGTH_SLIDER.min}
-              max={LENGTH_SLIDER.max}
-              step={LENGTH_SLIDER.step}
-              disabled={data.lengthFlexible}
-              aria-label={v.lengthLabel}
-            />
-            <div className="flex justify-between text-xs text-muted-foreground">
-              <span>
-                {LENGTH_SLIDER.min} {v.seconds}
-              </span>
-              <span>{v.lengthMax}</span>
-            </div>
-            <Label className="mt-4 cursor-pointer items-start gap-2.5 text-sm font-normal text-muted-foreground">
-              <Checkbox
-                checked={data.lengthFlexible}
-                onCheckedChange={(checked) => update("lengthFlexible", Boolean(checked))}
-                className="mt-0.5 cursor-pointer"
-              />
-              {v.lengthFlexibleLabel}
-            </Label>
-          </div>
-        </div>
-
-        <div>
-          <GroupLabel required>{s.voiceLabel}</GroupLabel>
-          {/* Two options, always on one row. */}
-          <div
-            role="radiogroup"
-            aria-label={s.voiceLabel}
-            className="grid grid-cols-2 gap-3 sm:gap-4"
-          >
-            {VOICEOVER_OPTIONS.map((opt) => (
-              <OptionCard
-                key={opt.key}
-                compact
-                icon={opt.icon}
-                label={s.voices[opt.key]}
-                selected={data.voiceover === opt.key}
-                onSelect={() => update("voiceover", opt.key)}
-              />
-            ))}
-          </div>
-
-          {/* Enter-only reveal — exit-gated unmounts hang with current motion/React. */}
-          {data.voiceover === "yes" ? (
-            <motion.div
-              key="voice-details"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3 }}
-            >
-              <div className="pt-4">
-                <Label htmlFor="quote-voice-details" className="mb-2.5 font-semibold">
-                  {s.voiceDetailsLabel}
-                </Label>
-                <Input
-                  id="quote-voice-details"
-                  value={data.voiceDetails}
-                  onChange={(e) => update("voiceDetails", e.target.value)}
-                  placeholder={s.voiceDetailsPh}
-                  className="h-9 bg-background/40"
-                  maxLength={300}
-                />
-              </div>
-            </motion.div>
-          ) : null}
-
-          {/* Example / reference videos, right under the voice-over choice. */}
           <div className="mt-6">
-            <Label htmlFor="quote-ref-links" className="mb-3 font-semibold">
+            <GroupLabel required>{s.voiceLabel}</GroupLabel>
+            {/* Two options, always on one row. */}
+            <div
+              role="radiogroup"
+              aria-label={s.voiceLabel}
+              className="grid grid-cols-2 gap-3 sm:gap-4"
+            >
+              {VOICEOVER_OPTIONS.map((opt) => (
+                <OptionCard
+                  key={opt.key}
+                  compact
+                  icon={opt.icon}
+                  label={s.voices[opt.key]}
+                  selected={data.voiceover === opt.key}
+                  onSelect={() => update("voiceover", opt.key)}
+                />
+              ))}
+            </div>
+
+          </div>
+
+          <div className="mt-6">
+            <Label htmlFor="quote-ref-links" className="mb-2.5 font-semibold">
               {s.refsLabel}
             </Label>
-            <Textarea
+            <Input
               id="quote-ref-links"
               value={data.refLinks}
               onChange={(e) => update("refLinks", e.target.value)}
               placeholder={s.refsPh}
-              className="min-h-[100px] bg-background/40"
+              className={cn("h-9", QUOTE_FIELD_CLASS)}
               maxLength={2000}
-            />
-          </div>
-
-          <div className="mt-6">
-            <GroupLabel className="mb-3">{s.refsUploadLabel}</GroupLabel>
-            <FileUploadField
-              id="quote-ref-upload"
-              files={refFiles}
-              onChange={onRefFiles}
-              otherBytes={otherBytes}
             />
           </div>
         </div>

@@ -24,12 +24,12 @@ export function MobileNav() {
 
   return (
     <>
-      <GlassShell className="service-mobile-dock lg:hidden fixed bottom-5 left-1/2 z-50 flex w-[92%] max-w-md -translate-x-1/2 items-center gap-1.5 px-3 py-2.5">
+      <GlassShell className="service-mobile-dock lg:hidden fixed bottom-3 left-1/2 z-50 flex w-[92%] max-w-md -translate-x-1/2 items-center gap-1.5 px-3 py-2">
         <Link
           href={portfolioHref}
           className="group flex flex-1 select-none flex-col items-center justify-center gap-1 text-muted-foreground transition-colors hover:text-foreground"
         >
-          <IconVideo className="h-[26px] w-[26px] text-neutral-800 transition-transform group-hover:scale-110 dark:text-neutral-200" />
+          <IconVideo className="h-[22px] w-[22px] text-neutral-800 transition-transform group-hover:scale-110 dark:text-neutral-200" />
           <span className="text-xs font-semibold tracking-wide">{t.header.portfolio}</span>
         </Link>
 
@@ -37,7 +37,7 @@ export function MobileNav() {
           href={contactHref}
           className="group flex flex-1 select-none flex-col items-center justify-center gap-1 text-muted-foreground transition-colors hover:text-foreground"
         >
-          <IconMail className="h-[26px] w-[26px] text-neutral-800 transition-transform group-hover:scale-110 dark:text-neutral-200" />
+          <IconMail className="h-[22px] w-[22px] text-neutral-800 transition-transform group-hover:scale-110 dark:text-neutral-200" />
           <span className="text-xs font-semibold tracking-wide">{t.header.contact}</span>
         </Link>
 
@@ -45,7 +45,7 @@ export function MobileNav() {
           href={servicesHref}
           className="group flex flex-1 select-none flex-col items-center justify-center gap-1 text-muted-foreground transition-colors hover:text-foreground"
         >
-          <IconBriefcase className="h-[26px] w-[26px] text-neutral-800 transition-transform group-hover:scale-110 dark:text-neutral-200" />
+          <IconBriefcase className="h-[22px] w-[22px] text-neutral-800 transition-transform group-hover:scale-110 dark:text-neutral-200" />
           <span className="text-xs font-semibold tracking-wide">{t.header.services}</span>
         </Link>
 
@@ -55,14 +55,19 @@ export function MobileNav() {
               <button
                 className={cn(
                   primaryGradientInteractiveClassName,
-                  "flex h-14 w-14 shrink-0 items-center justify-center rounded-full text-white outline-none active:scale-95"
+                  "flex h-12 w-12 shrink-0 items-center justify-center rounded-full text-white outline-none active:scale-95"
                 )}
               />
             }
           >
-            <IconMenu2 className="h-[26px] w-[26px] drop-shadow-sm" />
+            <IconMenu2 className="h-[22px] w-[22px] drop-shadow-sm" />
           </SheetTrigger>
-          <SheetContent side="bottom" className="h-[75vh] rounded-t-3xl border-t-0 liquid-glass p-0">
+          {/* Full viewport width — kill the glass side borders so the sheet
+              reads edge-to-edge instead of an inset panel. */}
+          <SheetContent
+            side="bottom"
+            className="liquid-glass inset-x-0 h-[75vh] w-full rounded-t-3xl border-x-0 border-t-0 border-b-0 p-0"
+          >
             <SheetTitle className="sr-only">Menu</SheetTitle>
             <div className="absolute top-4 left-1/2 -translate-x-1/2 w-12 h-1.5 bg-border/40 rounded-full" />
             <div className="flex flex-col h-full pt-16 pb-8 px-6 overflow-y-auto">
@@ -74,7 +79,7 @@ export function MobileNav() {
                 </div>
               </div>
 
-              <div className="flex flex-col gap-6 text-xl font-heading font-medium">
+              <div className="flex flex-col gap-6 text-xl font-heading font-semibold">
                 <Link
                   href={homeHref}
                   onClick={() => setIsOpen(false)}
@@ -119,14 +124,14 @@ export function MobileNav() {
 
               <div className="mt-auto pt-8">
                 <Link
-                  href={contactHref}
+                  href={`${homeHref}#quote`}
                   onClick={() => setIsOpen(false)}
                   className={cn(
                     buttonVariants({ variant: "default", size: "lg" }),
                     "flex h-14 w-full select-none items-center justify-center rounded-full text-lg font-bold"
                   )}
                 >
-                  {t.header.chat}
+                  {t.header.quoteCta}
                 </Link>
               </div>
             </div>

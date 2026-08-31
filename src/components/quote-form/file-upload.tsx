@@ -107,11 +107,11 @@ export function FileUploadField({
           addFiles(e.dataTransfer.files);
         }}
         className={cn(
-          "flex cursor-pointer flex-col items-center justify-center gap-1.5 rounded-2xl border border-dashed px-4 py-6 text-center transition-colors",
+          "flex cursor-pointer flex-col items-center justify-center gap-1.5 rounded-2xl border border-dashed px-4 py-6 text-center shadow-input-soft transition-colors",
           "focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50",
           dragOver
             ? "border-primary/70 bg-primary/5"
-            : "border-border/70 bg-card/40 hover:border-primary/40 hover:bg-card/70"
+            : "border-border/70 bg-card-elevated hover:border-primary/40"
         )}
       >
         <span
@@ -151,7 +151,7 @@ export function FileUploadField({
           {files.map((file, index) => (
             <li
               key={`${file.name}-${file.size}`}
-              className="flex items-center gap-2.5 rounded-xl border border-border/50 bg-card/70 px-3 py-2"
+              className="flex items-center gap-2.5 rounded-xl border border-border/50 bg-card-elevated px-3 py-2"
             >
               <span className="text-muted-foreground" aria-hidden>
                 {isImageName(file.name) ? (

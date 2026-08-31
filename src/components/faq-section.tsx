@@ -46,7 +46,7 @@ export function FaqSection({ className }: { className?: string }) {
             <AccordionItem
               key={item.q}
               value={`faq-${i}`}
-              className="overflow-hidden rounded-2xl border border-border/40 bg-card/70 px-6 shadow-sm backdrop-blur-sm dark:border-indigo-400/15 sm:rounded-3xl sm:px-8"
+              className="overflow-hidden rounded-2xl border border-card-border bg-card/70 px-6 shadow-sm backdrop-blur-sm sm:rounded-3xl sm:px-8"
             >
               <AccordionTrigger className="py-5 text-base font-semibold text-foreground sm:py-6 sm:text-lg">
                 {item.q}

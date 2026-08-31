@@ -20,6 +20,7 @@ import {
   IconSend,
 } from "@tabler/icons-react";
 import { useLanguage } from "@/lib/i18n/language-context";
+import { FOUND_US_KEYS } from "@/lib/found-us";
 import { termsPath } from "@/lib/routes";
 import { cn } from "@/lib/utils";
 
@@ -138,19 +139,11 @@ export function ContactInquiryForm({
   const [sendResult, setSendResult] = useState<null | "ok" | "error">(null);
 
   const termsHref = termsPath(language);
-  const foundUsOptions = useMemo(() => {
-    const opts = t.contact.foundUsOptions;
-    return [
-      { value: "google", label: opts.google },
-      { value: "social", label: opts.social },
-      { value: "instagram", label: opts.instagram },
-      { value: "tiktok", label: opts.tiktok },
-      { value: "youtube", label: opts.youtube },
-      { value: "referral", label: opts.referral },
-      { value: "event", label: opts.event },
-      { value: "other", label: opts.other },
-    ];
-  }, [t.contact.foundUsOptions]);
+  // Single source of truth for the catalogue — labels come from the dictionary.
+  const foundUsOptions = useMemo(
+    () => FOUND_US_KEYS.map((value) => ({ value, label: t.contact.foundUsOptions[value] })),
+    [t.contact.foundUsOptions]
+  );
 
   const selectedFoundUsLabel =
     foundUsOptions.find((o) => o.value === foundUs)?.label ?? "";
@@ -297,7 +290,7 @@ export function ContactInquiryForm({
         <div className="space-y-2">
           <FieldLabel>{t.contact.foundUs}</FieldLabel>
           <Select value={foundUs} onValueChange={(v) => setFoundUs(v ?? "")}>
-            <SelectTrigger className={cn("h-9 w-full px-2.5 text-sm", fieldShell)}>
+            <SelectTrigger size="lg" className={cn("w-full text-sm", fieldShell)}>
               <SelectValue
                 placeholder={
                   t.contact.foundUsPh.trim() === "" ? undefined : t.contact.foundUsPh

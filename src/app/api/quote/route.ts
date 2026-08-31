@@ -2,6 +2,15 @@ import { NextResponse } from "next/server";
 import { Resend } from "resend";
 
 import { dictionaries } from "@/lib/i18n/config";
+import { formatDateDisplay, ISO_DATE_RE } from "@/lib/dates";
+import { isFoundUsKey } from "@/lib/found-us";
+import {
+  EMAIL_RE,
+  clean,
+  cleanMultiline,
+  clientIp,
+  createRateLimiter,
+} from "@/lib/server/form-guards";
 import {
   FORMAT_OPTIONS,
   GOAL_OPTIONS,
@@ -30,40 +39,12 @@ const MAX = {
   company: 200,
   goalOther: 300,
   scriptText: 5000,
-  voiceDetails: 300,
   refLinks: 2000,
   deadline: 20,
   notes: 3000,
 } as const;
 
-const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-/** Trim, coerce to string, strip control chars (header injection), cap length. */
-function clean(value: unknown, max: number): string {
-  return typeof value === "string"
-    ? value.replace(/[\r\n\t\0]+/g, " ").trim().slice(0, max)
-    : "";
-}
-
-/** Like `clean` but preserves newlines — for multi-line free-text fields. */
-function cleanMultiline(value: unknown, max: number): string {
-  return typeof value === "string"
-    ? value.replace(/[\0]/g, "").trim().slice(0, max)
-    : "";
-}
-
-// Best-effort in-memory rate limit (same trade-offs as /api/contact).
-const RATE_LIMIT_WINDOW_MS = 60_000;
-const RATE_LIMIT_MAX = 5;
-const recentHits = new Map<string, number[]>();
-
-function isRateLimited(ip: string, now: number): boolean {
-  const windowStart = now - RATE_LIMIT_WINDOW_MS;
-  const hits = (recentHits.get(ip) ?? []).filter((tick) => tick > windowStart);
-  hits.push(now);
-  recentHits.set(ip, hits);
-  return hits.length > RATE_LIMIT_MAX;
-}
+const isRateLimited = createRateLimiter(60_000, 5);
 
 /** Keep only a safe basename for email attachments; truncation preserves the extension. */
 function sanitizeFilename(name: string): string {
@@ -95,29 +76,37 @@ function pickKeys(value: unknown, options: readonly { key: string }[]): string[]
   return [...new Set(value.filter((v): v is string => typeof v === "string" && allowed.has(v)))];
 }
 
-/** Browser-reported MIME types accepted alongside the extension allowlist. */
+/**
+ * Browser-reported MIME types accepted alongside the extension allowlist.
+ * `application/octet-stream` is allowed — it's the generic type many
+ * browsers/systems assign to perfectly valid documents; the extension
+ * allowlist remains the real contract.
+ */
 const ALLOWED_MIME_RE =
-  /^(application\/pdf|application\/msword|application\/vnd\.openxmlformats-officedocument\.wordprocessingml\.document|application\/rtf|text\/|image\/(png|jpeg|webp|gif))/;
+  /^(application\/pdf|application\/msword|application\/vnd\.openxmlformats-officedocument\.wordprocessingml\.document|application\/rtf|application\/octet-stream|text\/|image\/(png|jpeg|webp|gif))/;
 
-async function collectFiles(
-  form: FormData,
-  field: string
-): Promise<{ filename: string; content: Buffer }[] | null> {
+/** Cheap pre-buffering checks: count, type and name — sizes are on File already. */
+function validateFileEntries(form: FormData, field: string): File[] | null {
   const entries = form.getAll(field);
   if (entries.length > UPLOAD_MAX_FILES_PER_FIELD) return null;
-  const files: { filename: string; content: Buffer }[] = [];
+  const files: File[] = [];
   for (const entry of entries) {
     if (!(entry instanceof File)) return null;
     if (!isAllowedUploadName(entry.name)) return null;
-    // Extension is the contract; when the client also sent a MIME type, it
-    // must at least belong to an allowed family.
     if (entry.type && !ALLOWED_MIME_RE.test(entry.type)) return null;
-    files.push({
-      filename: sanitizeFilename(entry.name),
-      content: Buffer.from(await entry.arrayBuffer()),
-    });
+    files.push(entry);
   }
   return files;
+}
+
+/** Buffer already-validated files concurrently. */
+function bufferFiles(files: File[]) {
+  return Promise.all(
+    files.map(async (file) => ({
+      filename: sanitizeFilename(file.name),
+      content: Buffer.from(await file.arrayBuffer()),
+    }))
+  );
 }
 
 export async function POST(req: Request) {
@@ -131,12 +120,7 @@ export async function POST(req: Request) {
   }
 
   // Rate limit BEFORE buffering the multipart body — headers are enough.
-  const now = Date.now();
-  const ip =
-    req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
-    req.headers.get("x-real-ip") ||
-    "unknown";
-  if (isRateLimited(ip, now)) {
+  if (isRateLimited(clientIp(req), Date.now())) {
     return NextResponse.json(
       { ok: false, error: "Too many requests. Please try again shortly." },
       { status: 429 }
@@ -179,9 +163,10 @@ export async function POST(req: Request) {
   const company = clean(payload.company, MAX.company);
   const goalOther = clean(payload.goalOther, MAX.goalOther);
   const scriptText = cleanMultiline(payload.scriptText, MAX.scriptText);
-  const voiceDetails = clean(payload.voiceDetails, MAX.voiceDetails);
   const refLinks = cleanMultiline(payload.refLinks, MAX.refLinks);
-  const deadline = clean(payload.deadline, MAX.deadline);
+  // Deadline must be a real ISO date — anything else is discarded, not echoed.
+  const rawDeadline = clean(payload.deadline, MAX.deadline);
+  const deadline = ISO_DATE_RE.test(rawDeadline) ? rawDeadline : "";
   const notes = cleanMultiline(payload.notes, MAX.notes);
   const userLanguage = clean(payload.language, 5) || "bg";
 
@@ -197,11 +182,16 @@ export async function POST(req: Request) {
     ? Math.min(Math.max(Math.round(rawLength), LENGTH_SLIDER.min), LENGTH_SLIDER.max)
     : LENGTH_SLIDER.default;
 
+  // Server-side validation mirrors the wizard's required steps — the server
+  // is the contract, not the client gating.
   const invalidFields: string[] = [];
   if (!name) invalidFields.push("name");
   if (!email || !EMAIL_RE.test(email)) invalidFields.push("email");
-  // The client gates submit on the terms checkbox; enforce it here too.
   if (payload.termsAccepted !== true) invalidFields.push("termsAccepted");
+  if (!script) invalidFields.push("script");
+  if (!goal) invalidFields.push("goal");
+  if (formats.length === 0) invalidFields.push("formats");
+  if (!voiceover) invalidFields.push("voiceover");
   if (invalidFields.length > 0) {
     return NextResponse.json(
       {
@@ -213,16 +203,17 @@ export async function POST(req: Request) {
     );
   }
 
-  const scriptFiles = await collectFiles(form, "scriptFile");
-  const refFiles = await collectFiles(form, "refFile");
-  if (!scriptFiles || !refFiles) {
+  // Validate types/counts and the total size BEFORE buffering anything.
+  const scriptEntries = validateFileEntries(form, "scriptFile");
+  const refEntries = validateFileEntries(form, "refFile");
+  if (!scriptEntries || !refEntries) {
     return NextResponse.json(
       { ok: false, error: "Unsupported attachment." },
       { status: 422 }
     );
   }
-  const totalBytes = [...scriptFiles, ...refFiles].reduce(
-    (sum, f) => sum + f.content.byteLength,
+  const totalBytes = [...scriptEntries, ...refEntries].reduce(
+    (sum, f) => sum + f.size,
     0
   );
   if (totalBytes > UPLOAD_MAX_TOTAL_BYTES) {
@@ -231,6 +222,10 @@ export async function POST(req: Request) {
       { status: 413 }
     );
   }
+  const [scriptFiles, refFiles] = await Promise.all([
+    bufferFiles(scriptEntries),
+    bufferFiles(refEntries),
+  ]);
 
   // Internal email is in Bulgarian — labels come from the bg dictionary so the
   // form copy and the email stay in sync.
@@ -248,16 +243,15 @@ export async function POST(req: Request) {
   const voiceLabels: Record<string, string> = bgQuote.style.voices;
   const platformLabels: Record<string, string> = bgQuote.details.platforms;
   const foundUsLabels: Record<string, string> = dictionaries.bg.contact.foundUsOptions;
-  const foundUs =
-    typeof payload.foundUs === "string" && payload.foundUs in foundUsLabels
-      ? payload.foundUs
-      : "";
+  // Key allowlist (not `in` — that would accept prototype keys like "toString").
+  const foundUs = isFoundUsKey(payload.foundUs) ? payload.foundUs : "";
 
   const lengthText = lengthFlexible
     ? bgQuote.video.lengthFlexibleLabel
     : formatLengthSec(lengthSec, bgQuote.video);
 
-  const attachmentNames = [...scriptFiles, ...refFiles].map((f) => f.filename);
+  const scriptFileNames = scriptFiles.map((f) => f.filename);
+  const refFileNames = refFiles.map((f) => f.filename);
 
   const emailInput: QuoteEmailInput = {
     title: "Заявка за видео",
@@ -286,12 +280,7 @@ export async function POST(req: Request) {
             label: "Формат",
             value: formats.map((f) => label(formatLabels, f)).join(", "),
           },
-          {
-            label: "Войсоувър",
-            value: voiceover
-              ? `${label(voiceLabels, voiceover)}${voiceDetails ? ` - ${voiceDetails}` : ""}`
-              : "",
-          },
+          { label: "Войсоувър", value: label(voiceLabels, voiceover) },
         ],
       },
       {
@@ -299,6 +288,7 @@ export async function POST(req: Request) {
         fields: [
           { label: "Има ли готов сюжет", value: label(scriptLabels, script) },
           { label: "Описание на идеята / сюжета", value: scriptText, multiline: true },
+          { label: "Файлове със сюжета", value: scriptFileNames.join(", ") },
         ],
       },
       {
@@ -310,15 +300,17 @@ export async function POST(req: Request) {
           },
           {
             label: "Краен срок",
-            value: deadlineFlexible ? bgQuote.details.noDeadline : deadline,
+            value: deadlineFlexible
+              ? bgQuote.details.noDeadline
+              : formatDateDisplay(deadline),
           },
         ],
       },
       {
-        title: "Референции",
+        title: "Референции и материали",
         fields: [
           { label: "Линкове", value: refLinks, multiline: true },
-          { label: "Прикачени файлове", value: attachmentNames.join(", ") },
+          { label: "Прикачени материали", value: refFileNames.join(", ") },
         ],
       },
       {

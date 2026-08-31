@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 import Image from "next/image";
 import { motion } from "motion/react";
 import { ContactInquiryForm } from "@/components/contact-inquiry-form";
+import { SOCIAL_LINKS } from "@/lib/social-links";
 import { GradientMailIcon, GradientMapPinIcon, GradientPhoneIcon } from "@/components/ui/gradient-icons";
 
 const MotionLink = motion.a;
@@ -102,28 +103,7 @@ export function ContactSection({ className }: { className?: string }) {
     }
   }
 
-  const socials = [
-    {
-      href: "https://www.facebook.com/profile.php?id=61585919836260",
-      src: "/social_media_icons/facebook.png",
-      alt: "Facebook",
-    },
-    {
-      href: "https://www.instagram.com/dreamteam.video.ai/",
-      src: "/social_media_icons/instagram.png",
-      alt: "Instagram",
-    },
-    {
-      href: "https://www.linkedin.com/company/109344952",
-      src: "/social_media_icons/linkedin.png",
-      alt: "LinkedIn",
-    },
-    {
-      href: "https://www.youtube.com/@DreamTeamVideo",
-      src: "/social_media_icons/youtube.png",
-      alt: "YouTube",
-    },
-  ];
+  const socials = SOCIAL_LINKS;
 
   return (
     <section

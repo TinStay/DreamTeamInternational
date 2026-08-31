@@ -9,6 +9,8 @@
 
 @theme inline {
   --color-card: var(--card);
+  --color-card-elevated: var(--card-elevated);
+  --color-card-border: var(--card-border);
   --color-ring: var(--ring);
   --color-input: var(--input);
   --color-muted: var(--muted);
@@ -81,7 +83,16 @@
 }
 
 :root {
-  --card: #ffffff;
+  /* Text-card surface — a touch off the white page/tab-menu background so
+     cards read as their own layer. */
+  --card: #f7f8fb;
+  /* Interactive surfaces (selectable cards, dropzones, datepicker, slider
+     boxes, form fields) — the "inside of an input" surface, derived from the
+     tokens so retunes can't desync it. Use `bg-card-elevated` for new
+     interactive cards. */
+  --card-elevated: color-mix(in srgb, var(--background) 40%, var(--card));
+  /* Standard card/nav/footer border — the review-card border (border at 30%). */
+  --card-border: color-mix(in srgb, var(--border) 30%, transparent);
   --ring: #000000;
   --input: #ebebeb;
   --muted: #f5f5f5;
@@ -142,10 +153,15 @@
 }
 
 .dark {
-  /* Standard dark surface for text cards — dark navy (slate-900), matching the
-     footer glass. Build new cards with `bg-card` (or `bg-card/NN`) so they
-     automatically follow this standard. */
-  --card: #0f172a;
+  /* Standard dark surface for text cards — near-black slate matching the
+     portfolio tab-menu bar (`bg-background/95` ≈ #020617) but a touch lighter
+     so cards stay distinguishable. Build new cards with `bg-card` (or
+     `bg-card/NN`) so they automatically follow this standard. */
+  --card: #0c111e;
+  /* Interactive surfaces — the rendered form-field color (`--input` at 30%
+     over `--card`), derived so token retunes can't desync fields from cards. */
+  --card-elevated: color-mix(in srgb, var(--input) 30%, var(--card));
+  --card-border: color-mix(in srgb, var(--border) 30%, transparent);
   --ring: #f87171;
   --input: #33353a;
   --muted: #2a2c33;
@@ -207,9 +223,10 @@
 
 /* Dark mode */
 .dark .liquid-glass {
-  background: rgba(15, 23, 42, 0.55);
+  /* Derived from --card so it always matches the step-form / review cards. */
+  background: color-mix(in srgb, var(--card) 62%, transparent);
   backdrop-filter: blur(20px) saturate(150%);
-  border: 1px solid rgba(129, 140, 248, 0.14);
+  border: 1px solid var(--card-border);
   box-shadow: 0 4px 16px rgba(30, 27, 75, 0.35), inset 0 1px 0 rgba(165, 180, 252, 0.08);
 }
 
@@ -222,9 +239,10 @@
 }
 
 .dark .liquid-glass-header {
-  background: rgba(15, 23, 42, 0.52);
+  /* Derived from --card so it always matches the step-form / review cards. */
+  background: color-mix(in srgb, var(--card) 64%, transparent);
   backdrop-filter: blur(20px);
-  border: 1px solid rgba(129, 140, 248, 0.14);
+  border: 1px solid var(--card-border);
 }
 
 :root:not(.dark) .liquid-glass-header {
@@ -234,6 +252,23 @@
 }
 
 @layer utilities {
+  /** Vertical marquee used by `InfiniteSlider` (reviews columns). */
+  @keyframes marquee-y {
+    from { transform: translateY(0); }
+    to { transform: translateY(-50%); }
+  }
+  .animate-marquee-y {
+    animation: marquee-y var(--marquee-duration, 45s) linear infinite;
+  }
+
+  /** Subtle shadow for form inputs / dropzones. */
+  .shadow-input-soft {
+    box-shadow: 0 2px 10px rgba(15, 23, 42, 0.06);
+  }
+  .dark .shadow-input-soft {
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.32);
+  }
+
   .shadow-elevated-soft {
     box-shadow:
       0 22px 70px rgba(15, 23, 42, 0.14);
@@ -576,3 +611,5 @@ body.service-modal-open .service-mobile-dock {
     -ms-transform: translateY(-50%);
     transform: translateY(-50%);
   }
+
+
