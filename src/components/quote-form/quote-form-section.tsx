@@ -235,9 +235,10 @@ export function QuoteFormSection({ className }: { className?: string }) {
               if (isLastStep) void handleSubmit();
             }}
             className={cn(
-              "rounded-3xl border border-border/30 bg-card p-6 text-card-foreground shadow-elevated-soft sm:p-8",
+              // Tight padding on phones so fields/cards get the width back.
+              "rounded-3xl border border-border/30 bg-card px-3 py-5 text-card-foreground shadow-elevated-soft sm:p-8",
               // Confirmation screen: slightly tighter side padding.
-              submitted && "px-4 sm:px-6"
+              submitted && "sm:px-6"
             )}
           >
             {/* Honeypot: hidden from users, catches bots that fill every field. */}
@@ -370,7 +371,14 @@ export function QuoteFormSection({ className }: { className?: string }) {
                   {stepKey === "contact" && <ContactStep data={data} update={update} />}
                 </motion.div>
 
-                <div className="mt-8 flex items-center justify-between gap-3">
+                <div
+                  className={cn(
+                    "mt-8 flex items-center justify-between gap-3",
+                    // Last step on phones: submit spans the container on top,
+                    // back below it (col-reverse keeps Back first in tab order).
+                    isLastStep && "max-sm:flex-col-reverse max-sm:items-start"
+                  )}
+                >
                   <Button
                     type="button"
                     variant="outline"
@@ -385,7 +393,7 @@ export function QuoteFormSection({ className }: { className?: string }) {
                     <Button
                       type="submit"
                       disabled={!canProceed || isSubmitting}
-                      className="h-10 rounded-full px-6 font-bold"
+                      className="h-10 rounded-full px-6 font-bold max-sm:w-full"
                     >
                       {isSubmitting ? (
                         <>
