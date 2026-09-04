@@ -21,6 +21,7 @@ import { useLanguage } from "@/lib/i18n/language-context";
 import { EMAIL_RE } from "@/lib/server/form-guards";
 import { servicesPath } from "@/lib/routes";
 import { SOCIAL_LINKS } from "@/lib/social-links";
+import { trackLeadCreated } from "@/lib/openai-pixel";
 import {
   QUOTE_FORM_DEFAULTS,
   QUOTE_STEPS,
@@ -141,6 +142,8 @@ export function QuoteFormSection({ className }: { className?: string }) {
 
       const res = await fetch("/api/quote", { method: "POST", body: fd });
       if (!res.ok) throw new Error("Request failed");
+      // Conversion fires only once the server confirms the lead.
+      trackLeadCreated();
       setSubmitted(true);
     } catch {
       setSubmitError(true);

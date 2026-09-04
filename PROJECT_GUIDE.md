@@ -18,7 +18,7 @@ Marketing site for **DreamTeam** — an AI video production **company** (never c
   - ⚠️ Read `node_modules/next/dist/docs/` before using unfamiliar APIs — this version differs from training data. `params`/`searchParams` are **Promises** (must be awaited).
 - **Tailwind CSS v4** (+ `tw-animate-css`), shadcn-style components on **@base-ui/react** + Radix primitives
 - **motion** (`import { motion } from "motion/react"`) for animation — do NOT add `framer-motion`; it was consolidated away
-- **Resend** for contact/inquiry email; **PostHog** + **Vercel Analytics**; **next-themes** (dark default)
+- **Resend** for contact/inquiry email; **PostHog** + **Vercel Analytics**; **next-themes** (dark default); **OpenAI conversion pixel** (`oaiq`, loader in `src/app/layout.tsx`, `lead_created` fired via `src/lib/openai-pixel.ts`)
 - No styled-components / CSS-in-JS / `style jsx` — Tailwind classes or shared CSS in `src/app/globals.css` only
 
 ## 3. Structure (where things live)

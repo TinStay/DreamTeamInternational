@@ -22,6 +22,7 @@ import {
 import { useLanguage } from "@/lib/i18n/language-context";
 import { FOUND_US_KEYS } from "@/lib/found-us";
 import { termsPath } from "@/lib/routes";
+import { trackLeadCreated } from "@/lib/openai-pixel";
 import { cn } from "@/lib/utils";
 
 function SendResultCard({
@@ -175,6 +176,8 @@ export function ContactInquiryForm({
       });
 
       if (!res.ok) throw new Error("Request failed");
+      // Conversion fires only once the server confirms the lead.
+      trackLeadCreated();
       setSendResult("ok");
       setMessage("");
       setFoundUs("");

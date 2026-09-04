@@ -8,6 +8,7 @@ import { Analytics } from "@vercel/analytics/next";
 import { PostHogProvider } from "@/components/posthog-provider";
 import { PostHogPageView } from "@/components/posthog-pageview";
 import { Suspense } from "react";
+import Script from "next/script";
 
 /**
  * Display font for headings (`font-heading`) — body copy stays on Nunito Sans
@@ -188,6 +189,15 @@ export default function RootLayout({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(STRUCTURED_DATA) }}
         />
+        {/*
+          OpenAI conversion pixel (oaiq). Vendor snippet kept verbatim: it stubs
+          `window.oaiq` with a command queue, then injects the real SDK, so calls
+          fired before the SDK lands are replayed. `afterInteractive` matches the
+          vendor's plain <script> placement without blocking hydration.
+        */}
+        <Script id="openai-pixel" strategy="afterInteractive">
+          {`!function(w,d,s,u){if(w.oaiq)return;var q=function(){q.q.push(arguments)};q.q=[];w.oaiq=q;var j=d.createElement(s);j.async=1;j.src=u;var f=d.getElementsByTagName(s)[0];f.parentNode.insertBefore(j,f)}(window,document,"script","https://bzrcdn.openai.com/sdk/oaiq.min.js");oaiq("init",{pixelId:"9vxEQCFdaKzy9yXADo8cMC",debug:true});`}
+        </Script>
         <PostHogProvider>
           <ThemeProvider
               attribute="class"
