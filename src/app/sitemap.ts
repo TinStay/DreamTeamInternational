@@ -9,7 +9,8 @@ const PATHS = [
   "/contact",
   "/training",
   "/training/individual",
-  "/training/skool",
+  // Skool training temporarily hidden.
+  // "/training/skool",
   "/training/team",
   "/privacy",
   "/terms",

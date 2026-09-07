@@ -7,7 +7,8 @@ import { LOCALES, isLocale, getDictionary } from "@/lib/i18n/config";
 // Known training slugs are pre-rendered. `dynamicParams` is left at its default
 // (true) so any other slug still renders the fallback view, matching the prior
 // behavior; the locale, however, is validated below and 404s when unknown.
-const TRAINING_SLUGS = ["individual", "skool", "team", "corporate"] as const;
+// Skool training temporarily hidden — restore "skool" to the list to pre-render it again.
+const TRAINING_SLUGS = ["individual", /* "skool", */ "team", "corporate"] as const;
 
 export function generateStaticParams() {
   return LOCALES.flatMap((lang) =>

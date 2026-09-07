@@ -4,11 +4,13 @@ import Link from "next/link";
 import { useMemo } from "react";
 import { AnimatedFeatureCard } from "@/components/ui/animated-feature-card";
 import { useLanguage } from "@/lib/i18n/language-context";
+import { cn } from "@/lib/utils";
 
 const CARD_CONFIG = [
   { id: "individual", color: "orange" as const, index: "001" },
-  { id: "skool", color: "purple" as const, index: "002" },
-  { id: "team", color: "blue" as const, index: "003" },
+  // Skool training temporarily hidden (restore with index "002" and team back to "003").
+  // { id: "skool", color: "purple" as const, index: "002" },
+  { id: "team", color: "blue" as const, index: "002" },
 ] as const;
 
 export function TrainingFeatureCards() {
@@ -33,7 +35,13 @@ export function TrainingFeatureCards() {
   );
 
   return (
-    <div className="grid w-full grid-cols-1 gap-10 md:grid-cols-2 md:gap-8 lg:grid-cols-3 lg:gap-10">
+    <div
+      className={cn(
+        "grid w-full grid-cols-1 gap-10 md:grid-cols-2 md:gap-8 lg:gap-10",
+        // Columns follow the card count so the row always fills the container width.
+        cards.length === 2 ? "lg:grid-cols-2" : "lg:grid-cols-3"
+      )}
+    >
       {cards.map((card) => (
         <Link key={card.id} href={card.href} className="block h-full">
           <AnimatedFeatureCard

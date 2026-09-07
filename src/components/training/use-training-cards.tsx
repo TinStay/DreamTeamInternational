@@ -36,6 +36,8 @@ export function useTrainingCards(): TrainingExpandableCard[] {
         includes: <TrainingModalIncludes copy={tr.cards.individual} />,
         details: <TrainingModalDetails copy={tr.cards.individual} />,
       },
+      // Skool training temporarily hidden.
+      /*
       {
         id: "skool",
         title: tr.cards.skool.title,
@@ -46,6 +48,7 @@ export function useTrainingCards(): TrainingExpandableCard[] {
         includes: <TrainingModalIncludes copy={tr.cards.skool} />,
         details: <TrainingModalDetails copy={tr.cards.skool} />,
       },
+      */
       {
         id: "team",
         title: tr.cards.team.title,

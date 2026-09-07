@@ -795,8 +795,10 @@ export const en = {
   },
   training: {
     metaTitle: "Training | DreamTeam",
+    // Skool training temporarily hidden. Original:
+    // "Individual AI video consultations, Skool community courses, and team workshops from DreamTeam."
     metaDescription:
-      "Individual AI video consultations, Skool community courses, and team workshops from DreamTeam.",
+      "Individual AI video consultations and team workshops from DreamTeam.",
     eyebrow: "Hands-on AI video training",
     title: "Training for AI production",
     title1: "Training",

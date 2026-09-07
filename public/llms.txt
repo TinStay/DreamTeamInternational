@@ -18,8 +18,8 @@ DreamTeam ("Дрийм Тийм") produces advertising and brand video end to en
   - Bulgarian: AI изображения, генериране на изображения с изкуствен интелект.
 - **AI Automation** — automated content and production pipelines.
   - Bulgarian: AI автоматизация на съдържание.
-- **Training** — AI video training for individuals, a Skool community, and teams / companies.
-  - Bulgarian: обучения за създаване на видео с изкуствен интелект — индивидуални, общност и корпоративни.
+- **Training** — AI video training for individuals and teams / companies.
+  - Bulgarian: обучения за създаване на видео с изкуствен интелект — индивидуални и корпоративни.
 
 ## How we work
 

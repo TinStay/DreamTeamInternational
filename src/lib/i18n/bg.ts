@@ -794,8 +794,10 @@ export const bg = {
   },
   training: {
     metaTitle: "Обучения | DreamTeam",
+    // Skool training temporarily hidden. Original:
+    // "Индивидуални онлайн консултации за AI видео, курс в Skool и екипни обучения от DreamTeam."
     metaDescription:
-      "Индивидуални онлайн консултации за AI видео, курс в Skool и екипни обучения от DreamTeam.",
+      "Индивидуални онлайн консултации за AI видео и екипни обучения от DreamTeam.",
     eyebrow: "Практическо обучение по AI видео",
     title: "Обучение за AI продукция",
     title1: "Обучение",

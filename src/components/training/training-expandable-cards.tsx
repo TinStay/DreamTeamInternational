@@ -38,10 +38,18 @@ const buttonHoverVariants = {
 export function TrainingExpandableCards({ cards, className }: TrainingExpandableCardsProps) {
   const { language } = useLanguage();
 
+  // Columns follow the card count so the row always fills the container width.
+  const isTwoUp = cards.length === 2;
+  const columnsClass = isTwoUp ? "lg:grid-cols-2" : "lg:grid-cols-3";
+  const imageSizes = isTwoUp
+    ? "(max-width: 768px) 100vw, 50vw"
+    : "(max-width: 768px) 100vw, 33vw";
+
   return (
     <motion.ul
       className={cn(
-        "grid w-full max-w-none grid-cols-1 gap-5 md:grid-cols-2 md:gap-5 lg:grid-cols-3 lg:gap-6",
+        "grid w-full max-w-none grid-cols-1 gap-5 md:grid-cols-2 md:gap-5 lg:gap-6",
+        columnsClass,
         className
       )}
       initial="hidden"
@@ -88,7 +96,7 @@ export function TrainingExpandableCards({ cards, className }: TrainingExpandable
                     height={360}
                     src={card.src}
                     alt={card.title}
-                    sizes="(max-width: 768px) 100vw, 33vw"
+                    sizes={imageSizes}
                     className="h-52 w-full object-cover object-center sm:h-56 md:h-60"
                   />
                 </motion.div>
