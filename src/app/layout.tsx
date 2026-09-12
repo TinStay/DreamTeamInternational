@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import localFont from "next/font/local";
+import { Fira_Sans, Sofia_Sans } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { LanguageProvider } from "@/lib/i18n/language-context";
@@ -11,17 +11,22 @@ import { Suspense } from "react";
 import Script from "next/script";
 
 /**
- * Display font for headings (`font-heading`) — body copy stays on Nunito Sans
- * (`--font-sans` in globals.css). Only the Heavy face ships, declared across
- * the whole 100–900 range so EVERY weight resolves to it: with {100, 900}
- * faces registered separately, `font-medium` headings (dialog/card titles)
- * would resolve DOWN to hairline Thin per CSS font-matching. This also drops
- * ~350 KB of preloads for faces that never painted.
+ * Fonts are self-hosted by `next/font` (no runtime request to Google), so they
+ * can't fail to load behind a CSS `@import`. Cyrillic subsets are required —
+ * the site is Bulgarian-first. Sofia Sans is variable (1–1000), so no `weight`;
+ * Fira Sans ships static faces, so the used weights are listed explicitly.
  */
-const uniSans = localFont({
-  src: "./fonts/UniSans-Heavy.otf",
-  weight: "100 900",
-  variable: "--font-uni-sans",
+const sofiaSans = Sofia_Sans({
+  subsets: ["latin", "latin-ext", "cyrillic"],
+  variable: "--font-sofia-sans",
+  display: "swap",
+});
+
+const firaSans = Fira_Sans({
+  subsets: ["latin", "latin-ext", "cyrillic"],
+  weight: ["300", "400", "500", "600", "700"],
+  style: ["normal", "italic"],
+  variable: "--font-fira-sans",
   display: "swap",
 });
 
@@ -175,16 +180,15 @@ export default function RootLayout({
     // `class="dark"` is rendered server-side so the FIRST paint is already dark —
     // without it the light `:root` palette flashes until next-themes' script runs.
     // next-themes reconciles this client-side if the visitor picked light.
+    // Font variables live on <html>: `--font-sans` / `--font-heading` are
+    // resolved on `:root`, so the families must be defined there too.
     <html
       lang="bg"
-      className="dark"
+      className={`dark ${sofiaSans.variable} ${firaSans.variable}`}
       style={{ colorScheme: "dark" }}
       suppressHydrationWarning
     >
-      <body
-        className={`${uniSans.variable} font-sans antialiased relative min-h-screen`}
-        suppressHydrationWarning
-      >
+      <body className="font-sans antialiased relative min-h-screen" suppressHydrationWarning>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(STRUCTURED_DATA) }}

@@ -1,6 +1,5 @@
 import { cn } from "@/lib/utils";
 
-import { LightAuroraPageBackground } from "@/components/ui/background-gradient-glow";
 import { DarkMagentaOrbGridBackground } from "@/components/ui/grid-background";
 
 export type GradientBlurPageBgProps = {
@@ -8,12 +7,13 @@ export type GradientBlurPageBgProps = {
 };
 
 /**
- * Site-wide fixed background: light = aurora wash; dark = `.page-dark-grid-layer` in `globals.css`.
+ * Site-wide fixed background. Light = the "Bloom Field" mesh gradient
+ * (`.bloom-field-gradient` in `globals.css`); dark = `.page-dark-grid-layer`.
  */
 export function GradientBlurPageBg({ className }: GradientBlurPageBgProps) {
   return (
     <div className={cn("pointer-events-none absolute inset-0 z-0 overflow-hidden", className)} aria-hidden>
-      <LightAuroraPageBackground className="dark:hidden" />
+      <div className="bloom-field-gradient absolute inset-0 dark:hidden" />
       <DarkMagentaOrbGridBackground className="hidden dark:block" />
     </div>
   );

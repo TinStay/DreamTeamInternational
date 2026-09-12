@@ -2,22 +2,25 @@
 
 import { motion } from "motion/react";
 import Link from "next/link";
-import { IconMailFilled, IconVideoFilled } from "@tabler/icons-react";
+import { IconArrowRight, IconSendFilled } from "@tabler/icons-react";
 import { buttonVariants } from "@/components/ui/button";
-import { GlassShell } from "@/components/ui/glass-shell";
+import { PartnersSection } from "@/components/partners-section";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/lib/i18n/language-context";
-import { contactProcessPath, homePath } from "@/lib/routes";
+import { homePath, portfolioPath } from "@/lib/routes";
 import {
   HERO_EMBED,
   YOUTUBE_IFRAME_ALLOW,
   YOUTUBE_REFERRER_POLICY,
 } from "@/lib/youtube-embeds";
 
+const EASE = [0.22, 1, 0.36, 1] as const;
+
 export function HeroSection() {
   const { t, language } = useLanguage();
-  const contactHref = contactProcessPath(language);
-  const portfolioHref = `${homePath(language)}#portfolio`;
+  // Primary CTA jumps to the quote wizard further down the home page.
+  const quoteHref = `${homePath(language)}#quote`;
+  const portfolioHref = portfolioPath(language);
   const shouldRenderTitleGap = Boolean(t.hero.titleBefore) && Boolean(t.hero.titleGlow);
   // Space must live OUTSIDE the inline-block spans — leading whitespace inside
   // an inline-block is trimmed by CSS, which glued the words together.
@@ -25,9 +28,11 @@ export function HeroSection() {
     Boolean(t.hero.titleAfter) && Boolean(t.hero.titleGlow || t.hero.titleBefore);
 
   return (
+    <>
+    {/* z-10 lifts the section (and its drop shadow) above the next section's gradient page background. */}
     <section
       id="hero"
-      className="relative flex min-h-[100svh] items-center justify-center overflow-hidden"
+      className="relative z-10 flex min-h-[100svh] flex-col overflow-hidden shadow-[0_28px_60px_-18px_rgba(255,255,255,0.6)] dark:shadow-[0_34px_80px_-20px_rgba(0,0,0,0.9)]"
     >
       {/* Keyword-rich H1 for search engines / AI answer engines; the visual
           headline below is decorative and demoted to a paragraph. */}
@@ -51,18 +56,15 @@ export function HeroSection() {
           />
         </div>
 
-        <div className="absolute inset-0 z-[2] transition-opacity duration-700 bg-[radial-gradient(1200px_700px_at_50%_30%,rgba(0,0,0,0.14),transparent_58%),radial-gradient(900px_600px_at_0%_0%,rgba(0,0,0,0.32),transparent_58%),radial-gradient(900px_600px_at_100%_0%,rgba(0,0,0,0.32),transparent_58%),radial-gradient(900px_600px_at_0%_100%,rgba(0,0,0,0.26),transparent_62%),radial-gradient(900px_600px_at_100%_100%,rgba(0,0,0,0.26),transparent_62%)]" />
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 z-[2] h-21 bg-gradient-to-t from-background via-background/15 to-transparent sm:h-36 dark:from-background dark:via-background/85" />
-        <div
-          className="pointer-events-none absolute inset-x-0 bottom-0 z-[2] h-24 bg-gradient-to-t from-white/25 via-white/0 to-transparent sm:h-32 dark:from-white/[0.07] dark:via-white/[0.02]"
-          aria-hidden
-        />
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 z-[2] h-16" aria-hidden />
+        {/* Page-colour wash: solid along the bottom, fading toward the top-right
+            (see `.hero-wash` in globals.css). Copy and partner logos sit on it. */}
+        <div className="hero-wash pointer-events-none absolute inset-0 z-[2]" aria-hidden />
       </div>
 
-      <div className="relative z-20 mx-auto mt-24 flex w-full max-w-5xl flex-col items-center justify-center px-4 pb-8 text-center sm:mt-28 sm:pb-10 lg:mt-0 lg:pb-0">
+      {/* Copy block - centred, bottom of the viewport, above the partners strip. */}
+      <div className="relative z-20 mx-auto flex w-full max-w-7xl flex-1 flex-col items-center justify-end px-4 pt-28 pb-6 text-center sm:pt-32 sm:pb-8 lg:pb-10">
         <motion.p
-          className="mb-8 w-full min-w-0 max-w-full px-1 font-heading text-[clamp(1.75rem,6.2vw+0.35rem,2.25rem)] font-extrabold leading-[1.08] tracking-tight text-balance text-white [overflow-wrap:anywhere] break-words [text-shadow:0_2px_14px_rgba(0,0,0,0.35)] sm:mb-10 sm:text-5xl sm:leading-[1.06] md:text-6xl md:leading-[1.03] lg:text-7xl"
+          className="w-full min-w-0 max-w-4xl font-heading text-[clamp(2.25rem,7.5vw+0.35rem,3rem)] font-extrabold leading-[1.06] tracking-tight text-balance text-foreground [overflow-wrap:anywhere] break-words sm:text-6xl sm:leading-[1.04] md:text-7xl md:leading-[1.02] lg:text-8xl"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.45 }}
@@ -71,7 +73,7 @@ export function HeroSection() {
             className="inline-block"
             initial={{ y: 28, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.08, duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+            transition={{ delay: 0.08, duration: 0.55, ease: EASE }}
           >
             {t.hero.titleBefore}
           </motion.span>
@@ -90,7 +92,7 @@ export function HeroSection() {
                   damping: 20,
                 }}
               >
-                {letter === " " ? "\u00A0" : letter}
+                {letter === " " ? " " : letter}
               </motion.span>
             ))}
           </span>
@@ -102,53 +104,63 @@ export function HeroSection() {
             transition={{
               delay: 0.12 + t.hero.titleGlow.length * 0.045 + 0.08,
               duration: 0.55,
-              ease: [0.22, 1, 0.36, 1],
+              ease: EASE,
             }}
           >
             {t.hero.titleAfter}
           </motion.span>
         </motion.p>
 
+        <motion.p
+          className="mx-auto mt-5 max-w-xl text-base leading-relaxed text-muted-foreground sm:mt-6 sm:text-lg"
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4, duration: 0.55, ease: EASE }}
+        >
+          {t.hero.subtitle}
+        </motion.p>
+
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.45, duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
-          className="flex w-full max-w-full justify-center sm:max-w-none"
+          transition={{ delay: 0.5, duration: 0.55, ease: EASE }}
+          className="mt-7 flex w-full flex-col items-stretch gap-3 sm:mt-8 sm:w-auto sm:flex-row sm:items-center sm:justify-center"
         >
-          <GlassShell className="w-full max-w-full p-2 sm:w-fit sm:max-w-none sm:p-2">
-            <div className="flex w-full flex-col items-stretch gap-2  sm:w-auto sm:flex-row sm:items-center sm:justify-center">
-              <motion.div
-                className="w-full sm:w-auto"
-                initial={{ opacity: 0, scale: 0.96 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.58, type: "spring", stiffness: 120, damping: 18 }}
-              >
-                <Link
-                  href={contactHref}
-                  className={cn(
-                    buttonVariants({ variant: "default", size: "default" }),
-                    "flex h-11 w-full items-center justify-center gap-1.5 rounded-full px-5 text-sm font-semibold transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] sm:w-auto sm:min-w-[9.5rem]"
-                  )}
-                >
-                  <IconMailFilled className="h-4 w-4 shrink-0" aria-hidden />
-                  {t.hero.cta1}
-                </Link>
-              </motion.div>
+          <Link
+            href={quoteHref}
+            className={cn(
+              buttonVariants({ variant: "default", size: "default" }),
+              "flex h-12 w-full items-center justify-center gap-2 rounded-full px-6 text-sm font-semibold transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] sm:w-auto sm:min-w-[11rem]"
+            )}
+          >
+            <IconSendFilled className="h-4 w-4 shrink-0" aria-hidden />
+            {t.hero.cta1}
+          </Link>
 
-              <Link
-                href={portfolioHref}
-                className={cn(
-                  buttonVariants({ variant: "outline", size: "default" }),
-                  "flex h-11 w-full items-center justify-center gap-1.5 rounded-full border-0 bg-transparent px-5 text-sm font-semibold text-foreground shadow-none backdrop-blur-none transition-[transform,background-color] duration-200 hover:scale-[1.02] hover:bg-white/10 active:scale-[0.98] dark:border dark:border-white/15 dark:bg-white/10 dark:text-white dark:shadow-elevated-soft dark:backdrop-blur-sm sm:w-auto"
-                )}
-              >
-                <IconVideoFilled className="h-4 w-4 shrink-0" aria-hidden />
-                {t.hero.cta2}
-              </Link>
-            </div>
-          </GlassShell>
+          <Link
+            href={portfolioHref}
+            className={cn(
+              buttonVariants({ variant: "ghost", size: "default" }),
+              "flex h-12 w-full items-center justify-center gap-1.5 rounded-full px-5 text-sm font-semibold text-foreground shadow-none transition-[transform,background-color] duration-200 hover:scale-[1.02] hover:bg-foreground/5 active:scale-[0.98] sm:w-auto"
+            )}
+          >
+            {t.hero.cta2}
+            <IconArrowRight className="h-4 w-4 shrink-0" aria-hidden />
+          </Link>
         </motion.div>
       </div>
+
+      {/* Partners strip — bottom of the hero, layered above the video, wash and
+          copy (z-30). One row so it fits under the headline on short viewports. */}
+      <PartnersSection rows={1} className="isolate z-30 pt-2 pb-3 sm:pt-4 sm:pb-5" />
     </section>
+
+    {/* Soft hand-off from the hero's solid bottom into the page gradient: the
+        fade overlaps the next section's top padding (negative margin). */}
+    <div
+      aria-hidden
+      className="pointer-events-none relative z-[5] -mb-20 h-20 bg-gradient-to-b from-background via-background/60 to-transparent"
+    />
+    </>
   );
 }

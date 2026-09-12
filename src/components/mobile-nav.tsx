@@ -3,12 +3,27 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { IconBook, IconBriefcase, IconHome, IconMail, IconMenu2, IconVideo } from "@tabler/icons-react";
+import {
+  IconBook,
+  IconBriefcase,
+  IconFolder,
+  IconHome,
+  IconMail,
+  IconMenu2,
+  IconVideo,
+} from "@tabler/icons-react";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
 import { useLanguage } from "@/lib/i18n/language-context";
 import { buttonVariants, primaryGradientInteractiveClassName } from "@/components/ui/button";
 import { GlassShell } from "@/components/ui/glass-shell";
-import { contactProcessPath, homePath, servicesPath, trainingPath } from "@/lib/routes";
+import {
+  contactProcessPath,
+  homePath,
+  portfolioPath,
+  projectsPath,
+  servicesPath,
+  trainingPath,
+} from "@/lib/routes";
 import { cn } from "@/lib/utils";
 import { LanguageToggle } from "./language-toggle";
 import { ThemeToggle } from "./theme-toggle";
@@ -19,18 +34,20 @@ export function MobileNav() {
   const homeHref = homePath(language);
   const trainingHref = trainingPath(language);
   const contactHref = contactProcessPath(language);
-  const portfolioHref = `${homeHref}#portfolio`;
+  const portfolioHref = portfolioPath(language);
+  const projectsHref = projectsPath(language);
   const servicesHref = servicesPath(language);
 
   return (
     <>
+      {/* Dock: Projects first; Portfolio lives in the sheet menu. */}
       <GlassShell className="service-mobile-dock lg:hidden fixed bottom-3 left-1/2 z-50 flex w-[92%] max-w-md -translate-x-1/2 items-center gap-1.5 px-3 py-2">
         <Link
-          href={portfolioHref}
+          href={projectsHref}
           className="group flex flex-1 select-none flex-col items-center justify-center gap-1 text-muted-foreground transition-colors hover:text-foreground"
         >
-          <IconVideo className="h-[22px] w-[22px] text-neutral-800 transition-transform group-hover:scale-110 dark:text-neutral-200" />
-          <span className="text-xs font-semibold tracking-wide">{t.header.portfolio}</span>
+          <IconFolder className="h-[22px] w-[22px] text-neutral-800 transition-transform group-hover:scale-110 dark:text-neutral-200" />
+          <span className="text-xs font-semibold tracking-wide">{t.header.projects}</span>
         </Link>
 
         <Link
@@ -95,6 +112,14 @@ export function MobileNav() {
                 >
                   <IconVideo className="h-6 w-6 shrink-0 text-neutral-800 dark:text-neutral-200" />
                   <span className="transition-colors group-hover:text-primary">{t.header.portfolio}</span>
+                </Link>
+                <Link
+                  href={projectsPath(language)}
+                  onClick={() => setIsOpen(false)}
+                  className="group flex select-none items-center gap-4 text-foreground/80 transition-colors"
+                >
+                  <IconFolder className="h-6 w-6 shrink-0 text-neutral-800 dark:text-neutral-200" />
+                  <span className="transition-colors group-hover:text-primary">{t.header.projects}</span>
                 </Link>
                 <Link
                   href={servicesHref}

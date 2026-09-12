@@ -4,6 +4,7 @@ import { useLanguage } from "@/lib/i18n/language-context";
 import { motion } from "motion/react";
 import { PARTNERS, type Partner } from "@/lib/partners";
 import { PartnerLogo } from "@/components/partner-logo";
+import { cn } from "@/lib/utils";
 
 const imgClass =
   "h-[4.25rem] w-auto min-h-[4.25rem] min-w-[120px] max-w-[min(190px,36vw)] object-contain transition-transform duration-200 group-hover:scale-[1.05] sm:h-[4.5rem] sm:min-h-[4.5rem] sm:min-w-[115px] sm:max-w-[min(190px,24vw)] md:h-[5rem] md:min-h-[5rem] md:min-w-[130px] md:max-w-[205px]";
@@ -57,14 +58,26 @@ function PartnerMarqueeRow({
   );
 }
 
-export function PartnersSection() {
+export function PartnersSection({
+  className,
+  rows = 2,
+}: {
+  className?: string;
+  /** `1` puts every partner in a single row (used inside the hero). */
+  rows?: 1 | 2;
+}) {
   const { t } = useLanguage();
-  const mid = Math.ceil(PARTNERS.length / 2);
+  const mid = rows === 1 ? PARTNERS.length : Math.ceil(PARTNERS.length / 2);
   const rowPartners = PARTNERS.slice(0, mid);
   const rowPartnersB = PARTNERS.slice(mid);
 
   return (
-    <section className="relative overflow-x-hidden overflow-y-visible pt-10 pb-4 md:pt-12 md:pb-6">
+    <section
+      className={cn(
+        "relative overflow-x-hidden overflow-y-visible pt-10 pb-4 md:pt-12 md:pb-6",
+        className
+      )}
+    >
       <div className="relative z-10 mx-auto mb-1 max-w-6xl px-4 md:mb-2">
         <h2 className="text-center font-heading text-[0.7rem] font-semibold uppercase tracking-widest text-muted-foreground/70 md:text-xs">
           {t.partners.title}

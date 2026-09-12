@@ -8,24 +8,11 @@ import { Button } from "@/components/ui/button";
 import { primaryGradientInteractiveClassName } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
-  ANIMATED_SHORT,
-  ANIMATED_WIDE,
-  AVATARS_SHORT,
-  AVATARS_WIDE,
-  CARS_SHORT,
-  CARS_WIDE,
-  CONSTRUCTION_SHORT,
-  CONSTRUCTION_WIDE,
-  PRODUCT_SHORT,
-  PRODUCT_WIDE,
-  SERVICES_SHORT,
-  SERVICES_WIDE,
-  TV_SHORT,
-  TV_WIDE,
   YOUTUBE_IFRAME_ALLOW,
   YOUTUBE_REFERRER_POLICY,
   type YouTubeEmbed,
 } from "@/lib/youtube-embeds";
+import { embedsForCategory, isPortfolioCategory } from "@/lib/portfolio-highlights";
 import {
   IconBottleFilled,
   IconCarFilled,
@@ -475,27 +462,6 @@ const PortfolioTabBody = memo(function PortfolioTabBody({
   );
 });
 
-function embedsForCategory(category: string) {
-  switch (category) {
-    case "construction":
-      return { wide: CONSTRUCTION_WIDE, short: CONSTRUCTION_SHORT };
-    case "mascots": // avatars
-      return { wide: AVATARS_WIDE, short: AVATARS_SHORT };
-    case "cars":
-      return { wide: CARS_WIDE, short: CARS_SHORT };
-    case "tv":
-      return { wide: TV_WIDE, short: TV_SHORT };
-    case "product":
-      return { wide: PRODUCT_WIDE, short: PRODUCT_SHORT };
-    case "services":
-      return { wide: SERVICES_WIDE, short: SERVICES_SHORT };
-    case "animated":
-      return { wide: ANIMATED_WIDE, short: ANIMATED_SHORT };
-    default:
-      return { wide: [] as YouTubeEmbed[], short: [] as YouTubeEmbed[] };
-  }
-}
-
 /**
  * Curated “All” feed — a hand-picked highlight reel, NOT every clip in the portfolio.
  * Mascots + the first product wide lead the first rows; the full catalogue per category
@@ -535,7 +501,12 @@ function embedsForAll() {
   return { wide, short };
 }
 
-export function PortfolioSection() {
+export function PortfolioSection({
+  headingLevel = "h2",
+}: {
+  /** `h1` on the standalone /portfolio page (one h1 per page), `h2` elsewhere. */
+  headingLevel?: "h1" | "h2";
+}) {
   const { ref } = useInView();
   const { t } = useLanguage();
   const [format, setFormat] = useState<"all" | "desktop" | "mobile">("all");
@@ -543,6 +514,13 @@ export function PortfolioSection() {
   const [portfolioPage, setPortfolioPage] = useState(0);
 
   useEffect(() => {
+    // `?category=` deep links (home-page teaser thumbnails) pre-select a tab.
+    // Read on the client so the statically rendered page stays static.
+    const requested = new URLSearchParams(window.location.search).get("category");
+    if (requested && isPortfolioCategory(requested)) {
+      queueMicrotask(() => setActiveCategory(requested));
+    }
+
     const handlePortfolioNavigate = (event: Event) => {
       const { category } = (event as CustomEvent<PortfolioNavigateDetail>).detail ?? {};
       setActiveCategory(category ?? "all");
@@ -552,6 +530,8 @@ export function PortfolioSection() {
     window.addEventListener(PORTFOLIO_NAVIGATE_EVENT, handlePortfolioNavigate);
     return () => window.removeEventListener(PORTFOLIO_NAVIGATE_EVENT, handlePortfolioNavigate);
   }, []);
+
+  const Heading = headingLevel;
 
   const CATEGORIES: { key: string; label: string; icon: React.ReactNode }[] = useMemo(
     () => [
@@ -620,10 +600,10 @@ export function PortfolioSection() {
           <div
             className={"mb-6"}
           >
-            <h2 className="font-heading mb-3 text-4xl font-bold text-foreground md:text-5xl">
+            <Heading className="font-heading mb-3 text-4xl font-bold text-foreground md:text-5xl">
               {t.portfolio.title1}{" "}
               <span className="text-section-accent">{t.portfolio.title2}</span>
-            </h2>
+            </Heading>
             <p className="max-w-xl text-base text-muted-foreground">{t.portfolio.subtitle}</p>
           </div>
 

@@ -61,7 +61,7 @@ export function StatsSection({ title1, title2, subline, items, className }: Stat
     <section className={cn("py-12 md:py-20", className)}>
       <div className="mx-auto max-w-7xl space-y-8 px-4 md:space-y-12">
         <motion.div
-          className="relative z-10 max-w-2xl space-y-3"
+          className="relative z-10 mx-auto max-w-2xl space-y-3 text-center"
           initial="hidden"
           whileInView="visible"
           viewport={viewport}

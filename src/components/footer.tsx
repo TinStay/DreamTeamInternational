@@ -5,7 +5,14 @@ import Image from "next/image";
 import { Sphere } from "./iridescent-shapes";
 import { LanguageToggle } from "./language-toggle";
 import { useLanguage } from "@/lib/i18n/language-context";
-import { contactProcessPath, homePath, privacyPath, termsPath, trainingPath } from "@/lib/routes";
+import {
+  contactProcessPath,
+  homePath,
+  portfolioPath,
+  privacyPath,
+  termsPath,
+  trainingPath,
+} from "@/lib/routes";
 
 export function Footer() {
   const { t, language } = useLanguage();
@@ -33,7 +40,7 @@ export function Footer() {
           {/* Links column */}
           <div className="flex flex-col gap-3 items-center md:items-start text-sm">
             <h4 className="font-heading font-semibold text-foreground mb-2">{t.footer.links}</h4>
-            <Link href={`${homeHref}#portfolio`} className="text-muted-foreground hover:text-primary transition-colors">
+            <Link href={portfolioPath(language)} className="text-muted-foreground hover:text-primary transition-colors">
               {t.header.portfolio}
             </Link>
             <Link href={trainingHref} className="text-muted-foreground hover:text-primary transition-colors">

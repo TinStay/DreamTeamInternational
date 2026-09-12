@@ -39,7 +39,8 @@ DreamTeam ("Дрийм Тийм") produces advertising and brand video end to en
 - Home (EN): https://dreamteam.video/en
 - Home (BG): https://dreamteam.video/bg
 - Services: https://dreamteam.video/en#services
-- Portfolio: https://dreamteam.video/en#portfolio
+- Portfolio: https://dreamteam.video/en/portfolio
+- Projects (client case studies): https://dreamteam.video/en/projects
 - Training: https://dreamteam.video/en/training
 - Contact & process: https://dreamteam.video/en/contact
 

@@ -114,12 +114,12 @@ export function ContactSection({ className }: { className?: string }) {
       )}
     >
       <div className="relative z-10 mx-auto max-w-7xl px-4">
-        <div className="mb-10 lg:mb-12">
+        <div className="mb-10 text-center lg:mb-12">
           <h2 className="mb-6 font-heading text-4xl font-bold text-foreground md:text-5xl">
             {t.contact.title1}{" "}
             <span className="text-section-accent">{t.contact.title2}</span>
           </h2>
-          <p className="max-w-2xl text-lg text-muted-foreground">{t.contact.subtitle}</p>
+          <p className="mx-auto max-w-2xl text-lg text-muted-foreground">{t.contact.subtitle}</p>
         </div>
 
         <div className="grid items-start gap-12 lg:grid-cols-[minmax(0,60%)_minmax(0,40%)] lg:gap-16">

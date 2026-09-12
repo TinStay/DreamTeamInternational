@@ -4,6 +4,8 @@ const nextConfig: NextConfig = {
   images: {
     // Allow quality={100} usages (flags, service icons) without dev warnings.
     qualities: [75, 100],
+    // YouTube thumbnails for the home-page portfolio teaser marquee.
+    remotePatterns: [{ protocol: "https", hostname: "i.ytimg.com", pathname: "/vi/**" }],
   },
   async redirects() {
     return [

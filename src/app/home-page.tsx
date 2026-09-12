@@ -2,9 +2,8 @@ import { SiteHeader } from "@/components/site-header";
 import { MobileNav } from "@/components/mobile-nav";
 import { HeroSection } from "@/components/hero-section";
 import { QuoteFormSection } from "@/components/quote-form/quote-form-section";
-import { PortfolioSection } from "@/components/portfolio-section";
+import { ProjectsShowcase } from "@/components/projects-showcase";
 import { ServicesSection } from "@/components/services-section";
-import { PartnersSection } from "@/components/partners-section";
 import { ContactSection } from "@/components/contact-section";
 import { ProcessSection } from "@/components/process-section";
 import { CompanyStatsSection } from "@/components/company-stats-section";
@@ -26,11 +25,8 @@ export function HomePage() {
       <SiteHeader />
 
       <div className="flex-1 w-full relative z-10 flex flex-col">
+        {/* Partners marquee lives inside the hero (bottom strip over the video). */}
         <HeroSection />
-
-        <div className="relative">
-          <PartnersSection />
-        </div>
 
         <div className="relative">
           <ServicesSection />
@@ -40,8 +36,11 @@ export function HomePage() {
           <QuoteFormSection />
         </div>
 
+        {/* Full portfolio lives on /portfolio (hero CTA + nav). Scroll-driven
+            showcase below (sticky stage, full-screen clip per project); the
+            filterable list lives on /projects. */}
         <div className="relative">
-          <PortfolioSection />
+          <ProjectsShowcase />
         </div>
 
         <div className="relative">

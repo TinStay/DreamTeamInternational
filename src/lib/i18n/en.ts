@@ -6,7 +6,11 @@ export const en = {
     pricing: "Get a Quote",
     contact: "Contact",
     quoteCta: "Get a Quote",
-    training: "Training"
+    contactCta: "Contact us",
+    training: "Training",
+    projects: "Projects",
+    phoneCopy: "Copy phone number",
+    phoneCopied: "Copied!"
   },
   hero: {
     titleBefore: "Your",
@@ -14,7 +18,9 @@ export const en = {
     titleAfter: "is the limit.",
     seoHeading:
       "DreamTeam - AI video production and AI-powered video ads for brands in Bulgaria and worldwide",
-    cta1: "Contact us",
+    subtitle:
+      "AI video production for brands - product spots, cinema ads, mascots and social clips. Describe the video you need and get a tailored quote.",
+    cta1: "Request a quote",
     cta2: "View Our Work"
   },
   contactPage: {
@@ -34,6 +40,9 @@ export const en = {
     ]
   },
   portfolio: {
+    metaTitle: "Portfolio | DreamTeam",
+    metaDescription:
+      "AI-generated video productions by DreamTeam - product, cinema advertising, mascots, construction, cars, services and animation, in 16:9 and 9:16.",
     title1: "Featured",
     title2: "Work",
     subtitle: "Explore our diverse range of AI-generated video productions tailored for cutting-edge brands.",
@@ -74,6 +83,168 @@ export const en = {
   },
   partners: {
     title: "Trusted By"
+  },
+  projects: {
+    metaTitle: "Projects & case studies | DreamTeam",
+    metaDescription:
+      "Case studies of AI video campaigns DreamTeam produced for clients in software, products and construction - goals, results and where each video ran.",
+    title1: "Selected",
+    title2: "projects",
+    subtitle:
+      "A closer look at videos we produced for clients - software, products and construction, each with its own story.",
+    explore: "Explore projects",
+    categoriesLabel: "Categories",
+    cta: "Request a quote",
+    viewProject: "View project",
+    viewAll: "View all projects",
+    scrollHint: "Scroll to explore",
+    watch: "Watch the video",
+    similar: "Want a similar video?",
+    showcase: {
+      eyebrow: "DreamTeam · Case studies",
+      title1: "Step into the",
+      title2: "cinema",
+      subtitle: "Real brands, real campaigns - each with a world of its own.",
+      railLabel: "Jump to a project",
+      highlights: "Highlights",
+      scenes: {
+        emblema: {
+          buildings: [
+            { name: "District Living", place: "Chavdar bridge" },
+            { name: "Eria", place: "Ovcha Kupel" }
+          ]
+        }
+      }
+    },
+    categories: {
+      all: "All",
+      software: "Software",
+      products: "Products",
+      construction: "Construction"
+    },
+    styles: {
+      animated: "Animated",
+      realistic: "Realistic",
+      "semi-realistic": "Semi-realistic"
+    },
+    facts: {
+      industry: "Industry",
+      campaign: "Campaign",
+      style: "Style",
+      format: "Format",
+      deliverable: "Deliverable"
+    },
+    detail: {
+      metaTitle: "Case study | DreamTeam",
+      eyebrow: "Case study",
+      client: "Client",
+      mission: "The mission",
+      about: "About the campaign",
+      details: "Project details",
+      published: "Where the video ran",
+      views: "Total views",
+      viewsShort: "views",
+      viewsHint: "Across all platforms",
+      platforms: "Platforms",
+      partnership: "Partnership",
+      since: "Since",
+      months: "months together",
+      tbd: "-",
+      noPlatforms: "Publishing details will be added once the campaign goes live.",
+      backToProjects: "Back to all projects",
+      platformNames: {
+        youtube: "YouTube",
+        instagram: "Instagram",
+        tiktok: "TikTok",
+        facebook: "Facebook"
+      }
+    },
+    items: {
+      boleron: {
+        name: "Boleron",
+        headline: "Insurance explained in 30 seconds",
+        description:
+          "Over 20 AI videos with Roni, Boleron's robot mascot - from a civil-liability explainer to short social clips - which together passed 75 million views.",
+        highlight: "Over 20 videos with Roni that together generated more than 75 million views.",
+        tags: ["20+ videos", "75M+ views", "Mascot Roni"],
+        mission:
+          "Make a mandatory, dry insurance product feel simple and human, so visitors understand it in seconds and finish the purchase online instead of calling an agent.",
+        industry: "Online insurance",
+        campaign: "Brand development",
+        format: "16:9 + 9:16",
+        deliverable: "Product spot"
+      },
+      plasico: {
+        name: "Plasico",
+        headline: "An IT superstore, cinematic",
+        description:
+          "Three AI video concepts in 4K for Plasico's IT superstore - technology told cinematically, built entirely from AI-generated scenes.",
+        highlight: "Technology, told cinematically - three video concepts in 4K.",
+        tags: ["3 concepts", "4K", "AI video"],
+        mission:
+          "Give an online electronics store the cinematic presence of a global brand - premium visuals that make the catalogue feel exciting rather than transactional.",
+        industry: "IT retail",
+        campaign: "Brand campaign",
+        format: "16:9",
+        deliverable: "Brand video"
+      },
+      mindguard: {
+        name: "Mindguard",
+        headline: "Calm you can see",
+        description:
+          "A 60-second animated explainer that makes the Mindguard mental-health platform instantly understandable - shown to Klaus Schwab, the President of Switzerland and Ukraine's largest TV channel.",
+        highlight: "Calm you can see - how a mental-health platform became clear in 60 seconds.",
+        tags: ["60-second explainer", "Mental health", "Shown to Klaus Schwab"],
+        mission:
+          "Explain an abstract mental-health platform without screenshots - a story-driven animated explainer that makes the value obvious in the first ten seconds.",
+        industry: "Mental-health software",
+        campaign: "Product explainer",
+        format: "16:9",
+        deliverable: "Explainer video"
+      },
+      emblema: {
+        name: "Emblema",
+        headline: "The feeling of home, before it's built",
+        description:
+          "Two cinematic AI films for Emblema's residential projects - District Living by Chavdar bridge and Eria in Ovcha Kupel - so buyers feel the building before the first brick is laid.",
+        highlight: "The emotion of home, told cinematically.",
+        tags: ["2 projects", "2 films", "District Living · Eria"],
+        mission:
+          "Sell homes off-plan by letting buyers feel the finished building - light, materials and atmosphere - long before construction is complete.",
+        industry: "Home construction",
+        campaign: "Off-plan sales",
+        format: "16:9",
+        deliverable: "Property visualization"
+      },
+      isupport: {
+        name: "iSupport",
+        headline: "Products in motion",
+        description:
+          "Short product clips presenting the iSupport range through AI-generated demonstrations.",
+        highlight: "Short demonstrations instead of static photos - the products in use, vertical for social feeds.",
+        tags: ["9:16", "Product clips", "AI demonstrations"],
+        mission:
+          "Replace static product photos with short demonstrations that show the products in use and work natively in vertical social feeds.",
+        industry: "Consumer products",
+        campaign: "Product launch",
+        format: "9:16",
+        deliverable: "Product clips"
+      },
+      osmo: {
+        name: "OSMO",
+        headline: "Four product videos that sell",
+        description:
+          "Four vertical AI promo videos for OSMO's products, made for TikTok, Reels and Shorts - and they lifted sales of the featured products.",
+        highlight: "Four promotional product videos that increased sales of the featured products.",
+        tags: ["4 promo clips", "Product video", "Sales uplift"],
+        mission:
+          "Cut through crowded social feeds with a fast, vertical product spot that stops the scroll and drives traffic to the online shop.",
+        industry: "Consumer products",
+        campaign: "Social media campaign",
+        format: "9:16",
+        deliverable: "Social spot"
+      }
+    }
   },
   services: {
     title1: "Our",
@@ -449,7 +620,7 @@ export const en = {
       },
       {
         q: "How long does a video take?",
-        a: "Usually between 5 and 12 working days depending on the video's complexity, length, and revisions. If you need it sooner, we offer a paid priority option. If you want the highest quality, we take the time it needs — meeting your expectations always comes first.",
+        a: "Usually between 5 and 12 working days depending on the video's complexity, length, and revisions. If you need it sooner, we offer a paid priority option. If you want the highest quality, we take the time it needs - meeting your expectations always comes first.",
       },
       {
         q: "What types of videos can you make?",
@@ -521,7 +692,7 @@ export const en = {
         initials: "LN",
         color: "#3949AB",
         rating: 5,
-        text: "Thank you — we had a consultation, they listened to me and patiently made the changes I asked for. I'm happy and I recommend them.",
+        text: "Thank you - we had a consultation, they listened to me and patiently made the changes I asked for. I'm happy and I recommend them.",
       },
       {
         name: "Rosen Kanev",
@@ -667,7 +838,7 @@ export const en = {
     send: "Send",
     sending: "Sending…",
     sendSuccessTitle: "Message sent",
-    sendSuccessBody: "Thank you — we have received your message and will get back to you shortly.",
+    sendSuccessBody: "Thank you - we have received your message and will get back to you shortly.",
     sendErrorTitle: "Something went wrong",
     sendErrorBody: "We could not send your message. Please try again in a moment or email us directly."
   },
@@ -804,13 +975,13 @@ export const en = {
     title1: "Training",
     title2: "for AI production",
     subtitle:
-      "Learn the workflows we ship for clients — from briefing and prompt design to look development, editing, and delivery. Pick the format that matches your pace and team size.",
+      "Learn the workflows we ship for clients - from briefing and prompt design to look development, editing, and delivery. Pick the format that matches your pace and team size.",
     viewAll: "View all programs",
     comingSoon: "Coming soon",
     modalInquiryTitle: "Interested in this program?",
     modalInquirySubtitle: "Leave your details and we'll get back to you shortly.",
     inquirySubjectPrefix: "Training inquiry:",
-    inquiryFormStatePrefix: "Form: Training (page) — ",
+    inquiryFormStatePrefix: "Form: Training (page) - ",
     inquiryForm: {
       targetLabel: "What do you want to learn?",
       targetPlaceholder: "e.g. prompt workflows, editing, producing short ads…",
@@ -822,9 +993,9 @@ export const en = {
         title: "Individual lessons",
         featureTag: "Private lessons",
         featureSummary:
-          "Personal lessons to learn AI video creation — from idea and script to prompts, look, editing, and delivery.",
+          "Personal lessons to learn AI video creation - from idea and script to prompts, look, editing, and delivery.",
         suitableFor:
-          "1:1 training for people who want to learn how to create AI videos — from idea and script to prompts, look, editing, and delivery.",
+          "1:1 training for people who want to learn how to create AI videos - from idea and script to prompts, look, editing, and delivery.",
         cta: "Contact us",
         image: "/trainings/individual_banner.jpeg",
         modalIntro:
@@ -847,7 +1018,7 @@ export const en = {
         logisticsTitle: "How it works",
         logistics: [
           "60–90 minutes on Google Meet/Zoom. Optional recording + short recap after.",
-          "Beginner-friendly and advanced-friendly — we adapt the pace to your level.",
+          "Beginner-friendly and advanced-friendly - we adapt the pace to your level.",
           "Best results: book 2–4 sessions so practice compounds between calls.",
         ],
       },
@@ -861,7 +1032,7 @@ export const en = {
         cta: "Open Skool",
         image: "/trainings/skool_banner.jpeg",
         modalIntro:
-          "A structured program through our AI video stack. Designed to help you build a repeatable process — not just consume theory.",
+          "A structured program through our AI video stack. Designed to help you build a repeatable process - not just consume theory.",
         features: [
           { icon: "book", text: "Modules from brief → prompts → shots → edit → delivery" },
           { icon: "sparkles", text: "Assignments applied to your brand or a portfolio piece" },
@@ -880,7 +1051,7 @@ export const en = {
         logisticsTitle: "Format & access",
         logistics: [
           "Hosted on Skool: async lessons plus scheduled live touchpoints and community threads.",
-          "Expect several hours per week when a module is active — you control depth vs. speed.",
+          "Expect several hours per week when a module is active - you control depth vs. speed.",
           "Materials include Notion templates, shot lists, and export checklists you can clone.",
         ],
       },
@@ -890,7 +1061,7 @@ export const en = {
         featureSummary:
           "Workshops for groups: design ideas, generate scene images and clips, edit together, and keep style consistent.",
         suitableFor:
-          "For teams learning how to create AI videos together — from shaping an idea to a finished edit, with shared steps everyone can repeat.",
+          "For teams learning how to create AI videos together - from shaping an idea to a finished edit, with shared steps everyone can repeat.",
         cta: "Request a proposal",
         image: "/trainings/corporate_banner.jpeg",
         modalIntro:
@@ -912,7 +1083,7 @@ export const en = {
         ],
         logisticsTitle: "How it works",
         logistics: [
-          "Live sessions on Google Meet/Zoom — remote, on-site, or hybrid.",
+          "Live sessions on Google Meet/Zoom - remote, on-site, or hybrid.",
           "We work from your real briefs or sample campaigns (NDA-friendly).",
           "Flexible format: half-day intensives or multi-week programs for teams of any size.",
         ],

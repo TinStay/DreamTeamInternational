@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import { useLanguage } from "@/lib/i18n/language-context";
 import { homePath } from "@/lib/routes";
 import { getServiceIconBySlug } from "@/lib/services/constants";
+import { isProjectKey } from "@/lib/projects";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -25,6 +26,10 @@ function segmentToLabel(
   t: ReturnType<typeof useLanguage>["t"]
 ) {
   switch (segment) {
+    case "portfolio":
+      return t.header.portfolio;
+    case "projects":
+      return t.header.projects;
     case "contact":
       return t.header.contact;
     case "training":
@@ -43,6 +48,8 @@ function segmentToLabel(
     case "terms":
       return t.legal.termsTitle;
     default: {
+      // Project slug -> client name (e.g. "boleron" -> "Boleron").
+      if (isProjectKey(segment)) return t.projects.items[segment].name;
       // Service slug -> service title (e.g. "ai-video" -> "AI Видео Продукция").
       const icon = getServiceIconBySlug(segment);
       const service = icon

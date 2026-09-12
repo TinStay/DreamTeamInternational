@@ -25,6 +25,21 @@ export function servicePath(language: Language, slug: string) {
   return `/${language}/services/${slug}`;
 }
 
+/** Localized portfolio page path. */
+export function portfolioPath(language: Language) {
+  return `/${language}/portfolio`;
+}
+
+/** Localized projects (case studies) hub path. */
+export function projectsPath(language: Language) {
+  return `/${language}/projects`;
+}
+
+/** Localized path for a single project case study. */
+export function projectPath(language: Language, slug: string) {
+  return `/${language}/projects/${slug}`;
+}
+
 /** Localized terms page path. */
 export function termsPath(language: Language) {
   return `/${language}/terms`;

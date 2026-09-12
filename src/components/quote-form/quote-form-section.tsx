@@ -168,7 +168,7 @@ export function QuoteFormSection({ className }: { className?: string }) {
       className={cn("relative w-full scroll-mt-24 py-10 sm:py-14", className)}
     >
       <div className="relative z-10 mx-auto w-full max-w-7xl px-4">
-        <div className="mb-8 sm:mb-10">
+        <div className="mb-8 text-center sm:mb-10">
           <h2 className="font-heading mb-3 text-4xl font-bold text-foreground md:text-5xl">
             {q.title1} <span className="text-section-accent">{q.title2}</span>
           </h2>

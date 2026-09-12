@@ -49,7 +49,7 @@ export function ReviewsSection({ className }: { className?: string }) {
       id="reviews"
       className={cn("relative w-full overflow-hidden py-16 sm:py-20", className)}
     >
-      <div className="relative z-10 mx-auto mb-8 w-full max-w-7xl px-4 lg:mb-10">
+      <div className="relative z-10 mx-auto mb-8 w-full max-w-7xl px-4 text-center lg:mb-10">
         <h2 className="font-heading text-4xl font-bold text-foreground md:text-5xl">
           {r.title1}{" "}
           <span className="text-section-accent">{r.title2}</span>
