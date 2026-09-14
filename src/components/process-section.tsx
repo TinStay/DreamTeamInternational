@@ -50,6 +50,13 @@ const STEP_ICONS = [
  * bead riding the tip. The badges sit at 12.5 / 37.5 / 62.5 / 87.5 % of the row.
  */
 const WAVE_PATH = "M 40 100 C 90 100, 100 40, 125 100 S 210 190, 250 100 S 340 40, 375 100 S 460 190, 500 100 S 590 40, 625 100 S 710 190, 750 100 S 840 40, 875 100 S 940 150, 985 100";
+/**
+ * Phones / tablets: the steps stack, so the connector is an S-curve down the
+ * column (100 × 1000 viewBox, stretched), bowing out to one side between one
+ * badge and the next (badge centres ≈ 5.5 / 30.5 / 55.5 / 80.5 % of the
+ * column) - drawn as the steps scroll up the screen.
+ */
+const CURVE_PATH = "M 50 20 C 96 120, 4 210, 50 305 S 96 470, 50 555 S 4 720, 50 805 S 70 900, 50 990";
 
 export function ProcessSection() {
   const { ref, isInView } = useInView();
@@ -80,7 +87,22 @@ export function ProcessSection() {
   const beadLeft = useTransform(beadX, (x) => `${x / 10}%`);
   const beadTop = useTransform(beadY, (y) => `${y / 2}%`);
   const beadOpacity = useTransform(progress, (p) => (p > 0.02 && p < 0.98 ? 1 : 0));
-  const lineScale = useTransform(progress, (p) => p);
+
+  // Phones / tablets: the curve follows the steps as they scroll up - 0 with the column's top three quarters down
+  // the viewport, 1 once its bottom is most of the way up (the same whether on the home journey or not).
+  const curveRef = useRef<SVGPathElement>(null);
+  const { scrollYProgress: columnProgress } = useScroll({ target: rowRef, offset: ["start 75%", "end 82%"] });
+  const curve = useSpring(columnProgress, { stiffness: 120, damping: 26, mass: 0.6, restDelta: 0.001 });
+  const curveLength = useTransform(curve, (p) => Math.max(0.001, p));
+  const curveBeadLeft = useTransform(curve, (p) => {
+    const el = curveRef.current;
+    return el ? `${el.getPointAtLength(p * el.getTotalLength()).x}%` : "50%";
+  });
+  const curveBeadTop = useTransform(curve, (p) => {
+    const el = curveRef.current;
+    return el ? `${el.getPointAtLength(p * el.getTotalLength()).y / 10}%` : "0%";
+  });
+  const curveBeadOpacity = useTransform(curve, (p) => (p > 0.02 && p < 0.98 ? 1 : 0));
 
   return (
     <section id="process" className="relative overflow-hidden pt-12 pb-20 sm:pt-16 sm:pb-24" ref={ref}>
@@ -128,12 +150,33 @@ export function ProcessSection() {
             style={{ left: beadLeft, top: beadTop, opacity: beadOpacity }}
           />
           </div>
-          {/* Phones / tablets: a vertical thread growing down behind the stacked steps. */}
-          <motion.div
-            className="pointer-events-none absolute inset-y-0 left-1/2 z-0 w-px origin-top bg-gradient-to-b from-[var(--primary-gradient-start)] via-[var(--primary-gradient-end)] to-transparent lg:hidden"
-            style={{ scaleY: lineScale }}
-            aria-hidden
-          />
+          {/* Phones / tablets: the S-curve behind the stacked steps, drawing as they scroll up, a bead on its tip. */}
+          <div className="pointer-events-none absolute inset-0 z-0 lg:hidden" aria-hidden>
+            <svg className="h-full w-full" viewBox="0 0 100 1000" preserveAspectRatio="none">
+              <defs>
+                <linearGradient id="process-curve" x1="0" x2="0" y1="0" y2="1">
+                  <stop offset="0%" stopColor="var(--primary-gradient-start)" stopOpacity={0.55} />
+                  <stop offset="100%" stopColor="var(--primary-gradient-end)" stopOpacity={0.55} />
+                </linearGradient>
+              </defs>
+              {/* Faint full track + the drawn part on top, both in a subtle wash of the brand colours. */}
+              <path d={CURVE_PATH} fill="none" stroke="currentColor" strokeWidth="1" className="text-border/50" vectorEffect="non-scaling-stroke" />
+              <motion.path
+                ref={curveRef}
+                d={CURVE_PATH}
+                fill="none"
+                stroke="url(#process-curve)"
+                strokeWidth="2"
+                strokeLinecap="round"
+                vectorEffect="non-scaling-stroke"
+                style={{ pathLength: curveLength }}
+              />
+            </svg>
+            <motion.div
+              className="absolute size-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary-gradient opacity-80 shadow-[0_0_14px_4px_var(--primary-soft-glow)]"
+              style={{ left: curveBeadLeft, top: curveBeadTop, opacity: curveBeadOpacity }}
+            />
+          </div>
 
           <div className="flex flex-col lg:flex-row items-center lg:items-start justify-between gap-12 lg:gap-4 relative z-10">
             {t.process.steps.map((step, index) => {

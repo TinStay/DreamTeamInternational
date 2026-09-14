@@ -58,7 +58,7 @@ function stations(vp: Viewport): Geo[] {
     // 0 · the OSMO copy circle (× its outro swell, applied by the caller) - where the showcase leaves it
     lg
       ? circle(OSMO_CIRCLE.x * vw, OSMO_CIRCLE.y * vh, Math.min(0.46 * vw, 0.88 * vh))
-      : circle(OSMO_CIRCLE_MOBILE.x * vw, (sm ? OSMO_CIRCLE_MOBILE.y : 0.38) * vh, Math.min(1.24 * vw, 0.84 * vh)),
+      : circle(OSMO_CIRCLE_MOBILE.x * vw, (sm ? OSMO_CIRCLE_MOBILE.y : 0.38) * vh, Math.min(1.16 * vw, 0.84 * vh)),
     // 1 · the ring behind the stats
     circle(0.5 * vw, 0.58 * vh, Math.min(0.46 * vw, 0.72 * vh)),
     // 2 · the two lines beside the reviews: a rectangle taller than the viewport, so only its sides show (they sit
@@ -398,6 +398,40 @@ function Blob({ presence, position }: { presence: MotionValue<number>; position:
 }
 // Pre-built (the home page is a server component - it can hand these client references over, but not call them).
 export const blobLeftBackdrop: JourneyBackdrop = ({ presence }) => <Blob presence={presence} position="left" />;
+
+/**
+ * Services (the wizard's first step): the left blob, a soft dotted field
+ * behind the cards (a radial mask keeps it to the middle) and glowing
+ * particles drifting across it.
+ */
+export const servicesBackdrop: JourneyBackdrop = (props) => <ServicesField {...props} />;
+function ServicesField({ presence }: JourneyBackdropProps) {
+  const opacity = useTransform(presence, (p) => easeOut(p));
+  return (
+    <>
+      <Blob presence={presence} position="left" />
+      <motion.div className="absolute inset-0" style={{ opacity }}>
+        <div
+          className="absolute inset-0 [background-image:radial-gradient(color-mix(in_srgb,var(--primary-gradient-end)_60%,transparent)_1px,transparent_1.6px)] [background-size:26px_26px] [mask-image:radial-gradient(ellipse_62%_58%_at_50%_50%,black_18%,transparent_72%)]"
+          style={{ opacity: 0.55 }}
+        />
+        {Array.from({ length: 28 }, (_, i) => {
+          const seed = 500 + i;
+          return (
+            <Particle
+              key={i}
+              seed={seed}
+              x={`${(4 + noise(seed) * 92).toFixed(1)}%`}
+              y={`${(6 + noise(seed + 1) * 88).toFixed(1)}%`}
+              size={2.5 + noise(seed + 2) * 5}
+              alpha={0.3 + noise(seed + 7) * 0.5}
+            />
+          );
+        })}
+      </motion.div>
+    </>
+  );
+}
 /** FAQ: the right-hand blob plus smaller, tilted-orbit atoms. */
 export const blobRightBackdrop: JourneyBackdrop = (props) => (
   <>

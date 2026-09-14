@@ -136,7 +136,8 @@ export function Sparks({
  * downloading once `enabled` (the section is near the viewport); while a
  * frame is still loading the nearest loaded neighbour is drawn instead.
  * `split` draws the same frame onto two canvases showing the left / right
- * halves, pulled `splitGap`% apart (the Emblema buildings).
+ * halves, pulled apart by `--split-gap` (a percentage, set by the caller's
+ * class so it can differ per breakpoint; 15% if unset - the Emblema buildings).
  */
 export function FrameSequence({
   progress,
@@ -146,7 +147,6 @@ export function FrameSequence({
   height,
   enabled,
   split = false,
-  splitGap = 15,
   className,
 }: {
   progress: MotionValue<number>;
@@ -157,7 +157,6 @@ export function FrameSequence({
   height: number;
   enabled: boolean;
   split?: boolean;
-  splitGap?: number;
   className?: string;
 }) {
   const canvases = useRef<(HTMLCanvasElement | null)[]>([]);
@@ -253,7 +252,7 @@ export function FrameSequence({
             width={width}
             height={height}
             className={cn(canvasClass, "[clip-path:inset(0_52%_0_0)]")}
-            style={{ marginLeft: `-${splitGap}%` }}
+            style={{ marginLeft: "calc(-1 * var(--split-gap, 15%))" }}
           />
           <canvas
             ref={(el) => {
@@ -262,7 +261,7 @@ export function FrameSequence({
             width={width}
             height={height}
             className={cn(canvasClass, "[clip-path:inset(0_0_0_52%)]")}
-            style={{ marginLeft: `${splitGap}%` }}
+            style={{ marginLeft: "var(--split-gap, 15%)" }}
           />
         </>
       ) : (

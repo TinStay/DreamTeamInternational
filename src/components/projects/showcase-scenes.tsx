@@ -142,7 +142,7 @@ function BoleronVisual({ t, framesEnabled }: SceneVisualProps) {
       />
       <ParallaxLayer t={t} depth={-0.1} className="pointer-events-none">
         <motion.div
-          className="absolute left-auto right-[-8vw] top-[max(10.5rem,18vh)] aspect-[1206/1054] h-[26vh] [mask-image:linear-gradient(180deg,#000_0%,#000_72%,transparent_97%)] sm:top-[max(15rem,24vh)] sm:h-[36vh] lg:right-auto lg:left-[72%] lg:top-auto lg:bottom-[3vh] lg:h-[min(76vh,880px)] lg:-translate-x-1/2"
+          className="absolute left-1/2 top-[39vh] aspect-[1206/1054] h-[34vh] -translate-x-1/2 -translate-y-1/2 [mask-image:linear-gradient(180deg,#000_0%,#000_72%,transparent_97%)] sm:top-[42vh] sm:h-[40vh] lg:left-[72%] lg:top-auto lg:bottom-[3vh] lg:h-[min(76vh,880px)] lg:translate-y-0"
           style={{ y: roniSink }}
         >
           <FrameSequence
@@ -189,7 +189,7 @@ function EmblemaVisual({ t, framesEnabled }: SceneVisualProps) {
       </ParallaxLayer>
       {/* Buildings sequence - oversized so the split towers sit well out to the sides of the centred copy. */}
       <ParallaxLayer t={t} depth={0.12} className="pointer-events-none">
-        <div className="absolute left-1/2 top-[max(7rem,14vh)] aspect-[1284/716] w-[min(80vw,84vh)] -translate-x-1/2 sm:w-[min(80vw,90vh)] lg:top-auto lg:bottom-[12vh] lg:w-[min(80vw,140vh,1720px)]">
+        <div className="absolute left-1/2 top-[max(6.5rem,12vh)] aspect-[1284/716] w-[min(94vw,84vh)] -translate-x-1/2 sm:w-[min(84vw,90vh)] lg:top-auto lg:bottom-[12vh] lg:w-[min(80vw,140vh,1720px)]">
           <div className="animate-showcase-breathe absolute inset-0 origin-bottom">
             <div className="absolute left-[6%] top-[58%] h-[90%] w-[60%] -translate-x-1/2 -translate-y-1/2 rounded-full" style={{ background: goldGlow }} />
             <div className="absolute left-[89%] top-[58%] h-[90%] w-[60%] -translate-x-1/2 -translate-y-1/2 rounded-full" style={{ background: goldGlow }} />
@@ -209,15 +209,15 @@ function EmblemaVisual({ t, framesEnabled }: SceneVisualProps) {
               height={537}
               enabled={framesEnabled}
               split
-              splitGap={18}
-              className="absolute inset-0 drop-shadow-[0_12px_22px_rgba(30,27,23,0.18)]"
+              className="absolute inset-0 drop-shadow-[0_12px_22px_rgba(30,27,23,0.18)] [--split-gap:5%] lg:[--split-gap:18%]"
             />
             {buildings.map((building, i) => (
               <motion.div
                 key={building.name}
                 className={cn(
                   "absolute top-[94%] flex -translate-x-1/2 flex-col items-center gap-1.5 text-center",
-                  i === 0 ? "left-[5%]" : "left-[91%]"
+                  // Under each tower: the halves sit close on phones, well apart on desktop.
+                  i === 0 ? "left-[24%] lg:left-[5%]" : "left-[76%] lg:left-[91%]"
                 )}
                 style={{ opacity: labelK, y: labelY }}
               >
@@ -329,7 +329,7 @@ function MindguardVisual({ t, project, shouldMount }: SceneVisualProps) {
       {/* Right column (60%): the Mindguard mark above the tablet frame, both pinned bottom-right on desktop. */}
       <ParallaxLayer t={t} depth={-0.12} rotate={-2} className="pointer-events-none">
         <motion.div
-          className="absolute left-1/2 bottom-[6.5rem] flex w-[min(72vw,calc((100svh-36rem)*1.5))] -translate-x-1/2 flex-col items-center gap-4 sm:w-[min(62vw,calc((100svh-38rem)*1.5))] lg:left-auto lg:right-[max(3vw,6rem)] lg:bottom-[6vh] lg:w-[52vw] lg:translate-x-0 lg:items-end lg:gap-[2vw] 2xl:w-[54vw]"
+          className="absolute left-1/2 bottom-[9.5rem] flex w-[min(72vw,calc((100svh-36rem)*1.5))] -translate-x-1/2 flex-col items-center gap-4 sm:bottom-[8rem] sm:w-[min(62vw,calc((100svh-38rem)*1.5))] lg:left-auto lg:right-[max(3vw,6rem)] lg:bottom-[6vh] lg:w-[52vw] lg:translate-x-0 lg:items-end lg:gap-[2vw] 2xl:w-[54vw]"
           style={{ opacity: tabletK, y: tabletY, scale: tabletScale }}
         >
           <motion.div
@@ -456,7 +456,7 @@ function OsmoVisual({ t, project, shouldMount }: SceneVisualProps) {
       {/* The copy circle: layered radial highlight, a fine dot pattern, a concentric hairline and a deep soft shadow. */}
       <ParallaxLayer t={t} depth={0.2} scale={0.04} className="pointer-events-none">
         <div
-          className="absolute left-1/2 top-[38vh] aspect-square w-[124vw] -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-full sm:top-[32vh] sm:w-[min(124vw,84vh)] lg:left-[75vw] lg:top-[56vh] lg:w-[min(46vw,88vh)]"
+          className="absolute left-1/2 top-[38vh] aspect-square w-[116vw] -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-full sm:top-[32vh] sm:w-[min(116vw,84vh)] lg:left-[75vw] lg:top-[56vh] lg:w-[min(46vw,88vh)]"
           style={{
             background: `radial-gradient(120% 120% at 28% 22%, ${OSMO.light} 0%, ${OSMO.green} 46%, ${OSMO.deep} 100%)`,
             boxShadow: "0 50px 120px rgba(22,111,54,.38), inset 0 -30px 80px rgba(0,0,0,.18), inset 0 20px 60px rgba(255,255,255,.14)",
@@ -469,8 +469,8 @@ function OsmoVisual({ t, project, shouldMount }: SceneVisualProps) {
       </ParallaxLayer>
       {/* Wordmark below lg: centred on top of the green disc (white-ink file). */}
       <ParallaxLayer t={t} depth={0.35} className="pointer-events-none lg:hidden">
-        <Reveal t={t} delay={0.02} className="absolute left-1/2 top-[max(7.5rem,12vh)] -translate-x-1/2 sm:left-8 sm:top-[max(8rem,12vh)] sm:translate-x-0">
-          <Image src={OSMO_MARK_WHITE} alt="OSMO" width={2400} height={1340} sizes="40vw" className="h-16 w-auto sm:h-20" />
+        <Reveal t={t} delay={0.02} className="absolute left-1/2 top-[max(7rem,11vh)] -translate-x-1/2 sm:left-8 sm:top-[max(8rem,12vh)] sm:translate-x-0">
+          <Image src={OSMO_MARK_WHITE} alt="OSMO" width={2400} height={1340} sizes="50vw" className="h-20 w-auto sm:h-24" />
         </Reveal>
       </ParallaxLayer>
     </>

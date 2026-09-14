@@ -12,7 +12,7 @@ import { FaqSection } from "@/components/faq-section";
 import { Footer } from "@/components/footer";
 import { GradientBlurPageBg } from "@/components/ui/gradient-blur-bg";
 import { JourneyScene, ScrollJourney } from "@/components/ui/scroll-journey";
-import { atomsBackdrop, blobLeftBackdrop, blobRightBackdrop, journeyMorph, linesBackdrop, wavesBackdrop } from "@/components/ui/journey-backdrops";
+import { atomsBackdrop, blobRightBackdrop, journeyMorph, linesBackdrop, servicesBackdrop, wavesBackdrop } from "@/components/ui/journey-backdrops";
 import { OSMO_HANDOFF_VH } from "@/components/projects/showcase-timeline";
 import { MAIN_WITH_FIXED_PAGE_BG_CLASS } from "@/lib/page-shell";
 
@@ -36,7 +36,7 @@ export function HomePage() {
             <HeroSection />
           </JourneyScene>
           {/* Extra bottom room so the wizard never starts leaving while someone is still on a short step. */}
-          <JourneyScene className="pb-[45svh]" backdrop={blobLeftBackdrop}>
+          <JourneyScene className="pb-[45svh]" backdrop={servicesBackdrop}>
             <QuoteFormSection />
           </JourneyScene>
         </ScrollJourney>
