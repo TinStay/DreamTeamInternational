@@ -10,7 +10,7 @@ import { cn } from "@/lib/utils";
  * The number lives inside the PNG, so the dictionary `value` becomes its alt
  * text — the figure stays in the DOM for screen readers and crawlers.
  */
-const STAT_IMAGE_BY_ID: Record<string, string> = {
+export const STAT_IMAGE_BY_ID: Record<string, string> = {
   views: "/statistic_images/views_number.png",
   clients: "/statistic_images/clients_number.png",
   projects: "/statistic_images/projects_number.png",

@@ -6,8 +6,20 @@ export const SERVICE_ICONS = {
   automation: "/services/icons/ai_automation.png",
 } as const;
 
-/** Card accent colors, matched to `services.items` order in i18n files. */
-export const SERVICE_CARD_VARIANTS = ["red", "orange", "gray", "blue"] as const;
+export type ServiceKey = keyof typeof SERVICE_ICONS;
+
+/** Reverse lookup: icon path -> service key (the quote wizard's `service`). */
+export const SERVICE_KEY_BY_ICON: Record<string, ServiceKey> = Object.fromEntries(
+  (Object.entries(SERVICE_ICONS) as [ServiceKey, string][]).map(([key, icon]) => [icon, key])
+);
+
+/** Service key for a card, looked up by its icon path (the stable identifier). */
+export function getServiceKey(iconSrc: string): ServiceKey | undefined {
+  return SERVICE_KEY_BY_ICON[iconSrc];
+}
+
+/** Card surfaces (warm tints: video blue · mascot amber · images coral · automation green), in `services.items` order. */
+export const SERVICE_CARD_VARIANTS = ["blue", "amber", "coral", "green"] as const;
 
 export type ServiceCardVariant = (typeof SERVICE_CARD_VARIANTS)[number];
 

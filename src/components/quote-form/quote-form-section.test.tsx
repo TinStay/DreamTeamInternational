@@ -23,12 +23,18 @@ function nextButton() {
   return screen.getByRole("button", { name: "Напред" });
 }
 
+/** The wizard opens on the service cards - pick "AI video" (first card) via its quote pill. */
+async function pickVideo(user: ReturnType<typeof userEvent.setup>) {
+  await user.click(screen.getAllByRole("button", { name: "Поискай оферта" })[0]!);
+}
+
 async function pickRadio(user: ReturnType<typeof userEvent.setup>, name: RegExp | string) {
   await user.click(screen.getByRole("radio", { name }));
 }
 
 /** Walk the wizard to the contact step with a minimal valid selection. */
 async function walkToContact(user: ReturnType<typeof userEvent.setup>) {
+  await pickVideo(user);
   await pickRadio(user, /Не, искам вие да го напишете/);
   await user.click(nextButton());
   await pickRadio(user, /Да увеличи продажбите/);
@@ -49,10 +55,12 @@ afterEach(() => {
 });
 
 describe("QuoteFormSection wizard", () => {
-  it("starts on the script step with Next disabled until a choice is made", async () => {
+  it("starts on the service cards; the AI video pill opens the script step with Next disabled", async () => {
     const user = userEvent.setup();
     renderForm();
 
+    expect(screen.getAllByRole("button", { name: "Поискай оферта" })).toHaveLength(4);
+    await pickVideo(user);
     expect(screen.getByText("Имате ли готов сюжет?")).toBeTruthy();
     expect(nextButton()).toHaveProperty("disabled", true);
 
@@ -64,6 +72,7 @@ describe("QuoteFormSection wizard", () => {
     const user = userEvent.setup();
     renderForm();
 
+    await pickVideo(user);
     await pickRadio(user, /Не, искам вие да го напишете/);
     await user.click(nextButton());
     expect(screen.getByText("Каква е основната цел на видеото?")).toBeTruthy();
@@ -87,6 +96,7 @@ describe("QuoteFormSection wizard", () => {
     const user = userEvent.setup();
     renderForm();
 
+    await pickVideo(user);
     await pickRadio(user, /Не, искам вие да го напишете/);
     await user.click(nextButton());
     await pickRadio(user, /Да увеличи продажбите/);
@@ -130,6 +140,7 @@ describe("QuoteFormSection wizard", () => {
     const user = userEvent.setup();
     renderForm();
 
+    await pickVideo(user);
     await pickRadio(user, /Не, искам вие да го напишете/);
     await user.click(nextButton());
     await user.click(screen.getByRole("button", { name: "Назад" }));
@@ -138,12 +149,39 @@ describe("QuoteFormSection wizard", () => {
     expect(
       screen.getByRole("radio", { name: /Не, искам вие да го напишете/ })
     ).toHaveProperty("ariaChecked", "true");
+
+    // Back from the first flow step returns to the service cards.
+    await user.click(screen.getByRole("button", { name: "Изберете друга услуга" }));
+    expect(screen.getAllByRole("button", { name: "Поискай оферта" })).toHaveLength(4);
+  });
+
+  it("opens the AI images flow from its card and gates the specs step", async () => {
+    const user = userEvent.setup();
+    renderForm();
+
+    // Cards follow services.items order: video, mascot, images, automation.
+    await user.click(screen.getAllByRole("button", { name: "Поискай оферта" })[2]!);
+    expect(screen.getByText("Какви изображения ви трябват?")).toBeTruthy();
+    expect(nextButton()).toHaveProperty("disabled", true);
+
+    await pickRadio(user, "1-5");
+    await pickRadio(user, "4K");
+    expect(nextButton()).toHaveProperty("disabled", true);
+    await user.click(screen.getByRole("checkbox", { name: /9:16/ }));
+    expect(nextButton()).toHaveProperty("disabled", false);
+
+    await user.click(nextButton());
+    expect(screen.getByText("Опишете изображенията")).toBeTruthy();
+    expect(nextButton()).toHaveProperty("disabled", true);
+    await user.type(screen.getByLabelText(/Какво трябва да показват/), "Три продукта на бял фон");
+    expect(nextButton()).toHaveProperty("disabled", false);
   });
 
   it("clears pasted script text when switching to \"no script\"", async () => {
     const user = userEvent.setup();
     renderForm();
 
+    await pickVideo(user);
     await pickRadio(user, /Да, имам готов сюжет/);
     await user.type(screen.getByLabelText(/Опишете идеята или сюжета/), "стар текст");
     await pickRadio(user, /Не, искам вие да го напишете/);
@@ -185,6 +223,7 @@ describe("QuoteFormSection wizard", () => {
     const body = init?.body as FormData;
     const payload = JSON.parse(String(body.get("payload")));
     expect(payload).toMatchObject({
+      service: "video",
       script: "none",
       goal: "sales",
       formats: ["vertical"],

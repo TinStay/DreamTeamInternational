@@ -3,3 +3,9 @@ export const PHONE_PRIMARY = {
   href: "tel:+359878757930",
   label: "+359 87 875 7930",
 } as const;
+
+/** Public email (header copy button). Stays on the old domain - Resend-verified sender/recipient. */
+export const EMAIL_PRIMARY = {
+  href: "mailto:info@dreamteam.technology",
+  label: "info@dreamteam.technology",
+} as const;

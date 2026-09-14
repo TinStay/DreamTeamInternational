@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { motion, type Variants } from "motion/react";
+import { JourneyItem, type JourneySide } from "@/components/ui/scroll-journey";
 import { cn } from "@/lib/utils";
 
 export type StatsSectionItem = {
@@ -30,16 +31,6 @@ const fadeUp: Variants = {
   },
 };
 
-const statItem: Variants = {
-  hidden: { opacity: 0, y: 36, scale: 0.94 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    scale: 1,
-    transition: { duration: 0.65, ease },
-  },
-};
-
 const statImage: Variants = {
   hidden: { opacity: 0, scale: 0.78, y: 24, rotate: -2.5 },
   visible: {
@@ -55,11 +46,14 @@ const statValueClassName =
   "bg-linear-to-r from-zinc-950 to-zinc-600 bg-clip-text text-6xl font-bold text-transparent sm:text-7xl md:text-8xl dark:from-white dark:to-zinc-800";
 
 const viewport = { once: true, margin: "-80px 0px -60px 0px" } as const;
+const STAT_SIDES: JourneySide[] = ["left", "bottom", "right"];
 
 export function StatsSection({ title1, title2, subline, items, className }: StatsSectionProps) {
   return (
     <section className={cn("py-12 md:py-20", className)}>
       <div className="mx-auto max-w-7xl space-y-8 px-4 md:space-y-12">
+        {/* Journey parts (home): the heading block arrives first, then the three stats from the left / below / right. */}
+        <JourneyItem kind="title">
         <motion.div
           className="relative z-10 mx-auto max-w-2xl space-y-3 text-center"
           initial="hidden"
@@ -72,7 +66,7 @@ export function StatsSection({ title1, title2, subline, items, className }: Stat
         >
           <motion.h2
             variants={fadeUp}
-            className="font-heading text-4xl font-bold text-foreground md:text-5xl"
+            className="font-heading text-[2.75rem] leading-[1.06] font-extrabold sm:text-5xl md:text-6xl text-foreground"
           >
             <span className="text-section-accent">{title1}</span> {title2}
           </motion.h2>
@@ -80,6 +74,7 @@ export function StatsSection({ title1, title2, subline, items, className }: Stat
             {subline}
           </motion.p>
         </motion.div>
+        </JourneyItem>
 
         <motion.div
           className="grid divide-y divide-border *:text-center md:grid-cols-3 md:gap-2 md:divide-x md:divide-y-0"
@@ -91,10 +86,11 @@ export function StatsSection({ title1, title2, subline, items, className }: Stat
             visible: { transition: { staggerChildren: 0.14, delayChildren: 0.08 } },
           }}
         >
-          {items.map((item) => (
-            <motion.div
+          {items.map((item, index) => (
+            <JourneyItem
               key={item.label}
-              variants={statItem}
+              index={index}
+              from={STAT_SIDES[index % STAT_SIDES.length]}
               className="space-y-0 py-12 md:py-0"
             >
               {item.imgSrc ? (
@@ -116,7 +112,7 @@ export function StatsSection({ title1, title2, subline, items, className }: Stat
                 <div className={statValueClassName}>{item.value}</div>
               )}
               <p className="-mt-3 text-xl font-medium text-muted-foreground md:-mt-4 md:text-2xl">{item.label}</p>
-            </motion.div>
+            </JourneyItem>
           ))}
         </motion.div>
       </div>

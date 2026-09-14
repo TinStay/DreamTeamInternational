@@ -54,7 +54,7 @@ export function PartnerLogo({
       width={400}
       height={140}
       sizes={sizes}
-      className={imgClass}
+      className={cn(imgClass, p.invertOnLight && "invert dark:invert-0")}
     />
   );
 }

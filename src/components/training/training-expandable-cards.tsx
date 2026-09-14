@@ -7,7 +7,11 @@ import { motion } from "motion/react";
 import { useLanguage } from "@/lib/i18n/language-context";
 import { cn } from "@/lib/utils";
 import { primaryGradientInteractiveClassName } from "@/components/ui/button";
+import { JourneyItem, type JourneySide } from "@/components/ui/scroll-journey";
 import type { TrainingExpandableCard } from "./use-training-cards";
+
+/** Home journey: where each card arrives from. */
+const CARD_SIDES: JourneySide[] = ["left", "right", "bottom"];
 
 type TrainingExpandableCardsProps = {
   cards: TrainingExpandableCard[];
@@ -61,7 +65,7 @@ export function TrainingExpandableCards({ cards, className }: TrainingExpandable
         },
       }}
     >
-      {cards.map((card) => (
+      {cards.map((card, index) => (
         <motion.li
           key={card.id}
           className="list-none"
@@ -75,6 +79,8 @@ export function TrainingExpandableCards({ cards, className }: TrainingExpandable
             },
           }}
         >
+          {/* Journey part (home): cards arrive from the left / right (/ below) in turn. */}
+          <JourneyItem index={index} from={CARD_SIDES[index % CARD_SIDES.length]} className="h-full">
           <Link href={`/${language}/training/${card.id}`} className="block h-full">
             <motion.div
               role="link"
@@ -138,6 +144,7 @@ export function TrainingExpandableCards({ cards, className }: TrainingExpandable
               </motion.div>
             </motion.div>
           </Link>
+          </JourneyItem>
         </motion.li>
       ))}
     </motion.ul>

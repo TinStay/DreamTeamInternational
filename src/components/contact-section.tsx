@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 import Image from "next/image";
 import { motion } from "motion/react";
 import { ContactInquiryForm } from "@/components/contact-inquiry-form";
+import { JourneyItem } from "@/components/ui/scroll-journey";
 import { SOCIAL_LINKS } from "@/lib/social-links";
 import { GradientMailIcon, GradientMapPinIcon, GradientPhoneIcon } from "@/components/ui/gradient-icons";
 
@@ -114,18 +115,21 @@ export function ContactSection({ className }: { className?: string }) {
       )}
     >
       <div className="relative z-10 mx-auto max-w-7xl px-4">
-        <div className="mb-10 text-center lg:mb-12">
-          <h2 className="mb-6 font-heading text-4xl font-bold text-foreground md:text-5xl">
+        {/* Journey parts (home): heading first, then the form from the left and the details from the right. */}
+        <JourneyItem kind="title" className="mb-10 text-center lg:mb-12">
+          <h2 className="mb-6 font-heading text-[2.75rem] leading-[1.06] font-extrabold sm:text-5xl md:text-6xl text-foreground">
             {t.contact.title1}{" "}
             <span className="text-section-accent">{t.contact.title2}</span>
           </h2>
           <p className="mx-auto max-w-2xl text-lg text-muted-foreground">{t.contact.subtitle}</p>
-        </div>
+        </JourneyItem>
 
         <div className="grid items-start gap-12 lg:grid-cols-[minmax(0,60%)_minmax(0,40%)] lg:gap-16">
-          <ContactInquiryForm variant="card" />
+          <JourneyItem index={0} from="left">
+            <ContactInquiryForm variant="card" />
+          </JourneyItem>
 
-          <div>
+          <JourneyItem index={1} from="right">
             <div className="mb-10 space-y-6">
               <MotionLink
                 href="mailto:info@dreamteam.technology"
@@ -219,7 +223,7 @@ export function ContactSection({ className }: { className?: string }) {
                 </MotionLink>
               ))}
             </div>
-          </div>
+          </JourneyItem>
         </div>
       </div>
     </section>

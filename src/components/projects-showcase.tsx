@@ -1,7 +1,7 @@
 "use client";
 
-import { useCallback, useRef, useState } from "react";
-import Link from "next/link";
+import { useCallback, useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import {
   motion,
   useInView,
@@ -12,7 +12,7 @@ import {
   useTransform,
   type MotionValue,
 } from "motion/react";
-import { IconArrowDown, IconCircleArrowRightFilled } from "@tabler/icons-react";
+import { IconArrowDown } from "@tabler/icons-react";
 import { ProjectCard, ProjectTagChips } from "@/components/projects-section";
 import {
   clamp,
@@ -24,10 +24,19 @@ import {
   ParallaxLayer,
 } from "@/components/projects/showcase-primitives";
 import { sceneVisualFor, type MorphTarget } from "@/components/projects/showcase-scenes";
-import { primaryGradientInteractiveClassName } from "@/components/ui/button";
+import {
+  OSMO_COPY_FADE,
+  OSMO_OUTRO_START,
+  SHOWCASE_HOLD,
+  SHOWCASE_INTRO,
+  SHOWCASE_SPAN,
+  SHOWCASE_UNITS,
+} from "@/components/projects/showcase-timeline";
+import { ButtonWithIcon } from "@/components/ui/button-with-icon";
 import { useLanguage } from "@/lib/i18n/language-context";
+import { PARTNERS, PARTNER_ICON_BASE } from "@/lib/partners";
 import { SHOWCASE_PROJECTS, type Project } from "@/lib/projects";
-import { projectPath, projectsPath } from "@/lib/routes";
+import { projectPath } from "@/lib/routes";
 import { cn } from "@/lib/utils";
 
 /*
@@ -35,22 +44,25 @@ import { cn } from "@/lib/utils";
  *
  *   [ INTRO ][ SPAN ][ SPAN ] … [ SPAN ][ OUTRO ]
  *
- * INTRO: the cinema headline scales/blurs away, then the curtains (page
- * colour) open on the first project. Each project then owns one SPAN: the
- * first HOLD share it sits framed (with a slow 4% push-in), the rest it hands
- * over to the next project with one of the TRANSITIONS. OUTRO keeps the last
- * project framed a moment before the page scrolls on. Kept short (≈0.9
- * viewport per project) so a couple of wheel ticks advance a scene; the
- * spring below is stiff enough that the frame sequences track the wheel
- * without visible lag.
+ * INTRO: the cinema headline scales/blurs away, then the first project is
+ * revealed through a curtain-style clip (the page background stays visible
+ * around it). Each project then owns one SPAN: the first HOLD share it sits
+ * framed (with a slow 4% push-in), the rest it hands over to the next project
+ * with one of the TRANSITIONS. The timeline ends with the last project still
+ * framed (only its hold), so the sticky stage simply scrolls away into the
+ * next section - no empty tail. Kept short (≈0.9 viewport per project) so a
+ * couple of wheel ticks advance a scene; the spring below is stiff enough
+ * that the frame sequences track the wheel without visible lag.
  */
 const PROJECTS = SHOWCASE_PROJECTS;
 const COUNT = PROJECTS.length;
-const INTRO = 0.7;
-const SPAN = 0.9;
-const OUTRO = 0.3;
-const UNITS = INTRO + COUNT * SPAN + OUTRO;
-const HOLD = 0.5;
+const INTRO = SHOWCASE_INTRO;
+const SPAN = SHOWCASE_SPAN;
+const HOLD = SHOWCASE_HOLD;
+const UNITS = SHOWCASE_UNITS;
+/** Curtain reveal of the first scene, in timeline units. */
+const CURTAIN_START = 0.35;
+const CURTAIN_END = INTRO;
 /** Hand-over i → i+1 cycles through these (`flow` = diagonal light-wipe). */
 const TRANSITIONS = ["flow", "push", "pushX", "zoomOut"] as const;
 type Transition = (typeof TRANSITIONS)[number];
@@ -88,7 +100,9 @@ const HIDDEN_FRAME: SceneFrame = {
 function sceneFrame(t: number, index: number): SceneFrame {
   // The first scene is revealed by the curtains - always solid until it leaves.
   const beforeFirst = index === 0 && t <= 0;
-  if (!beforeFirst && (t <= -1 || t >= 1)) return HIDDEN_FRAME;
+  // The last scene has nothing to hand over to: it stays framed while the stage scrolls away.
+  const last = index === COUNT - 1 && t >= 0;
+  if (!beforeFirst && !last && (t <= -1 || t >= 1)) return HIDDEN_FRAME;
 
   const frame: SceneFrame = {
     opacity: 1,
@@ -98,7 +112,15 @@ function sceneFrame(t: number, index: number): SceneFrame {
     zIndex: 10 - index,
     visibility: "visible",
   };
-  if (beforeFirst) return frame;
+  if (beforeFirst) {
+    // Curtains: the scene opens from a horizontal slit at mid-height (page background around it).
+    const u = t * SPAN + INTRO;
+    const open = easeOut(clamp01((u - CURTAIN_START) / (CURTAIN_END - CURTAIN_START)));
+    const inset = 50 * (1 - open);
+    frame.clipPath = open >= 1 ? "none" : `inset(${inset}% 0 ${inset}% 0)`;
+    frame.visibility = open <= 0.001 ? "hidden" : "visible";
+    return frame;
+  }
 
   const out = t >= 0;
   const type = out
@@ -111,7 +133,14 @@ function sceneFrame(t: number, index: number): SceneFrame {
   const k = type ? easeInOut(clamp01((local - hold) / (1 - hold))) : 0;
   const holdScale = out ? 1 + 0.04 * Math.min(t / HOLD, 1) : 1;
   if (out) frame.transform = `scale(${holdScale})`;
-  if (!type) return frame;
+  if (!type) {
+    // Last scene: fade away at the very end so the page background shows through the transparent stage.
+    if (last) {
+      frame.opacity = 1 - easeInOut(clamp01((t - 0.45) / 0.05));
+      if (frame.opacity <= 0.001) frame.visibility = "hidden";
+    }
+    return frame;
+  }
 
   switch (type) {
     case "flow": {
@@ -136,23 +165,30 @@ function sceneFrame(t: number, index: number): SceneFrame {
       frame.zIndex = out ? 11 : 12;
       break;
     case "pushX":
+      // Outgoing keeps scale ≥ 1 so no gap opens between the two while they slide.
       frame.transform = out
-        ? `translate3d(${-100 * k}%, 0, 0) scale(${holdScale - 0.08 * k})`
+        ? `translate3d(${-100 * k}%, 0, 0) scale(${holdScale})`
         : `translate3d(${100 * (1 - k)}%, 0, 0)`;
       if (out) frame.opacity = 1 - 0.3 * k;
       frame.zIndex = out ? 11 : 12;
       break;
     case "zoomOut":
+      // The incoming scene fades in fast on top; the outgoing one only fades
+      // once it is covered, so the page background never shows through.
       if (out) {
-        frame.transform = `scale(${holdScale - 0.3 * k})`;
-        frame.opacity = 1 - k;
+        // Shrink only once the incoming scene covers, so the page never shows around the edges.
+        const covered = clamp01((k - 0.35) / 0.65);
+        frame.transform = `scale(${holdScale - 0.3 * covered})`;
+        frame.opacity = 1 - covered;
       } else {
         frame.transform = `scale(${1 + 0.3 * (1 - k)})`;
-        frame.opacity = k;
+        frame.opacity = clamp01(k / 0.4);
         frame.zIndex = 15;
       }
       break;
   }
+  // A fully transparent scene must not sit in the hit-testing / tab order.
+  if (frame.opacity <= 0.001) frame.visibility = "hidden";
   return frame;
 }
 
@@ -162,12 +198,15 @@ function sceneFrame(t: number, index: number): SceneFrame {
 
 const TONE = {
   dark: {
+    /** Dark-ink logos get a white pill on dark worlds. */
+    markPill: "rounded-full bg-white px-4 py-2 shadow-[0_10px_30px_rgba(0,0,0,0.35)]",
     eyebrow: "text-white/70",
     headline: "text-white [text-shadow:0_2px_24px_rgba(0,0,0,0.45)]",
     highlight: "text-white/85",
     cta: "bg-white text-neutral-900 shadow-[0_12px_32px_rgba(255,255,255,0.2)] hover:bg-white/90 hover:shadow-[0_16px_40px_rgba(255,255,255,0.3)]",
   },
   light: {
+    markPill: "",
     eyebrow: "text-neutral-600",
     headline: "text-neutral-900",
     highlight: "text-neutral-700",
@@ -177,27 +216,170 @@ const TONE = {
 
 /**
  * Where the copy block sits per `SceneVisual.layout`. Bottom padding below lg
- * clears the mobile dock; `top-left` keeps clear of the floating header pill;
- * `center` sits a touch below the middle to leave the top for a wordmark.
+ * clears the mobile dock; the top variants keep clear of the floating header
+ * pill; `center` sits a touch below the middle; `left-column` fills the left
+ * half and hugs the frame on the right (right-aligned from lg); `top-center`
+ * sits between the two frames of a top row (below the wide frame on mobile).
  */
 const TEXT_LAYOUT = {
-  "bottom-left":
-    "left-5 right-10 bottom-28 sm:left-8 sm:right-14 lg:bottom-12 lg:left-12 lg:right-auto lg:max-w-[46vw]",
-  center:
-    "inset-x-5 top-[54%] -translate-y-1/2 items-center text-center sm:inset-x-8 lg:inset-x-0 lg:mx-auto lg:max-w-[64ch]",
-  "top-left":
-    "left-5 right-10 top-[max(7.5rem,18vh)] sm:left-8 sm:right-14 lg:left-12 lg:right-auto lg:top-[max(9.5rem,24vh)] lg:max-w-[40vw]",
+  "bottom-left": {
+    block: "left-5 right-10 bottom-28 sm:left-8 sm:right-14 lg:bottom-12 lg:left-12 lg:right-auto lg:max-w-[46vw]",
+    row: "",
+    chips: "",
+  },
+  center: {
+    block: "inset-x-5 top-[54%] -translate-y-1/2 items-center text-center sm:inset-x-8 lg:inset-x-0 lg:mx-auto lg:max-w-[70ch]",
+    row: "flex justify-center",
+    chips: "justify-center",
+  },
+  "center-bottom": {
+    block:
+      "inset-x-5 bottom-28 mx-auto max-w-[min(88vw,32rem)] items-center text-center sm:inset-x-8 lg:inset-x-0 lg:bottom-[9vh] lg:max-w-[min(70ch,48vw)] 2xl:top-1/2 2xl:bottom-auto 2xl:-translate-y-1/2",
+    row: "flex justify-center",
+    chips: "justify-center",
+  },
+  boleron: {
+    // 20vw left margin; the bottom margin grows toward 20vh on tall viewports but stays clear of the lockup on short ones.
+    block:
+      "left-[8vw] right-[8vw] bottom-28 lg:left-[max(2rem,4vw)] lg:right-auto lg:bottom-[8vh] lg:w-[min(50vw,calc(60vw-12rem))]",
+    row: "",
+    chips: "",
+  },
+  "top-left": {
+    block: "left-5 right-10 top-[max(9rem,18vh)] sm:left-8 sm:right-14 lg:left-12 lg:right-auto lg:top-[max(9.5rem,15vh)] lg:max-w-[min(30vw,40ch)]",
+    row: "",
+    chips: "",
+  },
+  "top-left-wide": {
+    block:
+      "left-5 right-10 top-[max(9rem,18vh)] sm:left-8 sm:right-14 lg:left-12 lg:right-auto lg:top-[52vh] lg:max-w-[28vw] lg:-translate-y-1/2 xl:max-w-[30vw]",
+    row: "",
+    chips: "",
+  },
+  "in-circle": {
+    block:
+      "left-6 right-8 top-[max(12rem,23vh)] items-center text-center sm:left-10 sm:right-14 sm:top-[max(14rem,26vh)] lg:left-auto lg:right-[7vw] lg:top-[56vh] lg:w-[36vw] lg:-translate-y-1/2 lg:gap-4",
+    row: "flex justify-center",
+    chips: "justify-center",
+  },
+  "left-column": {
+    block:
+      "left-5 right-10 top-[max(9rem,18vh)] sm:left-8 sm:right-14 lg:inset-y-0 lg:left-0 lg:right-[60%] lg:top-0 lg:items-center lg:justify-center lg:px-[3vw] lg:text-center",
+    row: "flex justify-start lg:justify-center",
+    chips: "justify-start lg:justify-center",
+  },
+} as const;
+
+/** Type ramp per layout: the left column and wide top-left get the bigger headline. */
+const HEADLINE_SIZE = {
+  "bottom-left": "text-3xl sm:text-4xl lg:text-5xl xl:text-6xl",
+  boleron: "text-3xl sm:text-4xl lg:text-5xl 2xl:text-6xl",
+  center: "text-3xl sm:text-4xl lg:text-4xl xl:text-5xl 2xl:text-6xl",
+  "center-bottom": "text-3xl sm:text-4xl lg:text-4xl xl:text-5xl 2xl:text-6xl",
+  "top-left": "text-3xl sm:text-4xl lg:text-4xl xl:text-5xl",
+  "top-left-wide": "text-3xl sm:text-4xl lg:text-5xl xl:text-5xl 2xl:text-7xl",
+  "left-column": "text-3xl sm:text-4xl lg:text-4xl xl:text-5xl 2xl:text-6xl",
+  "in-circle": "text-3xl sm:text-4xl lg:text-5xl xl:text-6xl 2xl:text-7xl",
+} as const;
+const HIGHLIGHT_SIZE = {
+  "bottom-left": "text-base sm:text-lg lg:text-xl",
+  boleron: "text-base sm:text-lg lg:text-xl",
+  center: "text-base sm:text-lg lg:text-xl",
+  "center-bottom": "text-base sm:text-lg lg:text-xl",
+  "top-left": "text-base sm:text-lg",
+  "top-left-wide": "text-base sm:text-lg lg:text-xl 2xl:text-2xl",
+  "left-column": "text-base sm:text-lg lg:text-xl",
+  "in-circle": "text-base sm:text-lg lg:text-xl xl:text-2xl",
 } as const;
 
 /** The scene root's position on stage for local time `t` (see `sceneFrame`), as motion values. */
-function useSceneFrameStyle(t: MotionValue<number>, index: number, zBoost = 0) {
+function useSceneFrameStyle(t: MotionValue<number>, index: number) {
   const opacity = useTransform(t, (v) => sceneFrame(v, index).opacity);
   const transform = useTransform(t, (v) => sceneFrame(v, index).transform);
   const filter = useTransform(t, (v) => sceneFrame(v, index).filter);
   const clipPath = useTransform(t, (v) => sceneFrame(v, index).clipPath);
-  const zIndex = useTransform(t, (v) => sceneFrame(v, index).zIndex + zBoost);
+  const zIndex = useTransform(t, (v) => sceneFrame(v, index).zIndex);
   const visibility = useTransform(t, (v) => sceneFrame(v, index).visibility);
   return { opacity, transform, filter, clipPath, zIndex, visibility };
+}
+
+/**
+ * Brand mark leading the copy block: the client's logo (white-ink variant on
+ * dark worlds when one exists, otherwise the dark-ink one on a white pill),
+ * falling back to the client name for projects without a partner logo.
+ */
+function BrandMark({
+  project,
+  tone,
+  size = "md",
+  mark = "logo",
+  className,
+}: {
+  project: Project;
+  tone: "dark" | "light";
+  size?: "md" | "lg" | "xl";
+  mark?: "logo" | "logo-large" | "wordmark" | "custom" | "none";
+  className?: string;
+}) {
+  const { t } = useLanguage();
+  const partner = project.partnerId ? PARTNERS.find((candidate) => candidate.id === project.partnerId) : undefined;
+  const name = t.projects.items[project.id].name;
+  if (mark === "none") return null;
+  if (mark === "wordmark") {
+    // Giant, airy uppercase wordmark (light weight, wide tracking); scales with the viewport.
+    return (
+      <p
+        className={cn(
+          "font-heading text-[clamp(2.75rem,8.5vw,8rem)] font-light uppercase leading-[0.95] tracking-[0.06em]",
+          TONE[tone].headline,
+          className
+        )}
+      >
+        {name}
+      </p>
+    );
+  }
+  const file = tone === "dark" ? (partner?.dark ?? partner?.light) : (partner?.light ?? partner?.dark);
+  if (mark === "logo-large" && partner && file) {
+    // Big mark spanning the copy column; a dark-ink-only logo becomes a white silhouette on dark worlds.
+    const silhouette = tone === "dark" && !partner.dark;
+    return (
+      <Image
+        src={`${PARTNER_ICON_BASE}${file}`}
+        alt={partner.ariaLabel}
+        width={800}
+        height={280}
+        sizes="(max-width: 1024px) 70vw, 520px"
+        className={cn("h-auto w-[min(70vw,320px)] object-contain sm:w-[min(60vw,420px)] lg:w-[min(36vw,520px)]", silhouette && "brightness-0 invert", className)}
+      />
+    );
+  }
+  if (!partner || !file) {
+    return <p className={cn("text-xs font-semibold uppercase tracking-[0.2em]", TONE[tone].eyebrow, className)}>{name}</p>;
+  }
+  const needsPill = tone === "dark" && !partner.dark;
+  // A white-ink-only mark on a light world is inverted so it reads.
+  const invert = tone === "light" && !partner.light && partner.invertOnLight;
+  return (
+    <span className={cn("inline-flex items-center", needsPill && TONE.dark.markPill, className)}>
+      <Image
+        src={`${PARTNER_ICON_BASE}${file}`}
+        alt={partner.ariaLabel}
+        width={400}
+        height={140}
+        sizes="200px"
+        className={cn(
+          "w-auto object-contain",
+          size === "xl"
+            ? "h-20 max-w-[380px] sm:h-24 lg:h-36 2xl:h-44 2xl:max-w-[460px]"
+            : size === "lg"
+              ? "h-16 max-w-[320px] sm:h-20 lg:h-20 2xl:h-28"
+              : "h-9 max-w-[200px] sm:h-11 lg:h-12",
+          invert && "invert"
+        )}
+      />
+    </span>
+  );
 }
 
 /**
@@ -212,82 +394,109 @@ function ProjectScene({
   u,
   shouldMount,
   framesEnabled,
+  endFade,
 }: {
   project: Project;
   index: number;
   /** Timeline position in units (see the header comment). */
   u: MotionValue<number>;
-  /** Keep only the neighbours' players alive - several autoplaying iframes is too much. */
+  /** Only the visible scenes + the next one up keep a player mounted. */
   shouldMount: boolean;
   framesEnabled: boolean;
+  /** Unsmoothed end-of-timeline fade (1 → 0 over the last stretch of real scroll), so the stage is transparent before it unpins. */
+  endFade: MotionValue<number>;
 }) {
   const { t: dict, language } = useLanguage();
   const p = dict.projects;
   const copy = p.items[project.id];
-  const { tone, background, layout, Visual } = sceneVisualFor(project);
+  const { tone, background, layout, mark, Mark, Visual } = sceneVisualFor(project);
   const colors = TONE[tone];
 
   const t = useTransform(u, (v) => (v - INTRO) / SPAN - index);
   const frameStyle = useSceneFrameStyle(t, index);
+  const last = index === COUNT - 1;
+  // Parked scenes (not yet arriving / mostly gone) are inert: out of the tab order and the a11y tree. Driven by the
+  // scene's own time so the outgoing scene stays interactive while it is still visually framed.
+  const [parked, setParked] = useState(index !== 0);
+  useMotionValueEvent(t, "change", (v) => {
+    const next = v < -0.1 || v > 0.7;
+    setParked((prev) => (prev === next ? prev : next));
+  });
+  // Last scene: the copy fades out before the outro disc appears (and leaves the tab order), and the whole scene
+  // dissolves with the unsmoothed scroll at the very end.
+  const copyOpacity = useTransform(t, (v) => (last ? 1 - easeInOut(clamp01((v - OSMO_OUTRO_START) / OSMO_COPY_FADE)) : 1));
+  const copyVisibility = useTransform(t, (v) => (last && v >= OSMO_OUTRO_START + OSMO_COPY_FADE - 0.005 ? "hidden" : "visible"));
+  const opacity = useTransform([frameStyle.opacity, endFade], ([o, e]: number[]) => (last ? o * e : o));
+  // Recompute visibility from the frame + the end fade (a fully transparent scene must leave hit-testing / tab order).
+  const visibility = useTransform([t, endFade], ([v, e]: number[]) => {
+    const f = sceneFrame(v, index);
+    return f.visibility === "hidden" || (last && f.opacity * e <= 0.001) ? "hidden" : "visible";
+  });
 
   return (
     <motion.div
-      className="absolute inset-0 overflow-hidden will-change-[transform,opacity]"
-      style={{ ...frameStyle, backgroundColor: background }}
+      className="absolute inset-0 overflow-clip will-change-[transform,opacity]"
+      style={{ ...frameStyle, opacity, visibility, backgroundColor: background }}
+      inert={parked ? true : undefined}
     >
       <Visual project={project} t={t} shouldMount={shouldMount} framesEnabled={framesEnabled} />
 
       {/* Name, headline, highlight, tags, CTA - placed per scene layout. */}
-      <ParallaxLayer t={t} depth={0.7} dx={-0.05} className="pointer-events-none">
-        <div className={cn("absolute flex flex-col gap-4 sm:gap-5", TEXT_LAYOUT[layout])}>
-          <Reveal t={t} delay={0.04}>
-            <p className={cn("text-xs font-semibold uppercase tracking-[0.2em]", colors.eyebrow)}>{copy.name}</p>
-          </Reveal>
+      <ParallaxLayer t={t} depth={0.35} dx={-0.05} className="pointer-events-none">
+        <motion.div
+          className={cn("absolute flex flex-col gap-4 sm:gap-5", TEXT_LAYOUT[layout].block)}
+          style={{ opacity: copyOpacity, visibility: copyVisibility }}
+        >
+          {/* Scenes whose mark is decorative (giant text / mascot) still announce the client. */}
+          {mark === "none" || mark === "custom" ? <p className="sr-only">{copy.name}</p> : null}
+          {mark === "custom" && Mark ? (
+            <Reveal t={t} delay={0.04} className={TEXT_LAYOUT[layout].row}>
+              <Mark />
+            </Reveal>
+          ) : mark !== "none" && mark !== "custom" ? (
+            <Reveal t={t} delay={0.04} className={TEXT_LAYOUT[layout].row}>
+              <BrandMark
+                project={project}
+                tone={tone}
+                mark={mark}
+                size={
+                  layout === "center" || layout === "center-bottom"
+                    ? "xl"
+                    : layout === "left-column" || layout === "top-left-wide"
+                      ? "lg"
+                      : "md"
+                }
+              />
+            </Reveal>
+          ) : null}
           <Reveal t={t} delay={0.1}>
-            <h3
-              className={cn(
-                "font-heading text-3xl font-bold leading-[1.02] text-balance sm:text-4xl lg:text-5xl xl:text-6xl",
-                colors.headline
-              )}
-            >
+            <h3 className={cn("font-heading font-bold leading-[1.02] text-balance", HEADLINE_SIZE[layout], colors.headline)}>
               {copy.headline}
             </h3>
           </Reveal>
-          <Reveal t={t} delay={0.17} className={layout === "center" ? "flex justify-center" : undefined}>
-            <p className={cn("max-w-[38ch] text-base leading-relaxed text-pretty sm:text-lg lg:text-xl", colors.highlight)}>
+          <Reveal t={t} delay={0.17} className={TEXT_LAYOUT[layout].row}>
+            <p className={cn("max-w-[38ch] leading-relaxed text-pretty", HIGHLIGHT_SIZE[layout], colors.highlight)}>
               {copy.highlight}
             </p>
           </Reveal>
-          <Reveal t={t} delay={0.2} className={layout === "center" ? "flex justify-center" : undefined}>
-            <ProjectTagChips
-              project={project}
-              variant="highlights"
-              tone={tone}
-              className={layout === "center" ? "justify-center" : undefined}
-            />
+          <Reveal t={t} delay={0.2} className={TEXT_LAYOUT[layout].row}>
+            <ProjectTagChips project={project} variant="highlights" tone={tone} className={TEXT_LAYOUT[layout].chips} />
           </Reveal>
-          <Reveal t={t} delay={0.26} className="pointer-events-auto">
-            <Link
-              href={projectPath(language, project.id)}
-              className={cn(
-                "inline-flex h-11 cursor-pointer items-center gap-2 rounded-full px-5 text-sm font-semibold transition-[transform,background-color,box-shadow] duration-200 ease-out hover:scale-[1.03] active:scale-[0.98] lg:h-12 lg:px-6 lg:text-base",
-                colors.cta
-              )}
-            >
+          <Reveal t={t} delay={0.26} className={cn("pointer-events-auto", TEXT_LAYOUT[layout].row)}>
+            <ButtonWithIcon href={projectPath(language, project.id)} surface={tone === "dark" ? "light" : "dark"}>
               {p.viewProject}
-              <IconCircleArrowRightFilled className="size-5 shrink-0" aria-hidden />
-            </Link>
+            </ButtonWithIcon>
           </Reveal>
-        </div>
+        </motion.div>
       </ParallaxLayer>
     </motion.div>
   );
 }
 
 /**
- * A scene's `Overlay` (e.g. the Plasico wordmark), drawn *above* the morph
- * shape but moving exactly with its scene - same frame transform, z lifted
- * over the overlay's layer.
+ * A scene's `Overlay` (the giant PLASICO name), drawn *above* the morph shape
+ * but moving exactly with its scene - same frame transform, z lifted over the
+ * morph's layer.
  */
 function SceneOverlay({
   project,
@@ -295,19 +504,31 @@ function SceneOverlay({
   u,
   shouldMount,
   framesEnabled,
+  endFade,
 }: {
   project: Project;
   index: number;
   u: MotionValue<number>;
   shouldMount: boolean;
   framesEnabled: boolean;
+  endFade: MotionValue<number>;
 }) {
   const { Overlay } = sceneVisualFor(project);
   const t = useTransform(u, (v) => (v - INTRO) / SPAN - index);
-  const frameStyle = useSceneFrameStyle(t, index, 10);
+  const frameStyle = useSceneFrameStyle(t, index);
+  const last = index === COUNT - 1;
+  // Always above the morph shape (+30); during the hand-over it fades exactly with the incoming scene's cover so
+  // it is gone the moment the next world is opaque (the incoming scene's local time is t - 1).
+  const zIndex = useTransform(frameStyle.zIndex, (z) => z + 30);
+  const opacity = useTransform([t, endFade], ([v, e]: number[]) => {
+    const own = sceneFrame(v, index).opacity;
+    const incoming = !last && v >= 0 ? sceneFrame(v - 1, index + 1).opacity : 0;
+    return own * (1 - incoming) * (last ? e : 1);
+  });
+  const visibility = useTransform(opacity, (o) => (o <= 0.001 ? "hidden" : "visible"));
   if (!Overlay) return null;
   return (
-    <motion.div className="pointer-events-none absolute inset-0 overflow-hidden" style={frameStyle}>
+    <motion.div className="pointer-events-none absolute inset-0 overflow-clip" style={{ ...frameStyle, zIndex, opacity, visibility }}>
       <Overlay project={project} t={t} shouldMount={shouldMount} framesEnabled={framesEnabled} />
     </motion.div>
   );
@@ -331,7 +552,21 @@ function hexToRgb(hex: string): [number, number, number] {
  * hairline stretches into the Plasico bar and swells into the OSMO circle.
  * Always pill-shaped (radius ≥ half the smaller side), like the reference.
  */
+/** `true` from the lg breakpoint (1024px) - the scenes lay out differently below it. */
+function useIsLg() {
+  const [isLg, setIsLg] = useState(true);
+  useEffect(() => {
+    const mq = window.matchMedia("(min-width: 1024px)");
+    const update = () => setIsLg(mq.matches);
+    update();
+    mq.addEventListener("change", update);
+    return () => mq.removeEventListener("change", update);
+  }, []);
+  return isLg;
+}
+
 function MorphOverlay({ u }: { u: MotionValue<number> }) {
+  const isLg = useIsLg();
   const state = useTransform(u, (v) => {
     const uc = (v - INTRO) / SPAN;
     const i0 = clamp(Math.floor(uc), 0, COUNT - 1);
@@ -345,17 +580,16 @@ function MorphOverlay({ u }: { u: MotionValue<number> }) {
     const rgb = ca.map((c, j) => Math.round(lerp(c, cb[j], k))).join(",");
     // A scene that draws the shape itself keeps the overlay hidden while framed (fast 6% hand-off).
     const ownHide = A.ownsShape ? 1 - clamp01((f - HOLD) / 0.06) : B.ownsShape ? k : 0;
-    const endFade = clamp01(1 - (uc - (COUNT - 1) - 0.35) * 3);
     const px = lerp(A.px ?? 0, B.px ?? 0, k);
     return {
       width: `calc(${lerp(A.w[0], B.w[0], k) * 100}% + ${lerp(A.w[1], B.w[1], k) * 100}svh + ${px}px)`,
       height: `calc(${lerp(A.h[0], B.h[0], k) * 100}% + ${lerp(A.h[1], B.h[1], k) * 100}svh + ${px}px)`,
-      left: `${lerp(A.x, B.x, k) * 100}%`,
-      top: `${lerp(A.y, B.y, k) * 100}%`,
+      left: `${lerp(isLg ? A.x : (A.xMobile ?? A.x), isLg ? B.x : (B.xMobile ?? B.x), k) * 100}%`,
+      top: `${lerp(isLg ? A.y : (A.yMobile ?? A.y), isLg ? B.y : (B.yMobile ?? B.y), k) * 100}%`,
       rotate: k * (1 - k) * 90,
       backgroundColor: `rgba(${rgb},${lerp(A.alpha, B.alpha, k)})`,
       mixBlendMode: (k < 0.5 ? A : B).blend ?? "normal",
-      opacity: clamp01((v - 0.7) * 3) * endFade * (1 - ownHide),
+      opacity: clamp01((v - CURTAIN_START) * 3) * (1 - ownHide),
     };
   });
   const width = useTransform(state, (o) => o.width);
@@ -391,18 +625,19 @@ function RailBar({
 }) {
   const scaleY = useTransform(u, (v) => clamp01((v - INTRO) / SPAN - index + 1));
   return (
-    <button
-      type="button"
-      role="tab"
-      aria-selected={isActive}
-      aria-label={label}
-      onClick={() => onJump(index)}
-      className="group cursor-pointer px-2 py-0.5 transition-transform duration-200 ease-out hover:-translate-x-0.5"
-    >
-      <span className="block h-9 w-0.5 overflow-hidden rounded-full bg-white/25 transition-[background-color] duration-200 group-hover:bg-white/45 sm:h-11">
-        <motion.span className="block h-full w-full origin-top bg-white" style={{ scaleY }} />
-      </span>
-    </button>
+    <li>
+      <button
+        type="button"
+        aria-current={isActive ? "true" : undefined}
+        aria-label={label}
+        onClick={() => onJump(index)}
+        className="group cursor-pointer px-2 py-0.5 transition-transform duration-200 ease-out hover:-translate-x-0.5"
+      >
+        <span className="block h-9 w-0.5 overflow-hidden rounded-full bg-white/30 transition-[background-color] duration-200 group-hover:bg-white/50 sm:h-11">
+          <motion.span className="block h-full w-full origin-top bg-white" style={{ scaleY }} />
+        </span>
+      </button>
+    </li>
   );
 }
 
@@ -428,14 +663,18 @@ function scrollTargetFor(section: HTMLElement, stage: HTMLElement, index: number
  * buttons). Reduced-motion users get the plain card list.
  */
 export function ProjectsShowcase({ className }: { className?: string }) {
-  const { t, language } = useLanguage();
+  const { t } = useLanguage();
   const p = t.projects;
   const reduceMotion = useReducedMotion();
   const sectionRef = useRef<HTMLElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
   const [active, setActive] = useState(0);
-  // Frame sequences (≈8 MB of webp) only start loading once the section is close.
+  /** Scenes that keep a player mounted: the framed one, the previous one while it is still leaving, and the next one from 10% into the hold. */
+  const [mounted, setMounted] = useState<number[]>([0, 1]);
+  // Frame sequences (≈4.4 MB of webp) only start loading once the section is close.
   const framesEnabled = useInView(sectionRef, { once: true, margin: "800px 0px 800px 0px" });
+  // Players only live while the stage itself is on screen - nothing keeps playing under the rest of the page.
+  const stageOnScreen = useInView(sectionRef);
 
   const { scrollYProgress } = useScroll({
     target: sectionRef,
@@ -447,8 +686,18 @@ export function ProjectsShowcase({ className }: { className?: string }) {
   const u = useTransform(smooth, (v) => v * UNITS);
 
   useMotionValueEvent(u, "change", (v) => {
-    const next = clamp(Math.round((v - INTRO) / SPAN), 0, COUNT - 1);
+    const uc = (v - INTRO) / SPAN;
+    const next = clamp(Math.round(uc), 0, COUNT - 1);
     setActive((prev) => (prev === next ? prev : next));
+    setMounted((prev) => {
+      // Enter at the thresholds below; leave only once well past hidden (hysteresis so wheel jitter never remounts a player).
+      const keep = new Set(prev.filter((j) => Math.abs(uc - j) < 1.1));
+      keep.add(next);
+      if (next > 0 && uc < next) keep.add(next - 1); // previous still transitioning out
+      if (next < COUNT - 1 && uc >= next + 0.1) keep.add(next + 1); // next up, mounted early in the hold
+      const set = [...keep].sort((a, b) => a - b);
+      return prev.length === set.length && prev.every((x, i) => x === set[i]) ? prev : set;
+    });
   });
 
   // Intro: headline scales up, blurs and fades; curtains open right after.
@@ -458,14 +707,17 @@ export function ProjectsShowcase({ className }: { className?: string }) {
   const introScale = useTransform(introT, (v) => 1 + v * 0.35);
   const introY = useTransform(introT, (v) => -v * 40);
   const introFilter = useTransform(introGone, (v) => `blur(${v * 10}px)`);
-  const introVisibility = useTransform(introGone, (v) => (v >= 1 ? "hidden" : "visible"));
-  const curtainScale = useTransform(u, (v) => 1 - easeOut(clamp01((v - 0.5) / 0.5)));
-  const curtainVisibility = useTransform(curtainScale, (v) => (v <= 0.001 ? "hidden" : "visible"));
-  // Rail + "view all": in once the first scene is framed, out with the last one.
+  // Rail: in once the first scene is framed (and out of the tab order while invisible).
   const furnitureOpacity = useTransform(u, (v) => {
-    const uc = (v - INTRO) / SPAN;
-    return clamp01((v - 0.8) * 3) * clamp01(1 - (uc - (COUNT - 1) - 0.35) * 3);
+    const tLast = (v - INTRO) / SPAN - (COUNT - 1);
+    return clamp01((v - INTRO + 0.2) * 3) * (1 - easeInOut(clamp01((tLast - OSMO_OUTRO_START) / OSMO_COPY_FADE)));
   });
+  // End-of-timeline dissolve on the RAW scroll progress (no spring lag): fully transparent the instant the stage unpins.
+  const endFade = useTransform(scrollYProgress, (v) => {
+    const tLast = (v * UNITS - INTRO) / SPAN - (COUNT - 1);
+    return 1 - easeInOut(clamp01((tLast - 0.42) / 0.08));
+  });
+  const furnitureVisibility = useTransform(furnitureOpacity, (v) => (v <= 0.001 ? "hidden" : "visible"));
 
   const jumpTo = useCallback((index: number) => {
     const section = sectionRef.current;
@@ -476,16 +728,19 @@ export function ProjectsShowcase({ className }: { className?: string }) {
 
   if (reduceMotion) {
     return (
-      <section id="projects" className={cn("relative w-full py-12 sm:py-16", className)}>
-        <div className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-4">
-          <h2 className="font-heading text-4xl font-bold text-foreground md:text-5xl">
-            {p.title1} <span className="text-section-accent">{p.title2}</span>
-          </h2>
-          {PROJECTS.map((project, index) => (
-            <ProjectCard key={project.id} project={project} index={index} />
-          ))}
-        </div>
-      </section>
+      <section id="projects" ref={sectionRef} className={cn("relative w-full py-12 sm:py-16", className)}>
+          <div className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-4">
+            <div className="text-center">
+              <h2 className="font-heading text-[2.75rem] leading-[1.06] font-extrabold sm:text-5xl md:text-6xl text-foreground">
+                {p.title1} <span className="text-section-accent">{p.title2}</span>
+              </h2>
+              <p className="mx-auto mt-4 max-w-2xl text-lg text-muted-foreground">{p.subtitle}</p>
+            </div>
+            {PROJECTS.map((project, index) => (
+              <ProjectCard key={project.id} project={project} index={index} />
+            ))}
+          </div>
+        </section>
     );
   }
 
@@ -500,7 +755,7 @@ export function ProjectsShowcase({ className }: { className?: string }) {
         style={{ height: `${UNITS * 100}svh` }}
       >
         {/* Transparent stage: the page background shows through the intro and between scenes. */}
-        <div ref={stageRef} className="sticky top-0 h-[100svh] overflow-hidden">
+        <div ref={stageRef} className="sticky top-0 h-[100svh] overflow-clip">
           {/* Intro headline - the section title, cinema style. */}
           <motion.div
             className="pointer-events-none absolute inset-0 z-20 flex flex-col items-center justify-center gap-5 px-6 text-center will-change-[transform,opacity]"
@@ -509,11 +764,10 @@ export function ProjectsShowcase({ className }: { className?: string }) {
               scale: introScale,
               y: introY,
               filter: introFilter,
-              visibility: introVisibility,
             }}
           >
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">{p.showcase.eyebrow}</p>
-            <h2 className="font-heading text-5xl font-bold leading-none tracking-tight text-balance text-foreground md:text-7xl lg:text-8xl">
+            <p className="text-sm font-semibold uppercase tracking-[0.24em] text-muted-foreground md:text-base">{p.showcase.eyebrow}</p>
+            <h2 className="font-heading text-6xl font-bold leading-none tracking-tight text-balance text-foreground md:text-8xl lg:text-9xl">
               {p.showcase.title1} <span className="text-section-accent">{p.showcase.title2}</span>
             </h2>
             <p className="max-w-xl text-lg text-muted-foreground">{p.showcase.subtitle}</p>
@@ -523,18 +777,6 @@ export function ProjectsShowcase({ className }: { className?: string }) {
             </p>
           </motion.div>
 
-          {/* Curtains: two page-coloured halves that open on the first project. */}
-          <motion.div
-            className="absolute inset-x-0 top-0 z-[19] h-1/2 origin-top bg-background will-change-transform"
-            style={{ scaleY: curtainScale, visibility: curtainVisibility }}
-            aria-hidden
-          />
-          <motion.div
-            className="absolute inset-x-0 bottom-0 z-[19] h-1/2 origin-bottom bg-background will-change-transform"
-            style={{ scaleY: curtainScale, visibility: curtainVisibility }}
-            aria-hidden
-          />
-
           {/* Scenes */}
           <div className="absolute inset-0">
             {PROJECTS.map((project, index) => (
@@ -543,8 +785,9 @@ export function ProjectsShowcase({ className }: { className?: string }) {
                 project={project}
                 index={index}
                 u={u}
-                shouldMount={Math.abs(index - active) <= 1}
+                shouldMount={stageOnScreen && mounted.includes(index)}
                 framesEnabled={framesEnabled}
+                endFade={endFade}
               />
             ))}
             <MorphOverlay u={u} />
@@ -555,34 +798,22 @@ export function ProjectsShowcase({ className }: { className?: string }) {
                   project={project}
                   index={index}
                   u={u}
-                  shouldMount={Math.abs(index - active) <= 1}
+                  shouldMount={stageOnScreen && mounted.includes(index)}
                   framesEnabled={framesEnabled}
+                  endFade={endFade}
                 />
               ) : null
             )}
           </div>
 
-          {/* "View all" - top-right, above the scenes (difference-blended so it reads on light worlds too). */}
-          <motion.div
-            className="absolute right-5 top-24 z-30 hidden mix-blend-difference sm:right-8 sm:block lg:right-12 lg:top-28"
-            style={{ opacity: furnitureOpacity }}
+          {/* Progress rail: counter + one bar per project (jump buttons), on its own dark pill so it reads on every world. */}
+          <motion.nav
+            aria-label={p.showcase.railLabel}
+            className="absolute right-1 top-1/2 z-30 flex -translate-y-1/2 flex-col items-end gap-3 px-1 py-3 text-white mix-blend-difference sm:right-2 lg:right-3"
+            style={{ opacity: furnitureOpacity, visibility: furnitureVisibility }}
           >
-            <Link
-              href={projectsPath(language)}
-              className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-white/40 px-4 py-2 text-sm font-semibold text-white transition-[transform,background-color,box-shadow] duration-200 ease-out hover:-translate-y-[1px] hover:bg-white/15"
-            >
-              {p.viewAll}
-              <IconCircleArrowRightFilled className="size-4" aria-hidden />
-            </Link>
-          </motion.div>
-
-          {/* Progress rail: counter + one bar per project (jump buttons). */}
-          <motion.div
-            className="absolute right-1 top-1/2 z-30 flex -translate-y-1/2 flex-col items-end gap-3 mix-blend-difference sm:right-4 lg:right-8"
-            style={{ opacity: furnitureOpacity }}
-          >
-            <p className="pr-2 font-mono text-xs font-semibold tracking-[0.14em] text-white">{counter}</p>
-            <div className="flex flex-col gap-1" role="tablist" aria-label={p.showcase.railLabel}>
+            <p className="hidden pr-2 font-mono text-xs font-semibold tracking-[0.14em] lg:block">{counter}</p>
+            <ul className="flex flex-col gap-1">
               {PROJECTS.map((project, index) => (
                 <RailBar
                   key={project.id}
@@ -593,24 +824,10 @@ export function ProjectsShowcase({ className }: { className?: string }) {
                   onJump={jumpTo}
                 />
               ))}
-            </div>
-          </motion.div>
+            </ul>
+          </motion.nav>
         </div>
       </section>
-
-      {/* Big CTA below the showcase */}
-      <div className="relative z-10 mx-auto flex w-full max-w-7xl justify-center px-4 py-12 sm:py-16">
-        <Link
-          href={projectsPath(language)}
-          className={cn(
-            primaryGradientInteractiveClassName,
-            "inline-flex h-14 cursor-pointer items-center gap-3 rounded-full px-8 text-base font-bold sm:h-16 sm:px-10 sm:text-lg"
-          )}
-        >
-          {p.viewAll}
-          <IconCircleArrowRightFilled className="size-6 shrink-0" aria-hidden />
-        </Link>
-      </div>
     </>
   );
 }

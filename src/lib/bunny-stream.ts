@@ -5,6 +5,12 @@
  */
 export type BunnyVideo = { library: string; id: string };
 
+/** The regular player (controls, no autoplay) for a film frame. */
+export function bunnyPlayerEmbedSrc({ library, id }: BunnyVideo) {
+  const params = new URLSearchParams({ autoplay: "false", preload: "true", responsive: "true" });
+  return `https://iframe.mediadelivery.net/embed/${library}/${id}?${params.toString()}`;
+}
+
 /** Muted, looping, auto-playing background player with the in-player chrome hidden. */
 export function bunnyBackgroundEmbedSrc({ library, id }: BunnyVideo) {
   const params = new URLSearchParams({

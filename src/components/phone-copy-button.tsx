@@ -1,22 +1,32 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { AnimatePresence, motion } from "motion/react";
-import { IconCheck, IconPhoneFilled } from "@tabler/icons-react";
+import { useEffect, useRef, useState, type ComponentType } from "react";
+import { motion } from "motion/react";
+import { IconCheck, IconMailFilled, IconPhoneFilled } from "@tabler/icons-react";
 import { useLanguage } from "@/lib/i18n/language-context";
-import { PHONE_PRIMARY } from "@/lib/contact-info";
+import { EMAIL_PRIMARY, PHONE_PRIMARY } from "@/lib/contact-info";
 import { cn } from "@/lib/utils";
 
-const EASE = [0.22, 1, 0.36, 1] as const;
 const FEEDBACK_MS = 1800;
 
+type CopyIconButtonProps = {
+  icon: ComponentType<{ className?: string; "aria-hidden"?: boolean }>;
+  /** What gets copied (also the tooltip). */
+  value: string;
+  /** Where to go if the clipboard is unavailable (insecure origin, permissions). */
+  fallbackHref: string;
+  copyLabel: string;
+  copiedLabel: string;
+  className?: string;
+};
+
 /**
- * Desktop header phone control: an icon-only pill that reveals the number on
- * hover/focus and copies it on click, with a short "copied" confirmation.
- * Falls back to a `tel:` link if the clipboard API is unavailable (or blocked).
+ * Header contact control: a plain round icon button that copies its value on
+ * click and confirms with a check + a small "copied" tag underneath. No hover
+ * choreography on purpose - the feedback IS the interaction. Falls back to the
+ * `tel:` / `mailto:` link if the clipboard API is unavailable (or blocked).
  */
-export function PhoneCopyButton({ className }: { className?: string }) {
-  const { t } = useLanguage();
+function CopyIconButton({ icon: Icon, value, fallbackHref, copyLabel, copiedLabel, className }: CopyIconButtonProps) {
   const [copied, setCopied] = useState(false);
   const timer = useRef<number | null>(null);
 
@@ -29,70 +39,73 @@ export function PhoneCopyButton({ className }: { className?: string }) {
 
   async function handleCopy() {
     try {
-      await navigator.clipboard.writeText(PHONE_PRIMARY.label);
+      await navigator.clipboard.writeText(value);
       setCopied(true);
       if (timer.current) window.clearTimeout(timer.current);
       timer.current = window.setTimeout(() => setCopied(false), FEEDBACK_MS);
     } catch {
-      // Clipboard blocked (insecure origin, permissions) — dial instead.
-      window.location.href = PHONE_PRIMARY.href;
+      window.location.href = fallbackHref;
     }
   }
 
   return (
-    <button
-      type="button"
-      onClick={handleCopy}
-      aria-label={`${t.header.phoneCopy}: ${PHONE_PRIMARY.label}`}
-      title={PHONE_PRIMARY.label}
-      className={cn(
-        "group/phone relative inline-flex h-10 cursor-pointer items-center gap-2 rounded-full border border-card-border bg-foreground/[0.07] px-3 text-base font-semibold text-foreground",
-        "transition-[background-color,box-shadow,transform] duration-200 ease-out hover:-translate-y-px hover:bg-foreground/[0.12] hover:shadow-[0_10px_24px_-10px_rgba(2,6,23,0.55)] active:translate-y-0 active:scale-[0.98]",
-        "dark:bg-card-elevated dark:hover:bg-muted/60",
-        className
-      )}
-    >
-      <span className="relative flex size-5 shrink-0 items-center justify-center">
-        <AnimatePresence initial={false} mode="wait">
-          {copied ? (
-            <motion.span
-              key="check"
-              initial={{ scale: 0.4, opacity: 0, rotate: -30 }}
-              animate={{ scale: 1, opacity: 1, rotate: 0 }}
-              transition={{ type: "spring", stiffness: 320, damping: 18 }}
-              className="absolute inset-0 flex items-center justify-center text-emerald-500 dark:text-emerald-400"
-            >
-              <IconCheck className="size-5" stroke={3} aria-hidden />
-            </motion.span>
-          ) : (
-            <motion.span
-              key="phone"
-              initial={{ scale: 0.6, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ duration: 0.18, ease: EASE }}
-              className="absolute inset-0 flex items-center justify-center"
-            >
-              <IconPhoneFilled className="size-4.5 transition-transform duration-300 group-hover/phone:rotate-12" aria-hidden />
-            </motion.span>
-          )}
-        </AnimatePresence>
-      </span>
-
-      {/* Label reveals on hover/focus (and while confirming) via a 0fr -> 1fr grid column. */}
-      <span
+    <span className={cn("relative inline-flex", className)}>
+      <button
+        type="button"
+        onClick={handleCopy}
+        aria-label={`${copyLabel}: ${value}`}
+        title={value}
         className={cn(
-          "grid grid-cols-[0fr] transition-[grid-template-columns] duration-300 ease-out",
-          "group-hover/phone:grid-cols-[1fr] group-focus-visible/phone:grid-cols-[1fr]",
-          copied && "grid-cols-[1fr]"
+          "inline-flex size-9 shrink-0 cursor-pointer items-center justify-center rounded-full border border-card-border bg-foreground/[0.07] text-foreground dark:bg-card-elevated",
+          "focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50",
+          copied && "text-emerald-500 dark:text-emerald-400"
         )}
       >
-        <span className="overflow-hidden">
-          <span className="block whitespace-nowrap pr-1 tabular-nums">
-            {copied ? t.header.phoneCopied : PHONE_PRIMARY.label}
-          </span>
-        </span>
-      </span>
-    </button>
+        {copied ? <IconCheck className="size-[18px]" aria-hidden /> : <Icon className="size-[18px]" aria-hidden />}
+      </button>
+      {/* Confirmation tag under the button (enter-only - exit gating hangs with the current motion version). */}
+      {copied ? (
+        <motion.span
+          role="status"
+          initial={{ opacity: 0, y: -4 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.2 }}
+          className="pointer-events-none absolute left-1/2 top-full z-10 mt-2 -translate-x-1/2 whitespace-nowrap rounded-full border border-card-border bg-card px-2.5 py-1 text-xs font-semibold text-foreground shadow-md"
+        >
+          {copiedLabel}
+        </motion.span>
+      ) : null}
+    </span>
+  );
+}
+
+/** Desktop header: copies the phone number. */
+export function PhoneCopyButton({ className }: { className?: string }) {
+  const { t } = useLanguage();
+  return (
+    <CopyIconButton
+      icon={IconPhoneFilled}
+      value={PHONE_PRIMARY.label}
+      fallbackHref={PHONE_PRIMARY.href}
+      copyLabel={t.header.phoneCopy}
+      copiedLabel={t.header.phoneCopied}
+      className={className}
+    />
+  );
+}
+
+/** Desktop header: copies the email address. */
+export function EmailCopyButton({ className }: { className?: string }) {
+  const { t } = useLanguage();
+  return (
+    <CopyIconButton
+      icon={IconMailFilled}
+      value={EMAIL_PRIMARY.label}
+      fallbackHref={EMAIL_PRIMARY.href}
+      copyLabel={t.header.emailCopy}
+      copiedLabel={t.header.phoneCopied}
+      className={className}
+    />
   );
 }
 
@@ -104,12 +117,29 @@ export function PhoneIconLink({ className }: { className?: string }) {
       href={PHONE_PRIMARY.href}
       aria-label={`${t.header.contactCta}: ${PHONE_PRIMARY.label}`}
       className={cn(
-        "inline-flex size-10 shrink-0 cursor-pointer items-center justify-center rounded-full bg-gradient-to-r from-[var(--primary-gradient-start)] to-[var(--primary-gradient-end)] text-white",
+        "inline-flex size-9 shrink-0 cursor-pointer items-center justify-center rounded-full bg-gradient-to-r from-[var(--primary-gradient-start)] to-[var(--primary-gradient-end)] text-white",
         "shadow-[0_8px_20px_var(--primary-elevated-shadow)] transition-transform duration-200 ease-out hover:scale-105 active:scale-95",
         className
       )}
     >
-      <IconPhoneFilled className="size-[18px]" aria-hidden />
+      <IconPhoneFilled className="size-[17px]" aria-hidden />
+    </a>
+  );
+}
+
+/** Mobile header control: opens the mail app. */
+export function EmailIconLink({ className }: { className?: string }) {
+  const { t } = useLanguage();
+  return (
+    <a
+      href={EMAIL_PRIMARY.href}
+      aria-label={`${t.header.emailCopy}: ${EMAIL_PRIMARY.label}`}
+      className={cn(
+        "inline-flex size-9 shrink-0 cursor-pointer items-center justify-center rounded-full border border-card-border bg-foreground/[0.07] text-foreground dark:bg-card-elevated",
+        className
+      )}
+    >
+      <IconMailFilled className="size-[17px]" aria-hidden />
     </a>
   );
 }

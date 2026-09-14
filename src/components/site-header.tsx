@@ -4,11 +4,11 @@ import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { motion } from "motion/react";
-import { IconChevronDown, IconSendFilled } from "@tabler/icons-react";
-import { PhoneCopyButton, PhoneIconLink } from "@/components/phone-copy-button";
+import { IconChevronDown } from "@tabler/icons-react";
+import { EmailCopyButton, EmailIconLink, PhoneCopyButton, PhoneIconLink } from "@/components/phone-copy-button";
 import { ThemeToggle } from "./theme-toggle";
 // import { LanguageDropdown } from "./language-dropdown";
-import { buttonVariants } from "@/components/ui/button";
+import { ButtonWithIcon } from "@/components/ui/button-with-icon";
 import { GlassShell } from "@/components/ui/glass-shell";
 import { useTrainingCards } from "@/components/training/use-training-cards";
 import { cn } from "@/lib/utils";
@@ -163,19 +163,20 @@ export function SiteHeader() {
           isScrolled ? "scale-[0.98]" : "scale-100"
         }`}
       >
-        <GlassShell className="flex items-center justify-between gap-3 px-5 py-2">
+        <GlassShell className="flex items-center justify-between gap-3 px-4 py-1.5">
           <Link href={homeHref} className="group flex min-w-0 shrink items-center py-1 pr-2">
             <Image
               src="/logo-1.png"
               alt="DreamTeam"
               width={1024}
               height={416}
-              sizes="120px"
-              className="h-10 w-auto grayscale transition-all group-hover:grayscale-0 dark:invert"
+              sizes="100px"
+              className="h-8 w-auto grayscale transition-all group-hover:grayscale-0 dark:invert"
             />
           </Link>
-          <div className="flex shrink-0 items-center gap-2.5">
+          <div className="flex shrink-0 items-center gap-2">
             <ThemeToggle className="shrink-0" />
+            <EmailIconLink />
             <PhoneIconLink />
           </div>
         </GlassShell>
@@ -196,7 +197,7 @@ export function SiteHeader() {
               : "shadow-[0_12px_36px_-14px_rgba(2,6,23,0.3)]"
           )}
         >
-          <div className="relative flex w-full items-center justify-between gap-4 py-2 lg:gap-6">
+          <div className="relative flex w-full items-center justify-between gap-4 py-1.5 lg:gap-6">
             {/* Logo — breathing room via padding so it never touches the bar edges. */}
             <Link href={homeHref} className="group flex min-w-0 items-center justify-self-start py-1 pr-3">
               <Image
@@ -204,15 +205,15 @@ export function SiteHeader() {
                 alt="DreamTeam"
                 width={1024}
                 height={416}
-                sizes="160px"
+                sizes="130px"
                 priority
-                className="h-11 w-auto grayscale transition-all group-hover:grayscale-0 dark:invert md:h-12"
+                className="h-9 w-auto grayscale transition-all group-hover:grayscale-0 dark:invert md:h-10"
               />
             </Link>
 
             {/* Absolutely centred from xl up; below that it flows from the left.
                 Never `overflow-x-auto` — that clips the dropdown panels. */}
-            <nav className="flex min-w-0 flex-1 items-center gap-4 overflow-visible whitespace-nowrap px-2 text-base font-semibold text-foreground/80 xl:pointer-events-none xl:absolute xl:left-1/2 xl:w-auto xl:flex-none xl:-translate-x-1/2 xl:gap-8 xl:px-0 xl:text-lg xl:[&>*]:pointer-events-auto">
+            <nav className="flex min-w-0 flex-1 items-center gap-4 overflow-visible whitespace-nowrap px-2 text-[15px] font-semibold text-foreground/80 xl:pointer-events-none xl:absolute xl:left-1/2 xl:w-auto xl:flex-none xl:-translate-x-1/2 xl:gap-7 xl:px-0 xl:text-base xl:[&>*]:pointer-events-auto">
               <Link href={portfolioPath(language)} className="whitespace-nowrap transition-colors hover:text-primary">
                 {t.header.portfolio}
               </Link>
@@ -227,25 +228,13 @@ export function SiteHeader() {
             <div className="flex flex-shrink-0 items-center justify-end gap-3">
               {/* <LanguageDropdown /> */}
               <ThemeToggle className="shrink-0" />
-              {/* Secondary: icon-only, reveals the number on hover, copies on click. */}
+              {/* Plain round icon buttons: copy the email / phone with a "copied" tag as the only feedback. */}
+              <EmailCopyButton />
               <PhoneCopyButton />
-              <span className="relative inline-flex">
-                {/* Subtle red→purple glow around the CTA. */}
-                <span
-                  aria-hidden
-                  className="pointer-events-none absolute -inset-1 rounded-full bg-primary-gradient opacity-45 blur-md"
-                />
-                <Link
-                  href={`${homeHref}#quote`}
-                  className={cn(
-                    buttonVariants({ variant: "default", size: "lg" }),
-                    "relative h-10 cursor-pointer gap-2 rounded-full px-5 text-base font-semibold shadow-lg transition-all"
-                  )}
-                >
-                  <IconSendFilled className="size-4 shrink-0" aria-hidden />
-                  {t.header.quoteCta}
-                </Link>
-              </span>
+              {/* The site's main CTA - the projects' arrow-disc pill, slim for the bar. */}
+              <ButtonWithIcon href={`${homeHref}#quote`} surface="auto" size="sm" className="shrink-0">
+                {t.header.quoteCta}
+              </ButtonWithIcon>
             </div>
           </div>
         </div>

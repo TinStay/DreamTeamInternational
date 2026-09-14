@@ -1,21 +1,39 @@
 export type Partner = {
   id: string;
+  /** Logo for light surfaces (dark ink). */
   light: string | null;
+  /** Logo for dark surfaces (white ink). */
   dark: string | null;
   href?: string;
   ariaLabel: string;
+  /** Only a white-ink mark exists: render it inverted (black) on light surfaces. */
+  invertOnLight?: boolean;
 };
 
 export const PARTNER_ICON_BASE = "/company_icons/";
 
 export const PARTNERS: Partner[] = [
   {
-    id: "asia",
-    light: "asia_agency_logo_light.png",
-    dark: "asia_agency_logo_dark.png",
-    href: "https://asiaeventagency.com/",
-    ariaLabel: "Asia Event Agency",
+    id: "mindguard",
+    light: null,
+    dark: "mindguard_logo_dark.png", // white-ink mark only
+    ariaLabel: "Mindguard",
+    invertOnLight: true,
   },
+  {
+    id: "isupport",
+    light: "isupport_logo_light.png",
+    dark: "isupport_logo_dark.png",
+    ariaLabel: "iSupport",
+  },
+  // Parked (not shown for now): Asia Event Agency, Hubchev Properties, Valtcan, Designed by GG.
+  // {
+  //   id: "asia",
+  //   light: "asia_agency_logo_light.png",
+  //   dark: "asia_agency_logo_dark.png",
+  //   href: "https://asiaeventagency.com/",
+  //   ariaLabel: "Asia Event Agency",
+  // },
   {
     id: "emblema",
     light: "emblema_logo_light.png",
@@ -23,13 +41,13 @@ export const PARTNERS: Partner[] = [
     href: "https://emblema.bg/",
     ariaLabel: "Emblema",
   },
-  {
-    id: "hubchev",
-    light: null,
-    dark: "hubchev_logo_dark.png",
-    href: "https://hubchevproperties.com/",
-    ariaLabel: "Hubchev Properties",
-  },
+  // {
+  //   id: "hubchev",
+  //   light: null,
+  //   dark: "hubchev_logo_dark.png",
+  //   href: "https://hubchevproperties.com/",
+  //   ariaLabel: "Hubchev Properties",
+  // },
   {
     id: "hus-estate",
     light: "hus_estate_logo_light.png",
@@ -107,13 +125,13 @@ export const PARTNERS: Partner[] = [
     href: "https://stroyalianceinvest.eu/",
     ariaLabel: "Stroy Alliance Invest",
   },
-  {
-    id: "valtcan",
-    light: "valtcan_logo_light.png",
-    dark: "valtcan_logo_dark.png",
-    href: "https://www.valtcan.com/",
-    ariaLabel: "Valtcan",
-  },
+  // {
+  //   id: "valtcan",
+  //   light: "valtcan_logo_light.png",
+  //   dark: "valtcan_logo_dark.png",
+  //   href: "https://www.valtcan.com/",
+  //   ariaLabel: "Valtcan",
+  // },
   {
     id: "vidos",
     light: "vidos_logo_light.png",
@@ -121,11 +139,11 @@ export const PARTNERS: Partner[] = [
     href: "https://www.vidos.shop/",
     ariaLabel: "Vidos",
   },
-  {
-    id: "designedbygg",
-    light: "designedbygg_logo_light.png",
-    dark: "designedbygg_logo_dark.png",
-    href: "http://designedby.gg/",
-    ariaLabel: "Designed by GG",
-  },
+  // {
+  //   id: "designedbygg",
+  //   light: "designedbygg_logo_light.png",
+  //   dark: "designedbygg_logo_dark.png",
+  //   href: "http://designedby.gg/",
+  //   ariaLabel: "Designed by GG",
+  // },
 ];

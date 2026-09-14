@@ -136,7 +136,7 @@ export function Sparks({
  * downloading once `enabled` (the section is near the viewport); while a
  * frame is still loading the nearest loaded neighbour is drawn instead.
  * `split` draws the same frame onto two canvases showing the left / right
- * halves, pulled 15% apart (the Emblema buildings).
+ * halves, pulled `splitGap`% apart (the Emblema buildings).
  */
 export function FrameSequence({
   progress,
@@ -146,6 +146,7 @@ export function FrameSequence({
   height,
   enabled,
   split = false,
+  splitGap = 15,
   className,
 }: {
   progress: MotionValue<number>;
@@ -156,28 +157,32 @@ export function FrameSequence({
   height: number;
   enabled: boolean;
   split?: boolean;
+  splitGap?: number;
   className?: string;
 }) {
   const canvases = useRef<(HTMLCanvasElement | null)[]>([]);
   const frames = useRef<HTMLImageElement[]>([]);
+  /** Frames whose pixels are decoded and safe to draw synchronously. */
+  const decoded = useRef<boolean[]>([]);
   const wanted = useRef(0);
+  /** The frame index last requested (`drawn`) and the frame actually painted for it (`painted`, may be a stand-in). */
   const drawn = useRef(-1);
+  const painted = useRef(-1);
 
   const draw = useCallback(
     (index: number, force = false) => {
       if (!force && index === drawn.current) return;
-      const ready = (img?: HTMLImageElement) => !!img && img.complete && img.naturalWidth > 0;
-      let img: HTMLImageElement | undefined = frames.current[index];
-      if (!ready(img)) {
-        img = undefined;
-        for (let d = 1; d < count && !img; d++) {
-          const before = frames.current[index - d];
-          const after = frames.current[index + d];
-          if (ready(before)) img = before;
-          else if (ready(after)) img = after;
+      const ready = (idx: number) => decoded.current[idx] === true;
+      let source = ready(index) ? index : -1;
+      if (source < 0) {
+        // Nearest decoded neighbour as a stand-in.
+        for (let d = 1; d < count && source < 0; d++) {
+          if (ready(index - d)) source = index - d;
+          else if (ready(index + d)) source = index + d;
         }
-        if (!img) return;
+        if (source < 0) return;
       }
+      const img = frames.current[source];
       for (const canvas of canvases.current) {
         const ctx = canvas?.getContext("2d");
         if (!canvas || !ctx) continue;
@@ -185,22 +190,49 @@ export function FrameSequence({
         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
       }
       drawn.current = index;
+      painted.current = source;
     },
     [count]
   );
 
   useEffect(() => {
     if (!enabled || frames.current.length > 0) return;
-    for (let i = 0; i < count; i++) {
+    // Coarse-to-fine: the held pose (last frame) and every 8th frame first, so
+    // scrubbing has stand-ins almost immediately, then the gaps - six requests
+    // in flight at a time rather than all `count` at once.
+    const order: number[] = [count - 1];
+    for (const step of [8, 4, 2, 1]) for (let i = 0; i < count; i += step) if (!order.includes(i)) order.push(i);
+    let next = 0;
+    let cancelled = false;
+    const startOne = () => {
+      if (cancelled || next >= order.length) return;
+      const i = order[next++];
       const img = new Image();
       img.decoding = "async";
-      img.src = `${base}/f${String(i).padStart(3, "0")}.webp`;
-      // Repaint when the frame we are currently showing (or its stand-in) lands.
-      img.onload = () => {
-        if (drawn.current < 0 || wanted.current === i) draw(i, true);
-      };
       frames.current[i] = img;
-    }
+      const landed = () => {
+        if (cancelled) return;
+        decoded.current[i] = true;
+        // Repaint when this frame is closer to what we want than the stand-in on screen.
+        const want = wanted.current;
+        if (drawn.current < 0 || Math.abs(i - want) < Math.abs(painted.current - want)) draw(want, true);
+        startOne();
+      };
+      img.onload = () => {
+        img.decode().then(landed, () => startOne());
+      };
+      img.onerror = () => startOne();
+      img.src = `${base}/f${String(i).padStart(3, "0")}.webp`;
+    };
+    for (let k = 0; k < 6; k++) startOne();
+    return () => {
+      // A cancelled run leaves nothing behind, so a re-run (StrictMode, deps) restarts cleanly from the browser cache.
+      cancelled = true;
+      frames.current = [];
+      decoded.current = [];
+      drawn.current = -1;
+      painted.current = -1;
+    };
   }, [enabled, base, count, draw]);
 
   const index = useTransform(progress, (v) => Math.min(count - 1, Math.floor(clamp01(v) * count)));
@@ -220,7 +252,8 @@ export function FrameSequence({
             }}
             width={width}
             height={height}
-            className={cn(canvasClass, "-ml-[15%] [clip-path:inset(0_52%_0_0)]")}
+            className={cn(canvasClass, "[clip-path:inset(0_52%_0_0)]")}
+            style={{ marginLeft: `-${splitGap}%` }}
           />
           <canvas
             ref={(el) => {
@@ -228,7 +261,8 @@ export function FrameSequence({
             }}
             width={width}
             height={height}
-            className={cn(canvasClass, "ml-[15%] [clip-path:inset(0_0_0_52%)]")}
+            className={cn(canvasClass, "[clip-path:inset(0_0_0_52%)]")}
+            style={{ marginLeft: `${splitGap}%` }}
           />
         </>
       ) : (

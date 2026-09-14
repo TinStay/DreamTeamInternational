@@ -14,7 +14,8 @@ import {
 } from "@tabler/icons-react";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
 import { useLanguage } from "@/lib/i18n/language-context";
-import { buttonVariants, primaryGradientInteractiveClassName } from "@/components/ui/button";
+import { primaryGradientInteractiveClassName } from "@/components/ui/button";
+import { ButtonWithIcon } from "@/components/ui/button-with-icon";
 import { GlassShell } from "@/components/ui/glass-shell";
 import {
   contactProcessPath,
@@ -148,16 +149,9 @@ export function MobileNav() {
               </div>
 
               <div className="mt-auto pt-8">
-                <Link
-                  href={`${homeHref}#quote`}
-                  onClick={() => setIsOpen(false)}
-                  className={cn(
-                    buttonVariants({ variant: "default", size: "lg" }),
-                    "flex h-14 w-full select-none items-center justify-center rounded-full text-lg font-bold"
-                  )}
-                >
+                <ButtonWithIcon href={`${homeHref}#quote`} onClick={() => setIsOpen(false)} surface="auto" className="h-14 w-full text-base">
                   {t.header.quoteCta}
-                </Link>
+                </ButtonWithIcon>
               </div>
             </div>
           </SheetContent>

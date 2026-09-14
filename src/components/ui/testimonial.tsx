@@ -10,6 +10,8 @@ export type TestimonialProps = {
   initials?: string;
   /** Avatar circle background color (hex). Falls back to the brand gradient. */
   color?: string;
+  /** Denser type and padding - for stacks where several cards share the viewport (the home conveyor). */
+  compact?: boolean;
   className?: string;
 };
 
@@ -47,18 +49,21 @@ export function Testimonial({
   rating = 5,
   initials,
   color,
+  compact = false,
   className,
 }: TestimonialProps) {
   return (
     <div
       className={cn(
-        "relative flex w-80 max-w-full flex-col items-center rounded-2xl border border-card-border bg-card/80 px-6 pb-6 pt-11 text-center shadow-sm backdrop-blur-sm transition-shadow duration-300 hover:shadow-lg",
+        "relative flex w-80 max-w-full flex-col items-center rounded-2xl border border-card-border bg-card/80 text-center shadow-sm backdrop-blur-sm transition-shadow duration-300 hover:shadow-lg",
+        compact ? "px-5 pb-3.5 pt-8" : "px-6 pb-6 pt-11",
         className
       )}
     >
       <div
         className={cn(
-          "absolute -top-8 flex h-16 w-16 items-center justify-center rounded-full text-lg font-bold text-white shadow-lg ring-4 ring-background",
+          "absolute flex items-center justify-center rounded-full font-bold text-white shadow-lg ring-4 ring-background",
+          compact ? "-top-7 h-14 w-14 text-base" : "-top-8 h-16 w-16 text-lg",
           !color &&
             "bg-gradient-to-br from-[var(--primary-gradient-start)] to-[var(--primary-gradient-end)]"
         )}
@@ -68,16 +73,16 @@ export function Testimonial({
         {initials ?? computeInitials(name)}
       </div>
 
-      <h3 className="font-heading text-lg font-semibold text-foreground">{name}</h3>
-      {role ? <p className="text-sm text-muted-foreground">{role}</p> : null}
+      <h3 className={cn("font-heading font-semibold text-foreground", compact ? "text-base" : "text-lg")}>{name}</h3>
+      {role ? <p className={cn("text-muted-foreground", compact ? "text-xs" : "text-sm")}>{role}</p> : null}
 
-      <div className="mt-2 flex gap-0.5" aria-label={`${rating} / 5`}>
+      <div className={cn("flex gap-0.5", compact ? "mt-1.5" : "mt-2")} aria-label={`${rating} / 5`}>
         {Array.from({ length: 5 }).map((_, i) => (
           <StarIcon key={i} filled={i < rating} />
         ))}
       </div>
 
-      <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+      <p className={cn("text-muted-foreground", compact ? "mt-1.5 text-[13px] leading-[1.45]" : "mt-2 text-sm leading-relaxed")}>
         {text}
       </p>
     </div>

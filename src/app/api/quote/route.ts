@@ -12,22 +12,25 @@ import {
   createRateLimiter,
 } from "@/lib/server/form-guards";
 import {
-  FORMAT_OPTIONS,
-  GOAL_OPTIONS,
   LENGTH_SLIDER,
-  PLATFORM_OPTIONS,
-  SCRIPT_OPTIONS,
+  QUOTE_SERVICE_OPTIONS,
   UPLOAD_MAX_FILES_PER_FIELD,
   UPLOAD_MAX_TOTAL_BYTES,
-  VOICEOVER_OPTIONS,
-  formatLengthSec,
   isAllowedUploadName,
+  type QuoteServiceKey,
 } from "@/lib/quote-form/constants";
 import {
   buildQuoteEmailHtml,
   buildQuoteEmailText,
   type QuoteEmailInput,
 } from "./email-template";
+import {
+  SERVICE_EMAIL_TITLE,
+  SERVICE_OPTION_CATALOGUES as C,
+  missingServiceFields,
+  serviceEmailSections,
+  type ServiceAnswers,
+} from "./service-sections";
 
 export const runtime = "nodejs";
 
@@ -39,6 +42,7 @@ const MAX = {
   company: 200,
   goalOther: 300,
   scriptText: 5000,
+  brief: 5000,
   refLinks: 2000,
   deadline: 20,
   notes: 3000,
@@ -53,11 +57,6 @@ function sanitizeFilename(name: string): string {
   const dot = base.lastIndexOf(".");
   const ext = dot > 0 ? base.slice(dot) : "";
   return base.slice(0, 100 - ext.length) + ext;
-}
-
-/** Resolve an option key to its Bulgarian label (internal email), or "-". */
-function label(map: Record<string, string>, key: string): string {
-  return key ? (map[key] ?? key) : "-";
 }
 
 /** Narrow an unknown payload value to one of the allowed option keys. */
@@ -163,6 +162,7 @@ export async function POST(req: Request) {
   const company = clean(payload.company, MAX.company);
   const goalOther = clean(payload.goalOther, MAX.goalOther);
   const scriptText = cleanMultiline(payload.scriptText, MAX.scriptText);
+  const brief = cleanMultiline(payload.brief, MAX.brief);
   const refLinks = cleanMultiline(payload.refLinks, MAX.refLinks);
   // Deadline must be a real ISO date — anything else is discarded, not echoed.
   const rawDeadline = clean(payload.deadline, MAX.deadline);
@@ -170,11 +170,8 @@ export async function POST(req: Request) {
   const notes = cleanMultiline(payload.notes, MAX.notes);
   const userLanguage = clean(payload.language, 5) || "bg";
 
-  const script = pickKey(payload.script, SCRIPT_OPTIONS);
-  const goal = pickKey(payload.goal, GOAL_OPTIONS);
-  const voiceover = pickKey(payload.voiceover, VOICEOVER_OPTIONS);
-  const formats = pickKeys(payload.formats, FORMAT_OPTIONS);
-  const platforms = pickKeys(payload.platforms, PLATFORM_OPTIONS);
+  // Which flow the answers belong to (older clients sent no service - the video form).
+  const service = (pickKey(payload.service, QUOTE_SERVICE_OPTIONS) || "video") as QuoteServiceKey;
   const lengthFlexible = payload.lengthFlexible === true;
   const deadlineFlexible = payload.deadlineFlexible === true;
   const rawLength = Number(payload.lengthSec);
@@ -182,16 +179,44 @@ export async function POST(req: Request) {
     ? Math.min(Math.max(Math.round(rawLength), LENGTH_SLIDER.min), LENGTH_SLIDER.max)
     : LENGTH_SLIDER.default;
 
+  // Every option key is narrowed to its catalogue; unknown values are dropped, never echoed.
+  const answers: ServiceAnswers = {
+    service,
+    script: pickKey(payload.script, C.script),
+    goal: pickKey(payload.goal, C.goal),
+    goalOther,
+    scriptText,
+    scriptFileNames: [],
+    lengthSec,
+    lengthFlexible,
+    formats: pickKeys(payload.formats, C.formats),
+    voiceover: pickKey(payload.voiceover, C.voiceover),
+    platforms: pickKeys(payload.platforms, C.platforms),
+    brief,
+    imageCount: pickKey(payload.imageCount, C.imageCount),
+    imageResolution: pickKey(payload.imageResolution, C.imageResolution),
+    imageRatios: pickKeys(payload.imageRatios, C.imageRatios),
+    imageUsage: pickKeys(payload.imageUsage, C.imageUsage),
+    mascotType: pickKey(payload.mascotType, C.mascotType),
+    mascotStyle: pickKey(payload.mascotStyle, C.mascotStyle),
+    mascotUsage: pickKeys(payload.mascotUsage, C.mascotUsage),
+    mascotDeliverables: pickKeys(payload.mascotDeliverables, C.mascotDeliverables),
+    automationTasks: pickKeys(payload.automationTasks, C.automationTasks),
+    automationVolume: pickKey(payload.automationVolume, C.automationVolume),
+    automationInputs: pickKeys(payload.automationInputs, C.automationInputs),
+    refLinks,
+    refFileNames: [],
+    deadlineText: "",
+    notes,
+  };
+
   // Server-side validation mirrors the wizard's required steps — the server
   // is the contract, not the client gating.
   const invalidFields: string[] = [];
   if (!name) invalidFields.push("name");
   if (!email || !EMAIL_RE.test(email)) invalidFields.push("email");
   if (payload.termsAccepted !== true) invalidFields.push("termsAccepted");
-  if (!script) invalidFields.push("script");
-  if (!goal) invalidFields.push("goal");
-  if (formats.length === 0) invalidFields.push("formats");
-  if (!voiceover) invalidFields.push("voiceover");
+  invalidFields.push(...missingServiceFields(answers));
   if (invalidFields.length > 0) {
     return NextResponse.json(
       {
@@ -230,31 +255,17 @@ export async function POST(req: Request) {
   // Internal email is in Bulgarian — labels come from the bg dictionary so the
   // form copy and the email stay in sync.
   const bgQuote = dictionaries.bg.quoteForm;
-  const goalLabels: Record<string, string> = bgQuote.video.goals;
-  const scriptLabels: Record<string, string> = Object.fromEntries(
-    SCRIPT_OPTIONS.map((o) => [o.key, bgQuote.script.options[o.key].label])
-  );
-  const formatLabels: Record<string, string> = Object.fromEntries(
-    FORMAT_OPTIONS.map((o) => [
-      o.key,
-      `${bgQuote.video.formats[o.key].label} (${bgQuote.video.formats[o.key].hint})`,
-    ])
-  );
-  const voiceLabels: Record<string, string> = bgQuote.style.voices;
-  const platformLabels: Record<string, string> = bgQuote.details.platforms;
   const foundUsLabels: Record<string, string> = dictionaries.bg.contact.foundUsOptions;
   // Key allowlist (not `in` — that would accept prototype keys like "toString").
   const foundUs = isFoundUsKey(payload.foundUs) ? payload.foundUs : "";
 
-  const lengthText = lengthFlexible
-    ? bgQuote.video.lengthFlexibleLabel
-    : formatLengthSec(lengthSec, bgQuote.video);
+  answers.scriptFileNames = scriptFiles.map((f) => f.filename);
+  answers.refFileNames = refFiles.map((f) => f.filename);
+  answers.deadlineText = deadlineFlexible ? bgQuote.details.noDeadline : formatDateDisplay(deadline);
 
-  const scriptFileNames = scriptFiles.map((f) => f.filename);
-  const refFileNames = refFiles.map((f) => f.filename);
-
+  const title = SERVICE_EMAIL_TITLE[service];
   const emailInput: QuoteEmailInput = {
-    title: "Заявка за видео",
+    title,
     subtitle: name,
     footerNote: `Автоматично генерирано от формата за оферта на сайта. Език на формата: ${userLanguage}.`,
     sections: [
@@ -265,54 +276,10 @@ export async function POST(req: Request) {
           { label: "Имейл", value: email },
           { label: "Телефон", value: phone },
           { label: "Компания", value: company },
-          { label: "Как ни намерихте", value: label(foundUsLabels, foundUs) },
+          { label: "Как ни намерихте", value: foundUs ? (foundUsLabels[foundUs] ?? foundUs) : "-" },
         ],
       },
-      {
-        title: "Видео",
-        fields: [
-          {
-            label: "Основна цел",
-            value: `${label(goalLabels, goal)}${goal === "other" && goalOther ? ` - ${goalOther}` : ""}`,
-          },
-          { label: "Дължина", value: lengthText },
-          {
-            label: "Формат",
-            value: formats.map((f) => label(formatLabels, f)).join(", "),
-          },
-          { label: "Войсоувър", value: label(voiceLabels, voiceover) },
-        ],
-      },
-      {
-        title: "Сюжет",
-        fields: [
-          { label: "Има ли готов сюжет", value: label(scriptLabels, script) },
-          { label: "Описание на идеята / сюжета", value: scriptText, multiline: true },
-          { label: "Файлове със сюжета", value: scriptFileNames.join(", ") },
-        ],
-      },
-      {
-        title: "Разпространение и срокове",
-        fields: [
-          {
-            label: "Платформи",
-            value: platforms.map((p) => label(platformLabels, p)).join(", "),
-          },
-          {
-            label: "Краен срок",
-            value: deadlineFlexible
-              ? bgQuote.details.noDeadline
-              : formatDateDisplay(deadline),
-          },
-        ],
-      },
-      {
-        title: "Референции и материали",
-        fields: [
-          { label: "Линкове", value: refLinks, multiline: true },
-          { label: "Прикачени материали", value: refFileNames.join(", ") },
-        ],
-      },
+      ...serviceEmailSections(answers),
       {
         title: "Друга информация",
         fields: [{ label: "Бележки", value: notes, multiline: true }],
@@ -320,7 +287,7 @@ export async function POST(req: Request) {
     ],
   };
 
-  const subject = `Заявка за видео - ${name}`;
+  const subject = `${title} - ${name}`;
   const text = buildQuoteEmailText(emailInput);
   const html = buildQuoteEmailHtml(emailInput);
 

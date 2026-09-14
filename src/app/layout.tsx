@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Fira_Sans, Sofia_Sans } from "next/font/google";
+import { Fira_Sans, Montserrat, Sofia_Sans } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { LanguageProvider } from "@/lib/i18n/language-context";
@@ -27,6 +27,14 @@ const firaSans = Fira_Sans({
   weight: ["300", "400", "500", "600", "700"],
   style: ["normal", "italic"],
   variable: "--font-fira-sans",
+  display: "swap",
+});
+
+/** Montserrat ExtraBold - only the giant "Boleron" word in the projects showcase (the face the reference animation uses). */
+const montserrat = Montserrat({
+  subsets: ["latin", "cyrillic"],
+  weight: ["800"],
+  variable: "--font-montserrat",
   display: "swap",
 });
 
@@ -184,7 +192,7 @@ export default function RootLayout({
     // resolved on `:root`, so the families must be defined there too.
     <html
       lang="bg"
-      className={`dark ${sofiaSans.variable} ${firaSans.variable}`}
+      className={`dark ${sofiaSans.variable} ${firaSans.variable} ${montserrat.variable}`}
       style={{ colorScheme: "dark" }}
       suppressHydrationWarning
     >

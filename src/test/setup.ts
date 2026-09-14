@@ -39,3 +39,19 @@ if (typeof window !== "undefined") {
 
   Element.prototype.scrollIntoView ??= () => {};
 }
+
+// jsdom has no IntersectionObserver (motion `whileInView` on the service cards).
+if (typeof window !== "undefined" && !("IntersectionObserver" in window)) {
+  class IntersectionObserverPolyfill {
+    readonly root = null;
+    readonly rootMargin = "";
+    readonly thresholds: readonly number[] = [];
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+    takeRecords(): IntersectionObserverEntry[] {
+      return [];
+    }
+  }
+  (window as unknown as Record<string, unknown>).IntersectionObserver = IntersectionObserverPolyfill;
+}

@@ -8,23 +8,56 @@
  */
 import type { ComponentType } from "react";
 import {
+  IconAd2,
+  IconBadge2k,
+  IconBadge4k,
+  IconBadgeHd,
   IconBrandFacebook,
   IconBrandInstagram,
   IconBrandTiktok,
   IconBrandYoutube,
+  IconBrush,
+  IconBuildingStore,
+  IconCamera,
+  IconCircle,
+  IconCrop11,
+  IconCrop169,
+  IconCropLandscape,
+  IconCropPortrait,
+  IconCube,
+  IconCube3dSphere,
   IconDeviceDesktop,
   IconDeviceMobile,
   IconDeviceTv,
   IconDots,
   IconFileCheck,
+  IconFileSpreadsheet,
+  IconFileText,
+  IconInfinity,
   IconMicrophone,
   IconMicrophoneOff,
+  IconMoodHappy,
+  IconMoodSmile,
+  IconPalette,
   IconPencil,
+  IconPhoto,
+  IconPlayerPlay,
+  IconPrinter,
+  IconRectangleVertical,
   IconRocket,
+  IconRun,
   IconSchool,
   IconShieldCheck,
+  IconShirt,
   IconShoppingCart,
+  IconSparkles,
   IconSpeakerphone,
+  IconStack,
+  IconStack2,
+  IconStack3,
+  IconSticker,
+  IconUsers,
+  IconVideo,
   IconWorld,
 } from "@tabler/icons-react";
 
@@ -35,9 +68,33 @@ export type QuoteOption<K extends string> = {
   icon: QuoteOptionIcon;
 };
 
-/** Step order — one entry per step component in `src/components/quote-form/steps`. */
+/**
+ * Services the wizard can quote — keys match `SERVICE_ICONS` in
+ * `src/lib/services/constants.ts` (the service cards on the first step).
+ */
+export const QUOTE_SERVICES = ["video", "images", "mascot", "automation"] as const;
+export type QuoteServiceKey = (typeof QUOTE_SERVICES)[number];
+export const QUOTE_SERVICE_OPTIONS = QUOTE_SERVICES.map((key) => ({ key }));
+
+/** Video flow — one entry per step component in `src/components/quote-form/steps`. */
 export const QUOTE_STEPS = ["script", "goal", "video", "details", "contact"] as const;
-export type QuoteStepKey = (typeof QUOTE_STEPS)[number];
+
+/**
+ * Steps after the service pick, per service. Every flow ends on the shared
+ * `contact` step; the wizard prepends the `service` step itself.
+ */
+export const QUOTE_FLOWS = {
+  video: QUOTE_STEPS,
+  images: ["imagesSpecs", "imagesBrief", "imagesTiming", "contact"],
+  mascot: ["mascotStyle", "mascotBrief", "mascotTiming", "contact"],
+  automation: ["automationScope", "automationBrief", "automationTiming", "contact"],
+} as const satisfies Record<QuoteServiceKey, readonly string[]>;
+export type QuoteStepKey = "service" | (typeof QUOTE_FLOWS)[QuoteServiceKey][number];
+
+/** The wizard's step list for the chosen service (`service` alone until one is picked). */
+export function quoteStepsFor(service: QuoteServiceKey | ""): readonly QuoteStepKey[] {
+  return service ? ["service", ...QUOTE_FLOWS[service]] : ["service"];
+}
 
 /** „Имате ли готов сюжет?“ */
 export const SCRIPT_OPTIONS = [
@@ -81,6 +138,116 @@ export const PLATFORM_OPTIONS = [
   { key: "screens", icon: IconDeviceTv },
 ] as const satisfies readonly QuoteOption<string>[];
 export type PlatformOptionKey = (typeof PLATFORM_OPTIONS)[number]["key"];
+
+/* ------------------------------------------------------------ AI images */
+
+/** „Колко изображения ви трябват?“ */
+export const IMAGE_COUNT_OPTIONS = [
+  { key: "few", icon: IconPhoto },
+  { key: "some", icon: IconStack2 },
+  { key: "many", icon: IconStack3 },
+  { key: "bulk", icon: IconInfinity },
+] as const satisfies readonly QuoteOption<string>[];
+export type ImageCountKey = (typeof IMAGE_COUNT_OPTIONS)[number]["key"];
+
+/** „Каква резолюция?“ */
+export const IMAGE_RESOLUTION_OPTIONS = [
+  { key: "1080p", icon: IconBadgeHd },
+  { key: "2k", icon: IconBadge2k },
+  { key: "4k", icon: IconBadge4k },
+] as const satisfies readonly QuoteOption<string>[];
+export type ImageResolutionKey = (typeof IMAGE_RESOLUTION_OPTIONS)[number]["key"];
+
+/** „В какво съотношение?“ (multi-select) */
+export const IMAGE_RATIO_OPTIONS = [
+  { key: "16:9", icon: IconCrop169 },
+  { key: "9:16", icon: IconRectangleVertical },
+  { key: "4:5", icon: IconCropPortrait },
+  { key: "1:1", icon: IconCrop11 },
+  { key: "3:2", icon: IconCropLandscape },
+  { key: "other", icon: IconDots },
+] as const satisfies readonly QuoteOption<string>[];
+export type ImageRatioKey = (typeof IMAGE_RATIO_OPTIONS)[number]["key"];
+
+/** „Къде ще се използват изображенията?“ (multi-select, optional) */
+export const IMAGE_USAGE_OPTIONS = [
+  { key: "website", icon: IconWorld },
+  { key: "social", icon: IconBrandInstagram },
+  { key: "ads", icon: IconAd2 },
+  { key: "shop", icon: IconBuildingStore },
+  { key: "print", icon: IconPrinter },
+] as const satisfies readonly QuoteOption<string>[];
+export type ImageUsageKey = (typeof IMAGE_USAGE_OPTIONS)[number]["key"];
+
+/* ---------------------------------------------------------- brand mascot */
+
+/** „Какъв тип талисман?“ */
+export const MASCOT_TYPE_OPTIONS = [
+  { key: "2d", icon: IconBrush },
+  { key: "3d", icon: IconCube3dSphere },
+  { key: "unsure", icon: IconSparkles },
+] as const satisfies readonly QuoteOption<string>[];
+export type MascotTypeKey = (typeof MASCOT_TYPE_OPTIONS)[number]["key"];
+
+/** „В какъв стил?“ */
+export const MASCOT_STYLE_OPTIONS = [
+  { key: "cartoon", icon: IconMoodHappy },
+  { key: "realistic", icon: IconCamera },
+  { key: "minimal", icon: IconCircle },
+  { key: "open", icon: IconPalette },
+] as const satisfies readonly QuoteOption<string>[];
+export type MascotStyleKey = (typeof MASCOT_STYLE_OPTIONS)[number]["key"];
+
+/** „Къде ще живее талисманът?“ (multi-select, optional) */
+export const MASCOT_USAGE_OPTIONS = [
+  { key: "video", icon: IconVideo },
+  { key: "social", icon: IconBrandInstagram },
+  { key: "website", icon: IconWorld },
+  { key: "merch", icon: IconShirt },
+] as const satisfies readonly QuoteOption<string>[];
+export type MascotUsageKey = (typeof MASCOT_USAGE_OPTIONS)[number]["key"];
+
+/** „Какво ви трябва накрая?“ (multi-select, optional) */
+export const MASCOT_DELIVERABLE_OPTIONS = [
+  { key: "poses", icon: IconRun },
+  { key: "expressions", icon: IconMoodSmile },
+  { key: "animation", icon: IconPlayerPlay },
+  { key: "stickers", icon: IconSticker },
+  { key: "model", icon: IconCube },
+] as const satisfies readonly QuoteOption<string>[];
+export type MascotDeliverableKey = (typeof MASCOT_DELIVERABLE_OPTIONS)[number]["key"];
+
+/* ------------------------------------------------------------ automation */
+
+/** „Какво искате да автоматизирате?“ (multi-select) */
+export const AUTOMATION_TASK_OPTIONS = [
+  { key: "productVideos", icon: IconVideo },
+  { key: "socialPosts", icon: IconBrandInstagram },
+  { key: "adVariations", icon: IconAd2 },
+  { key: "imageVariations", icon: IconPhoto },
+  { key: "personalized", icon: IconUsers },
+  { key: "other", icon: IconDots },
+] as const satisfies readonly QuoteOption<string>[];
+export type AutomationTaskKey = (typeof AUTOMATION_TASK_OPTIONS)[number]["key"];
+
+/** „Какъв обем на месец?“ */
+export const AUTOMATION_VOLUME_OPTIONS = [
+  { key: "small", icon: IconStack },
+  { key: "medium", icon: IconStack2 },
+  { key: "large", icon: IconStack3 },
+  { key: "xl", icon: IconInfinity },
+] as const satisfies readonly QuoteOption<string>[];
+export type AutomationVolumeKey = (typeof AUTOMATION_VOLUME_OPTIONS)[number]["key"];
+
+/** „С какви материали разполагате?“ (multi-select, optional) */
+export const AUTOMATION_INPUT_OPTIONS = [
+  { key: "feed", icon: IconFileSpreadsheet },
+  { key: "images", icon: IconPhoto },
+  { key: "texts", icon: IconFileText },
+  { key: "brandKit", icon: IconPalette },
+  { key: "none", icon: IconSparkles },
+] as const satisfies readonly QuoteOption<string>[];
+export type AutomationInputKey = (typeof AUTOMATION_INPUT_OPTIONS)[number]["key"];
 
 /** Video length bounds; the max position renders as "5+ min". */
 export const LENGTH_SLIDER = {
@@ -134,6 +301,25 @@ export function isAllowedUploadName(name: string): boolean {
 
 /** All quote form answers except the uploaded files (kept in component state). */
 export type QuoteFormData = {
+  /** Picked on the first step (the service cards). */
+  service: QuoteServiceKey | "";
+  /* AI images */
+  imageCount: ImageCountKey | "";
+  imageResolution: ImageResolutionKey | "";
+  imageRatios: ImageRatioKey[];
+  imageUsage: ImageUsageKey[];
+  /* Brand mascot */
+  mascotType: MascotTypeKey | "";
+  mascotStyle: MascotStyleKey | "";
+  mascotUsage: MascotUsageKey[];
+  mascotDeliverables: MascotDeliverableKey[];
+  /* Automation */
+  automationTasks: AutomationTaskKey[];
+  automationVolume: AutomationVolumeKey | "";
+  automationInputs: AutomationInputKey[];
+  /** Free-text brief for the images / mascot / automation flows (the video flow has `scriptText`). */
+  brief: string;
+  /* AI video */
   script: ScriptOptionKey | "";
   scriptText: string;
   goal: GoalOptionKey | "";
@@ -163,6 +349,19 @@ export type QuoteFormData = {
 };
 
 export const QUOTE_FORM_DEFAULTS: QuoteFormData = {
+  service: "",
+  imageCount: "",
+  imageResolution: "",
+  imageRatios: [],
+  imageUsage: [],
+  mascotType: "",
+  mascotStyle: "",
+  mascotUsage: [],
+  mascotDeliverables: [],
+  automationTasks: [],
+  automationVolume: "",
+  automationInputs: [],
+  brief: "",
   script: "",
   scriptText: "",
   goal: "",
@@ -210,13 +409,28 @@ export function isQuoteStepValid(
   emailRe: RegExp
 ): boolean {
   switch (step) {
+    case "service":
+      return data.service !== "";
     case "script":
       return data.script !== "";
     case "goal":
       return data.goal !== "";
     case "video":
       return data.formats.length > 0 && data.voiceover !== "";
+    case "imagesSpecs":
+      return data.imageCount !== "" && data.imageResolution !== "" && data.imageRatios.length > 0;
+    case "mascotStyle":
+      return data.mascotType !== "" && data.mascotStyle !== "";
+    case "automationScope":
+      return data.automationTasks.length > 0 && data.automationVolume !== "";
+    case "imagesBrief":
+    case "mascotBrief":
+    case "automationBrief":
+      return data.brief.trim() !== "";
     case "details":
+    case "imagesTiming":
+    case "mascotTiming":
+    case "automationTiming":
       return true;
     case "contact":
       return (

@@ -7,9 +7,10 @@ import { GradientBlurPageBg } from "@/components/ui/gradient-blur-bg";
 import { MAIN_WITH_FIXED_PAGE_BG_CLASS } from "@/lib/page-shell";
 import { PageBreadcrumbs } from "@/components/page-breadcrumbs";
 import { FeatureShowcase } from "@/components/ui/feature-showcase";
-import { ContactInquiryForm } from "@/components/contact-inquiry-form";
+import { ButtonWithIcon } from "@/components/ui/button-with-icon";
+import { QuoteFormSection } from "@/components/quote-form/quote-form-section";
 import { useLanguage } from "@/lib/i18n/language-context";
-import { getServiceIconBySlug } from "@/lib/services/constants";
+import { getServiceIconBySlug, getServiceKey } from "@/lib/services/constants";
 
 export function ServiceDetailPageView({ slug }: { slug: string }) {
   const { t } = useLanguage();
@@ -21,6 +22,7 @@ export function ServiceDetailPageView({ slug }: { slug: string }) {
   // Server route already 404s unknown slugs; guard defensively.
   if (!service) return null;
   const { modal } = service;
+  const serviceKey = icon ? getServiceKey(icon) : undefined;
 
   return (
     <main className={MAIN_WITH_FIXED_PAGE_BG_CLASS}>
@@ -47,25 +49,19 @@ export function ServiceDetailPageView({ slug }: { slug: string }) {
             tabs={modal.tabs}
             defaultTab={modal.defaultTab}
             className="bg-transparent px-0 py-0 md:py-0"
+            // The main CTA, a size up: scrolls to the wizard below, already on this service's first step.
+            action={
+              <ButtonWithIcon href="#quote" surface="auto" size="lg">
+                {t.services.quoteCta}
+              </ButtonWithIcon>
+            }
           />
-
-          {/* Quote / contact form — same form used on the home page. */}
-          <section id="contact" className="mt-12 lg:mt-16">
-            <div className="mx-auto max-w-3xl">
-              <ContactInquiryForm
-                variant="card"
-                subject={service.title}
-                formStateBg={`Услуга: ${service.title}`}
-                headingDivider={false}
-                heading={
-                  <h2 className="font-heading text-2xl font-bold tracking-tight text-foreground md:text-3xl">
-                    {t.services.ctaHeading}
-                  </h2>
-                }
-              />
-            </div>
-          </section>
         </div>
+      </div>
+
+      {/* The quote wizard, opened straight on this service's flow (its cards step is one "back" away). */}
+      <div className="relative z-10 w-full pb-16 lg:pb-20">
+        <QuoteFormSection initialService={serviceKey} />
       </div>
 
       <div className="relative z-10">

@@ -17,6 +17,7 @@ import {
   ctaPillClassName,
   primaryGradientInteractiveClassName,
 } from "@/components/ui/button";
+import { JourneyItem } from "@/components/ui/scroll-journey";
 import { useLanguage } from "@/lib/i18n/language-context";
 import { EMAIL_RE } from "@/lib/server/form-guards";
 import { servicesPath } from "@/lib/routes";
@@ -24,17 +25,22 @@ import { SOCIAL_LINKS } from "@/lib/social-links";
 import { trackLeadCreated } from "@/lib/openai-pixel";
 import {
   QUOTE_FORM_DEFAULTS,
-  QUOTE_STEPS,
   isQuoteStepValid,
+  quoteStepsFor,
   type QuoteFieldUpdater,
   type QuoteFormData,
+  type QuoteServiceKey,
 } from "@/lib/quote-form/constants";
 import { cn } from "@/lib/utils";
+import { ServiceStep } from "./steps/service-step";
 import { ScriptStep } from "./steps/script-step";
 import { VideoStep } from "./steps/video-step";
 import { GoalStep } from "./steps/goal-step";
 import { DetailsStep } from "./steps/details-step";
 import { ContactStep } from "./steps/contact-step";
+import { ImagesBriefStep, ImagesSpecsStep, ImagesTimingStep } from "./steps/images-steps";
+import { MascotBriefStep, MascotStyleStep, MascotTimingStep } from "./steps/mascot-steps";
+import { AutomationBriefStep, AutomationScopeStep, AutomationTimingStep } from "./steps/automation-steps";
 
 /**
  * Enter-only step transition. Exit animations are deliberately avoided:
@@ -70,17 +76,28 @@ function sumBytes(files: File[]): number {
 }
 
 /**
- * Multi-step "request a quote" form (video service) — sits right after the
- * hero. Each step is its own component under `./steps`; answers post to
- * `/api/quote` together with any uploaded files.
+ * Services + multi-step "request a quote" wizard, right after the hero. The
+ * first step is the four service cards (the old services section) - their
+ * "get a quote" pill picks the service and opens its own flow (`QUOTE_FLOWS`);
+ * every flow ends on the shared contact step. Each step is its own component
+ * under `./steps`; answers post to `/api/quote` together with any uploads.
  */
-export function QuoteFormSection({ className }: { className?: string }) {
+export function QuoteFormSection({
+  className,
+  initialService,
+}: {
+  className?: string;
+  /** Open straight on this service's first step (the service pages) instead of the service cards. */
+  initialService?: QuoteServiceKey;
+}) {
   const { t, language } = useLanguage();
   const q = t.quoteForm;
   const cardRef = React.useRef<HTMLDivElement>(null);
 
-  const [currentStep, setCurrentStep] = React.useState(0);
-  const [data, setData] = React.useState<QuoteFormData>(QUOTE_FORM_DEFAULTS);
+  const [currentStep, setCurrentStep] = React.useState(initialService ? 1 : 0);
+  const [data, setData] = React.useState<QuoteFormData>(
+    initialService ? { ...QUOTE_FORM_DEFAULTS, service: initialService } : QUOTE_FORM_DEFAULTS
+  );
   const [scriptFiles, setScriptFiles] = React.useState<File[]>([]);
   const [refFiles, setRefFiles] = React.useState<File[]>([]);
   const [isSubmitting, setIsSubmitting] = React.useState(false);
@@ -102,8 +119,10 @@ export function QuoteFormSection({ className }: { className?: string }) {
     }));
   }, []);
 
-  const stepKey = QUOTE_STEPS[currentStep];
-  const isLastStep = currentStep === QUOTE_STEPS.length - 1;
+  const steps = quoteStepsFor(data.service);
+  const stepKey = steps[Math.min(currentStep, steps.length - 1)];
+  const isServiceStep = stepKey === "service";
+  const isLastStep = currentStep === steps.length - 1 && !isServiceStep;
   const canProceed = isQuoteStepValid(stepKey, data, EMAIL_RE);
 
   const scriptBytes = React.useMemo(() => sumBytes(scriptFiles), [scriptFiles]);
@@ -130,6 +149,12 @@ export function QuoteFormSection({ className }: { className?: string }) {
     setCurrentStep(step);
   }
 
+  /** The card CTA: pick the service and open the first step of its flow. */
+  function pickService(service: QuoteServiceKey) {
+    update("service", service);
+    goTo(1);
+  }
+
   async function handleSubmit() {
     if (!canProceed || isSubmitting) return;
     setIsSubmitting(true);
@@ -153,13 +178,18 @@ export function QuoteFormSection({ className }: { className?: string }) {
   }
 
   function resetForm() {
-    setData(QUOTE_FORM_DEFAULTS);
+    setData(initialService ? { ...QUOTE_FORM_DEFAULTS, service: initialService } : QUOTE_FORM_DEFAULTS);
     setScriptFiles([]);
     setRefFiles([]);
     setSubmitError(false);
     setSubmitted(false);
-    setCurrentStep(0);
+    setCurrentStep(initialService ? 1 : 0);
   }
+
+  const serviceName = data.service ? q.serviceNames[data.service] : "";
+  const stepOf = q.stepOf
+    .replace("{current}", String(currentStep))
+    .replace("{total}", String(steps.length - 1));
 
   return (
     <section
@@ -168,13 +198,34 @@ export function QuoteFormSection({ className }: { className?: string }) {
       className={cn("relative w-full scroll-mt-24 py-10 sm:py-14", className)}
     >
       <div className="relative z-10 mx-auto w-full max-w-7xl px-4">
-        <div className="mb-8 text-center sm:mb-10">
-          <h2 className="font-heading mb-3 text-4xl font-bold text-foreground md:text-5xl">
-            {q.title1} <span className="text-section-accent">{q.title2}</span>
-          </h2>
-        </div>
+        {/* Journey part (home): the heading arrives first; the cards / the form card follow. */}
+        <JourneyItem kind="title" className="mb-8 text-center sm:mb-10">
+          {isServiceStep && !submitted ? (
+            <>
+              <h2 className="font-heading mb-3 text-[2.75rem] leading-[1.06] font-extrabold sm:text-5xl md:text-6xl text-foreground">
+                {t.services.title1} <span className="text-section-accent">{t.services.title2}</span>
+              </h2>
+              <p className="mx-auto max-w-xl text-base text-muted-foreground">{t.services.subtitle}</p>
+            </>
+          ) : (
+            <>
+              <h2 className="font-heading mb-3 text-[2.75rem] leading-[1.06] font-extrabold sm:text-5xl md:text-6xl text-foreground">
+                {q.title1} <span className="text-section-accent">{q.title2}</span>
+              </h2>
+              {!submitted ? (
+                <p className="text-sm font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                  {serviceName} · {stepOf}
+                </p>
+              ) : null}
+            </>
+          )}
+        </JourneyItem>
 
         <div ref={cardRef} className="scroll-mt-24">
+          {isServiceStep && !submitted ? (
+            <ServiceStep onPick={pickService} />
+          ) : (
+          <JourneyItem index={0} from="bottom">
           {/* Stepper temporarily disabled (kept for a future revision).
           <div className="mb-6">
             <div className="mb-2 flex justify-between">
@@ -351,6 +402,7 @@ export function QuoteFormSection({ className }: { className?: string }) {
                   initial="hidden"
                   animate="visible"
                 >
+                  {/* AI video */}
                   {stepKey === "script" && (
                     <ScriptStep
                       data={data}
@@ -371,6 +423,25 @@ export function QuoteFormSection({ className }: { className?: string }) {
                     />
                   )}
                   {stepKey === "details" && <DetailsStep data={data} update={update} />}
+                  {/* AI images */}
+                  {stepKey === "imagesSpecs" && <ImagesSpecsStep data={data} update={update} />}
+                  {stepKey === "imagesBrief" && (
+                    <ImagesBriefStep data={data} update={update} refFiles={refFiles} onRefFiles={setRefFiles} otherBytes={scriptBytes} />
+                  )}
+                  {stepKey === "imagesTiming" && <ImagesTimingStep data={data} update={update} />}
+                  {/* Brand mascot */}
+                  {stepKey === "mascotStyle" && <MascotStyleStep data={data} update={update} />}
+                  {stepKey === "mascotBrief" && (
+                    <MascotBriefStep data={data} update={update} refFiles={refFiles} onRefFiles={setRefFiles} otherBytes={scriptBytes} />
+                  )}
+                  {stepKey === "mascotTiming" && <MascotTimingStep data={data} update={update} />}
+                  {/* Automation */}
+                  {stepKey === "automationScope" && <AutomationScopeStep data={data} update={update} />}
+                  {stepKey === "automationBrief" && (
+                    <AutomationBriefStep data={data} update={update} refFiles={refFiles} onRefFiles={setRefFiles} otherBytes={scriptBytes} />
+                  )}
+                  {stepKey === "automationTiming" && <AutomationTimingStep data={data} update={update} />}
+                  {/* Shared last step */}
                   {stepKey === "contact" && <ContactStep data={data} update={update} />}
                 </motion.div>
 
@@ -382,6 +453,7 @@ export function QuoteFormSection({ className }: { className?: string }) {
                     isLastStep && "max-sm:flex-col-reverse max-sm:items-start"
                   )}
                 >
+                  {/* Back from the first flow step returns to the service cards. */}
                   <Button
                     type="button"
                     variant="outline"
@@ -389,7 +461,7 @@ export function QuoteFormSection({ className }: { className?: string }) {
                     disabled={currentStep === 0 || isSubmitting}
                     className="h-10 rounded-full px-5"
                   >
-                    <IconChevronLeft className="size-4" /> {q.back}
+                    <IconChevronLeft className="size-4" /> {currentStep === 1 ? q.changeService : q.back}
                   </Button>
 
                   {isLastStep ? (
@@ -442,6 +514,8 @@ export function QuoteFormSection({ className }: { className?: string }) {
               </>
             )}
           </form>
+          </JourneyItem>
+          )}
         </div>
       </div>
     </section>

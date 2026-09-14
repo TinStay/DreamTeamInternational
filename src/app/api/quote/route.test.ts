@@ -170,4 +170,77 @@ describe("POST /api/quote", () => {
     const email = sendMock.mock.calls[0]![0] as unknown as { text: string };
     expect(email.text).toContain("Нямам краен срок");
   });
+
+  describe("other services", () => {
+    const imagesPayload = {
+      service: "images",
+      name: "Мария",
+      email: "maria@example.com",
+      termsAccepted: true,
+      imageCount: "some",
+      imageResolution: "4k",
+      imageRatios: ["9:16", "1:1", "<b>x</b>"],
+      imageUsage: ["social", "shop"],
+      brief: "Три продукта на бял фон",
+      refLinks: "",
+      deadline: "",
+      deadlineFlexible: true,
+      notes: "",
+      language: "bg",
+      website: "",
+    };
+
+    it("validates the AI images flow on its own required answers, not the video ones", async () => {
+      const res = await POST(makeRequest({ ...imagesPayload, brief: "" }));
+      expect(res.status).toBe(422);
+      const body = await res.json();
+      expect(body.fields).toEqual(["brief"]);
+      expect(sendMock).not.toHaveBeenCalled();
+    });
+
+    it("sends the AI images request with its own subject and labels", async () => {
+      const res = await POST(makeRequest(imagesPayload, [{ field: "refFile", name: "продукт.png" }]));
+      expect(res.status).toBe(200);
+      const email = sendMock.mock.calls[0]![0] as unknown as {
+        subject: string;
+        text: string;
+        html: string;
+        attachments: { filename: string }[];
+      };
+      expect(email.subject).toBe("Заявка за AI изображения - Мария");
+      expect(email.text).toContain("6-20");
+      expect(email.text).toContain("4K");
+      expect(email.text).toContain("9:16, 1:1");
+      expect(email.html).not.toContain("<b>x</b>");
+      expect(email.text).toContain("Социални мрежи, Онлайн магазин / маркетплейс");
+      expect(email.text).toContain("Три продукта на бял фон");
+      expect(email.text).not.toContain("Войсоувър");
+      expect(email.attachments.map((a) => a.filename)).toEqual(["продукт.png"]);
+    });
+
+    it("gates the mascot and automation flows on their required answers", async () => {
+      const mascot = await POST(
+        makeRequest({ ...imagesPayload, service: "mascot", mascotType: "3d", brief: "Дружелюбен робот" })
+      );
+      expect(mascot.status).toBe(422);
+      expect((await mascot.json()).fields).toEqual(["mascotStyle"]);
+
+      const automation = await POST(
+        makeRequest({
+          ...imagesPayload,
+          service: "automation",
+          automationTasks: ["productVideos"],
+          automationVolume: "large",
+          platforms: ["tiktok"],
+          brief: "Видео за всеки нов продукт от фийда",
+        })
+      );
+      expect(automation.status).toBe(200);
+      const email = sendMock.mock.calls.at(-1)![0] as unknown as { subject: string; text: string };
+      expect(email.subject).toBe("Заявка за автоматизация - Мария");
+      expect(email.text).toContain("Продуктови видеа");
+      expect(email.text).toContain("50-200");
+      expect(email.text).toContain("TikTok");
+    });
+  });
 });

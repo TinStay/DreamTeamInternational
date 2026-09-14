@@ -1,6 +1,7 @@
 "use client";
 
 import { useLanguage } from "@/lib/i18n/language-context";
+import { JourneyItem } from "@/components/ui/scroll-journey";
 import { cn } from "@/lib/utils";
 import {
   Accordion,
@@ -31,20 +32,21 @@ export function FaqSection({ className }: { className?: string }) {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <div className="relative z-10 mx-auto w-full max-w-7xl px-4">
-        <div className="mb-10 text-center lg:mb-12">
-          <h2 className="mb-6 font-heading text-4xl font-bold text-foreground md:text-5xl">
+        {/* Journey parts (home): heading first, then the questions alternating from the left / right. */}
+        <JourneyItem kind="title" className="mb-10 text-center lg:mb-12">
+          <h2 className="mb-6 font-heading text-[2.75rem] leading-[1.06] font-extrabold sm:text-5xl md:text-6xl text-foreground">
             {faq.title1}{" "}
             <span className="text-section-accent">{faq.title2}</span>
           </h2>
           <p className="mx-auto max-w-2xl text-lg text-muted-foreground">
             {faq.subtitle}
           </p>
-        </div>
+        </JourneyItem>
 
         <Accordion className="space-y-3 sm:space-y-4">
           {faq.items.map((item, i) => (
+            <JourneyItem key={item.q} index={i}>
             <AccordionItem
-              key={item.q}
               value={`faq-${i}`}
               className="overflow-hidden rounded-2xl border border-card-border bg-card/70 px-6 shadow-sm backdrop-blur-sm sm:rounded-3xl sm:px-8"
             >
@@ -55,6 +57,7 @@ export function FaqSection({ className }: { className?: string }) {
                 <p>{item.a}</p>
               </AccordionContent>
             </AccordionItem>
+            </JourneyItem>
           ))}
         </Accordion>
       </div>

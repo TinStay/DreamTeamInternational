@@ -3,7 +3,6 @@ import { MobileNav } from "@/components/mobile-nav";
 import { HeroSection } from "@/components/hero-section";
 import { QuoteFormSection } from "@/components/quote-form/quote-form-section";
 import { ProjectsShowcase } from "@/components/projects-showcase";
-import { ServicesSection } from "@/components/services-section";
 import { ContactSection } from "@/components/contact-section";
 import { ProcessSection } from "@/components/process-section";
 import { CompanyStatsSection } from "@/components/company-stats-section";
@@ -12,6 +11,9 @@ import { ReviewsSection } from "@/components/reviews-section";
 import { FaqSection } from "@/components/faq-section";
 import { Footer } from "@/components/footer";
 import { GradientBlurPageBg } from "@/components/ui/gradient-blur-bg";
+import { JourneyScene, ScrollJourney } from "@/components/ui/scroll-journey";
+import { atomsBackdrop, blobLeftBackdrop, blobRightBackdrop, journeyMorph, linesBackdrop, wavesBackdrop } from "@/components/ui/journey-backdrops";
+import { OSMO_HANDOFF_VH } from "@/components/projects/showcase-timeline";
 import { MAIN_WITH_FIXED_PAGE_BG_CLASS } from "@/lib/page-shell";
 
 export function HomePage() {
@@ -25,47 +27,59 @@ export function HomePage() {
       <SiteHeader />
 
       <div className="flex-1 w-full relative z-10 flex flex-col">
-        {/* Partners marquee lives inside the hero (bottom strip over the video). */}
-        <HeroSection />
-
-        <div className="relative">
-          <ServicesSection />
-        </div>
-
-        <div className="relative">
-          <QuoteFormSection />
-        </div>
+        {/* Opening journey: the hero's headline / CTAs / partners strip leave as the services + quote wizard
+            arrive (its first step IS the services grid); the wizard then leaves into the projects stage below.
+            The hero keeps its own top (no header padding, no overlap above it). */}
+        <ScrollJourney overlapFirst={false} leaveLast overlap={0.5} reveal={0.35}>
+          <JourneyScene className="pt-0">
+            {/* Partners marquee lives inside the hero (bottom strip over the video). */}
+            <HeroSection />
+          </JourneyScene>
+          {/* Extra bottom room so the wizard never starts leaving while someone is still on a short step. */}
+          <JourneyScene className="pb-[45svh]" backdrop={blobLeftBackdrop}>
+            <QuoteFormSection />
+          </JourneyScene>
+        </ScrollJourney>
 
         {/* Full portfolio lives on /portfolio (hero CTA + nav). Scroll-driven
             showcase below (sticky stage, full-screen clip per project); the
-            filterable list lives on /projects. */}
-        <div className="relative">
+            filterable list lives on /projects. It overlaps the wizard's tail like
+            a journey scene, so its cinema headline is already rising while the
+            wizard's parts leave (plain flow under reduced motion). */}
+        <div className="relative -mt-[45svh] motion-reduce:mt-0">
           <ProjectsShowcase />
         </div>
 
-        <div className="relative">
-          <CompanyStatsSection />
-        </div>
-
-        <div className="relative">
-          <ReviewsSection />
-        </div>
-
-        <div className="relative">
-          <TrainingSection />
-        </div>
-
-        <div className="relative">
-          <ContactSection />
-        </div>
-
-        <div className="relative">
-          <ProcessSection />
-        </div>
-
-        <div className="relative">
-          <FaqSection />
-        </div>
+        {/* The journey keeps going after the stage: each section is a sticky scene
+            whose title and components fly in from different sides and leave again
+            (`JourneyItem`s inside the sections) before the next one arrives. */}
+        {/* Quick pacing: a section changes within about two wheel ticks. One shape travels the whole journey
+            (journey-backdrops.tsx, `journeyMorph`): the canvas comes up `OSMO_HANDOFF_VH` before the stats arrive and
+            takes the OSMO copy circle over from the showcase and slides it into the ring behind the stats, splits into
+            the two particle lines the review cards travel between, closes into the frame behind the trainings (with
+            atoms drifting around), then the outer signal ring behind the contact details; the FAQ gets its blob and
+            smaller atoms. The reviews scene drops the header pad: its own sticky stage
+            (title + card conveyor) carries it. */}
+        <ScrollJourney overlap={0.7} reveal={0.22} morph={journeyMorph} prelude={OSMO_HANDOFF_VH}>
+          <JourneyScene>
+            <CompanyStatsSection />
+          </JourneyScene>
+          <JourneyScene className="pt-0" backdrop={linesBackdrop}>
+            <ReviewsSection />
+          </JourneyScene>
+          <JourneyScene backdrop={atomsBackdrop}>
+            <TrainingSection />
+          </JourneyScene>
+          <JourneyScene backdrop={wavesBackdrop}>
+            <ContactSection />
+          </JourneyScene>
+          <JourneyScene>
+            <ProcessSection />
+          </JourneyScene>
+          <JourneyScene backdrop={blobRightBackdrop}>
+            <FaqSection />
+          </JourneyScene>
+        </ScrollJourney>
       </div>
 
       <div className="relative z-10">

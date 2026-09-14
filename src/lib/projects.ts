@@ -3,6 +3,8 @@
  * `/projects/[slug]`. Copy lives in the dictionaries under
  * `projects.items[id]`; this file holds identity data and numbers only.
  */
+import type { BunnyVideo } from "@/lib/bunny-stream";
+
 export const PROJECT_CATEGORY_KEYS = ["software", "products", "construction"] as const;
 export type ProjectCategoryKey = (typeof PROJECT_CATEGORY_KEYS)[number];
 
@@ -32,6 +34,9 @@ export type ProjectPlatform = {
   views: number | null;
 };
 
+/** A hosted clip a story can embed: a YouTube id or a Bunny Stream video. */
+export type StoryClip = { youtube: string } | { bunny: BunnyVideo };
+
 export type Project = {
   id: ProjectKey;
   category: ProjectCategoryKey;
@@ -43,12 +48,27 @@ export type Project = {
    * `null` renders a branded placeholder — fill in once the clip is published.
    */
   videoId: string | null;
+  /**
+   * Clip for the home showcase frame only - a stand-in that must NOT be
+   * attributed to the client on the case study / cards. Falls back to `videoId`.
+   */
+  showcaseVideoId?: string;
   /** Aspect of the clip behind `videoId`; tall thumbnails get a centre crop. */
   orientation: "wide" | "tall";
   /** Start of the partnership, ISO `yyyy-mm-dd`; `null` hides the tile. */
   since: string | null;
   /** Where the campaign ran. */
   platforms: ProjectPlatform[];
+  /**
+   * Long-form case study ("story") data that is not copy (see `components/projects/story/`): `films` = one entry
+   * per film in `projects.stories[id].films.items` (same order, Emblema) - the YouTube id (`null` = branded
+   * placeholder until the clip is published) and its aspect; `clips` = the named clips a story embeds (Boleron,
+   * Plasico) - YouTube or Bunny, `null` = placeholder.
+   */
+  story?: {
+    films?: { videoId: string | null; orientation: "wide" | "tall" }[];
+    clips?: Record<string, StoryClip | null>;
+  };
   /** Brand accent pair — drives the scroll-showcase background for this project. */
   accent: [string, string];
 };
@@ -71,6 +91,8 @@ export const PROJECTS: Project[] = [
     orientation: "wide",
     since: null,
     platforms: [yt("I6EmmL9u678")],
+    // Story: the Shorts cut and the YouTube pre-roll are published; the Facebook / TikTok cuts show placeholders.
+    story: { clips: { shorts: { youtube: "L4fGQjib0A8" }, youtube: { youtube: "j4cCnQ6rpq4" }, facebook: null, tiktok: null } },
     accent: ["#1d6fe0", "#22c1c3"],
   },
   {
@@ -79,6 +101,8 @@ export const PROJECTS: Project[] = [
     style: "realistic",
     partnerId: "plasico",
     videoId: "dvqlJZPQynw", // "Plasico 1"
+    // Story: "Back to Work 4K" on Bunny Stream, the second film on YouTube.
+    story: { clips: { film: { bunny: { library: "750681", id: "481d2093-0dc0-44db-bda4-4d562c20d8fe" } }, second: { youtube: "dvqlJZPQynw" } } },
     orientation: "wide",
     since: null,
     platforms: [yt("dvqlJZPQynw")],
@@ -88,7 +112,10 @@ export const PROJECTS: Project[] = [
     id: "mindguard",
     category: "software",
     style: "animated",
-    videoId: null, // TODO: not in the portfolio catalogue yet
+    partnerId: "mindguard",
+    videoId: null, // TODO(content): the Mindguard explainer is not on YouTube yet
+    // Stand-in footage ("Map Animation") for the showcase tablet only - never shown as Mindguard's own video.
+    showcaseVideoId: "kCNmslCsfkc",
     orientation: "wide",
     since: null,
     platforms: [],
@@ -104,11 +131,20 @@ export const PROJECTS: Project[] = [
     since: null,
     platforms: [yt("8dw7O71wawY")],
     accent: ["#b45309", "#f59e0b"],
+    // Films 02 (vertical) and 03 get their ids once the clips are on YouTube.
+    story: {
+      films: [
+        { videoId: "8dw7O71wawY", orientation: "wide" },
+        { videoId: null, orientation: "tall" },
+        { videoId: null, orientation: "wide" },
+      ],
+    },
   },
   {
     id: "isupport",
     category: "products",
     style: "semi-realistic",
+    partnerId: "isupport",
     videoId: null, // TODO: not in the portfolio catalogue yet
     orientation: "wide",
     since: null,

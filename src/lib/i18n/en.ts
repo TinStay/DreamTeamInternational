@@ -5,11 +5,12 @@ export const en = {
     services: "Services",
     pricing: "Get a Quote",
     contact: "Contact",
-    quoteCta: "Get a Quote",
+    quoteCta: "Request a quote",
     contactCta: "Contact us",
     training: "Training",
     projects: "Projects",
     phoneCopy: "Copy phone number",
+    emailCopy: "Copy email",
     phoneCopied: "Copied!"
   },
   hero: {
@@ -18,8 +19,7 @@ export const en = {
     titleAfter: "is the limit.",
     seoHeading:
       "DreamTeam - AI video production and AI-powered video ads for brands in Bulgaria and worldwide",
-    subtitle:
-      "AI video production for brands - product spots, cinema ads, mascots and social clips. Describe the video you need and get a tailored quote.",
+    subtitle: "An AI video and media production company - ads, mascots and content for brands worldwide.",
     cta1: "Request a quote",
     cta2: "View Our Work"
   },
@@ -101,19 +101,356 @@ export const en = {
     watch: "Watch the video",
     similar: "Want a similar video?",
     showcase: {
-      eyebrow: "DreamTeam · Case studies",
+      eyebrow: "Our projects",
       title1: "Step into the",
       title2: "cinema",
       subtitle: "Real brands, real campaigns - each with a world of its own.",
       railLabel: "Jump to a project",
       highlights: "Highlights",
       scenes: {
+        boleron: { tagline: "Online insurance" },
         emblema: {
           buildings: [
             { name: "District Living", place: "Chavdar bridge" },
             { name: "Eria", place: "Ovcha Kupel" }
           ]
         }
+      }
+    },
+    /** Long-form case studies (only the projects that have one); structure per project - see `Project.story`. */
+    stories: {
+      emblema: {
+        hero: {
+          eyebrow: "Case study · Emblema",
+          titleLines: ["Two buildings."],
+          titleAccent: "Three short films.",
+          sub: "How we sold the feeling of living in buildings that do not exist yet.",
+          meta: [
+            { label: "Client", value: "Emblema" },
+            { label: "Projects", value: "ERIA · District Living" },
+            { label: "Format", value: "3 short films" },
+            { label: "Role", value: "Full production" },
+            { label: "Year", value: "2026" }
+          ]
+        },
+        client: {
+          eyebrow: "The client",
+          title: "Emblema builds homes. We build the feeling of them.",
+          lead:
+            "Emblema is a Sofia-based residential developer with projects in Ovcha Kupel, Manastirski Livadi and the city centre. Italian ceramic facades, Reynaers aluminium windows and an eye for detail.",
+          body: [
+            "The two projects we worked on are at different stages and speak to different buyers. ERIA is a complex of two sixteen-storey buildings in Ovcha Kupel with 217 apartments and five decares of landscaped courtyard. District Living is a mixed-use city block by the Chavdar bridge, with a retail ground floor, an aparthotel and a gated inner courtyard.",
+            "They share one thing: both are sold before they exist."
+          ]
+        },
+        films: {
+          eyebrow: "The work",
+          title: "Three films.",
+          placeholder: "Film {n} · coming soon",
+          items: [
+            {
+              project: "ERIA · 55 President Lincoln Blvd",
+              title: "Live on the next level",
+              text: "The first ERIA film sets the tone: calm, premium, not a single spare move. The focus is the ventilated ceramic facade, the panoramic views and the car-free inner courtyard.",
+              tags: ["Cinematic", "Exterior & interior", "Voice-over"]
+            },
+            {
+              project: "ERIA · 55 President Lincoln Blvd",
+              title: "Everything within reach",
+              text: "The second film turns from the building to its location. Four minutes' walk to the metro, twelve to the centre, schools and cafés within two. Told through movement, not a map.",
+              tags: ["Location", "Dynamic edit", "Social media"]
+            },
+            {
+              project: "District Living · by the Chavdar bridge",
+              title: "Sofia's new rhythm",
+              text: "A two-minute documentary about the 15-minute city. From the coffee machine in the morning, through a flight down Dondukov Blvd, to sunset on the terrace. The longest and most complex production of the three.",
+              tags: ["2 minutes", "Aerial shots", "Full voice-over", "Macro details"]
+            }
+          ]
+        },
+        challenge: {
+          eyebrow: "The challenge",
+          title: "The buyer has to feel a home that is not there yet.",
+          lead:
+            "3D visualisations show what there will be. They do not show what it will feel like. And that is exactly what someone buying an apartment at the shell stage is paying for.",
+          body: [
+            "The task was not a prettier render. The task was to take the buyer inside the building: the morning light through the windows, the quiet of the inner courtyard, the coffee on the ground floor, the evening on the terrace.",
+            "That is direction, not visualisation. And it had to happen three times in a row without the buildings looking like three different buildings."
+          ]
+        },
+        principles: {
+          eyebrow: "The approach",
+          title: "Cinematic documentary, not a tour of renders.",
+          items: [
+            {
+              title: "Emotion before specification",
+              text: "Every shot answers \"what is it like to live here\", not \"what is it made of\". Materials enter the film through detail and light, not through a list."
+            },
+            {
+              title: "A directed camera",
+              text: "Every move is logical and motivated, as in a feature film. The camera follows a person, the light or a direction of movement - it never moves just to move."
+            },
+            {
+              title: "One building, one world",
+              text: "Time of day, season, colour grade and architectural details stay identical in every shot. That is how three films read as one project instead of three separate attempts."
+            }
+          ]
+        },
+        process: {
+          eyebrow: "The process",
+          title: "How we made these three films.",
+          steps: [
+            {
+              title: "The story",
+              text: "For District Living we wrote a two-minute narrative around the idea of the 15-minute city. For ERIA two shorter ones: one about the building itself, one about what surrounds it."
+            },
+            {
+              title: "Shot-by-shot storyboard",
+              text: "Every shot is described on its own: frame, light, movement and exact duration. District Living alone ran to over fifty shots. The client approves here, not at the end."
+            },
+            {
+              title: "Images, frame by frame",
+              text: "For every shot the final image is built: facade, materials, time of day, people in frame. It is approved as a picture before it goes anywhere near video. This is where consistency gets locked."
+            },
+            {
+              title: "Video from the approved frame",
+              text: "The approved image becomes the first frame. Only the motion is directed: camera, people, light, leaves. Nothing in the frame itself changes."
+            },
+            {
+              title: "Voice, music and sound",
+              text: "A Bulgarian voice-over written to picture and fitted to the cut, so every key word lands on its shot. Plus music and sound design."
+            },
+            {
+              title: "Edit, grade and formats",
+              text: "Final rhythm and a colour grade shared by all three films. Delivered in 16:9 for screens and 9:16 for social media."
+            }
+          ]
+        },
+        problems: {
+          eyebrow: "The hard parts",
+          title: "The three problems that decide everything else.",
+          problemLabel: "Problem",
+          solutionLabel: "Solution",
+          pairs: [
+            {
+              problem: "Consistency. Shots are generated one by one, but the viewer watches them back to back. The slightest difference in time of day, season or facade colour and the building stops being one building.",
+              solution: "We locked light, season and colour grade at the image stage. Every shot is approved before it becomes video. Materials and architectural details are described identically in every shot, no exceptions."
+            },
+            {
+              problem: "Direction. Automatically generated motion looks arbitrary. The camera drifts for no reason, people stand as in a photo and the clip starts to look like a visualisation.",
+              solution: "Every move is motivated. The camera follows a person, the light or an architectural line. The pace is deliberately slower, no jolts. People in frame do something specific instead of posing."
+            },
+            {
+              problem: "Duration. The cost of AI video grows linearly with every second, unlike traditional production.",
+              solution: "The length of every shot is fixed at storyboard level. Nothing is generated \"just in case\". The two-minute District Living film is assembled from shots with a predetermined length."
+            }
+          ]
+        },
+        results: {
+          eyebrow: "The result",
+          title: "Three films that work everywhere.",
+          lead:
+            "The films run on social media and on screens in fitness centres, and accompany the projects' printed materials. The same footage serves the digital campaign and the sales office.",
+          stats: [
+            { num: "3", label: "Short films" },
+            { num: "2", label: "Projects" },
+            { num: "2", label: "Delivery formats" }
+          ],
+          body: [
+            "The real effect is not in the production but at the moment of sale. The buyer does not watch what the building will look like - they watch what living in it will be like. That is the difference between a 3D visualisation and a film.",
+            "AI-generated video turns out more natural than a classic render precisely here. The light is photographic, the people are alive, the motion is soft. The viewer stops looking at a project and starts looking at a home."
+          ]
+        },
+        cta: {
+          eyebrow: "The next project",
+          title: "Have a building that is not built yet?",
+          lead: "We make the film before you pour the first slab.",
+          quote: "Request a quote",
+          contact: "Contact us"
+        }
+      },
+      osmo: {
+        hero: {
+          eyebrow: "Case study · OSMO Bulgaria",
+          title: "AI video ads for Bulgaria's leading importer of wood oils",
+          lead: "How we created a series of product video ads for OSMO's natural oils for Meta Ads — made entirely with artificial intelligence."
+        },
+        facts: [
+          { label: "Client", value: ["OSMO Bulgaria"] },
+          { label: "Industry", value: ["Building materials", "and wood protection"] },
+          { label: "Partnership", value: ["6+ months"] },
+          { label: "Products", value: ["Wood stain oil", "One-coat stain", "UV protection oil", "Decking oil"] },
+          { label: "Delivered", value: ["A series of product video ads, optimised for Meta Ads"] }
+        ],
+        challenge: {
+          eyebrow: "Challenge",
+          title: "Explain and show every product — its purpose and its specifics",
+          body: [
+            "OSMO is a German maker of natural wood oils and waxes with a history going back to 1878. The products soak into the wood and protect it from within — an advantage that is hard to explain in a few seconds on screen.",
+            "A traditional product photo shows a can and a surface. It does not show the rain, the sun and the years the oil keeps the wood safe from, nor the difference between a treated and an untreated facade. On top of that, OSMO's range is varied, each product with its own specifics, and every one of them is unique.",
+            "The brief was for each ad to tell the story of one product's specifics on its own, in about 30 seconds, in a social-media ad format — and to work for awareness and for sales at the same time."
+          ]
+        },
+        solution: {
+          eyebrow: "Solution",
+          title: "Real situations and real product benefits — visualised with artificial intelligence",
+          body: [
+            "Instead of a studio shot of the packaging, we placed every product in the environment it was made for: a terrace under the summer sun, a facade in the rain, a wooden house in the mountains. Its benefits we explained visually — through the way it is applied, before-and-after comparisons and the result on real wood.",
+            "Attention to detail was critical: the labels, the stain tones and the texture of the treated wood have to be recognisable to a craftsman who works with them every day. So we built product references before generating the videos.",
+            "Every video is short, opens with a visual problem and ends with the product as the answer — a format that reads without sound, works across every social network and is optimised for Meta Ads."
+          ]
+        },
+        collage: ["Wood stain oil", "One-coat stain", "UV protection oil", "Decking oil"],
+        metaLabels: { format: "Format", length: "Length", channels: "Channels" },
+        products: [
+          {
+            eyebrow: "Protective wood stain oil",
+            title: "We showed the protection through macro shots and a palette on real samples",
+            body: [
+              "The oil soaking in is an invisible process, so we made it visible: macro shots of the brush along the grain, the oil sinking into the wood's structure, drops stopping on the surface. Every scene is generated from a product reference so the can, label and tone match.",
+              "We showed the colours with a fan of real samples and one facade in different tones, and the applications — facades, fences, garden furniture — as a run of short scenes with on-screen text. Protection from rain, rot and UV is the finale: stylised macro shots of water on treated wood."
+            ],
+            meta: { format: "9:16", length: "32 s", channels: "Meta Ads" }
+          },
+          {
+            eyebrow: "One-coat stain",
+            title: "Before and after in a single shot, and a time-lapse of the application",
+            body: [
+              "The benefit is in the name, so we built the clip around one transformation: a grey, cracked board on a dark background, the brush passes once and right behind the bristles the wood saturates. The before-and-after happens in one continuous shot, with no narration.",
+              "Then the board slots into place in a real fence — a transition from the studio to the real world — and a craftsman finishes the whole fence in fast motion. That is how we showed the application, while the coverage (up to 26 m² per litre), the time saved and the 14 colours came in as short text accents over the finished fence and the lined-up cans."
+            ],
+            meta: { format: "4:5", length: "31 s", channels: "Meta Ads" }
+          },
+          {
+            eyebrow: "UV protection oil",
+            title: "Summer heat, a sunbeam across six colours and slow-motion rain",
+            body: [
+              "We started from the problem, not the product: a drone shot towards a modern house with a wooden facade, a pool and air shimmering in the heat. The can only appears in the second scene, set on boards by the facade with the yard blurred behind it — the product in the centre, the setting still real.",
+              "We showed the application with macro tracking behind the roller along the grain, and the six colours as six vertical boards on the facade that a sunbeam lights up one by one. The protection is summer rain in slow motion: drops beading down the wood without soaking in. The finale is golden hour, the house, the can and the logo."
+            ],
+            meta: { format: "4:5", length: "32 s", channels: "Meta Ads" }
+          },
+          {
+            eyebrow: "Decking oil",
+            title: "One terrace, split in two, through the four seasons",
+            body: [
+              "The whole video is one and the same shot: a low viewpoint at board level, the terrace treated with Decking-Oil on the left, unprotected on the right. We never change the location — we change the season. Spring rain that beads on the left and soaks in on the right; summer sun bleaching the right half; autumn leaves, stains and the first cracks; snow on grey, split wood.",
+              "Between the seasons there is a macro of the seam between the two boards — living grain under a satin coat against a rough, grey surface. The finale closes the story: a brush passes over the untreated half and the colour evens out, then the can and the ten tones fanned out on the terrace at golden hour."
+            ],
+            meta: { format: "4:5", length: "34 s", channels: "Meta Ads" }
+          }
+        ],
+        results: {
+          eyebrow: "Result",
+          title: "Ads ready in weeks, not months",
+          stats: [
+            { num: "4", suffix: "", label: "products in one visual series" },
+            { num: "4", suffix: "", label: "finished video ads" },
+            { num: "250", suffix: "K+", label: "views on Meta" }
+          ],
+          closing: "Today OSMO Bulgaria's videos run in the company's Instagram and Meta campaigns — for brand awareness and for sales. The product is no longer a can on a shelf, but a solution in a real situation."
+        },
+        quote: {
+          eyebrow: "Client testimonial",
+          text: "I was impressed by their ability to get the job done fast. They made me very good, professionally produced videos. The message is clear, the look is modern and the editing holds your attention through the whole video.",
+          name: "Dimitar Vladikov",
+          role: "Owner and general manager, OSMO Bulgaria"
+        },
+        cta: { title: "Want us to present your product in a new, innovative way?", quote: "Request a quote", contact: "Contact us" }
+      },
+      boleron: {
+        hero: {
+          eyebrow: "Case study · Boleron",
+          title: "A brand mascot and AI ads for Bulgaria's largest online insurer",
+          lead: "How we created a brand mascot for Boleron and turned it into ad campaigns for television, social media and YouTube."
+        },
+        facts: [
+          { label: "Client", value: ["Boleron"] },
+          { label: "Industry", value: ["Insurance"] },
+          { label: "Partnership", value: ["6+ months"] },
+          { label: "Delivered", value: ["Brand mascot · TV ad · Social media videos and posts · YouTube ad"] }
+        ],
+        challenge: {
+          eyebrow: "Challenge",
+          title: "A brand everyone knows",
+          body: [
+            "Boleron is Bulgaria's leading digital insurance broker — insurance in minutes, entirely online. But in a sector dominated by traditional companies with decades of history, the digital leader also has to be the most recognisable one.",
+            "The goal was clear: Boleron had to become a brand people remember and like. That meant a character with personality — friendly, modern, unlike anything in insurance — and ads that establish it wherever the audience is.",
+            "We proposed an innovative route: a mascot and ad campaigns created entirely with artificial intelligence. Speed and scale out of reach for traditional production, with quality that makes no compromises."
+          ]
+        },
+        solution: {
+          eyebrow: "Solution",
+          title: "Character first, picture second",
+          body: [
+            "We started with what matters most — who the hero is. Together with the Boleron team we defined the character, and only then did we develop the visual directions. Out of more than 10 concepts the client chose the final mascot.",
+            "After the approval we turned the hero into a complete system: poses, expressions, scenes. That is how it stays the same in every asset — from a TV ad to a social media post."
+          ]
+        },
+        collage: ["At the beach", "In the city", "In the mountains", "At home", "In the sky"],
+        tv: {
+          eyebrow: "TV ad",
+          title: "The hero on air",
+          body: [
+            "We also produced an ad for broadcast — aired on bTV before the weather and the sports news, in the most-watched minutes of the day.",
+            "12 seconds in which the mascot introduces Boleron to the whole of Bulgaria: script, animation, voice-over and editing — entirely with artificial intelligence.",
+            "The result is a TV ad of animation-studio quality, produced in days instead of months and for a fraction of a traditional production's budget."
+          ],
+          meta: [
+            { label: "Channel", value: "bTV" },
+            { label: "Slot", value: "Before the weather and sports" },
+            { label: "Length", value: "12 s" }
+          ]
+        },
+        social: {
+          eyebrow: "Social media",
+          title: "One hero, every format",
+          note: "9:16 · Shorts, Reels, TikTok",
+          items: ["YouTube Shorts", "Facebook", "TikTok"],
+          placeholder: "Coming soon"
+        },
+        youtube: { eyebrow: "YouTube", title: "The hero on YouTube", note: "Pre-roll · 16:9" },
+        results: {
+          eyebrow: "Result",
+          title: "From the first meeting to the airwaves",
+          stats: [
+            { num: "20+", suffix: "", label: "videos in 7 months" },
+            { num: "10+", suffix: "", label: "social media posts" },
+            { num: "50", suffix: "M+", label: "views" },
+            { num: "1", suffix: "", label: "hero the whole of Bulgaria recognises" }
+          ],
+          closing: "Boleron now has a brand hero that lives everywhere — on the website, on social media, on TV. And most importantly: in the minds of people all over Bulgaria."
+        },
+        cta: { title: "Want a brand hero for your business?", quote: "Request a quote", contact: "Contact us" }
+      },
+      plasico: {
+        hero: {
+          eyebrow: "Case study · Plasico",
+          title: "An IT superstore, cinema style",
+          lead: "Three AI video concepts in 4K for Plasico's online store — technology told cinematically, entirely from generated scenes."
+        },
+        films: [
+          {
+            eyebrow: "Film 01 · Back to Work",
+            title: "The working day as a film",
+            body: [
+              "Laptops, monitors and accessories from Plasico's catalogue — placed in real situations from the working day and shot like frames from a film: light, depth, camera movement.",
+              "Every scene is generated from a product reference, so the models, colours and details match the real devices in the store."
+            ],
+            note: "16:9 · 4K"
+          },
+          {
+            eyebrow: "Film 02",
+            title: "The catalogue, told cinematically",
+            body: [
+              "Product shots with macro detail and a premium grade — the feel of a global brand that makes the catalogue exciting rather than merely commercial.",
+              "A short, rhythmic edit that works without sound — for the website, social media and the store's ad campaigns."
+            ],
+            note: "16:9 · 4K"
+          }
+        ],
+        placeholder: "Coming soon",
+        cta: { title: "Want your products in cinema style too?", quote: "Request a quote", contact: "Contact us" }
       }
     },
     categories: {
@@ -137,6 +474,9 @@ export const en = {
     detail: {
       metaTitle: "Case study | DreamTeam",
       eyebrow: "Case study",
+      ctaTitle: "Want a project like this for your brand?",
+      ctaQuote: "Request a quote",
+      ctaContact: "Contact us",
       client: "Client",
       mission: "The mission",
       about: "About the campaign",
@@ -164,9 +504,9 @@ export const en = {
         name: "Boleron",
         headline: "Insurance explained in 30 seconds",
         description:
-          "Over 20 AI videos with Roni, Boleron's robot mascot - from a civil-liability explainer to short social clips - which together passed 75 million views.",
-        highlight: "Over 20 videos with Roni that together generated more than 75 million views.",
-        tags: ["20+ videos", "75M+ views", "Mascot Roni"],
+          "Proof that new technology can reinvent an old industry - insurance told with fresh ideas, in over 20 AI videos and 75 million views.",
+        highlight: "New technology can change an old industry - and bring it new ideas.",
+        tags: ["75M+ views", "Mascot", "20+ videos", "Software ad"],
         mission:
           "Make a mandatory, dry insurance product feel simple and human, so visitors understand it in seconds and finish the purchase online instead of calling an agent.",
         industry: "Online insurance",
@@ -180,7 +520,7 @@ export const en = {
         description:
           "Three AI video concepts in 4K for Plasico's IT superstore - technology told cinematically, built entirely from AI-generated scenes.",
         highlight: "Technology, told cinematically - three video concepts in 4K.",
-        tags: ["3 concepts", "4K", "AI video"],
+        tags: ["Online store ads", "4K"],
         mission:
           "Give an online electronics store the cinematic presence of a global brand - premium visuals that make the catalogue feel exciting rather than transactional.",
         industry: "IT retail",
@@ -193,8 +533,8 @@ export const en = {
         headline: "Calm you can see",
         description:
           "A 60-second animated explainer that makes the Mindguard mental-health platform instantly understandable - shown to Klaus Schwab, the President of Switzerland and Ukraine's largest TV channel.",
-        highlight: "Calm you can see - how a mental-health platform became clear in 60 seconds.",
-        tags: ["60-second explainer", "Mental health", "Shown to Klaus Schwab"],
+        highlight: "Calm you can see - a mental-health platform made clear in 60 seconds.",
+        tags: ["Software showcase", "Mental health", "Shown to Klaus Schwab"],
         mission:
           "Explain an abstract mental-health platform without screenshots - a story-driven animated explainer that makes the value obvious in the first ten seconds.",
         industry: "Mental-health software",
@@ -208,7 +548,7 @@ export const en = {
         description:
           "Two cinematic AI films for Emblema's residential projects - District Living by Chavdar bridge and Eria in Ovcha Kupel - so buyers feel the building before the first brick is laid.",
         highlight: "The emotion of home, told cinematically.",
-        tags: ["2 projects", "2 films", "District Living · Eria"],
+        tags: ["Construction", "Cinema ad"],
         mission:
           "Sell homes off-plan by letting buyers feel the finished building - light, materials and atmosphere - long before construction is complete.",
         industry: "Home construction",
@@ -235,8 +575,8 @@ export const en = {
         headline: "Four product videos that sell",
         description:
           "Four vertical AI promo videos for OSMO's products, made for TikTok, Reels and Shorts - and they lifted sales of the featured products.",
-        highlight: "Four promotional product videos that increased sales of the featured products.",
-        tags: ["4 promo clips", "Product video", "Sales uplift"],
+        highlight: "The right shot sells on its own.",
+        tags: ["Social spots", "Product ad"],
         mission:
           "Cut through crowded social feeds with a fast, vertical product spot that stops the scroll and drives traffic to the online shop.",
         industry: "Consumer products",
@@ -251,6 +591,7 @@ export const en = {
     title2: "Services",
     subtitle: "End-to-end AI production - from video and mascots to stills and automated pipelines.",
     learnMore: "Learn more",
+    quoteCta: "Request a quote",
     metaTitle: "AI Video Services for Business | DreamTeam",
     metaDescription:
       "AI video production, brand mascots, AI images, and automations. AI-powered video ads for brands in Bulgaria and worldwide.",
@@ -843,9 +1184,19 @@ export const en = {
     sendErrorBody: "We could not send your message. Please try again in a moment or email us directly."
   },
   quoteForm: {
-    title1: "Request a Quote for",
-    title2: "AI Video",
+    title1: "Request a",
+    title2: "Quote",
+    /** Eyebrow above the wizard once a service is picked: "{service} · step 2 of 5". */
+    stepOf: "step {current} of {total}",
+    changeService: "Choose another service",
+    serviceNames: {
+      video: "AI video",
+      images: "AI images",
+      mascot: "Brand mascot",
+      automation: "Automation",
+    },
     steps: {
+      service: "Service",
       script: "Script",
       goal: "Goal",
       video: "Video",
@@ -932,6 +1283,131 @@ export const en = {
       title: "Contact details",
       subtitle: "We'll send your quote to the email you provide.",
       company: "Company",
+    },
+    images: {
+      specsTitle: "What images do you need?",
+      countLabel: "How many images?",
+      counts: {
+        few: "1-5",
+        some: "6-20",
+        many: "21-50",
+        bulk: "50+",
+      },
+      resolutionLabel: "Resolution",
+      resolutions: {
+        "1080p": "1080p",
+        "2k": "2K",
+        "4k": "4K",
+      },
+      ratioLabel: "Aspect ratio",
+      ratioHint: "Pick every format you need.",
+      ratios: {
+        "16:9": { label: "16:9", hint: "Landscape - web, banners, TV" },
+        "9:16": { label: "9:16", hint: "Portrait - Stories, Reels, TikTok" },
+        "4:5": { label: "4:5", hint: "Feed posts" },
+        "1:1": { label: "1:1", hint: "Square - profile, catalogue" },
+        "3:2": { label: "3:2", hint: "Photo - print, hero images" },
+        other: { label: "Other / mixed", hint: "Tell us in the brief" },
+      },
+      briefTitle: "Describe the images",
+      briefLabel: "What should the images show?",
+      briefPh: "Products, scenes, mood, colours, text on the image, what they are for…",
+      uploadLabel: "Products for the images / example images",
+      uploadHint: "Photos of the product, your logo, or examples of the look you want.",
+      linksLabel: "Links to examples (optional)",
+      linksPh: "Instagram post, website, Pinterest board…",
+      timingTitle: "Usage & timing",
+      usageLabel: "Where will the images be used?",
+      usages: {
+        website: "Website",
+        social: "Social media",
+        ads: "Paid ads",
+        shop: "Online shop / marketplace",
+        print: "Print",
+      },
+      deadlineLabel: "When do you need the images?",
+    },
+    mascot: {
+      styleTitle: "What kind of mascot?",
+      typeLabel: "Type",
+      types: {
+        "2d": { label: "2D", hint: "Illustrated, flat or shaded" },
+        "3d": { label: "3D", hint: "Rendered character with depth" },
+        unsure: { label: "Not sure yet", hint: "We'll recommend" },
+      },
+      styleLabel: "Style",
+      styles: {
+        cartoon: "Cartoon / playful",
+        realistic: "Realistic",
+        minimal: "Minimal / geometric",
+        open: "Open - surprise me",
+      },
+      usageLabel: "Where will the mascot live?",
+      usages: {
+        video: "Videos & ads",
+        social: "Social media",
+        website: "Website & app",
+        merch: "Print & merchandise",
+      },
+      briefTitle: "Tell us about the character",
+      briefLabel: "Who is the mascot and what is it like?",
+      briefPh: "Your brand, audience, the character's personality, a name if you have one…",
+      uploadLabel: "Brand assets & references",
+      uploadHint: "Logo, brand colours, sketches or examples of mascots you like.",
+      linksLabel: "Links to references (optional)",
+      linksPh: "Website, Instagram, a mascot you like…",
+      timingTitle: "Deliverables & timing",
+      deliverablesLabel: "What do you need at the end?",
+      deliverables: {
+        poses: "Set of poses",
+        expressions: "Facial expressions",
+        animation: "Animated versions",
+        stickers: "Stickers / emoji",
+        model: "3D model file",
+      },
+      deadlineLabel: "When do you need the mascot?",
+    },
+    automation: {
+      scopeTitle: "What should we automate?",
+      tasksLabel: "What do you want to produce automatically?",
+      tasks: {
+        productVideos: "Product videos",
+        socialPosts: "Social media posts",
+        adVariations: "Ad variations",
+        imageVariations: "Image variations & backgrounds",
+        personalized: "Personalized videos",
+        other: "Something else",
+      },
+      volumeLabel: "Volume per month",
+      volumes: {
+        small: "up to 10",
+        medium: "10-50",
+        large: "50-200",
+        xl: "200+",
+      },
+      briefTitle: "Describe the pipeline",
+      inputsLabel: "What do you already have?",
+      inputs: {
+        feed: "Product feed / catalogue",
+        images: "Product images",
+        texts: "Texts & scripts",
+        brandKit: "Brand kit",
+        none: "Nothing yet",
+      },
+      briefLabel: "How should it work?",
+      briefPh: "What goes in, what comes out, how often, where it gets published…",
+      uploadLabel: "Examples & materials",
+      uploadHint: "A sample of the input (feed, images) or of the result you expect.",
+      linksLabel: "Links to examples (optional)",
+      linksPh: "Your shop, a competitor's feed, an example video…",
+      timingTitle: "Destinations & timing",
+      platformsLabel: "Where will the output be published?",
+      deadlineLabel: "When would you like to start?",
+    },
+    timing: {
+      noDeadline: "No hard deadline",
+      notesLabel: "Anything else important we should know?",
+      notesPh: "Budget range, an upcoming launch, requirements from a partner…",
     },
     upload: {
       drop: "Drop a file here or",

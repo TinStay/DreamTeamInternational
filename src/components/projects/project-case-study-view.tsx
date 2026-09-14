@@ -45,6 +45,8 @@ import {
 } from "@/lib/projects";
 import { projectsPath } from "@/lib/routes";
 import { cn } from "@/lib/utils";
+import { PROJECT_STORIES } from "./project-story";
+import { CtaBand } from "./story/primitives";
 import { YOUTUBE_IFRAME_ALLOW, YOUTUBE_REFERRER_POLICY } from "@/lib/youtube-embeds";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
@@ -124,6 +126,14 @@ function DetailRow({
 
 /** Case study page for one project: client logo, mission, description, stats, platforms, quote form. */
 export function ProjectCaseStudyView({ project }: { project: Project }) {
+  // Projects with a long-form story get their own page instead (see project-story.tsx).
+  const Story = PROJECT_STORIES[project.id];
+  if (Story) return <Story project={project} />;
+  return <ProjectCaseStudyDefault project={project} />;
+}
+
+/** The generic case study layout - header panel, stats band, mission / about / video, details sidebar. */
+function ProjectCaseStudyDefault({ project }: { project: Project }) {
   const { t, language } = useLanguage();
   const p = t.projects;
   const d = p.detail;
@@ -194,17 +204,20 @@ export function ProjectCaseStudyView({ project }: { project: Project }) {
                 </p>
 
                 {/* Result tags ("20+ videos", "75M+ views"…) - same list the home showcase leads with. */}
-                <dl className="mt-5 flex flex-wrap gap-2">
-                  <dt className="sr-only">{p.showcase.highlights}</dt>
-                  {copy.tags.map((tag) => (
-                    <dd key={tag}>
-                      <Chip>
-                        <IconSparklesFilled className="size-3.5" aria-hidden />
-                        {tag}
-                      </Chip>
-                    </dd>
-                  ))}
-                </dl>
+                {copy.tags.filter((tag) => tag !== p.categories[project.category]).length > 0 ? (
+                  <dl className="mt-5 flex flex-wrap gap-2">
+                    <dt className="sr-only">{p.showcase.highlights}</dt>
+                    {/* The category already has its own chip above - don't repeat it. */}
+                    {copy.tags.filter((tag) => tag !== p.categories[project.category]).map((tag) => (
+                      <dd key={tag}>
+                        <Chip>
+                          <IconSparklesFilled className="size-3.5" aria-hidden />
+                          {tag}
+                        </Chip>
+                      </dd>
+                    ))}
+                  </dl>
+                ) : null}
 
                 <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
                   {videoHref ? (
@@ -390,6 +403,17 @@ export function ProjectCaseStudyView({ project }: { project: Project }) {
             </div>
           </div>
         </motion.div>
+
+        {/* The band every case study ends on: a quote and a contact way in. */}
+        <div className="mx-auto mt-16 w-full max-w-7xl px-4 sm:px-6 lg:mt-20 lg:px-8">
+          <CtaBand
+            title={d.ctaTitle}
+            quote={d.ctaQuote}
+            contact={d.ctaContact}
+            tone="page"
+            className="rounded-3xl border border-card-border bg-card p-8 text-card-foreground shadow-elevated-soft sm:p-12"
+          />
+        </div>
 
         {/* Same multi-step quote wizard as the home page. */}
         <QuoteFormSection className="mt-6" />

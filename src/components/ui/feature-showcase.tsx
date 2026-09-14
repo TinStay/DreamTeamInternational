@@ -39,6 +39,8 @@ export type FeatureShowcaseProps = {
   className?: string;
   variant?: "section" | "modal";
   titleAs?: "h1" | "h2";
+  /** A call to action under the description (section variant). */
+  action?: React.ReactNode;
 };
 
 function ModalCarouselTabs({
@@ -138,6 +140,7 @@ export function FeatureShowcase({
   className,
   variant = "section",
   titleAs = "h2",
+  action,
 }: FeatureShowcaseProps) {
   const initial = defaultTab ?? tabs[0]?.value ?? "tab-0";
   const [activeTab, setActiveTab] = React.useState(initial);
@@ -198,6 +201,8 @@ export function FeatureShowcase({
               {description}
             </p>
           ) : null}
+
+          {!isModal && action ? <div className="mt-7">{action}</div> : null}
 
           {stats.length > 0 && (
             <div className={cn("flex flex-wrap gap-2", isModal ? "mt-4" : "mt-6")}>

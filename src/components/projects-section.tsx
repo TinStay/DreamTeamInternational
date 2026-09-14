@@ -3,7 +3,7 @@
 import { useMemo, useRef, useState, type ComponentType } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { motion, useInView } from "motion/react";
+import { motion, useInView, useReducedMotion } from "motion/react";
 import {
   IconBoxMultipleFilled,
   IconCircleArrowRightFilled,
@@ -51,11 +51,12 @@ export const TAG_CHIP_LIGHT_CLASS =
   "inline-flex items-center gap-1.5 rounded-md border border-black/15 bg-white/70 px-2 py-1 text-[0.65rem] font-semibold uppercase tracking-widest text-neutral-900 backdrop-blur-md";
 
 /**
- * Category + fact tags for a project: icon + text only (labels stay for screen
- * readers). `facts` (default) shows campaign + style; `highlights` shows the
- * project's result tags from the dictionary (`items[id].tags` - "20+ videos",
- * "75M+ views"…), which is what the home showcase leads with. `tone` picks
- * the chip surface for dark footage vs. a light scene.
+ * Tags for a project: icon + text only (labels stay for screen readers).
+ * `facts` (default) shows the category chip + campaign + style; `highlights`
+ * shows *only* the project's curated tags from the dictionary
+ * (`items[id].tags` - "75M+ views", "Cinema ad"…, in that order), which is
+ * what the home showcase leads with. `tone` picks the chip surface for dark
+ * footage vs. a light scene.
  */
 export function ProjectTagChips({
   project,
@@ -78,11 +79,13 @@ export function ProjectTagChips({
   const iconClass = tone === "light" ? "size-3 text-neutral-500" : "size-3 text-white/70";
   return (
     <dl className={cn("flex flex-wrap items-center gap-1.5", className)}>
-      <div className={chipClass}>
-        <CategoryIcon className={iconClass} aria-hidden />
-        <dt className="sr-only">{p.facts.industry}</dt>
-        <dd>{p.categories[project.category]}</dd>
-      </div>
+      {variant === "facts" ? (
+        <div className={chipClass}>
+          <CategoryIcon className={iconClass} aria-hidden />
+          <dt className="sr-only">{p.facts.industry}</dt>
+          <dd>{p.categories[project.category]}</dd>
+        </div>
+      ) : null}
       {tags.map(({ key, label, value, Icon }) => (
         <div key={key} className={chipClass}>
           <Icon className={iconClass} aria-hidden />
@@ -154,7 +157,8 @@ export function ClientLogo({
           width={400}
           height={140}
           sizes="80px"
-          className="max-h-full w-auto max-w-full object-contain"
+          // A white-ink-only mark is inverted so it reads on the white circle.
+          className={cn("max-h-full w-auto max-w-full object-contain", partner.invertOnLight && "invert")}
         />
       ) : (
         <span
@@ -240,11 +244,13 @@ export function ProjectBackdropMedia({
   const ref = useRef<HTMLDivElement>(null);
   // `once` so scrolling back up doesn't restart every player.
   const inView = useInView(ref, { once: true, margin: "250px 0px 250px 0px" });
+  // Reduced motion: keep the poster, never autoplay.
+  const reduceMotion = useReducedMotion();
 
   return (
     <div ref={ref} className="absolute inset-0 overflow-hidden" aria-hidden>
       <ProjectThumbnail project={project} alt={alt} sizes={sizes} priority={priority} />
-      {project.videoId && inView ? (
+      {project.videoId && inView && !reduceMotion ? (
         <iframe
           className={cn(
             "pointer-events-none absolute left-1/2 top-1/2 h-full w-full -translate-x-1/2 -translate-y-1/2",
@@ -273,14 +279,16 @@ export function ProjectCard({ project, index }: { project: Project; index: numbe
   const { t, language } = useLanguage();
   const p = t.projects;
   const copy = p.items[project.id];
+  const reduceMotion = useReducedMotion();
 
   return (
     <motion.article
-      // Tilts up out of the page with a blur; the right column trails the left.
-      initial={{ opacity: 0, y: 80, rotateX: 16, scale: 0.93, filter: "blur(10px)" }}
+      // Tilts up out of the page with a blur; the right column trails the left. Skipped under reduced motion.
+      initial={reduceMotion ? false : { opacity: 0, y: 80, rotateX: 16, scale: 0.93, filter: "blur(10px)" }}
       whileInView={{ opacity: 1, y: 0, rotateX: 0, scale: 1, filter: "blur(0px)" }}
-      viewport={{ once: true, amount: 0.2 }}
-      transition={{ duration: 0.85, delay: (index % 2) * 0.14, ease: EASE }}
+      viewport={{ once: true, amount: reduceMotion ? 0 : 0.2 }}
+      // Reduced motion also snaps the (server-rendered) initial state straight to the final one.
+      transition={reduceMotion ? { duration: 0 } : { duration: 0.85, delay: (index % 2) * 0.14, ease: EASE }}
       style={{ transformPerspective: 1400, transformOrigin: "50% 100%" }}
       className="group relative aspect-[16/10] w-full overflow-hidden rounded-3xl bg-card-elevated shadow-[0_32px_80px_-24px_rgba(2,6,23,0.55)] ring-1 ring-black/5 transition-shadow duration-300 will-change-transform hover:shadow-[0_40px_100px_-24px_rgba(2,6,23,0.65)] dark:ring-white/10 sm:aspect-[16/9]"
     >
