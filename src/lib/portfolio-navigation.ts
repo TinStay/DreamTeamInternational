@@ -1,3 +1,5 @@
+import { scrollToElement } from "@/lib/smooth-scroll";
+
 export type PortfolioNavigateDetail = {
   category?: string;
 };
@@ -13,8 +15,5 @@ export function navigateToPortfolio(category?: string) {
     })
   );
 
-  document.getElementById("portfolio")?.scrollIntoView({
-    behavior: "smooth",
-    block: "start",
-  });
+  scrollToElement(document.getElementById("portfolio"));
 }

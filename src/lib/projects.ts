@@ -3,7 +3,7 @@
  * `/projects/[slug]`. Copy lives in the dictionaries under
  * `projects.items[id]`; this file holds identity data and numbers only.
  */
-import type { BunnyVideo } from "@/lib/bunny-stream";
+import { bunny, type BunnyVideo } from "@/lib/bunny-stream";
 
 export const PROJECT_CATEGORY_KEYS = ["software", "products", "construction"] as const;
 export type ProjectCategoryKey = (typeof PROJECT_CATEGORY_KEYS)[number];
@@ -49,10 +49,22 @@ export type Project = {
    */
   videoId: string | null;
   /**
+   * The project's own clip on Bunny Stream, for a project whose film is not on YouTube: the cards' poster +
+   * background player and the showcase frame use it in `videoId`'s place (`videoId` wins when both exist).
+   */
+  clip?: BunnyVideo;
+  /**
    * Clip for the home showcase frame only - a stand-in that must NOT be
-   * attributed to the client on the case study / cards. Falls back to `videoId`.
+   * attributed to the client on the case study / cards. Falls back to `clip`, then `videoId`.
    */
   showcaseVideoId?: string;
+  /** A Bunny clip for the home showcase frame (preferred over `showcaseVideoId`); MindGuard's UI/UX film. */
+  showcaseClip?: BunnyVideo;
+  /**
+   * The generic case study's ground in the client's colours (light / dark theme) - a project with a long-form story
+   * paints its own (see `StoryShell`).
+   */
+  world?: { light: string; dark: string; accent: string };
   /** Aspect of the clip behind `videoId`; tall thumbnails get a centre crop. */
   orientation: "wide" | "tall";
   /** Start of the partnership, ISO `yyyy-mm-dd`; `null` hides the tile. */
@@ -61,12 +73,12 @@ export type Project = {
   platforms: ProjectPlatform[];
   /**
    * Long-form case study ("story") data that is not copy (see `components/projects/story/`): `films` = one entry
-   * per film in `projects.stories[id].films.items` (same order, Emblema) - the YouTube id (`null` = branded
-   * placeholder until the clip is published) and its aspect; `clips` = the named clips a story embeds (Boleron,
-   * Plasico) - YouTube or Bunny, `null` = placeholder.
+   * per film in `projects.stories[id].films.items` (same order, Emblema) - the clip (`null` = branded
+   * placeholder until it is published) and its aspect; `clips` = the named clips a story embeds (Boleron,
+   * Plasico, MindGuard, OSMO) - YouTube or Bunny, `null` = placeholder.
    */
   story?: {
-    films?: { videoId: string | null; orientation: "wide" | "tall" }[];
+    films?: { clip: StoryClip | null; orientation: "wide" | "tall" }[];
     clips?: Record<string, StoryClip | null>;
   };
   /** Brand accent pair — drives the scroll-showcase background for this project. */
@@ -91,8 +103,24 @@ export const PROJECTS: Project[] = [
     orientation: "wide",
     since: null,
     platforms: [yt("I6EmmL9u678")],
-    // Story: the Shorts cut and the YouTube pre-roll are published; the Facebook / TikTok cuts show placeholders.
-    story: { clips: { shorts: { youtube: "L4fGQjib0A8" }, youtube: { youtube: "j4cCnQ6rpq4" }, facebook: null, tiktok: null } },
+    // Story: the Shorts cut and the YouTube pre-roll are on YouTube, the Facebook / TikTok cuts show placeholders,
+    // and the eight product ads (all 16:9) are on Bunny Stream - keyed by product, in `AD_KEYS` order on the page.
+    story: {
+      clips: {
+        shorts: { youtube: "L4fGQjib0A8" },
+        youtube: { youtube: "j4cCnQ6rpq4" },
+        facebook: null,
+        tiktok: null,
+        summer: { bunny: { library: "750681", id: "879d538c-1bb4-46d3-bbd0-6bd9d3cab9eb" } }, // "Boleron - Лятна Реклама"
+        casco4: { bunny: { library: "750681", id: "57df0c8a-c7aa-46cc-a581-b71019803c70" } }, // "Boleron - Автокаско 4"
+        liability3: { bunny: { library: "750681", id: "aeb0681d-6e2f-4aff-bfc7-463e87c443f4" } }, // "Гражданска Отговорност 3 - Хоризонтално 4k"
+        property: { bunny: { library: "750681", id: "73680a1c-ff29-44a4-b248-07511785b74b" } }, // "Имуществена Застраховка Хоризонтално"
+        travel: { bunny: { library: "750681", id: "84014d4f-6f5f-418c-8541-36fd7fcf93cf" } }, // "Пътуване в чужбина - horizontal"
+        liabilityApp: { bunny: { library: "750681", id: "a12ed819-ef01-4098-bc7a-5dee4249be56" } }, // "Boleron Гражданска Интерфейс (horizontal)"
+        casco3: { bunny: { library: "750681", id: "566606d5-c770-4397-b712-3523dd07bbc6" } }, // "Boleron Автокаско 3"
+        liability2: { bunny: { library: "750681", id: "d3c562b7-d5e9-4a8b-979c-0619227e97bf" } }, // "Гражданска 2"
+      },
+    },
     accent: ["#1d6fe0", "#22c1c3"],
   },
   {
@@ -101,8 +129,17 @@ export const PROJECTS: Project[] = [
     style: "realistic",
     partnerId: "plasico",
     videoId: "dvqlJZPQynw", // "Plasico 1"
-    // Story: "Back to Work 4K" on Bunny Stream, the second film on YouTube.
-    story: { clips: { film: { bunny: { library: "750681", id: "481d2093-0dc0-44db-bda4-4d562c20d8fe" } }, second: { youtube: "dvqlJZPQynw" } } },
+    // The home showcase frame plays the "Back to Work 4K" ad from Bunny Stream.
+    showcaseClip: bunny("481d2093-0dc0-44db-bda4-4d562c20d8fe"),
+    // Story: the three ads in the order they were made, all on Bunny Stream - "Back to Work 4K" (the office one,
+    // 16:9), "Back to School" (the vertical 9:16 cut, with subtitles) and the "Hot Summer Sale" spot.
+    story: {
+      clips: {
+        first: { bunny: { library: "750681", id: "481d2093-0dc0-44db-bda4-4d562c20d8fe" } },
+        second: { bunny: { library: "750681", id: "9bbc728d-de27-4404-994c-3f987516db83" } },
+        third: { bunny: { library: "750681", id: "eeaa9212-f44d-4d7c-b69a-b3054c758eed" } },
+      },
+    },
     orientation: "wide",
     since: null,
     platforms: [yt("dvqlJZPQynw")],
@@ -113,9 +150,23 @@ export const PROJECTS: Project[] = [
     category: "software",
     style: "animated",
     partnerId: "mindguard",
-    videoId: null, // TODO(content): the Mindguard explainer is not on YouTube yet
-    // Stand-in footage ("Map Animation") for the showcase tablet only - never shown as Mindguard's own video.
-    showcaseVideoId: "kCNmslCsfkc",
+    videoId: null, // the films are on Bunny Stream, not YouTube - see `clip` and `story.clips`
+    // The PR film (the one presented to Prof. Klaus Schwab) - the cards' poster + player.
+    clip: bunny("dbb13635-0fda-4d13-8ff6-1a832cbc54af"),
+    // The showcase tablet plays the UI/UX film (the interface, made for TV).
+    showcaseClip: bunny("973736cf-0b6c-417e-b0fe-45c5e2dfa14b"),
+    // Story: the four films, keyed as `stories.mindguard.film.items` - the PR film (Klaus Schwab), the user film
+    // (the President of Switzerland), the UI/UX film for TV, and the TV block stream on Ukraine's national TV.
+    story: {
+      clips: {
+        pr: { bunny: { library: "750681", id: "dbb13635-0fda-4d13-8ff6-1a832cbc54af" } },
+        president: { bunny: { library: "750681", id: "067fb3bd-0528-4972-bfba-5e0007f2e7c3" } },
+        tv: { bunny: { library: "750681", id: "973736cf-0b6c-417e-b0fe-45c5e2dfa14b" } },
+        broadcast: { bunny: { library: "750681", id: "e9ebc942-97c4-4b00-8609-9b85f695f274" } },
+      },
+    },
+    // The platform's own colours (mymindguard.ai): charcoal, teal - and the teal on a whisper-of-teal white.
+    world: { light: "#F3F7F7", dark: "#0E1116", accent: "#45A199" },
     orientation: "wide",
     since: null,
     platforms: [],
@@ -131,12 +182,14 @@ export const PROJECTS: Project[] = [
     since: null,
     platforms: [yt("8dw7O71wawY")],
     accent: ["#b45309", "#f59e0b"],
-    // Films 02 (vertical) and 03 get their ids once the clips are on YouTube.
+    // The three films on Bunny Stream, in the order of `stories.emblema.films.items`: "Eria Video 1 - Movie
+    // Style" (4K, wide) and "Eria Video 2 / 3 - Social Media" (both vertical). NOTE(content): the third item's copy
+    // still describes the District Living film - the clip delivered as the third is an ERIA social cut.
     story: {
       films: [
-        { videoId: "8dw7O71wawY", orientation: "wide" },
-        { videoId: null, orientation: "tall" },
-        { videoId: null, orientation: "wide" },
+        { clip: { bunny: { library: "750681", id: "28f54810-3c7b-4beb-9a0a-f6f0926323d5" } }, orientation: "wide" },
+        { clip: { bunny: { library: "750681", id: "521631f9-1eb7-4dca-a39d-603bf7d61c3f" } }, orientation: "tall" },
+        { clip: { bunny: { library: "750681", id: "d491c5e2-2f68-489b-8318-bdae7816a1a9" } }, orientation: "tall" },
       ],
     },
   },
@@ -160,6 +213,16 @@ export const PROJECTS: Project[] = [
     orientation: "tall",
     since: null,
     platforms: [yt("Ufr8ZBXw9hk")],
+    // Story: the four product films on Bunny Stream (4:5, 9:16, 4:5, 4:5 - their real frames), in the order of
+    // `stories.osmo.products`.
+    story: {
+      clips: {
+        lazur: { bunny: { library: "750681", id: "41c9be58-ac47-425a-9b93-240185214c08" } }, // "1. Лазурно Масло Осмо" (1080×1350)
+        singleCoat: { bunny: { library: "750681", id: "ec95a6f3-740c-4f12-ab67-b9d71647d558" } }, // "2. Еднослоен Лазур" (608×1088)
+        uv: { bunny: { library: "750681", id: "49a2ee2c-e8ee-4549-b934-7b39fffaace8" } }, // "3. УВ Защитно Масло" (1080×1340)
+        decking: { bunny: { library: "750681", id: "77afdafa-a4c2-48fa-8e08-ef9a8ef6b269" } }, // "4. Decking Масло" (2048×2560)
+      },
+    },
     accent: ["#e11d48", "#f97316"],
   },
 ];
@@ -170,6 +233,7 @@ export const PROJECTS: Project[] = [
  * Everything in `PROJECTS` still lists on `/projects`.
  */
 export const SHOWCASE_PROJECT_KEYS = ["boleron", "emblema", "mindguard", "plasico", "osmo"] as const satisfies readonly ProjectKey[];
+export type ShowcaseProjectKey = (typeof SHOWCASE_PROJECT_KEYS)[number];
 
 export const SHOWCASE_PROJECTS: Project[] = SHOWCASE_PROJECT_KEYS.map(
   (key) => PROJECTS.find((project) => project.id === key)!

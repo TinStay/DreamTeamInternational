@@ -3,6 +3,7 @@
 import { memo, useEffect, useMemo, useRef, useState } from "react";
 import { useLanguage } from "@/lib/i18n/language-context";
 import { PORTFOLIO_NAVIGATE_EVENT, type PortfolioNavigateDetail } from "@/lib/portfolio-navigation";
+import { scrollToElement } from "@/lib/smooth-scroll";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { primaryGradientInteractiveClassName } from "@/components/ui/button";
@@ -570,10 +571,7 @@ export function PortfolioSection({
   );
 
   const scrollPortfolioIntoView = () => {
-    document.getElementById("portfolio")?.scrollIntoView({
-      behavior: "smooth",
-      block: "start",
-    });
+    scrollToElement(document.getElementById("portfolio"));
   };
 
   const isActiveTab = (key: string) => key === activeCategory;

@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/button";
 import { JourneyItem } from "@/components/ui/scroll-journey";
 import { useLanguage } from "@/lib/i18n/language-context";
+import { scrollToElement } from "@/lib/smooth-scroll";
 import { EMAIL_RE } from "@/lib/server/form-guards";
 import { servicesPath } from "@/lib/routes";
 import { SOCIAL_LINKS } from "@/lib/social-links";
@@ -84,9 +85,12 @@ function sumBytes(files: File[]): number {
  */
 export function QuoteFormSection({
   className,
+  headingClassName,
   initialService,
 }: {
   className?: string;
+  /** Extra classes for the heading block - e.g. white ink tokens when the section sits on a colour (a story page). */
+  headingClassName?: string;
   /** Open straight on this service's first step (the service pages) instead of the service cards. */
   initialService?: QuoteServiceKey;
 }) {
@@ -140,7 +144,7 @@ export function QuoteFormSection({
     // only when the card top scrolled out of view.
     const isMobile = window.matchMedia("(max-width: 1023px)").matches;
     if (isMobile || el.getBoundingClientRect().top < 0) {
-      el.scrollIntoView({ behavior: "smooth", block: "start" });
+      scrollToElement(el);
     }
   }, [currentStep]);
 
@@ -199,7 +203,7 @@ export function QuoteFormSection({
     >
       <div className="relative z-10 mx-auto w-full max-w-7xl px-4">
         {/* Journey part (home): the heading arrives first; the cards / the form card follow. */}
-        <JourneyItem kind="title" className="mb-8 text-center sm:mb-10">
+        <JourneyItem kind="title" className={cn("mb-8 text-center sm:mb-10", headingClassName)}>
           {isServiceStep && !submitted ? (
             <>
               <h2 className="font-heading mb-3 text-[2.75rem] leading-[1.06] font-extrabold sm:text-5xl md:text-6xl text-foreground">

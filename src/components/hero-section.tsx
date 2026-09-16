@@ -10,11 +10,8 @@ import { JourneyItem } from "@/components/ui/scroll-journey";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/lib/i18n/language-context";
 import { homePath, portfolioPath } from "@/lib/routes";
-import {
-  HERO_EMBED,
-  YOUTUBE_IFRAME_ALLOW,
-  YOUTUBE_REFERRER_POLICY,
-} from "@/lib/youtube-embeds";
+import { HERO_VIDEO, bunnyBackgroundEmbedSrc } from "@/lib/bunny-stream";
+import { YOUTUBE_IFRAME_ALLOW, YOUTUBE_REFERRER_POLICY } from "@/lib/youtube-embeds";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
@@ -48,18 +45,20 @@ export function HeroSection() {
           headline below is decorative and demoted to a paragraph. */}
       <h1 className="sr-only">{t.hero.seoHeading}</h1>
 
-      {/* Background video */}
+      {/* Background film: the Bunny Stream player (`HERO_VIDEO`), muted, looping - a 16:9 box centred on the section
+          and cover-fit to it (no extra zoom or crop: unlike the old YouTube embed there is no player chrome to hide). */}
       <div className="absolute inset-0 z-0 overflow-hidden">
-        <div className="pointer-events-none absolute inset-0 overflow-hidden scale-105">
+        <div className="pointer-events-none absolute inset-0 overflow-hidden">
           <iframe
-            className="absolute left-1/2 top-1/2 h-[100svh] w-[177.78svh] min-h-[56.25vw] min-w-[100vw] -translate-x-1/2 -translate-y-1/2 origin-center scale-[1.22] [clip-path:inset(0_0_8%_0)]"
-            src={HERO_EMBED.src}
-            title={HERO_EMBED.title ?? "YouTube video"}
+            className="absolute left-1/2 top-1/2 h-[100svh] w-[177.78svh] min-h-[56.25vw] min-w-[100vw] -translate-x-1/2 -translate-y-1/2"
+            src={bunnyBackgroundEmbedSrc(HERO_VIDEO)}
+            title="DreamTeam hero video"
+            tabIndex={-1}
             allow={YOUTUBE_IFRAME_ALLOW}
             allowFullScreen={false}
             referrerPolicy={YOUTUBE_REFERRER_POLICY}
           />
-          {/* Masks residual YouTube center / corner UI after load (cannot be removed from inside the iframe). */}
+          {/* A soft vignette toward the edges, so the copy and the partners strip sit on calmer footage. */}
           <div
             className="pointer-events-none absolute inset-0 z-[0.5] bg-[radial-gradient(ellipse_52%_50%_at_50%_50%,transparent_22%,rgba(0,0,0,0.16)_50%,rgba(0,0,0,0.38)_100%)]"
             aria-hidden

@@ -5,8 +5,9 @@ import { motion, useScroll, useSpring, useTransform } from "motion/react";
 
 import { useLanguage } from "@/lib/i18n/language-context";
 import { InfiniteSlider } from "@/components/ui/infinite-slider";
-import { Testimonial } from "@/components/ui/testimonial";
+import { AVATAR_SHAPES, Testimonial } from "@/components/ui/testimonial";
 import { JourneyItem, useJourney, type JourneySide } from "@/components/ui/scroll-journey";
+import { useScrollEased } from "@/lib/smooth-scroll";
 import { cn } from "@/lib/utils";
 
 const COLUMN_DURATIONS = [55, 75, 62];
@@ -26,7 +27,7 @@ const EDGE = 28;
 const TOP_INSET = EDGE + 28;
 /** The cards travel this much faster than the page - a touch livelier than plain scrolling. */
 const SPEED = 1.2;
-/** Track smoothing - stiff, so a wheel tick glides instead of stepping. */
+/** Track smoothing under native scrolling - stiff, so a wheel tick glides instead of stepping. */
 const SPRING = { stiffness: 260, damping: 36, mass: 0.5, restDelta: 0.001 };
 
 /** 1 column below md, 2 below lg, 3 from lg — matches the Tailwind breakpoints. */
@@ -87,7 +88,7 @@ function ReviewConveyor({ items, heading }: { items: Review[]; heading: React.Re
   // bottom meets the viewport bottom - on desktop the moment the stage lets go; below `lg` (mobile dock) the moment
   // the scene's hand-over begins, so the stack is at rest for that last dock-high stretch while the parts fade.
   const { scrollYProgress } = useScroll({ target: runwayRef, offset: ["start 0px", "end 100%"] });
-  const progress = useSpring(scrollYProgress, SPRING);
+  const progress = useScrollEased(scrollYProgress, useSpring(scrollYProgress, SPRING));
   const y = useTransform(progress, (p) => -p * travel);
 
   return (
@@ -110,10 +111,10 @@ function ReviewConveyor({ items, heading }: { items: Review[]; heading: React.Re
             <motion.div
               ref={trackRef}
               // Odd card at the end of a two-column stack: centred across both columns.
-              className="absolute inset-x-0 mx-auto grid w-[calc(100%-2rem)] grid-cols-1 gap-3 md:w-[min(72rem,calc(84vw-4rem))] md:grid-cols-2 md:gap-4 md:[&>*:nth-child(odd):last-child]:col-span-2 md:[&>*:nth-child(odd):last-child]:w-[calc(50%-0.5rem)] md:[&>*:nth-child(odd):last-child]:justify-self-center"
+              className="absolute inset-x-0 mx-auto grid w-[calc(100%-2rem)] grid-cols-1 gap-3 will-change-transform md:w-[min(72rem,calc(84vw-4rem))] md:grid-cols-2 md:gap-4 md:[&>*:nth-child(odd):last-child]:col-span-2 md:[&>*:nth-child(odd):last-child]:w-[calc(50%-0.5rem)] md:[&>*:nth-child(odd):last-child]:justify-self-center"
               style={{ top: TOP_INSET, y, gridAutoRows: rowMin > 0 ? `minmax(${Math.round(rowMin)}px, auto)` : undefined }}
             >
-              {items.map((review) => (
+              {items.map((review, index) => (
                 <div key={review.name} className="flex">
                   <Testimonial
                     name={review.name}
@@ -122,6 +123,7 @@ function ReviewConveyor({ items, heading }: { items: Review[]; heading: React.Re
                     rating={review.rating}
                     initials={review.initials}
                     color={review.color}
+                    shape={AVATAR_SHAPES[index % AVATAR_SHAPES.length]}
                     compact
                     className="w-full max-w-none"
                   />
@@ -196,6 +198,7 @@ export function ReviewsSection({ className }: { className?: string }) {
                         rating={review.rating}
                         initials={review.initials}
                         color={review.color}
+                        shape={AVATAR_SHAPES[items.indexOf(review) % AVATAR_SHAPES.length]}
                         className="w-full"
                       />
                     </div>

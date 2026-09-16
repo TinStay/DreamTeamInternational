@@ -10,12 +10,6 @@ export const YOUTUBE_IFRAME_ALLOW =
   "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share";
 export const YOUTUBE_REFERRER_POLICY = "strict-origin-when-cross-origin" as const;
 
-export const HERO_EMBED: YouTubeEmbed = {
-  // Hero video (16:9): controls/fs/iv/cc minimize in-iframe chrome; autoplay+mute for background playback.
-  src: "https://www.youtube.com/embed/aZ3llb8YVXE?si=HqE-1rIFNgBY5xLI&autoplay=1&mute=1&controls=0&loop=1&playlist=aZ3llb8YVXE&modestbranding=1&playsinline=1&rel=0&disablekb=1&fs=0&iv_load_policy=3&cc_load_policy=0",
-  title: "DreamTeam hero video",
-};
-
 // Portfolio defaults (used for categories without specific lists yet)
 export const PORTFOLIO_DEFAULT_WIDE: YouTubeEmbed = {
   src: "https://www.youtube.com/embed/fznYCs6dvQI",

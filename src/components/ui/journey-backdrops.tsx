@@ -4,7 +4,7 @@ import { useEffect, useRef, type CSSProperties } from "react";
 import { motion, useMotionTemplate, useMotionValue, useTransform, type MotionValue } from "motion/react";
 import { cn } from "@/lib/utils";
 import type { JourneyBackdrop, JourneyBackdropProps, JourneyMorph } from "@/components/ui/scroll-journey";
-import { OSMO_CIRCLE, OSMO_CIRCLE_MOBILE, OSMO_HANDOFF_START, SHOWCASE_HOLD, osmoCircleLayer } from "@/components/projects/showcase-timeline";
+import { OSMO_CIRCLE, OSMO_HANDOFF_START, SHOWCASE_HOLD, osmoCircleLayer, osmoCircleMobile } from "@/components/projects/showcase-timeline";
 
 /*
  * Background furniture for the home journeys, drawn on the journey's fixed
@@ -53,12 +53,10 @@ function stations(vp: Viewport): Geo[] {
   const { w: vw, h: vh } = vp;
   const lg = vw >= 1024;
   const md = vw >= 768;
-  const sm = vw >= 640;
+  const mobileDisc = osmoCircleMobile(vw, vh);
   return [
     // 0 · the OSMO copy circle (× its outro swell, applied by the caller) - where the showcase leaves it
-    lg
-      ? circle(OSMO_CIRCLE.x * vw, OSMO_CIRCLE.y * vh, Math.min(0.46 * vw, 0.88 * vh))
-      : circle(OSMO_CIRCLE_MOBILE.x * vw, (sm ? OSMO_CIRCLE_MOBILE.y : 0.38) * vh, Math.min(1.16 * vw, 0.84 * vh)),
+    lg ? circle(OSMO_CIRCLE.x * vw, OSMO_CIRCLE.y * vh, Math.min(0.46 * vw, 0.88 * vh)) : circle(mobileDisc.x, mobileDisc.y, mobileDisc.d),
     // 1 · the ring behind the stats
     circle(0.5 * vw, 0.58 * vh, Math.min(0.46 * vw, 0.72 * vh)),
     // 2 · the two lines beside the reviews: a rectangle taller than the viewport, so only its sides show (they sit
@@ -180,29 +178,42 @@ function Morph({ position }: { position: MotionValue<number> }) {
   const height = useTransform(shape, (s) => s.geo.h);
   const borderRadius = useTransform(shape, (s) => s.geo.r);
   const opacity = useTransform(shape, (s) => (s.visible && viewport.current.w > 0 ? 1 : 0));
-  // The looks are colour-mixes of the brand tokens weighted by the strengths above (percent strings for the templates).
+  // The looks: the stroke and the frame tint are colour-mixes of the brand tokens on the box itself (flat, cheap to
+  // repaint); the OSMO radial + green shadow and the ring's radial + purple glow are full-strength children faded
+  // with `opacity` - each its own compositor layer, so the shape moving across the screen never re-rasters those
+  // big blurred shadows, only a change of size does.
   const usePercent = (get: (s: ReturnType<typeof shapeAt>) => number, max: number) =>
     useTransform(shape, (s) => (get(s) * max).toFixed(2));
-  const fillPct = usePercent((s) => s.fill, 100);
   const strokePct = usePercent((s) => s.stroke, 100);
-  const ringStartPct = usePercent((s) => s.ring, 7);
-  const ringEndPct = usePercent((s) => s.ring, 12);
   const framePct = usePercent((s) => s.frame, 5);
+  const fill = useTransform(shape, (s) => s.fill);
   const ring = useTransform(shape, (s) => s.ring);
   const borderColor = useMotionTemplate`color-mix(in srgb, var(--primary-gradient-end) ${strokePct}%, transparent)`;
-  // Layers: OSMO's radial (weighted by the green fill), the ring's radial, the frame's tint.
-  const backgroundImage = useMotionTemplate`radial-gradient(120% 120% at 28% 22%, color-mix(in srgb, ${OSMO_LOOK.light} ${fillPct}%, transparent) 0%, color-mix(in srgb, ${OSMO_LOOK.green} ${fillPct}%, transparent) 46%, color-mix(in srgb, ${OSMO_LOOK.deep} ${fillPct}%, transparent) 100%), radial-gradient(closest-side, color-mix(in srgb, var(--primary-gradient-start) ${ringStartPct}%, transparent) 0%, transparent 58%, color-mix(in srgb, var(--primary-gradient-end) ${ringEndPct}%, transparent) 100%), linear-gradient(color-mix(in srgb, var(--primary-gradient-end) ${framePct}%, transparent), color-mix(in srgb, var(--primary-gradient-end) ${framePct}%, transparent))`;
-  const boxShadow = useMotionTemplate`0 0 90px 10px color-mix(in srgb, var(--primary-gradient-end) ${ringEndPct}%, transparent), 0 50px 120px color-mix(in srgb, rgb(22 111 54 / 0.38) ${fillPct}%, transparent)`;
+  const backgroundColor = useMotionTemplate`color-mix(in srgb, var(--primary-gradient-end) ${framePct}%, transparent)`;
   return (
     <motion.div
-      className="absolute border will-change-[left,top,width,height]"
-      style={{ left, top, width, height, borderRadius, opacity, borderColor, backgroundImage, boxShadow }}
+      className="absolute border will-change-transform"
+      style={{ left, top, width, height, borderRadius, opacity, borderColor, backgroundColor }}
     >
-      {/* The ring's dashed inner line (stats only). */}
+      {/* OSMO's copy circle look (the prelude). */}
       <motion.div
-        className="absolute inset-[8%] rounded-[inherit] border border-dashed border-[color:color-mix(in_srgb,var(--primary-gradient-start)_30%,transparent)]"
-        style={{ opacity: ring }}
+        className="absolute inset-0 rounded-[inherit] shadow-[0_50px_120px_rgba(22,111,54,0.38)] will-change-[opacity]"
+        style={{
+          opacity: fill,
+          backgroundImage: `radial-gradient(120% 120% at 28% 22%, ${OSMO_LOOK.light} 0%, ${OSMO_LOOK.green} 46%, ${OSMO_LOOK.deep} 100%)`,
+        }}
       />
+      {/* The ring behind the stats: soft radial + glow, and the dashed inner line. */}
+      <motion.div
+        className="absolute inset-0 rounded-[inherit] shadow-[0_0_90px_10px_color-mix(in_srgb,var(--primary-gradient-end)_12%,transparent)] will-change-[opacity]"
+        style={{
+          opacity: ring,
+          backgroundImage:
+            "radial-gradient(closest-side, color-mix(in srgb, var(--primary-gradient-start) 7%, transparent) 0%, transparent 58%, color-mix(in srgb, var(--primary-gradient-end) 12%, transparent) 100%)",
+        }}
+      >
+        <div className="absolute inset-[8%] rounded-[inherit] border border-dashed border-[color:color-mix(in_srgb,var(--primary-gradient-start)_30%,transparent)]" />
+      </motion.div>
     </motion.div>
   );
 }
@@ -384,14 +395,15 @@ function Blob({ presence, position }: { presence: MotionValue<number>; position:
   return (
     <motion.div
       className={cn(
-        "absolute top-[36%] aspect-square w-[min(60vw,70vh)] -translate-x-1/2 -translate-y-1/2 rounded-full blur-3xl",
+        // A gradient that already fades out - no blur filter (the GPU would re-blur it every frame it scales).
+        "absolute top-[36%] aspect-square w-[min(60vw,70vh)] -translate-x-1/2 -translate-y-1/2 rounded-full will-change-[transform,opacity]",
         position === "left" ? "left-[8%]" : "left-[88%]"
       )}
       style={{
         opacity,
         scale,
         background:
-          "radial-gradient(closest-side, color-mix(in srgb, var(--primary-gradient-start) 22%, transparent) 0%, color-mix(in srgb, var(--primary-gradient-end) 14%, transparent) 55%, transparent 100%)",
+          "radial-gradient(closest-side, color-mix(in srgb, var(--primary-gradient-start) 20%, transparent) 0%, color-mix(in srgb, var(--primary-gradient-end) 13%, transparent) 50%, color-mix(in srgb, var(--primary-gradient-end) 4%, transparent) 82%, transparent 100%)",
       }}
     />
   );

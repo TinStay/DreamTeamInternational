@@ -18,7 +18,8 @@ import { MAIN_WITH_FIXED_PAGE_BG_CLASS } from "@/lib/page-shell";
 
 export function HomePage() {
   return (
-    <main className={MAIN_WITH_FIXED_PAGE_BG_CLASS}>
+    <main className={MAIN_WITH_FIXED_PAGE_BG_CLASS} data-snap-sections>
+      {/* data-snap-sections: on phones the projects stage snaps to its scenes (`SnapStop`, globals.css). */}
       {/* Site-wide animated grid (replaces dot pattern) */}
       <div className="fixed inset-0 z-[-1]">
         <GradientBlurPageBg className="h-full w-full" />
@@ -30,13 +31,14 @@ export function HomePage() {
         {/* Opening journey: the hero's headline / CTAs / partners strip leave as the services + quote wizard
             arrive (its first step IS the services grid); the wizard then leaves into the projects stage below.
             The hero keeps its own top (no header padding, no overlap above it). */}
-        <ScrollJourney overlapFirst={false} leaveLast overlap={0.5} reveal={0.35}>
-          <JourneyScene className="pt-0">
+        <ScrollJourney overlapFirst={false} leaveLast overlap={0.5}>
+          {/* The hero is the landing view: pinned from the top of the page, no room of its own. */}
+          <JourneyScene className="pt-0" hold={0}>
             {/* Partners marquee lives inside the hero (bottom strip over the video). */}
             <HeroSection />
           </JourneyScene>
-          {/* Extra bottom room so the wizard never starts leaving while someone is still on a short step. */}
-          <JourneyScene className="pb-[45svh]" backdrop={servicesBackdrop}>
+          {/* Extra room so the wizard never starts leaving while someone is still on a short step. */}
+          <JourneyScene hold={0.45} backdrop={servicesBackdrop}>
             <QuoteFormSection />
           </JourneyScene>
         </ScrollJourney>
@@ -53,18 +55,19 @@ export function HomePage() {
         {/* The journey keeps going after the stage: each section is a sticky scene
             whose title and components fly in from different sides and leave again
             (`JourneyItem`s inside the sections) before the next one arrives. */}
-        {/* Quick pacing: a section changes within about two wheel ticks. One shape travels the whole journey
+        {/* Quick pacing: a section changes within about three wheel ticks. One shape travels the whole journey
             (journey-backdrops.tsx, `journeyMorph`): the canvas comes up `OSMO_HANDOFF_VH` before the stats arrive and
             takes the OSMO copy circle over from the showcase and slides it into the ring behind the stats, splits into
             the two particle lines the review cards travel between, closes into the frame behind the trainings (with
             atoms drifting around), then the outer signal ring behind the contact details; the FAQ gets its blob and
             smaller atoms. The reviews scene drops the header pad: its own sticky stage
             (title + card conveyor) carries it. */}
-        <ScrollJourney overlap={0.7} reveal={0.22} morph={journeyMorph} prelude={OSMO_HANDOFF_VH}>
+        <ScrollJourney overlap={0.7} morph={journeyMorph} prelude={OSMO_HANDOFF_VH}>
           <JourneyScene>
             <CompanyStatsSection />
           </JourneyScene>
-          <JourneyScene className="pt-0" backdrop={linesBackdrop}>
+          {/* The reviews bring their own runway (the card conveyor), so no extra room. */}
+          <JourneyScene className="pt-0" hold={0} backdrop={linesBackdrop}>
             <ReviewsSection />
           </JourneyScene>
           <JourneyScene backdrop={atomsBackdrop}>

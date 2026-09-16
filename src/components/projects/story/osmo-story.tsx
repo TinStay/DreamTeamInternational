@@ -5,6 +5,7 @@ import { motion } from "motion/react";
 import { PartnerLogo } from "@/components/partner-logo";
 import { useLanguage } from "@/lib/i18n/language-context";
 import { PARTNERS } from "@/lib/partners";
+import { PROJECT_DISPLAY_FONT } from "@/lib/project-fonts";
 import type { Project } from "@/lib/projects";
 import { cn } from "@/lib/utils";
 import {
@@ -13,6 +14,7 @@ import {
   CtaBand,
   Display,
   Eyebrow,
+  HERO_TITLE,
   FactsStrip,
   MediaFrame,
   MetaList,
@@ -33,20 +35,24 @@ import {
  * frame; four product films follow, each in its own frame with format /
  * length / channel; the page then sinks into OSMO green for the results, the
  * client's words and the CTA. Copy in `projects.stories.osmo`; the films are
- * self-hosted under `public/projects/osmo/story/`.
+ * on Bunny Stream (`Project.story.clips`), the hero clip self-hosted under
+ * `public/projects/osmo/story/`.
  */
 
 const OSMO = { green: "#108C3C", deep: "#0B6E2F", light: "#2FA55A", oak: "#C9A46B", oakDeep: "#8A5A2B" };
 const BASE = "/projects/osmo/story";
 const HERO_CLIP = { src: `${BASE}/hero-samples.mp4`, poster: `${BASE}/hero-samples-poster.webp` };
 const COLLAGE = [1, 2, 3, 4].map((n) => `${BASE}/collage-${n}.webp`);
-/** The four product films, in the order of `stories.osmo.products` (9:16, then three 4:5). */
+/**
+ * The four product films, in the order of `stories.osmo.products` - keys into `Project.story.clips` and each
+ * one's real frame (4:5, 9:16, 4:5, 4:5 - the player letterboxes anything else).
+ */
 const FILMS = [
-  { src: `${BASE}/lazur.mp4`, poster: `${BASE}/lazur-poster.webp`, aspect: "aspect-[9/16]", width: "max-w-[320px]" },
-  { src: `${BASE}/single-coat.mp4`, poster: `${BASE}/single-coat-poster.webp`, aspect: "aspect-[4/5]", width: "max-w-[440px]" },
-  { src: `${BASE}/uv.mp4`, poster: `${BASE}/uv-poster.webp`, aspect: "aspect-[4/5]", width: "max-w-[440px]" },
-  { src: `${BASE}/decking.mp4`, poster: `${BASE}/decking-poster.webp`, aspect: "aspect-[4/5]", width: "max-w-[440px]" },
-];
+  { key: "lazur", aspect: "aspect-[4/5]", width: "max-w-[440px]" },
+  { key: "singleCoat", aspect: "aspect-[9/16]", width: "max-w-[320px]" },
+  { key: "uv", aspect: "aspect-[4/5]", width: "max-w-[440px]" },
+  { key: "decking", aspect: "aspect-[4/5]", width: "max-w-[440px]" },
+] as const;
 
 /** OSMO's wood-edged frame around a white inner. */
 function WoodFrame({ className, children }: { className?: string; children: React.ReactNode }) {
@@ -64,6 +70,7 @@ export function OsmoStory({ project }: { project: Project }) {
   const { t } = useLanguage();
   const story = t.projects.stories.osmo;
   const name = t.projects.items[project.id].name;
+  const clips = project.story?.clips ?? {};
   const partner = PARTNERS.find((p) => p.id === project.partnerId);
   const style = {
     "--story-accent": OSMO.green,
@@ -73,7 +80,18 @@ export function OsmoStory({ project }: { project: Project }) {
   } as CSSProperties;
 
   return (
-    <StoryShell style={style} accent={OSMO.green}>
+    <StoryShell
+      style={style}
+      accent={OSMO.green}
+      display={PROJECT_DISPLAY_FONT.osmo}
+      className="[--story-ground:#F4F8F2] dark:[--story-ground:#0C1912]"
+      ground={
+        // Paper with a hint of green / a deep green-black, a soft green light top-right in both.
+        <div className="absolute inset-0 overflow-hidden bg-[var(--story-ground)]" aria-hidden>
+          <div className="absolute right-[-12%] top-[-4%] aspect-square w-[min(820px,80vw)] rounded-full bg-[radial-gradient(closest-side,rgba(47,165,90,0.16)_0%,transparent_100%)] dark:bg-[radial-gradient(closest-side,rgba(47,165,90,0.24)_0%,transparent_100%)]" />
+        </div>
+      }
+    >
       {/* ---------------- HERO ---------------- */}
       <Section tight className="pt-4 sm:pt-6 lg:pt-8">
         <motion.div
@@ -84,17 +102,14 @@ export function OsmoStory({ project }: { project: Project }) {
         >
           <div>
             {partner ? (
-              <motion.div variants={fadeUp} className="mb-8">
-                <PartnerLogo p={partner} imgClass="h-14 w-auto md:h-20" sizes="220px" />
+              <motion.div variants={fadeUp} className="mb-10">
+                <PartnerLogo p={partner} imgClass="h-24 w-auto md:h-36" sizes="520px" />
               </motion.div>
             ) : null}
-            <motion.div variants={fadeUp}>
-              <Eyebrow>{story.hero.eyebrow}</Eyebrow>
-            </motion.div>
-            <h1 className="font-heading text-[clamp(2.5rem,5.2vw,4.5rem)] font-bold leading-[1.06] tracking-tight text-balance">
+            <h1 className={cn(HERO_TITLE.long, "font-heading font-bold tracking-tight text-balance", PROJECT_DISPLAY_FONT.osmo, "leading-[1.06]")}>
               <Words text={story.hero.title} base={0.1} step={0.035} />
             </h1>
-            <motion.p variants={fadeUp} className="mt-7 max-w-[40ch] text-lg leading-relaxed text-[var(--story-muted)] sm:text-xl">
+            <motion.p variants={fadeUp} className="mt-7 max-w-[40ch] text-lg leading-relaxed text-[var(--story-muted)] sm:text-xl xl:text-2xl">
               {story.hero.lead}
             </motion.p>
           </div>
@@ -129,7 +144,7 @@ export function OsmoStory({ project }: { project: Project }) {
           left={
             <>
               <Eyebrow>{story.challenge.eyebrow}</Eyebrow>
-              <Display text={story.challenge.title} className="text-3xl sm:text-4xl lg:text-5xl" />
+              <Display text={story.challenge.title} className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl" />
             </>
           }
           right={<BodyXL paragraphs={story.challenge.body} />}
@@ -141,7 +156,7 @@ export function OsmoStory({ project }: { project: Project }) {
           left={
             <>
               <Eyebrow>{story.solution.eyebrow}</Eyebrow>
-              <Display text={story.solution.title} className="text-3xl sm:text-4xl lg:text-5xl" />
+              <Display text={story.solution.title} className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl" />
             </>
           }
           right={<BodyXL paragraphs={story.solution.body} />}
@@ -187,12 +202,13 @@ export function OsmoStory({ project }: { project: Project }) {
               <motion.div variants={fadeUp} className={cn("mx-auto w-full", film?.width, flip && "lg:order-1")}>
                 {film ? (
                   <MediaFrame
-                    src={film.src}
-                    poster={film.poster}
+                    clip={clips[film.key] ?? null}
                     title={`${name} · ${product.eyebrow}`}
                     aspect={film.aspect}
-                    placeholder=""
+                    placeholder={t.projects.stories.boleron.social.placeholder}
                     className="rounded-xl bg-[#181418] shadow-[0_30px_60px_-30px_rgba(24,20,24,0.5)]"
+                    placeholderClass="text-white/60 [background:linear-gradient(135deg,#1c2a20,#101a14)]"
+                    ringClass="border-white/40 text-white/80"
                   />
                 ) : null}
               </motion.div>
@@ -203,11 +219,11 @@ export function OsmoStory({ project }: { project: Project }) {
 
       {/* ---------------- RESULTS (a pale green tint, the theme's own ink) ---------------- */}
       <Section
-        className="bg-[color:color-mix(in_srgb,#2FA55A_14%,var(--background))] [--story-rule:#108C3C] dark:[--story-rule:rgba(255,255,255,0.7)]"
+        className="bg-[color:color-mix(in_srgb,#2FA55A_14%,var(--story-ground))] [--story-rule:#108C3C] dark:[--story-rule:rgba(255,255,255,0.7)]"
       >
         <Reveal>
           <Eyebrow>{story.results.eyebrow}</Eyebrow>
-          <Display text={story.results.title} className="text-3xl sm:text-4xl lg:text-5xl" />
+          <Display text={story.results.title} className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl" />
         </Reveal>
         <StatGrid stats={story.results.stats} className="mt-14" />
         <Reveal className="mt-14 max-w-[60ch]">
@@ -219,7 +235,7 @@ export function OsmoStory({ project }: { project: Project }) {
       <div
         className="text-white [--story-accent:rgba(255,255,255,0.85)] [--story-muted:rgba(255,255,255,0.8)] [--story-line:rgba(255,255,255,0.25)]"
         style={{
-          background: `linear-gradient(180deg, color-mix(in srgb, ${OSMO.light} 14%, var(--background)) 0%, ${OSMO.light} 30%, ${OSMO.green} 65%, ${OSMO.deep} 100%)`,
+          background: `linear-gradient(180deg, color-mix(in srgb, ${OSMO.light} 14%, var(--story-ground)) 0%, ${OSMO.light} 30%, ${OSMO.green} 65%, ${OSMO.deep} 100%)`,
         }}
       >
         <Section tight className="pt-16 sm:pt-20 lg:pt-24">
@@ -236,7 +252,18 @@ export function OsmoStory({ project }: { project: Project }) {
         </Section>
 
         <Section tight className="pt-0 sm:pt-0 lg:pt-0">
-          <CtaBand title={story.cta.title} quote={story.cta.quote} contact={story.cta.contact} tone="light" className="rounded-2xl bg-white p-8 text-[#181418] sm:p-12" />
+          {/* OSMO's card - white, or deep green in the dark theme - with an oak edge, a green light in the corner and
+              a soft green glow. */}
+          <CtaBand
+            title={story.cta.title}
+            quote={story.cta.quote}
+            contact={story.cta.contact}
+            tone="page"
+            className="rounded-2xl bg-white p-8 pl-10 text-[#181418] shadow-[0_30px_90px_-30px_rgba(16,140,60,0.4)] sm:p-12 sm:pl-14 lg:p-14 lg:pl-16 dark:bg-[#0F2418] dark:text-white dark:shadow-[0_30px_90px_-30px_rgba(47,165,90,0.5)]"
+          >
+            <div className="absolute inset-y-0 left-0 w-2.5" style={{ background: `linear-gradient(180deg, ${OSMO.oak}, #B08553 55%, ${OSMO.oakDeep})` }} aria-hidden />
+            <div className="absolute -right-24 -top-24 size-80 rounded-full bg-[radial-gradient(closest-side,rgba(47,165,90,0.22),transparent)] dark:bg-[radial-gradient(closest-side,rgba(47,165,90,0.34),transparent)]" aria-hidden />
+          </CtaBand>
         </Section>
       </div>
     </StoryShell>

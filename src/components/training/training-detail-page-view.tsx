@@ -16,6 +16,7 @@ import { PageBreadcrumbs } from "@/components/page-breadcrumbs";
 import { Button, buttonVariants, primaryGradientInteractiveClassName } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { ContactInquiryForm } from "@/components/contact-inquiry-form";
+import { scrollToElement } from "@/lib/smooth-scroll";
 import { TrainingModalDetails, TrainingModalIncludes } from "./training-modal-rich";
 
 function getSlugFromPathname(pathname: string) {
@@ -150,7 +151,7 @@ export function TrainingDetailPageView({ slug: slugProp }: { slug?: string }) {
                 primaryGradientInteractiveClassName
               )}
               onClick={() => {
-                formRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+                scrollToElement(formRef.current);
               }}
             >
               {tr.cards.individual.cta}

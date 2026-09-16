@@ -14,6 +14,7 @@ import {
   type ReactNode,
 } from "react";
 import {
+  frame,
   motion,
   useMotionValue,
   useMotionValueEvent,
@@ -24,6 +25,8 @@ import {
   type MotionValue,
 } from "motion/react";
 import { cn } from "@/lib/utils";
+import { useScrollEased } from "@/lib/smooth-scroll";
+import { useHydrated } from "@/lib/use-media-query";
 
 /*
  * Scroll-driven "journey" for the home sections after the projects showcase.
@@ -33,7 +36,7 @@ import { cn } from "@/lib/utils";
  * from different sides and leave again, choreographed on scroll -
  *
  *   previous title leaves ▸ previous components leave (staggered) ▸
- *   next title arrives from the top ▸ next components arrive from their sides.
+ *   next title rises in ▸ next components arrive from their sides.
  *
  * A journey can also carry background furniture on a fixed, viewport-sized
  * canvas under the scenes: per-scene backdrops (`JourneyBackdrop`) and one
@@ -41,32 +44,42 @@ import { cn } from "@/lib/utils";
  * position; `prelude` lets the canvas come up before the first scene so the
  * shape can be taken over from whatever precedes the journey (the OSMO disc).
  *
- * Every scene is a sticky box (`min-h-[100svh]`, `pt-24` for the floating
- * header, content vertically centred): it scrolls like a normal section until
- * its bottom reaches the bottom of the viewport, then stays pinned while its
- * parts leave; the incoming scene overlaps that tail by `OVERLAP` of a
- * viewport (negative top margin) and is held at the top of the viewport with
- * a counter-translate for the whole stretch, so its parts fly in onto a still
- * frame. The hand-over runs over `REVEAL` of a viewport (about four wheel
- * ticks: two out, two in) and the new scene then sits framed for the rest
- * before it scrolls on. Progress is read off zero-height flow markers
- * before/after each sticky box (a pinned element's own offsetTop moves with
- * the pin); the incoming's reveal and the outgoing's leave coincide because
- * the scenes are adjacent in flow. Part motion runs on a stiff spring so wheel
- * steps read as motion, not jumps; the hold itself is exact. Transforms are
- * gone once a scene is in, so nothing inside (forms, accordions) is affected
- * while it is in use. Scenes that are not on stage are `opacity: 0` +
- * `inert`. Below `lg` the pin sits above the mobile dock (`--journey-dock`).
+ * Every scene is a sticky box (at least a viewport high, `pt-24` for the
+ * floating header, content vertically centred in the first viewport, plus
+ * `hold` of a viewport of room at the bottom so even a screen-high scene
+ * scrolls on for a while, fully in, before it is pinned): it scrolls like a
+ * normal section until its bottom reaches the bottom of the viewport, then
+ * stays pinned while its parts leave; the incoming scene overlaps that tail
+ * by `OVERLAP` of a viewport (negative top margin), and the hand-over spans
+ * that WHOLE stretch (`1 - OVERLAP` of a viewport of scroll): the previous
+ * parts leave in the first half, the new ones arrive in the second, and the
+ * moment they have landed the scene scrolls on - there is never a stretch
+ * where the wheel moves nothing. The incoming box is not held still: a
+ * counter-translate eases it up into place (`riseOffset`) - nearly still
+ * while the previous parts leave, rising with growing speed as its own parts
+ * land, at exactly scroll speed when it lets go - so the release has no jolt.
+ * Progress is read off zero-height flow markers before/after each sticky box
+ * (a pinned element's own offsetTop moves with the pin); the incoming's
+ * arrival and the outgoing's leave coincide because the scenes are adjacent
+ * in flow. Part motion follows the scroll directly while the smooth scroller
+ * glides it, and runs on a stiff spring under native scrolling so wheel steps
+ * read as motion, not jumps (`useScrollEased`). Transforms are gone once a
+ * scene is in, so nothing inside (forms, accordions) is affected while it is
+ * in use. Scenes that are not on stage are `opacity: 0` + `inert`. Below
+ * `lg` the pin sits above the mobile dock (`--journey-dock`).
  * Until the component has mounted (server HTML, no JS) the sections are plain
  * flow, no overlap; reduced motion keeps them that way and `JourneyItem`s
  * render plain (they also do outside any journey, e.g. on `/contact`).
  */
 
-/** Default: how much of a viewport each scene overlaps the previous one's tail by (the room for the hand-over). */
+/**
+ * Default: how much of a viewport each scene overlaps the previous one's tail by. The hand-over (previous parts out,
+ * new ones in) takes the rest of that viewport (`1 - OVERLAP`) of scroll - a bigger overlap is a quicker change.
+ */
 const OVERLAP = 0.35;
-/** Default: scroll distance, in viewports, of the hand-over - the previous parts leave, then the new ones arrive. */
-const REVEAL = 0.5;
-/** Part motion smoothing - stiff, so a wheel tick glides instead of stepping. */
+/** Default reading room (viewport fraction) a scene scrolls through, fully in, before it is pinned for the next hand-over. */
+const HOLD = 0.2;
+/** Part motion smoothing under native scrolling - stiff, so a wheel tick glides instead of stepping. */
 const SPRING = { stiffness: 210, damping: 32, mass: 0.6, restDelta: 0.001 };
 
 const clamp01 = (x: number) => Math.min(1, Math.max(0, x));
@@ -74,6 +87,13 @@ const easeOut = (t: number) => 1 - Math.pow(1 - t, 3);
 const easeInOut = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
 /** 0 → 1 across [a, b]. */
 const across = (v: number, a: number, b: number) => clamp01((v - a) / (b - a));
+/**
+ * The incoming box's counter-translate over its stretch (`stretch` px of scroll, `tr` 0 → 1): its natural top runs
+ * from `stretch` down to 0; instead it starts a third of the way down and rises along `(1 - tr³) / 3` - velocity 0 at
+ * the start, exactly the scroll's at the end, so the box is as good as still while the previous parts leave and is
+ * already moving at full speed when it is released into normal flow.
+ */
+const riseOffset = (tr: number, stretch: number) => stretch * ((1 - tr * tr * tr) / 3 - (1 - tr));
 
 export type JourneyContextValue = {
   /** Hand-over progress while this scene ARRIVES (0 → 1). */
@@ -158,13 +178,14 @@ function JourneyBackdropLayer({
   );
 }
 
-/** Where the parts of the previous scene have gone and the new title starts to arrive. */
-const arriveStart = (lead: boolean) => (lead ? 0.06 : 0.5);
+/** Where the new title starts to arrive - a little before the previous parts are all gone, so the two cross-fade. */
+const arriveStart = (lead: boolean) => (lead ? 0.06 : 0.44);
 
 /** Fade of the whole scene box - covers whatever a section does not mark as a `JourneyItem` (dividers, lines). */
 function sceneOpacity(lead: boolean, isLast: boolean, p: number, c: number) {
   const s = arriveStart(lead);
-  return easeOut(across(p, s - 0.05, s + 0.08)) * (isLast ? 1 : 1 - easeInOut(across(c, 0.42, 0.64)));
+  // Out over the middle of the hand-over: a crossfade with the arriving parts rather than a cut.
+  return easeOut(across(p, s - 0.05, s + 0.08)) * (isLast ? 1 : 1 - easeInOut(across(c, 0.3, 0.64)));
 }
 
 export type JourneySide = "top" | "bottom" | "left" | "right";
@@ -180,21 +201,24 @@ const ARRIVE_FROM: Record<JourneySide, [number, number]> = {
 /** A part's offset/opacity/scale for arrive progress `p` and leave progress `c`. */
 function itemFrame(kind: ItemKind, index: number, side: JourneySide, lead: boolean, p: number, c: number) {
   const s = arriveStart(lead);
-  // Title first, then the components one after another (stagger capped so long lists still land by the end).
-  const inA = kind === "title" ? s : Math.min(s + 0.12 + index * 0.05, 0.86);
-  const inB = Math.min(1, inA + (kind === "title" ? 0.24 : 0.3));
-  const outA = kind === "title" ? 0 : Math.min(0.08 + index * 0.04, 0.34);
-  const outB = outA + (kind === "title" ? 0.2 : 0.24);
+  // Title first, then the components one after another (stagger capped so long lists still land by the end - the
+  // scene is released the moment they have).
+  const inA = kind === "title" ? s : Math.min(s + 0.1 + index * 0.045, 0.72);
+  const inB = Math.min(1, inA + (kind === "title" ? 0.24 : 0.28));
+  const outA = kind === "title" ? 0 : Math.min(0.06 + index * 0.04, 0.3);
+  const outB = outA + (kind === "title" ? 0.22 : 0.26);
   const kIn = easeOut(across(p, inA, inB));
   const kOut = easeInOut(across(c, outA, outB));
   const [fx, fy] = ARRIVE_FROM[side];
+  // The heading travels a shorter way than the components.
+  const reach = kind === "title" ? 0.75 : 1;
   // Leaves upward (with the scroll), sideways parts drifting back toward their side.
   const outX = side === "left" ? -56 : side === "right" ? 56 : 0;
   return {
-    x: fx * (1 - kIn) + outX * kOut,
-    y: fy * (1 - kIn) - 44 * kOut,
+    x: fx * reach * (1 - kIn) + outX * kOut,
+    y: fy * reach * (1 - kIn) - 56 * kOut,
     opacity: kIn * (1 - kOut),
-    scale: 1 - 0.04 * (1 - kIn) - 0.04 * kOut,
+    scale: 1 - 0.03 * (1 - kIn) - 0.03 * kOut,
   };
 }
 
@@ -203,7 +227,7 @@ export type JourneyItemProps = {
   kind?: ItemKind;
   /** Position among the scene's items - drives the stagger. */
   index?: number;
-  /** Side it arrives from (title: top; items alternate left / right by default). */
+  /** Side it arrives from (rising from below for a title; items alternate left / right by default). */
   from?: JourneySide;
   as?: "div" | "header" | "li";
   className?: string;
@@ -218,7 +242,7 @@ export function JourneyItem({ kind = "item", index = 0, from, as = "div", classN
   const enter = journey?.enter ?? settled;
   const leave = journey?.leave ?? still;
   const lead = journey?.lead ?? false;
-  const side: JourneySide = from ?? (kind === "title" ? "top" : index % 2 ? "right" : "left");
+  const side: JourneySide = from ?? (kind === "title" ? "bottom" : index % 2 ? "right" : "left");
   const x = useTransform([enter, leave], ([p, c]: number[]) => itemFrame(kind, index, side, lead, p, c).x);
   const y = useTransform([enter, leave], ([p, c]: number[]) => itemFrame(kind, index, side, lead, p, c).y);
   const opacity = useTransform([enter, leave], ([p, c]: number[]) => itemFrame(kind, index, side, lead, p, c).opacity);
@@ -229,8 +253,9 @@ export function JourneyItem({ kind = "item", index = 0, from, as = "div", classN
     return <Plain className={className}>{children}</Plain>;
   }
   const Tag = as === "header" ? motion.header : as === "li" ? motion.li : motion.div;
+  // Its own compositor layer: the scroll-linked transform / opacity must not repaint the part every frame.
   return (
-    <Tag className={className} style={{ x, y, opacity, scale }}>
+    <Tag className={cn("will-change-[transform,opacity]", className)} style={{ x, y, opacity, scale }}>
       {children}
     </Tag>
   );
@@ -246,15 +271,20 @@ export type JourneySceneProps = {
   overlap?: boolean;
   /** Fade out while the next block arrives - off for the last scene before the footer. */
   leaves?: boolean;
-  /** Pacing overrides from `ScrollJourney` (viewport fractions). */
+  /** Pacing override from `ScrollJourney` (viewport fraction). */
   overlapBy?: number;
-  revealOver?: number;
   /** Position in the journey (set by `ScrollJourney`). */
   index?: number;
   /** Background furniture wanted behind this scene - see `JourneyBackdropLayer`. */
   backdrop?: JourneyBackdrop;
-  /** Per-scene pacing: a smaller overlap than the journey's = a longer hold on this scene. */
+  /** Per-scene pacing: a smaller overlap than the journey's = a slower hand-over into this scene. */
   pace?: { overlap?: number };
+  /**
+   * Reading room (viewport fraction, default `HOLD`): bottom padding the scene scrolls through, fully in, before it
+   * is pinned and starts leaving - `0` for a scene that brings its own runway (the reviews' conveyor) or is pinned
+   * from the top of the page (the hero).
+   */
+  hold?: number;
 };
 
 /** Viewport box in px - the same numbers motion resolves its scroll offsets against. */
@@ -268,8 +298,8 @@ export function JourneyScene({
   overlap = true,
   leaves = !isLast,
   overlapBy = OVERLAP,
-  revealOver = REVEAL,
   index = 0,
+  hold = HOLD,
 }: JourneySceneProps) {
   const ref = useRef<HTMLDivElement>(null);
   const registry = useContext(JourneyRegistryContext);
@@ -278,24 +308,26 @@ export function JourneyScene({
   const startRef = useRef<HTMLDivElement>(null);
   const endRef = useRef<HTMLDivElement>(null);
   const viewport = useRef<Viewport>({ w: 0, h: 0 });
-  const [mounted, setMounted] = useState(false);
+  // Server HTML and the hydrating render are plain flow; the overlap / rise apply from the first client render after.
+  const mounted = useHydrated();
   const [height, setHeight] = useState(0);
   const [parked, setParked] = useState(false);
   const reduceMotion = useReducedMotion();
 
   // `travel`: the box's top going from the viewport bottom (its marker meets the bottom - the previous scene has
-  // just pinned) up to the top of the viewport; the hand-over is the first `REVEAL` of that.
+  // just pinned) up to the top of the viewport - the whole of it is the hand-over.
   const { scrollYProgress: travel } = useScroll({ target: startRef, offset: ["start end", `start ${overlapBy}`] });
   // The box's bottom doing the same - which is exactly the next scene's hand-over.
-  const { scrollYProgress: leaving } = useScroll({ target: endRef, offset: ["start end", `start ${1 - revealOver}`] });
-  const cover = useTransform(leaving, (v) => (leaves ? v : 0));
-  const reveal = useTransform(travel, (v) => clamp01((v * (1 - overlapBy)) / revealOver));
+  const { scrollYProgress: leaving } = useScroll({ target: endRef, offset: ["start end", `start ${overlapBy}`] });
+  const never = useMotionValue(0);
+  // Raw scroll values straight into the easing (both progresses are already clamped 0 → 1): a derived value in
+  // between would be recomputed in the same frame step as the easing and could leave it a frame behind.
+  const cover = leaves ? leaving : never;
   // The scene's own scroll: its box top at the viewport top (end marker at `height`) → its bottom pinned.
   const { scrollYProgress: within } = useScroll({ target: endRef, offset: [`start ${Math.max(height, 1)}px`, "start end"] });
-  const enter = useSpring(reveal, SPRING);
-  const leave = useSpring(cover, SPRING);
+  const enter = useScrollEased(travel, useSpring(travel, SPRING));
+  const leave = useScrollEased(cover, useSpring(cover, SPRING));
 
-  useEffect(() => setMounted(true), []);
   // Feed the journey's backdrop with this scene's (smoothed) arrival.
   useEffect(() => registry?.register(index, enter), [registry, index, enter]);
 
@@ -318,8 +350,10 @@ export function JourneyScene({
     };
   }, [reduceMotion]);
 
-  // Hold at the top of the viewport for the whole overlap stretch (exact - no spring - so the frame is still).
-  const y = useTransform(travel, (tr) => (mounted && tr > 0 && tr < 1 ? -(1 - tr) * (1 - overlapBy) * viewport.current.h : 0));
+  // Eased up into place over the overlap stretch (exact - no spring - it must meet normal flow at the end).
+  const y = useTransform(travel, (tr) =>
+    mounted && tr > 0 && tr < 1 ? riseOffset(tr, (1 - overlapBy) * viewport.current.h) : 0
+  );
   // Off stage (not started yet, or gone) = fully transparent and inert. Opacity rather than `visibility: hidden`:
   // Chrome never lazy-loads images inside a hidden subtree, which left badges blank after the scene appeared.
   const offStage = useTransform([travel, cover], ([tr, c]: number[]): number => (mounted && (tr <= 0 || c >= 0.999) ? 1 : 0));
@@ -340,18 +374,24 @@ export function JourneyScene({
       </>
     );
   }
+  // A viewport (content centred in it) plus the reading room - the same numbers on the server and the client. A scene
+  // that never leaves (the last one before the footer) needs none.
+  const room = `${leaves ? Math.round(hold * 100) : 0}svh`;
   return (
     <>
       <div ref={startRef} className="h-0" aria-hidden />
       <motion.div
         ref={ref}
         className={cn(
-          // pt-24 keeps a held scene's title clear of the floating header.
-          "relative flex min-h-[100svh] flex-col justify-center pt-24 [--journey-dock:5rem] lg:[--journey-dock:0px]",
+          // pt-24 keeps an arriving scene's title clear of the floating header. Its own compositor layer, so the
+          // scroll-linked rise / fade never repaints the whole section.
+          "relative flex flex-col justify-center pt-24 will-change-[transform,opacity] [--journey-dock:5rem] lg:[--journey-dock:0px]",
           height > 0 && "sticky",
           className
         )}
         style={{
+          minHeight: `calc(100svh + ${room})`,
+          paddingBottom: room,
           top: `calc(100svh - var(--journey-dock) - ${height}px)`,
           marginTop: mounted && overlap ? `${-overlapBy * 100}svh` : 0,
           y,
@@ -373,9 +413,11 @@ export type ScrollJourneyProps = {
   overlapFirst?: boolean;
   /** Let the last scene leave too - when a non-journey block (the projects stage) follows instead of the footer. */
   leaveLast?: boolean;
-  /** Pacing (viewport fractions): how much a scene overlaps the previous tail, and how much scroll the hand-over takes. */
+  /**
+   * Pacing (viewport fraction): how much a scene overlaps the previous one's tail - the hand-over takes the rest of
+   * the viewport, so a bigger overlap is a quicker change.
+   */
   overlap?: number;
-  reveal?: number;
   /** One continuous background shape for the whole journey (see `journeyMorph`). */
   morph?: JourneyMorph;
   /**
@@ -392,32 +434,37 @@ export function ScrollJourney({
   overlapFirst = true,
   leaveLast = false,
   overlap = OVERLAP,
-  reveal = REVEAL,
   morph,
   prelude = 0,
 }: ScrollJourneyProps) {
   const scenes = Children.toArray(children).filter((child): child is ReactElement<JourneySceneProps> =>
     isValidElement(child)
   );
-  // The scenes' arrivals summed (scene k fully in at k + 1) ...
+  // The scenes' arrivals summed (scene k fully in at k + 1) ... The sum is taken on the NEXT frame's pre-update
+  // step, before anything derived from it is recomputed: an arrival changes in the pre-render step (it is derived
+  // from the scroll), and a value derived from the sum that has already been recomputed in that step would not be
+  // again - the backdrop would sit a step behind until the next scroll.
   const arrived = useMotionValue(0);
   const arrivals = useRef(new Map<number, MotionValue<number>>());
-  const registry = useRef<JourneyRegistry>({
+  // One registry object for the journey's life (state, not a ref: it is handed to the context during render).
+  const [registry] = useState<JourneyRegistry>(() => ({
     register: (index, arrival) => {
       arrivals.current.set(index, arrival);
-      const recompute = () => {
-        let sum = 0;
-        for (const mv of arrivals.current.values()) sum += mv.get();
-        arrived.set(sum);
+      const sum = () => {
+        let total = 0;
+        for (const mv of arrivals.current.values()) total += mv.get();
+        arrived.set(total);
       };
+      const recompute = () => frame.preUpdate(sum);
       const unsubscribe = arrival.on("change", recompute);
       recompute();
       return () => {
         unsubscribe();
         arrivals.current.delete(index);
+        recompute();
       };
     },
-  });
+  }));
   // ... plus the prelude: zero-height markers at the journey's head and tail. `approach` runs 0 → 1 while the head
   // marker climbs the last `prelude` viewports to the fold (raw scroll, no spring - it is a hand-over from outside),
   // `exit` 0 → 1 as the tail marker rises from the fold to mid-viewport (the footer coming up under the last scene).
@@ -437,7 +484,7 @@ export function ScrollJourney({
   // flow-root: a scene's negative margin must not collapse through to the container (it would move the markers).
   // z-10: level with the showcase, so a scene held over its tail paints on top.
   return (
-    <JourneyRegistryContext.Provider value={registry.current}>
+    <JourneyRegistryContext.Provider value={registry}>
       <div className={cn("relative z-10 flow-root", className)}>
         <div ref={headRef} className="h-0" aria-hidden />
         {hasBackdrop ? (
@@ -451,7 +498,6 @@ export function ScrollJourney({
             overlap: overlapFirst || index > 0,
             leaves: leaveLast || index < scenes.length - 1,
             overlapBy: scene.props.pace?.overlap ?? overlap,
-            revealOver: reveal,
           })
         )}
         <div ref={tailRef} className="h-0" aria-hidden />

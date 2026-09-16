@@ -114,6 +114,12 @@ export const en = {
             { name: "District Living", place: "Chavdar bridge" },
             { name: "Eria", place: "Ovcha Kupel" }
           ]
+        },
+        mindguard: {
+          shownTo: {
+            label: "Shown to",
+            items: ["Klaus Schwab", "The President of Switzerland", "Ukraine's largest TV channel"]
+          }
         }
       }
     },
@@ -127,7 +133,7 @@ export const en = {
           sub: "How we sold the feeling of living in buildings that do not exist yet.",
           meta: [
             { label: "Client", value: "Emblema" },
-            { label: "Projects", value: "ERIA · District Living" },
+            { label: "Projects", value: ["ERIA", "District Living"] },
             { label: "Format", value: "3 short films" },
             { label: "Role", value: "Full production" },
             { label: "Year", value: "2026" }
@@ -310,7 +316,7 @@ export const en = {
               "The oil soaking in is an invisible process, so we made it visible: macro shots of the brush along the grain, the oil sinking into the wood's structure, drops stopping on the surface. Every scene is generated from a product reference so the can, label and tone match.",
               "We showed the colours with a fan of real samples and one facade in different tones, and the applications — facades, fences, garden furniture — as a run of short scenes with on-screen text. Protection from rain, rot and UV is the finale: stylised macro shots of water on treated wood."
             ],
-            meta: { format: "9:16", length: "32 s", channels: "Meta Ads" }
+            meta: { format: "4:5", length: "32 s", channels: "Meta Ads" }
           },
           {
             eyebrow: "One-coat stain",
@@ -319,7 +325,7 @@ export const en = {
               "The benefit is in the name, so we built the clip around one transformation: a grey, cracked board on a dark background, the brush passes once and right behind the bristles the wood saturates. The before-and-after happens in one continuous shot, with no narration.",
               "Then the board slots into place in a real fence — a transition from the studio to the real world — and a craftsman finishes the whole fence in fast motion. That is how we showed the application, while the coverage (up to 26 m² per litre), the time saved and the 14 colours came in as short text accents over the finished fence and the lined-up cans."
             ],
-            meta: { format: "4:5", length: "31 s", channels: "Meta Ads" }
+            meta: { format: "9:16", length: "31 s", channels: "Meta Ads" }
           },
           {
             eyebrow: "UV protection oil",
@@ -375,16 +381,16 @@ export const en = {
           title: "A brand everyone knows",
           body: [
             "Boleron is Bulgaria's leading digital insurance broker — insurance in minutes, entirely online. But in a sector dominated by traditional companies with decades of history, the digital leader also has to be the most recognisable one.",
-            "The goal was clear: Boleron had to become a brand people remember and like. That meant a character with personality — friendly, modern, unlike anything in insurance — and ads that establish it wherever the audience is.",
-            "We proposed an innovative route: a mascot and ad campaigns created entirely with artificial intelligence. Speed and scale out of reach for traditional production, with quality that makes no compromises."
+            "Boleron had to become a brand people remember and like — a character with personality, friendly, modern and unlike anything in insurance, and ads that establish it wherever the audience is.",
+            "We proposed an innovative route — a mascot and ad campaigns created entirely with artificial intelligence."
           ]
         },
         solution: {
           eyebrow: "Solution",
           title: "Character first, picture second",
           body: [
-            "We started with what matters most — who the hero is. Together with the Boleron team we defined the character, and only then did we develop the visual directions. Out of more than 10 concepts the client chose the final mascot.",
-            "After the approval we turned the hero into a complete system: poses, expressions, scenes. That is how it stays the same in every asset — from a TV ad to a social media post."
+            "We started with what matters most — who the hero is. Together with the Boleron team we defined the character, and only then did we develop the visual directions. Out of a few concepts the client chose the final mascot.",
+            "After the approval we turned the hero into a complete system of poses, expressions and scenes, so it stays the same in every asset — from a TV ad to a social media post."
           ]
         },
         collage: ["At the beach", "In the city", "In the mountains", "At home", "In the sky"],
@@ -392,8 +398,7 @@ export const en = {
           eyebrow: "TV ad",
           title: "The hero on air",
           body: [
-            "We also produced an ad for broadcast — aired on bTV before the weather and the sports news, in the most-watched minutes of the day.",
-            "12 seconds in which the mascot introduces Boleron to the whole of Bulgaria: script, animation, voice-over and editing — entirely with artificial intelligence.",
+            "An ad for broadcast, aired on bTV before the weather and the sports news — in the most-watched minutes of the day. In 12 seconds the mascot introduces Boleron to the whole of Bulgaria, with the script, animation, voice-over and editing all made with artificial intelligence.",
             "The result is a TV ad of animation-studio quality, produced in days instead of months and for a fraction of a traditional production's budget."
           ],
           meta: [
@@ -406,10 +411,37 @@ export const en = {
           eyebrow: "Social media",
           title: "One hero, every format",
           note: "9:16 · Shorts, Reels, TikTok",
+          body: [
+            "Vertical cuts for Shorts, Reels and TikTok — the same hero and the same character, with a rhythm of its own for each platform."
+          ],
           items: ["YouTube Shorts", "Facebook", "TikTok"],
           placeholder: "Coming soon"
         },
-        youtube: { eyebrow: "YouTube", title: "The hero on YouTube", note: "Pre-roll · 16:9" },
+        ads: {
+          eyebrow: "The ads",
+          title: "Eight ads, one hero",
+          body: [
+            "Casco, third-party liability, property insurance, travel insurance, a summer campaign — every insurance got its own ad with Roni, in one style and with one character."
+          ],
+          items: {
+            summer: { title: "Summer campaign", note: "Ad" },
+            casco4: { title: "Casco", note: "Ad II" },
+            liability3: { title: "Third-party liability", note: "Ad II · 4K" },
+            property: { title: "Property insurance", note: "Ad" },
+            travel: { title: "Travel insurance", note: "Ad" },
+            liabilityApp: { title: "Third-party liability", note: "The app" },
+            casco3: { title: "Casco", note: "Ad I" },
+            liability2: { title: "Third-party liability", note: "Ad I" }
+          }
+        },
+        youtube: {
+          eyebrow: "YouTube",
+          title: "The hero on YouTube",
+          note: "Pre-roll · 16:9",
+          body: [
+            "A pre-roll ad in which the hero introduces Boleron in seconds — before the video the viewer chose to watch."
+          ]
+        },
         results: {
           eyebrow: "Result",
           title: "From the first meeting to the airwaves",
@@ -419,38 +451,135 @@ export const en = {
             { num: "50", suffix: "M+", label: "views" },
             { num: "1", suffix: "", label: "hero the whole of Bulgaria recognises" }
           ],
-          closing: "Boleron now has a brand hero that lives everywhere — on the website, on social media, on TV. And most importantly: in the minds of people all over Bulgaria."
+          closing: "Boleron now has a brand hero that lives everywhere — on the website, on social media, on TV and, above all, in the minds of people all over Bulgaria."
         },
-        cta: { title: "Want a brand hero for your business?", quote: "Request a quote", contact: "Contact us" }
+        cta: {
+          eyebrow: "The next hero",
+          title: "Want a brand hero for your business?",
+          lead: "Tell us about your business — we will propose a character, a style and a plan for the first ads.",
+          quote: "Request a quote",
+          contact: "Contact us"
+        }
       },
       plasico: {
         hero: {
-          eyebrow: "Case study · Plasico",
-          title: "An IT superstore, cinema style",
-          lead: "Three AI video concepts in 4K for Plasico's online store — technology told cinematically, entirely from generated scenes."
+          title: "Premium feel. With humour.",
+          lead: "Three AI ads for the Plasico IT superstore — gaming gear told like cinema, with a premium look and a sense of humour."
         },
-        films: [
+        challenge: {
+          eyebrow: "The brief",
+          title: "Content on a new level",
+          body: [
+            "Plasico came to us with a clear brief: take their marketing content to a new level. They wanted a premium feel, humour and their products — all in one.",
+            "The answer was three ads, each building on what the previous one taught us."
+          ]
+        },
+        ads: [
           {
-            eyebrow: "Film 01 · Back to Work",
-            title: "The working day as a film",
+            eyebrow: "Ad 01",
+            title: "Gaming details. A word to the office.",
             body: [
-              "Laptops, monitors and accessories from Plasico's catalogue — placed in real situations from the working day and shot like frames from a film: light, depth, camera movement.",
-              "Every scene is generated from a product reference, so the models, colours and details match the real devices in the store."
+              "Plasico's products are for gamers — so the first ad grabs the eye with gaming details in every frame.",
+              "It also carries a message to the people at the office. Two audiences, blended into one story."
             ],
             note: "16:9 · 4K"
           },
           {
-            eyebrow: "Film 02",
-            title: "The catalogue, told cinematically",
+            eyebrow: "Ad 02",
+            title: "Catchier. Sharper.",
             body: [
-              "Product shots with macro detail and a premium grade — the feel of a global brand that makes the catalogue exciting rather than merely commercial.",
-              "A short, rhythmic edit that works without sound — for the website, social media and the store's ad campaigns."
+              "For the second video we went for a catchier concept and catchier lines — not just entertaining, but speaking straight to the viewer's problem.",
+              "Again with top-tier AI visuals. The result is a video that is one of a kind in the industry."
             ],
-            note: "16:9 · 4K"
+            note: "9:16 · vertical · subtitled"
+          },
+          {
+            eyebrow: "Ad 03",
+            title: "From the beach to the gaming room",
+            body: [
+              "The third video is a dynamic 15-second ad with everything we had learned so far poured into it.",
+              "In fifteen seconds the viewer travels from the beach to the gaming room — and feels both."
+            ],
+            note: "15 s · 16:9 · 4K"
           }
         ],
+        method: {
+          eyebrow: "How we work",
+          title: "Together, down to the last detail",
+          body: [
+            "Our work with Plasico rests on one method: we actively discuss the concepts and develop them, and their details, together.",
+            "When both sides bring ideas, the highest quality on the market is only a matter of time."
+          ],
+          points: ["Concepts discussed actively", "Ideas from both sides", "Quality with no equal on the market"]
+        },
         placeholder: "Coming soon",
         cta: { title: "Want your products in cinema style too?", quote: "Request a quote", contact: "Contact us" }
+      },
+      mindguard: {
+        hero: {
+          title: "Calm you can see",
+          lead: "A 60-second explainer for MindGuard — a Swiss mental-resilience platform built together with Ukraine's veterans. An abstract product, made clear from the first frame."
+        },
+        facts: [
+          { label: "Client", value: ["MindGuard", "Switzerland · Ukraine"] },
+          { label: "Industry", value: ["Mental health", "DeepTech"] },
+          { label: "Format", value: ["Explainer video", "60 s · 16:9"] },
+          { label: "Shown to", value: ["Prof. Klaus Schwab", "the President of Switzerland", "Ukraine's largest TV channel"] }
+        ],
+        product: {
+          eyebrow: "The product",
+          title: "War doesn't end on the battlefield",
+          body: [
+            "MindGuard is a mental-resilience platform built in Switzerland together with Ukraine's veterans — for everyone affected by the war. Short daily actions — push-ups, breathwork, resilience exercises — that reduce stress, bring sleep back and build healthy habits.",
+            "Neuroscience runs underneath. Every exercise is verified by the phone's camera, an accountability buddy keeps you in rhythm, small wins reset the brain's dopamine system, and streaks and community make the habit stick. Five weeks in, about 74% of veterans are still training — against 3–5% for typical mental-health apps."
+          ],
+          loopLabel: "The MindGuard loop, every day",
+          loop: ["Daily action", "Peer accountability", "Dopamine incentives", "Progress tracking", "Reinforcement"]
+        },
+        challenge: {
+          eyebrow: "The challenge",
+          title: "How do you show something that happens in the brain?",
+          body: [
+            "The platform is serious science — neurobiology, behavioural mechanisms, dopamine. Screenshots would never explain it, and dry terms would move no one.",
+            "The brief: in 60 seconds the viewer feels the problem, understands what MindGuard does and sees the benefit — within the first ten seconds."
+          ]
+        },
+        approach: {
+          eyebrow: "How we visualised it",
+          title: "Real people. Modern technology.",
+          body: [
+            "We built it on human shots: realistic scenes with people — a veteran doing push-ups at dawn, breathwork in a quiet room, meeting his accountability buddy. Created with the latest AI video models, directed and cut like real live-action film.",
+            "Over them, the animated interface and graphics — the app's loop, the streaks, the small wins. The emotion comes from the people, the clarity from the screen. Modern technology for something deeply human."
+          ],
+          points: [
+            { title: "Human shots", text: "Realistic AI scenes of people in real situations — instead of abstract illustration." },
+            { title: "The interface in motion", text: "Animated UI and graphics that show the app's loop in seconds." },
+            { title: "The first 10 seconds", text: "The problem and the benefit — before the viewer decides whether to keep watching." }
+          ]
+        },
+        film: {
+          eyebrow: "The film",
+          title: "60 seconds that explain everything",
+          note: "PR film · 16:9 · presented to Prof. Klaus Schwab",
+          items: {
+            president: { title: "The user film", note: "Presented to the President of Switzerland" },
+            tv: { title: "The UI/UX film for TV", note: "The platform's interface, frame by frame" },
+            broadcast: { title: "On air", note: "A TV block with Ben on Ukraine's largest TV channel" }
+          }
+        },
+        results: {
+          eyebrow: "The result",
+          title: "Shown at the highest level",
+          body: "The film introduced MindGuard to Prof. Klaus Schwab, the President of Switzerland and Ukraine's largest TV channel — and became the way the platform explains itself.",
+          stats: [
+            { num: "60", suffix: "s", label: "the whole platform, explained" },
+            { num: "1,064", suffix: "", label: "veterans MindGuard was built with" },
+            { num: "74", suffix: "%", label: "of veterans still active after five weeks" }
+          ],
+          source: "Platform figures: mymindguard.ai"
+        },
+        placeholder: "The film — coming soon",
+        cta: { title: "Have a product that is hard to explain?", quote: "Request a quote", contact: "Contact us" }
       }
     },
     categories: {
@@ -502,10 +631,10 @@ export const en = {
     items: {
       boleron: {
         name: "Boleron",
-        headline: "Insurance explained in 30 seconds",
+        headline: "Insurance explained in 15 seconds",
         description:
           "Proof that new technology can reinvent an old industry - insurance told with fresh ideas, in over 20 AI videos and 75 million views.",
-        highlight: "New technology can change an old industry - and bring it new ideas.",
+        highlight: "A video mascot with over 75 million views, 20+ videos and 6 platforms - YouTube, TikTok, Instagram, Facebook, TV and LinkedIn.",
         tags: ["75M+ views", "Mascot", "20+ videos", "Software ad"],
         mission:
           "Make a mandatory, dry insurance product feel simple and human, so visitors understand it in seconds and finish the purchase online instead of calling an agent.",

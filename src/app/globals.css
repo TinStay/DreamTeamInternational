@@ -444,9 +444,44 @@
     @apply bg-background text-foreground;
     transition: background-color 200ms ease, color 200ms ease;
   }
-  html {
+  /* Native smooth scrolling only while the Lenis smooth scroller is not running (it adds `.lenis` to <html>). */
+  html:not(.lenis) {
     scroll-behavior: smooth;
   }
+}
+
+/*
+ * Mobile scene snapping: the home page (`main[data-snap-sections]`) marks the projects stage's stops with `SnapStop`
+ * markers (ui/snap-stop.tsx) and the root snaps to them - `always`, so one swipe is one scene, TikTok-style.
+ * `proximity`, not `mandatory`: the stops are only in the stage (half a viewport apart, so it always snaps in there)
+ * and the rest of the page must scroll free - it only ever snaps within about a third of a viewport of a stop.
+ * Coarse pointers below lg only, never under reduced motion, and off while a field has focus so the keyboard's own
+ * scroll-into-view is not undone. Lenis leaves touch scrolling native, so the two do not fight.
+ */
+@media (max-width: 1023px) and (pointer: coarse) and (prefers-reduced-motion: no-preference) {
+  html:has(main[data-snap-sections]):not(:has(input:focus, textarea:focus, select:focus, [contenteditable="true"]:focus)) {
+    scroll-snap-type: y proximity;
+  }
+}
+
+/* Lenis (site-wide smooth scrolling, `components/smooth-scroll.tsx`) - its own stylesheet, inlined. */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis:not(.lenis-autoToggle).lenis-stopped {
+  overflow: clip;
+}
+.lenis [data-lenis-prevent],
+.lenis [data-lenis-prevent-wheel],
+.lenis [data-lenis-prevent-touch],
+.lenis [data-lenis-prevent-vertical],
+.lenis [data-lenis-prevent-horizontal] {
+  overscroll-behavior: contain;
+}
+/* While a smooth scroll runs, wheel over an embed keeps scrolling the page. */
+.lenis.lenis-smooth iframe {
+  pointer-events: none;
 }
 
 /* Hide bottom mobile dock while a service modal is open (avoids visual overlap). */

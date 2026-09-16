@@ -4,6 +4,7 @@ import type { ComponentType } from "react";
 import type { Project, ProjectKey } from "@/lib/projects";
 import { BoleronStory } from "./story/boleron-story";
 import { EmblemaStory } from "./story/emblema-story";
+import { MindguardStory } from "./story/mindguard-story";
 import { OsmoStory } from "./story/osmo-story";
 import { PlasicoStory } from "./story/plasico-story";
 
@@ -18,4 +19,5 @@ export const PROJECT_STORIES: Partial<Record<ProjectKey, ComponentType<{ project
   osmo: OsmoStory,
   boleron: BoleronStory,
   plasico: PlasicoStory,
+  mindguard: MindguardStory,
 };

@@ -66,8 +66,8 @@ export function ProcessSection() {
   const journey = useJourney();
 
   // Elsewhere: draws while the row travels from the lower part of the viewport to its middle. On the home journey
-  // the section is held still while it arrives, so the wave draws over the second half of that hold instead - it
-  // reaches the 4th badge before the page can scroll on.
+  // the section eases up into place while it arrives, so the wave draws over the second half of that arrival
+  // instead - it reaches the 4th badge as the scene is released to scroll on.
   const { scrollYProgress } = useScroll({ target: rowRef, offset: ["start 90%", "end 60%"] });
   const source = useTransform(
     [scrollYProgress, journey?.travel ?? scrollYProgress],

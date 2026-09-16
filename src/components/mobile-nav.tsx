@@ -41,8 +41,9 @@ export function MobileNav() {
 
   return (
     <>
-      {/* Dock: Projects first; Portfolio lives in the sheet menu. */}
-      <GlassShell className="service-mobile-dock lg:hidden fixed bottom-3 left-1/2 z-50 flex w-[92%] max-w-md -translate-x-1/2 items-center gap-1.5 px-3 py-2">
+      {/* Dock: Projects first; Portfolio lives in the sheet menu. Tight to the bottom edge (the home indicator's
+          inset on iPhones), as wide as the top bar. */}
+      <GlassShell className="service-mobile-dock lg:hidden fixed bottom-[max(0.375rem,env(safe-area-inset-bottom))] left-1/2 z-50 flex w-[96%] max-w-lg -translate-x-1/2 items-center gap-1.5 px-3 py-2">
         <Link
           href={projectsHref}
           className="group flex flex-1 select-none flex-col items-center justify-center gap-1 text-muted-foreground transition-colors hover:text-foreground"

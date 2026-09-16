@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, type ReactNode } from "react";
 import { motion, useMotionValueEvent, useTransform, type MotionValue } from "motion/react";
 import { backgroundEmbedSrc } from "@/components/projects-section";
+import { bunnyBackgroundEmbedSrc } from "@/lib/bunny-stream";
 import type { Project } from "@/lib/projects";
 import { cn } from "@/lib/utils";
 import { YOUTUBE_IFRAME_ALLOW, YOUTUBE_REFERRER_POLICY } from "@/lib/youtube-embeds";
@@ -320,23 +321,29 @@ export function EmbedCover({
   );
 }
 
-/** `EmbedCover` for a project's YouTube clip; renders nothing while the clip isn't published. */
+/**
+ * `EmbedCover` for a project's clip on the stage - the stage-only footage first (`showcaseClip` on Bunny, then
+ * the YouTube `showcaseVideoId`), else the project's own (`videoId`, then the Bunny `clip`); renders nothing
+ * while nothing is published.
+ */
 export function ProjectEmbedCover({
   project,
   boxAspect,
   className,
 }: {
-  project: Pick<Project, "videoId" | "orientation">;
+  project: Pick<Project, "videoId" | "orientation" | "clip" | "showcaseClip" | "showcaseVideoId">;
   boxAspect: number;
   className?: string;
 }) {
-  if (!project.videoId) return null;
-  return (
-    <EmbedCover
-      src={backgroundEmbedSrc(project.videoId)}
-      orientation={project.orientation}
-      boxAspect={boxAspect}
-      className={className}
-    />
-  );
+  const src = project.showcaseClip
+    ? bunnyBackgroundEmbedSrc(project.showcaseClip)
+    : project.showcaseVideoId
+      ? backgroundEmbedSrc(project.showcaseVideoId)
+      : project.videoId
+        ? backgroundEmbedSrc(project.videoId)
+        : project.clip
+          ? bunnyBackgroundEmbedSrc(project.clip)
+          : null;
+  if (!src) return null;
+  return <EmbedCover src={src} orientation={project.orientation} boxAspect={boxAspect} className={className} />;
 }

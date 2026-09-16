@@ -18,13 +18,26 @@ export const SHOWCASE_UNITS = SHOWCASE_INTRO + (SHOWCASE_PROJECT_KEYS.length - 1
  */
 export const SHOWCASE_UNIT_VH = (SHOWCASE_UNITS - 1) / SHOWCASE_UNITS;
 
-/** Scene-local time at which the OSMO copy starts fading (after its stagger + a beat of hold). */
-export const OSMO_OUTRO_START = 0.26;
-/** How long the copy takes to fade; the disc only appears once it is gone. */
+/**
+ * Scene-local time at which a scene has fully framed: the hand-over is done at 0 and the copy's staggered reveal
+ * (`Reveal`, the CTA last) by 0.24 - where the rail jumps to and where phones snap to (`SnapStop`).
+ */
+export const SCENE_FRAMED = 0.27;
+/** Scene-local time at which the OSMO copy starts fading (after its stagger + a beat of hold, past `SCENE_FRAMED`). */
+export const OSMO_OUTRO_START = 0.3;
+/** How long the copy takes to fade; the disc only appears once it is gone (`OSMO_HANDOFF_START`). */
 export const OSMO_COPY_FADE = 0.08;
-/** The OSMO copy circle: centre + diameter (stage fractions) on desktop (`lg`); phones centre it higher (see `OSMO_CIRCLE_MOBILE`). */
+/** The OSMO copy circle: centre + diameter (stage fractions) on desktop (`lg`); below that see `osmoCircleMobile`. */
 export const OSMO_CIRCLE = { x: 0.75, y: 0.56, d: 0.46 };
-export const OSMO_CIRCLE_MOBILE = { x: 0.5, y: 0.32 };
+/**
+ * Below `lg` the disc is centred, its top edge just under the floating header (5.75rem, or 10vh on tall phones) and
+ * no wider than 88vw / 52vh - px for a viewport; `showcase-scenes.tsx` spells the same numbers as CSS
+ * (`top-[calc(max(5.75rem,10vh)+min(44vw,26vh))]`, `w-[min(88vw,52vh)]`), so keep the two in step.
+ */
+export function osmoCircleMobile(vw: number, vh: number) {
+  const d = Math.min(0.88 * vw, 0.52 * vh);
+  return { x: 0.5 * vw, y: Math.max(5.75 * 16, 0.1 * vh) + d / 2, d };
+}
 export const OSMO_GREEN = "#1E9E4A";
 
 /**

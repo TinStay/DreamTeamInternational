@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
-import { Fira_Sans, Montserrat, Sofia_Sans } from "next/font/google";
+import { Exo_2, Fira_Sans, Montserrat, Nunito, Playfair_Display, Sofia_Sans, Unbounded } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
+import { SmoothScroll } from "@/components/smooth-scroll";
 import { LanguageProvider } from "@/lib/i18n/language-context";
 import { SOCIAL_LINKS } from "@/lib/social-links";
 import { Analytics } from "@vercel/analytics/next";
@@ -30,11 +31,41 @@ const firaSans = Fira_Sans({
   display: "swap",
 });
 
-/** Montserrat ExtraBold - only the giant "Boleron" word in the projects showcase (the face the reference animation uses). */
+/**
+ * The projects showcase's display faces - one per brand world (`showcase-scenes.tsx`, `headline`), all with
+ * Cyrillic: Montserrat (the giant "Boleron" word, the face the reference animation uses, and Boleron's corporate
+ * headline), Playfair Display (Emblema, as in the reference), Exo 2 (Plasico's tech), Nunito (OSMO's home-friendly
+ * rounded), Unbounded (MindGuard's big, strong one).
+ */
 const montserrat = Montserrat({
   subsets: ["latin", "cyrillic"],
-  weight: ["800"],
+  weight: ["700", "800"],
   variable: "--font-montserrat",
+  display: "swap",
+});
+const playfair = Playfair_Display({
+  subsets: ["latin", "cyrillic"],
+  weight: ["500", "600"],
+  style: ["normal", "italic"],
+  variable: "--font-playfair",
+  display: "swap",
+});
+const exo = Exo_2({
+  subsets: ["latin", "cyrillic"],
+  weight: ["700"],
+  variable: "--font-exo",
+  display: "swap",
+});
+const nunito = Nunito({
+  subsets: ["latin", "cyrillic"],
+  weight: ["800"],
+  variable: "--font-nunito",
+  display: "swap",
+});
+const unbounded = Unbounded({
+  subsets: ["latin", "cyrillic"],
+  weight: ["700"],
+  variable: "--font-unbounded",
   display: "swap",
 });
 
@@ -192,7 +223,7 @@ export default function RootLayout({
     // resolved on `:root`, so the families must be defined there too.
     <html
       lang="bg"
-      className={`dark ${sofiaSans.variable} ${firaSans.variable} ${montserrat.variable}`}
+      className={`dark ${sofiaSans.variable} ${firaSans.variable} ${montserrat.variable} ${playfair.variable} ${exo.variable} ${nunito.variable} ${unbounded.variable}`}
       style={{ colorScheme: "dark" }}
       suppressHydrationWarning
     >
@@ -218,6 +249,7 @@ export default function RootLayout({
               disableTransitionOnChange={false}
             >
               <LanguageProvider>
+                <SmoothScroll />
                 <Suspense fallback={null}>
                   <PostHogPageView />
                 </Suspense>

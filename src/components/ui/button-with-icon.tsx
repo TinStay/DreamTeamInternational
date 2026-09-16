@@ -19,7 +19,8 @@ import { cn } from "@/lib/utils";
  * footage), `auto` = dark pill in the light theme, white pill in the dark
  * theme (the header, the hero, anything on the page ground). The arrow disc
  * always carries the brand gradient. `size="sm"` is the slim header bar's,
- * `"lg"` the service pages' hero CTA.
+ * `"lg"` the service pages' hero CTA. `glow` lays a faint red → violet halo
+ * behind the pill (the header's), a little stronger while it is hovered.
  */
 export function ButtonWithIcon({
   href,
@@ -27,6 +28,7 @@ export function ButtonWithIcon({
   children,
   surface = "dark",
   size = "md",
+  glow = false,
   className,
 }: {
   href?: string;
@@ -34,6 +36,7 @@ export function ButtonWithIcon({
   children: ReactNode;
   surface?: "dark" | "light" | "auto";
   size?: "md" | "sm" | "lg";
+  glow?: boolean;
   className?: string;
 }) {
   const pill = {
@@ -73,16 +76,24 @@ export function ButtonWithIcon({
       </span>
     </>
   );
-  if (href) {
-    return (
-      <Button render={<Link href={href} />} nativeButton={false} onClick={onClick} variant="ghost" size="lg" className={shared}>
-        {content}
-      </Button>
-    );
-  }
-  return (
+  const button = href ? (
+    <Button render={<Link href={href} />} nativeButton={false} onClick={onClick} variant="ghost" size="lg" className={shared}>
+      {content}
+    </Button>
+  ) : (
     <Button type="button" onClick={onClick} variant="ghost" size="lg" className={shared}>
       {content}
     </Button>
+  );
+  if (!glow) return button;
+  // The halo sits outside the pill (which clips its own overflow for the sliding disc), so it wraps it.
+  return (
+    <span className="group/glow relative inline-flex shrink-0">
+      <span
+        className="pointer-events-none absolute -inset-1 rounded-full bg-gradient-to-r from-[var(--primary-gradient-start)] to-[var(--primary-gradient-end)] opacity-30 blur-md transition-opacity duration-500 group-hover/glow:opacity-55 dark:opacity-35"
+        aria-hidden
+      />
+      {button}
+    </span>
   );
 }

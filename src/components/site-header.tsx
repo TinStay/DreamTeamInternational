@@ -13,10 +13,13 @@ import { GlassShell } from "@/components/ui/glass-shell";
 import { useTrainingCards } from "@/components/training/use-training-cards";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/lib/i18n/language-context";
+import { PARTNERS, PARTNER_ICON_BASE } from "@/lib/partners";
+import { PROJECTS } from "@/lib/projects";
 import { getServiceSlug } from "@/lib/services/constants";
 import {
   homePath,
   portfolioPath,
+  projectPath,
   projectsPath,
   servicePath,
   servicesPath,
@@ -25,7 +28,7 @@ import {
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
-type DropdownItem = { href: string; label: string; icon: ReactNode };
+type DropdownItem = { href: string; label: string; icon: ReactNode; /** The tile behind the icon: the theme's tint, or white for a client's logo. */ tile?: "tint" | "white" };
 
 /**
  * Desktop-only nav item with a hover/focus dropdown. The label itself stays a
@@ -102,7 +105,12 @@ function NavDropdown({
                 href={item.href}
                 className="group/item flex items-center gap-3 rounded-xl px-2.5 py-2 text-sm font-semibold text-foreground/85 transition-[background-color,color,transform] duration-200 ease-out hover:translate-x-1 hover:bg-foreground/[0.07] hover:text-foreground"
               >
-                <span className="flex size-14 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-foreground/[0.05] ring-1 ring-card-border transition-shadow duration-200 group-hover/item:shadow-[0_10px_24px_-8px_rgba(2,6,23,0.45)]">
+                <span
+                  className={cn(
+                    "flex size-14 shrink-0 items-center justify-center overflow-hidden rounded-xl ring-1 ring-card-border transition-shadow duration-200 group-hover/item:shadow-[0_10px_24px_-8px_rgba(2,6,23,0.45)]",
+                    item.tile === "white" ? "bg-white" : "bg-foreground/[0.05]"
+                  )}
+                >
                   <span className="flex size-full items-center justify-center transition-transform duration-300 ease-out group-hover/item:scale-110">
                     {item.icon}
                   </span>
@@ -146,6 +154,31 @@ export function SiteHeader() {
     ];
   });
 
+  // The case studies, each with the client's logo on a white tile (a white-ink-only mark is inverted for it).
+  const projectItems: DropdownItem[] = PROJECTS.flatMap((project) => {
+    const partner = project.partnerId ? PARTNERS.find((candidate) => candidate.id === project.partnerId) : undefined;
+    const file = partner?.light ?? partner?.dark;
+    return [
+      {
+        href: projectPath(language, project.id),
+        label: t.projects.items[project.id].name,
+        tile: "white" as const,
+        icon: file ? (
+          <Image
+            src={`${PARTNER_ICON_BASE}${file}`}
+            alt=""
+            width={400}
+            height={140}
+            sizes="120px"
+            className={cn("h-7 w-auto max-w-[46px] object-contain", partner?.invertOnLight && !partner.light && "invert")}
+          />
+        ) : (
+          <span className="font-heading text-lg font-bold text-neutral-900">{t.projects.items[project.id].name.charAt(0)}</span>
+        ),
+      },
+    ];
+  });
+
   // Same card list as the training page, so hidden trainings stay hidden here too.
   const trainingItems: DropdownItem[] = trainingCards.map((card) => ({
     href: `${trainingPath(language)}/${card.id}`,
@@ -157,27 +190,28 @@ export function SiteHeader() {
 
   return (
     <>
-      {/* Mobile: glass bar — DT logo left, theme toggle right (matches bottom sticky dock) */}
+      {/* Mobile: glass bar — DT logo left, theme toggle right. Wider and taller than the bottom dock (96%, a 2.5rem
+          logo, 2.5rem round buttons) so the brand reads at a glance. */}
       <header
-        className={`fixed left-1/2 z-50 w-[92%] max-w-md -translate-x-1/2 transition-all duration-300 lg:hidden top-[max(1.25rem,env(safe-area-inset-top))] ${
+        className={`fixed left-1/2 z-50 w-[96%] max-w-lg -translate-x-1/2 transition-all duration-300 lg:hidden top-[max(0.5rem,env(safe-area-inset-top))] ${
           isScrolled ? "scale-[0.98]" : "scale-100"
         }`}
       >
-        <GlassShell className="flex items-center justify-between gap-3 px-4 py-1.5">
+        <GlassShell className="flex items-center justify-between gap-3 px-5 py-2.5">
           <Link href={homeHref} className="group flex min-w-0 shrink items-center py-1 pr-2">
             <Image
               src="/logo-1.png"
               alt="DreamTeam"
               width={1024}
               height={416}
-              sizes="100px"
-              className="h-8 w-auto grayscale transition-all group-hover:grayscale-0 dark:invert"
+              sizes="128px"
+              className="h-10 w-auto grayscale transition-all group-hover:grayscale-0 dark:invert"
             />
           </Link>
-          <div className="flex shrink-0 items-center gap-2">
+          <div className="flex shrink-0 items-center gap-2.5">
             <ThemeToggle className="shrink-0" />
-            <EmailIconLink />
-            <PhoneIconLink />
+            <EmailIconLink className="size-10" />
+            <PhoneIconLink className="size-10" />
           </div>
         </GlassShell>
       </header>
@@ -191,7 +225,7 @@ export function SiteHeader() {
       >
         <div
           className={cn(
-            "liquid-glass-header rounded-full px-6 transition-shadow duration-300",
+            "liquid-glass-header rounded-full ps-6 pe-3 transition-shadow duration-300",
             isScrolled
               ? "shadow-[0_18px_50px_-12px_rgba(2,6,23,0.45)]"
               : "shadow-[0_12px_36px_-14px_rgba(2,6,23,0.3)]"
@@ -213,15 +247,18 @@ export function SiteHeader() {
 
             {/* Absolutely centred from xl up; below that it flows from the left.
                 Never `overflow-x-auto` — that clips the dropdown panels. */}
-            <nav className="flex min-w-0 flex-1 items-center gap-4 overflow-visible whitespace-nowrap px-2 text-[15px] font-semibold text-foreground/80 xl:pointer-events-none xl:absolute xl:left-1/2 xl:w-auto xl:flex-none xl:-translate-x-1/2 xl:gap-7 xl:px-0 xl:text-base xl:[&>*]:pointer-events-auto">
+            <nav className="flex min-w-0 flex-1 items-center gap-5 overflow-visible whitespace-nowrap px-2 text-base font-semibold text-foreground/80 xl:gap-8 xl:text-lg 2xl:pointer-events-none 2xl:absolute 2xl:left-1/2 2xl:w-auto 2xl:flex-none 2xl:-translate-x-1/2 2xl:px-0 2xl:text-xl 2xl:[&>*]:pointer-events-auto">
               <Link href={portfolioPath(language)} className="whitespace-nowrap transition-colors hover:text-primary">
                 {t.header.portfolio}
               </Link>
-              <Link href={projectsPath(language)} className="whitespace-nowrap transition-colors hover:text-primary">
-                {t.header.projects}
-              </Link>
+              {/* The case studies: a dropdown of the clients (logo + name), the label itself the listing. */}
+              <NavDropdown label={t.header.projects} href={projectsPath(language)} items={projectItems} />
               <NavDropdown label={t.header.services} href={servicesPath(language)} items={serviceItems} />
               <NavDropdown label={t.header.training} href={trainingPath(language)} items={trainingItems} />
+              {/* Scrolls to the home page's contact form (smooth on the home page itself, a jump from any other page). */}
+              <Link href={`${homeHref}#contact`} className="whitespace-nowrap transition-colors hover:text-primary">
+                {t.header.contact}
+              </Link>
             </nav>
 
             {/* Right controls */}
@@ -231,8 +268,9 @@ export function SiteHeader() {
               {/* Plain round icon buttons: copy the email / phone with a "copied" tag as the only feedback. */}
               <EmailCopyButton />
               <PhoneCopyButton />
-              {/* The site's main CTA - the projects' arrow-disc pill, slim for the bar. */}
-              <ButtonWithIcon href={`${homeHref}#quote`} surface="auto" size="sm" className="shrink-0">
+              {/* The site's main CTA - the projects' arrow-disc pill at the slim header size, hugging the bar's right end
+                  (the bar's end padding equals its vertical one) under a faint brand-gradient glow. */}
+              <ButtonWithIcon href={`${homeHref}#quote`} surface="auto" size="sm" glow className="shrink-0">
                 {t.header.quoteCta}
               </ButtonWithIcon>
             </div>

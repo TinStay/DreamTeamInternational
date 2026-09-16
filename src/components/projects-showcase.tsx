@@ -13,7 +13,7 @@ import {
   type MotionValue,
 } from "motion/react";
 import { IconArrowDown } from "@tabler/icons-react";
-import { ProjectCard, ProjectTagChips } from "@/components/projects-section";
+import { ProjectCard } from "@/components/projects-section";
 import {
   clamp,
   clamp01,
@@ -27,6 +27,7 @@ import { sceneVisualFor, type MorphTarget } from "@/components/projects/showcase
 import {
   OSMO_COPY_FADE,
   OSMO_OUTRO_START,
+  SCENE_FRAMED,
   SHOWCASE_HOLD,
   SHOWCASE_INTRO,
   SHOWCASE_SPAN,
@@ -37,7 +38,9 @@ import { useLanguage } from "@/lib/i18n/language-context";
 import { PARTNERS, PARTNER_ICON_BASE } from "@/lib/partners";
 import { SHOWCASE_PROJECTS, type Project } from "@/lib/projects";
 import { projectPath } from "@/lib/routes";
+import { scrollToY, useScrollEased } from "@/lib/smooth-scroll";
 import { cn } from "@/lib/utils";
+import { SnapStop } from "@/components/ui/snap-stop";
 
 /*
  * Scroll timeline, measured in "units" (1 unit = one viewport of scroll):
@@ -113,9 +116,10 @@ function sceneFrame(t: number, index: number): SceneFrame {
     visibility: "visible",
   };
   if (beforeFirst) {
-    // Curtains: the scene opens from a horizontal slit at mid-height (page background around it).
+    // Curtains: the scene opens from a horizontal slit at mid-height (the intro's letterbox streak is on the same
+    // line) - eased in and out, so it grows out of the line gently and settles.
     const u = t * SPAN + INTRO;
-    const open = easeOut(clamp01((u - CURTAIN_START) / (CURTAIN_END - CURTAIN_START)));
+    const open = easeInOut(clamp01((u - CURTAIN_START) / (CURTAIN_END - CURTAIN_START)));
     const inset = 50 * (1 - open);
     frame.clipPath = open >= 1 ? "none" : `inset(${inset}% 0 ${inset}% 0)`;
     frame.visibility = open <= 0.001 ? "hidden" : "visible";
@@ -221,6 +225,10 @@ const TONE = {
  * half and hugs the frame on the right (right-aligned from lg); `top-center`
  * sits between the two frames of a top row (below the wide frame on mobile).
  */
+/** Below lg the Boleron / Mindguard / OSMO chips shrink with the rest of their compact copy blocks. */
+const DENSE_CHIPS =
+  "max-lg:gap-1 max-lg:[&>div]:gap-1 max-lg:[&>div]:px-1.5 max-lg:[&>div]:py-0.5 max-lg:[&>div]:text-[0.58rem] max-lg:[&>div]:tracking-[0.12em] max-lg:[&_svg]:size-2.5";
+
 const TEXT_LAYOUT = {
   "bottom-left": {
     block: "left-5 right-10 bottom-28 sm:left-8 sm:right-14 lg:bottom-12 lg:left-12 lg:right-auto lg:max-w-[46vw]",
@@ -232,18 +240,19 @@ const TEXT_LAYOUT = {
     row: "flex justify-center",
     chips: "justify-center",
   },
+  // Below lg the blocks sit low, just above the mobile dock (`bottom-[5.5rem]`), with tighter gaps.
   "center-bottom": {
     block:
-      "inset-x-5 bottom-28 mx-auto max-w-[min(88vw,32rem)] items-center text-center sm:inset-x-8 lg:inset-x-0 lg:bottom-[9vh] lg:max-w-[min(70ch,48vw)] 2xl:top-1/2 2xl:bottom-auto 2xl:-translate-y-1/2",
+      "inset-x-5 bottom-[5.5rem] mx-auto max-w-[min(88vw,32rem)] items-center gap-3 text-center sm:inset-x-8 sm:gap-4 lg:inset-x-0 lg:bottom-[9vh] lg:max-w-[min(70ch,48vw)] lg:gap-5 2xl:top-[49%] 2xl:bottom-auto 2xl:-translate-y-1/2",
     row: "flex justify-center",
     chips: "justify-center",
   },
   boleron: {
     // 20vw left margin; the bottom margin grows toward 20vh on tall viewports but stays clear of the lockup on short ones.
     block:
-      "left-[8vw] right-[8vw] bottom-28 lg:left-[max(2rem,4vw)] lg:right-auto lg:bottom-[8vh] lg:w-[min(50vw,calc(60vw-12rem))]",
+      "left-[8vw] right-[8vw] bottom-[5.5rem] gap-3 sm:gap-4 lg:left-[max(2rem,4vw)] lg:right-auto lg:bottom-[8vh] lg:w-[min(50vw,calc(60vw-12rem))] lg:gap-5",
     row: "",
-    chips: "",
+    chips: DENSE_CHIPS,
   },
   "top-left": {
     block: "left-5 right-10 top-[max(9rem,18vh)] sm:left-8 sm:right-14 lg:left-12 lg:right-auto lg:top-[max(9.5rem,15vh)] lg:max-w-[min(30vw,40ch)]",
@@ -256,40 +265,45 @@ const TEXT_LAYOUT = {
     row: "",
     chips: "",
   },
+  // Below lg: a compact block inside the top of the (smaller) disc, under the white mark (see `OsmoVisual`).
   "in-circle": {
     block:
-      "left-6 right-8 top-[max(12rem,23vh)] items-center text-center sm:left-10 sm:right-14 sm:top-[max(14rem,26vh)] lg:left-auto lg:right-[7vw] lg:top-[56vh] lg:w-[36vw] lg:-translate-y-1/2 lg:gap-4",
+      "left-[12vw] right-[12vw] top-[calc(max(5.75rem,10vh)+5.75rem)] items-center gap-2 text-center sm:left-[22vw] sm:right-[22vw] sm:top-[calc(max(5.75rem,10vh)+7.5rem)] sm:gap-3 lg:left-auto lg:right-[7vw] lg:top-[56vh] lg:w-[36vw] lg:-translate-y-1/2 lg:gap-4",
     row: "flex justify-center",
-    chips: "justify-center",
+    chips: `justify-center ${DENSE_CHIPS}`,
   },
+  // Below lg: a compact block at the bottom, under the tablet that sits up top (see `MindguardVisual`). The mark
+  // row pulls the MindGuard file's transparent left padding (5.3% of it - 0.155 × the mark's height) back, so the
+  // mark's ink lines up with the left-aligned copy under it.
   "left-column": {
     block:
-      "left-5 right-10 top-[max(9rem,18vh)] sm:left-8 sm:right-14 lg:inset-y-0 lg:left-0 lg:right-[60%] lg:top-0 lg:items-center lg:justify-center lg:px-[3vw] lg:text-center",
-    row: "flex justify-start lg:justify-center",
-    chips: "justify-start lg:justify-center",
+      "left-5 right-8 bottom-[5.5rem] gap-2.5 sm:left-8 sm:right-14 sm:gap-3 lg:top-[5.5rem] lg:bottom-0 lg:left-0 lg:right-[60%] lg:items-start lg:justify-center lg:gap-5 lg:px-[max(2rem,4vw)] lg:text-left",
+    row: "flex justify-start",
+    mark: "-ml-[0.43rem] sm:-ml-[0.54rem] lg:-ml-[0.93rem] xl:-ml-[1.09rem] 2xl:-ml-[1.39rem]",
+    chips: `justify-start ${DENSE_CHIPS}`,
   },
 } as const;
 
 /** Type ramp per layout: the left column and wide top-left get the bigger headline. */
 const HEADLINE_SIZE = {
   "bottom-left": "text-3xl sm:text-4xl lg:text-5xl xl:text-6xl",
-  boleron: "text-3xl sm:text-4xl lg:text-5xl 2xl:text-6xl",
+  boleron: "text-2xl sm:text-4xl lg:text-5xl 2xl:text-6xl",
   center: "text-3xl sm:text-4xl lg:text-4xl xl:text-5xl 2xl:text-6xl",
   "center-bottom": "text-3xl sm:text-4xl lg:text-4xl xl:text-5xl 2xl:text-6xl",
   "top-left": "text-3xl sm:text-4xl lg:text-4xl xl:text-5xl",
   "top-left-wide": "text-3xl sm:text-4xl lg:text-5xl xl:text-5xl 2xl:text-7xl",
-  "left-column": "text-3xl sm:text-4xl lg:text-4xl xl:text-5xl 2xl:text-6xl",
-  "in-circle": "text-3xl sm:text-4xl lg:text-5xl xl:text-6xl 2xl:text-7xl",
+  "left-column": "text-2xl sm:text-3xl lg:text-4xl xl:text-5xl 2xl:text-6xl",
+  "in-circle": "text-xl sm:text-2xl lg:text-5xl xl:text-6xl 2xl:text-7xl",
 } as const;
 const HIGHLIGHT_SIZE = {
   "bottom-left": "text-base sm:text-lg lg:text-xl",
-  boleron: "text-base sm:text-lg lg:text-xl",
+  boleron: "text-sm sm:text-lg lg:text-xl",
   center: "text-base sm:text-lg lg:text-xl",
   "center-bottom": "text-base sm:text-lg lg:text-xl",
   "top-left": "text-base sm:text-lg",
   "top-left-wide": "text-base sm:text-lg lg:text-xl 2xl:text-2xl",
-  "left-column": "text-base sm:text-lg lg:text-xl",
-  "in-circle": "text-base sm:text-lg lg:text-xl xl:text-2xl",
+  "left-column": "text-sm sm:text-base lg:text-xl",
+  "in-circle": "text-xs sm:text-sm lg:text-xl xl:text-2xl",
 } as const;
 
 /** The scene root's position on stage for local time `t` (see `sceneFrame`), as motion values. */
@@ -367,13 +381,13 @@ function BrandMark({
         alt={partner.ariaLabel}
         width={400}
         height={140}
-        sizes="200px"
+        sizes={size === "xl" ? "(max-width: 1024px) 380px, 640px" : size === "lg" ? "(max-width: 1024px) 220px, 480px" : "200px"}
         className={cn(
           "w-auto object-contain",
           size === "xl"
-            ? "h-20 max-w-[380px] sm:h-24 lg:h-36 2xl:h-44 2xl:max-w-[460px]"
+            ? "h-20 max-w-[320px] sm:h-24 sm:max-w-[380px] lg:h-52 lg:max-w-[520px] xl:h-56 xl:max-w-[560px] 2xl:h-72 2xl:max-w-[720px]"
             : size === "lg"
-              ? "h-16 max-w-[320px] sm:h-20 lg:h-20 2xl:h-28"
+              ? "h-11 max-w-[220px] sm:h-14 lg:h-24 lg:max-w-[340px] xl:h-28 xl:max-w-[400px] 2xl:h-36 2xl:max-w-[480px]"
               : "h-9 max-w-[200px] sm:h-11 lg:h-12",
           invert && "invert"
         )}
@@ -409,8 +423,10 @@ function ProjectScene({
   const { t: dict, language } = useLanguage();
   const p = dict.projects;
   const copy = p.items[project.id];
-  const { tone, background, layout, mark, Mark, Visual } = sceneVisualFor(project);
+  const { tone, background, layout, mark, Mark, Visual, headline, Detail, highlight: showHighlight = true } = sceneVisualFor(project);
   const colors = TONE[tone];
+  // A layout may pull its mark row back over the copy (the MindGuard file's transparent left padding).
+  const markRow = (TEXT_LAYOUT[layout] as { mark?: string }).mark;
 
   const t = useTransform(u, (v) => (v - INTRO) / SPAN - index);
   const frameStyle = useSceneFrameStyle(t, index);
@@ -454,7 +470,7 @@ function ProjectScene({
               <Mark />
             </Reveal>
           ) : mark !== "none" && mark !== "custom" ? (
-            <Reveal t={t} delay={0.04} className={TEXT_LAYOUT[layout].row}>
+            <Reveal t={t} delay={0.04} className={cn(TEXT_LAYOUT[layout].row, markRow)}>
               <BrandMark
                 project={project}
                 tone={tone}
@@ -470,18 +486,26 @@ function ProjectScene({
             </Reveal>
           ) : null}
           <Reveal t={t} delay={0.1}>
-            <h3 className={cn("font-heading font-bold leading-[1.02] text-balance", HEADLINE_SIZE[layout], colors.headline)}>
+            {/* The leading comes after the sizes: tailwind-merge drops a leading that precedes a font-size class. */}
+            <h3 className={cn("font-heading font-bold text-balance", HEADLINE_SIZE[layout], colors.headline, headline, "leading-[1.02]")}>
               {copy.headline}
             </h3>
           </Reveal>
-          <Reveal t={t} delay={0.17} className={TEXT_LAYOUT[layout].row}>
-            <p className={cn("max-w-[38ch] leading-relaxed text-pretty", HIGHLIGHT_SIZE[layout], colors.highlight)}>
-              {copy.highlight}
-            </p>
-          </Reveal>
+          {Detail || showHighlight ? (
+            <Reveal t={t} delay={0.17} className={TEXT_LAYOUT[layout].row}>
+              {Detail ? (
+                <Detail />
+              ) : (
+                <p className={cn("max-w-[38ch] leading-relaxed text-pretty", HIGHLIGHT_SIZE[layout], colors.highlight)}>
+                  {copy.highlight}
+                </p>
+              )}
+            </Reveal>
+          ) : null}
+          {/* The highlight tags are parked for now.
           <Reveal t={t} delay={0.2} className={TEXT_LAYOUT[layout].row}>
             <ProjectTagChips project={project} variant="highlights" tone={tone} className={TEXT_LAYOUT[layout].chips} />
-          </Reveal>
+          </Reveal> */}
           <Reveal t={t} delay={0.26} className={cn("pointer-events-auto", TEXT_LAYOUT[layout].row)}>
             <ButtonWithIcon href={projectPath(language, project.id)} surface={tone === "dark" ? "light" : "dark"}>
               {p.viewProject}
@@ -642,10 +666,11 @@ function RailBar({
 }
 
 /** Scroll position (px) at which project `index` is framed in the sticky stage. */
+/** Scroll position at which scene `index` is fully framed, copy revealed (`SCENE_FRAMED`) - the rail's jumps. */
 function scrollTargetFor(section: HTMLElement, stage: HTMLElement, index: number) {
   const top = section.getBoundingClientRect().top + window.scrollY;
   const travel = section.offsetHeight - stage.offsetHeight;
-  return top + ((INTRO + index * SPAN) / UNITS) * travel;
+  return top + ((INTRO + (index + SCENE_FRAMED) * SPAN) / UNITS) * travel;
 }
 
 /* ------------------------------------------------------------------------ */
@@ -680,9 +705,12 @@ export function ProjectsShowcase({ className }: { className?: string }) {
     target: sectionRef,
     offset: ["start start", "end end"],
   });
-  // Over-damped so the stage glides after each wheel tick without overshooting,
-  // but quick (~50 ms) so canvases and players don't trail the scroll.
-  const smooth = useSpring(scrollYProgress, { stiffness: 220, damping: 34, mass: 0.5, restDelta: 0.0002 });
+  // Under native scrolling: over-damped so the stage glides after each wheel tick without overshooting, but quick
+  // (~50 ms) so canvases and players don't trail the scroll. While Lenis glides the wheel the raw progress is used.
+  const smooth = useScrollEased(
+    scrollYProgress,
+    useSpring(scrollYProgress, { stiffness: 220, damping: 34, mass: 0.5, restDelta: 0.0002 })
+  );
   const u = useTransform(smooth, (v) => v * UNITS);
 
   useMotionValueEvent(u, "change", (v) => {
@@ -707,6 +735,14 @@ export function ProjectsShowcase({ className }: { className?: string }) {
   const introScale = useTransform(introT, (v) => 1 + v * 0.35);
   const introY = useTransform(introT, (v) => -v * 40);
   const introFilter = useTransform(introGone, (v) => `blur(${v * 10}px)`);
+  // The cinema behind the headline: a faint letterbox band across the middle of the stage - the screen the first
+  // scene opens from (the slit in `sceneFrame` is at the same 50%) - with a streak of light along its centre line
+  // that wakes as the headline leaves, and a soft pool of light. All of it fades as the picture grows past it.
+  const cinemaOpen = useTransform(u, (v) => easeInOut(clamp01((v - CURTAIN_START) / (CURTAIN_END - CURTAIN_START))));
+  const cinemaOpacity = useTransform(cinemaOpen, (v) => 1 - v);
+  const cinemaBand = useTransform(introT, (v) => 0.9 + 0.1 * easeOut(clamp01(v / CURTAIN_START)));
+  // The streak wakes once the headline is mostly gone (it fades over 0.2 → 0.5), peaking as the slit starts to open.
+  const cinemaStreak = useTransform(u, (v) => easeOut(clamp01((v - 0.26) / 0.12)));
   // Rail: in once the first scene is framed (and out of the tab order while invisible).
   const furnitureOpacity = useTransform(u, (v) => {
     const tLast = (v - INTRO) / SPAN - (COUNT - 1);
@@ -723,7 +759,7 @@ export function ProjectsShowcase({ className }: { className?: string }) {
     const section = sectionRef.current;
     const stage = stageRef.current;
     if (!section || !stage) return;
-    window.scrollTo({ top: scrollTargetFor(section, stage, index), behavior: "smooth" });
+    scrollToY(scrollTargetFor(section, stage, index));
   }, []);
 
   if (reduceMotion) {
@@ -754,8 +790,32 @@ export function ProjectsShowcase({ className }: { className?: string }) {
         className={cn("relative w-full", className)}
         style={{ height: `${UNITS * 100}svh` }}
       >
+        {/* Mobile scene snapping (see `SnapStop`): the intro, then each scene fully framed with its copy revealed
+            (`SCENE_FRAMED` - the same positions the rail jumps to, `scrollTargetFor`). */}
+        <SnapStop className="absolute inset-x-0 top-0" />
+        {PROJECTS.map((project, index) => (
+          <SnapStop
+            key={project.id}
+            className="absolute inset-x-0"
+            style={{ top: `${((((INTRO + (index + SCENE_FRAMED) * SPAN) / UNITS) * (UNITS - 1)) * 100).toFixed(3)}svh` }}
+          />
+        ))}
         {/* Transparent stage: the page background shows through the intro and between scenes. */}
         <div ref={stageRef} className="sticky top-0 h-[100svh] overflow-clip">
+          {/* The cinema (under the headline and the scenes): the pool of light, the letterbox band widening a little
+              as the intro plays, and the streak along its centre line - theme tokens, so it is as quiet on the
+              off-white ground as on the dark one. */}
+          <motion.div className="pointer-events-none absolute inset-0 z-0 will-change-[opacity]" style={{ opacity: cinemaOpacity }} aria-hidden>
+            <div className="absolute left-1/2 top-1/2 h-[min(64vh,760px)] w-[min(110vw,1500px)] -translate-x-1/2 -translate-y-1/2 rounded-[100%] bg-radial from-foreground/[0.05] via-foreground/[0.015] via-45% to-transparent to-70%" />
+            <motion.div
+              className="absolute inset-x-0 top-1/2 h-[clamp(200px,42vh,520px)] -translate-y-1/2 border-y border-foreground/[0.08] bg-gradient-to-b from-transparent via-foreground/[0.03] to-transparent will-change-transform"
+              style={{ scaleY: cinemaBand }}
+            />
+            <motion.div className="absolute inset-x-[6%] top-1/2 -translate-y-1/2" style={{ opacity: cinemaStreak }}>
+              <div className="absolute inset-x-0 top-1/2 h-5 -translate-y-1/2 bg-gradient-to-b from-transparent via-foreground/[0.09] to-transparent" />
+              <div className="absolute inset-x-0 top-1/2 h-px -translate-y-1/2 bg-gradient-to-r from-transparent via-foreground/45 to-transparent" />
+            </motion.div>
+          </motion.div>
           {/* Intro headline - the section title, cinema style. */}
           <motion.div
             className="pointer-events-none absolute inset-0 z-20 flex flex-col items-center justify-center gap-5 px-6 text-center will-change-[transform,opacity]"

@@ -17,6 +17,7 @@ import {
 import { ctaPillClassName, primaryGradientInteractiveClassName } from "@/components/ui/button";
 import { useLanguage } from "@/lib/i18n/language-context";
 import { PARTNERS, PARTNER_ICON_BASE } from "@/lib/partners";
+import { bunnyBackgroundEmbedSrc, bunnyThumbnailUrl } from "@/lib/bunny-stream";
 import { youtubeThumbnailUrl } from "@/lib/portfolio-highlights";
 import {
   PROJECTS,
@@ -188,8 +189,10 @@ export function backgroundEmbedSrc(videoId: string) {
 const PLAYER_COVER_SCALE = { wide: "scale-[1.25]", tall: "scale-[3.2]" } as const;
 
 /**
- * Project visual: YouTube thumbnail (centre-cropped for 9:16 clips) or a
- * branded gradient placeholder when the clip isn't published yet. Fills its
+ * Project visual: YouTube thumbnail (centre-cropped for 9:16 clips), the
+ * poster of the project's Bunny clip (a plain img - the pull zone serves it
+ * only with the site as referrer, never to the image optimizer), or a
+ * branded gradient placeholder when nothing is published yet. Fills its
  * positioned parent; pair with `group` on the parent for the hover zoom.
  */
 export function ProjectThumbnail({
@@ -203,6 +206,23 @@ export function ProjectThumbnail({
   sizes: string;
   priority?: boolean;
 }) {
+  if (!project.videoId && project.clip) {
+    return (
+      <Image
+        src={bunnyThumbnailUrl(project.clip)}
+        alt={alt}
+        fill
+        unoptimized
+        priority={priority}
+        sizes={sizes}
+        referrerPolicy="origin"
+        className={cn(
+          "object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]",
+          project.orientation === "tall" && cn(TALL_THUMB_SCALE, "group-hover:scale-[2.5]")
+        )}
+      />
+    );
+  }
   if (!project.videoId) {
     return (
       <div className="absolute inset-0 bg-primary-gradient opacity-90" aria-hidden>
@@ -246,17 +266,19 @@ export function ProjectBackdropMedia({
   const inView = useInView(ref, { once: true, margin: "250px 0px 250px 0px" });
   // Reduced motion: keep the poster, never autoplay.
   const reduceMotion = useReducedMotion();
+  // The muted background player: the YouTube clip, else the Bunny one.
+  const backdrop = project.videoId ? backgroundEmbedSrc(project.videoId) : project.clip ? bunnyBackgroundEmbedSrc(project.clip) : null;
 
   return (
     <div ref={ref} className="absolute inset-0 overflow-hidden" aria-hidden>
       <ProjectThumbnail project={project} alt={alt} sizes={sizes} priority={priority} />
-      {project.videoId && inView && !reduceMotion ? (
+      {backdrop && inView && !reduceMotion ? (
         <iframe
           className={cn(
             "pointer-events-none absolute left-1/2 top-1/2 h-full w-full -translate-x-1/2 -translate-y-1/2",
             PLAYER_COVER_SCALE[project.orientation === "tall" ? "tall" : "wide"]
           )}
-          src={backgroundEmbedSrc(project.videoId)}
+          src={backdrop}
           title=""
           tabIndex={-1}
           allow={YOUTUBE_IFRAME_ALLOW}

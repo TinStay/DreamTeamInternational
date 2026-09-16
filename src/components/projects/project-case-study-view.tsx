@@ -1,6 +1,6 @@
 "use client";
 
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "motion/react";
@@ -46,6 +46,7 @@ import {
 import { projectsPath } from "@/lib/routes";
 import { cn } from "@/lib/utils";
 import { PROJECT_STORIES } from "./project-story";
+import { STORY_CONTAINER } from "./story/primitives";
 import { CtaBand } from "./story/primitives";
 import { YOUTUBE_IFRAME_ALLOW, YOUTUBE_REFERRER_POLICY } from "@/lib/youtube-embeds";
 
@@ -157,9 +158,14 @@ function ProjectCaseStudyDefault({ project }: { project: Project }) {
 
       <SiteHeader />
 
-      <div className="relative z-10 flex w-full flex-1 flex-col pb-8 pt-24 lg:pt-32">
+      <div
+        className="relative z-10 flex w-full flex-1 flex-col pb-20 pt-24 lg:pt-32"
+        style={project.world ? ({ "--world-light": project.world.light, "--world-dark": project.world.dark } as CSSProperties) : undefined}
+      >
+        {/* The client's ground (`Project.world`), behind the case study only - the footer keeps the page ground. */}
+        {project.world ? <div className="absolute inset-0 -z-[1] bg-[var(--world-light)] dark:bg-[var(--world-dark)]" aria-hidden /> : null}
         <motion.div
-          className="mx-auto w-full max-w-7xl px-4"
+          className={STORY_CONTAINER}
           initial="hidden"
           animate="visible"
           variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.1 } } }}
@@ -171,12 +177,12 @@ function ProjectCaseStudyDefault({ project }: { project: Project }) {
             <div className="grid lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)]">
               <div className="flex flex-col p-6 sm:p-8 lg:p-10">
                 <div className="flex flex-wrap items-center justify-between gap-4">
-                  <div className="flex h-14 items-center">
+                  <div className="flex h-24 items-center sm:h-28">
                     {partner ? (
                       <PartnerLogo
                         p={partner}
-                        imgClass="h-12 w-auto max-w-[190px] object-contain sm:h-14"
-                        sizes="190px"
+                        imgClass="h-20 w-auto max-w-[380px] object-contain sm:h-28"
+                        sizes="380px"
                       />
                     ) : (
                       <span className="font-heading text-2xl font-bold text-foreground">
@@ -405,21 +411,51 @@ function ProjectCaseStudyDefault({ project }: { project: Project }) {
         </motion.div>
 
         {/* The band every case study ends on: a quote and a contact way in. */}
-        <div className="mx-auto mt-16 w-full max-w-7xl px-4 sm:px-6 lg:mt-20 lg:px-8">
-          <CtaBand
-            title={d.ctaTitle}
-            quote={d.ctaQuote}
-            contact={d.ctaContact}
-            tone="page"
-            className="rounded-3xl border border-card-border bg-card p-8 text-card-foreground shadow-elevated-soft sm:p-12"
-          />
+        <div className={cn("mt-16 lg:mt-20", STORY_CONTAINER)}>
+          {project.world ? (
+            // The client's world as a card: its dark ground, a lighter light, the dot grid and a ring in its accent.
+            <CtaBand
+              title={d.ctaTitle}
+              quote={d.ctaQuote}
+              contact={d.ctaContact}
+              tone="dark"
+              className="rounded-3xl p-8 text-white sm:p-12 lg:p-14"
+            >
+              <div
+                className="absolute inset-0"
+                style={{
+                  background: `radial-gradient(80% 70% at 24% 30%, color-mix(in srgb, ${project.world.accent} 22%, ${project.world.dark}) 0%, ${project.world.dark} 60%)`,
+                }}
+                aria-hidden
+              />
+              <div
+                className="absolute inset-0 opacity-[0.16] [background-size:34px_34px]"
+                style={{ backgroundImage: `radial-gradient(${project.world.accent} 1px, transparent 1.5px)` }}
+                aria-hidden
+              />
+              <div
+                className="absolute -bottom-40 -right-24 size-96 rounded-full border"
+                style={{ borderColor: `color-mix(in srgb, ${project.world.accent} 30%, transparent)` }}
+                aria-hidden
+              />
+            </CtaBand>
+          ) : (
+            <CtaBand
+              title={d.ctaTitle}
+              quote={d.ctaQuote}
+              contact={d.ctaContact}
+              tone="page"
+              className="rounded-3xl border border-card-border bg-card p-8 text-card-foreground shadow-elevated-soft sm:p-12"
+            />
+          )}
         </div>
 
         {/* Same multi-step quote wizard as the home page. */}
         <QuoteFormSection className="mt-6" />
       </div>
 
-      <div className="relative z-10">
+      {/* The ground runs right down to the footer (its top margin is the padding above). */}
+      <div className="relative z-10 [&>footer]:mt-0">
         <Footer />
       </div>
       <MobileNav />

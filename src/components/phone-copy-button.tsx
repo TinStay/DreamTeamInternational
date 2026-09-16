@@ -61,7 +61,7 @@ function CopyIconButton({ icon: Icon, value, fallbackHref, copyLabel, copiedLabe
           copied && "text-emerald-500 dark:text-emerald-400"
         )}
       >
-        {copied ? <IconCheck className="size-[18px]" aria-hidden /> : <Icon className="size-[18px]" aria-hidden />}
+        {copied ? <IconCheck className="size-4.5" aria-hidden /> : <Icon className="size-4.5" aria-hidden />}
       </button>
       {/* Confirmation tag under the button (enter-only - exit gating hangs with the current motion version). */}
       {copied ? (

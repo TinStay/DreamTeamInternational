@@ -16,6 +16,7 @@ import {
 } from "@/components/projects/showcase-primitives";
 import { OSMO_CIRCLE, OSMO_GREEN } from "@/components/projects/showcase-timeline";
 import { useLanguage } from "@/lib/i18n/language-context";
+import { PROJECT_DISPLAY_FONT } from "@/lib/project-fonts";
 import type { Project, ProjectKey } from "@/lib/projects";
 import { cn } from "@/lib/utils";
 
@@ -69,7 +70,7 @@ export type SceneVisual = {
   /**
    * Where the brand mark / headline / highlight / tags / CTA block sits:
    * `top-left-wide` = top-left at 40% of the width; `left-column` = the
-   * left ~56%, right-aligned against a frame on the right.
+   * left ~40%, left-aligned, with the tablet frame on the right.
    */
   layout: "bottom-left" | "center" | "center-bottom" | "top-left" | "top-left-wide" | "left-column" | "in-circle" | "boleron";
   morph: MorphTarget;
@@ -81,6 +82,18 @@ export type SceneVisual = {
   mark?: "logo" | "logo-large" | "wordmark" | "custom" | "none";
   /** The mark component for `mark: "custom"` (rendered inside the copy block). */
   Mark?: ComponentType;
+  /**
+   * The headline's display face - classes for the copy block's `h3` (a font variable from `layout.tsx`, weight,
+   * style); the heading face when unset.
+   */
+  headline?: string;
+  /**
+   * What sits under the headline instead of the `highlight` paragraph - a block of the scene's own (MindGuard's
+   * "shown to" label + list); the paragraph when unset.
+   */
+  Detail?: ComponentType;
+  /** `false` drops the highlight paragraph altogether (Emblema shows only its headline). */
+  highlight?: boolean;
   Visual: ComponentType<SceneVisualProps>;
   /** Optional layer the showcase draws *above* the morph shape (same scene transform). */
   Overlay?: ComponentType<SceneVisualProps>;
@@ -110,20 +123,21 @@ function BoleronVisual({ t, framesEnabled }: SceneVisualProps) {
         <div className="absolute right-[-18vw] top-[-42vh] aspect-square w-[min(1100px,86vw)] rounded-full border-[clamp(40px,6vw,90px)] border-white/[0.06]" />
         <div className="absolute right-[-4vw] top-[-22vh] aspect-square w-[min(620px,50vw)] rounded-full border-[clamp(28px,4vw,60px)] border-white/[0.05]" />
         <div className={cn(blob, "left-[38%] top-[-10%] h-[70vh] w-[34vw] rotate-[22deg] rounded-[45%]")} />
-        <div className={cn(blob, "right-[10%] top-[48%] h-[22vh] w-[18vw] rotate-[-28deg] rounded-full")} />
       </ParallaxLayer>
       <ParallaxLayer t={t} depth={0.32} dx={0.05} scale={0.14} className="pointer-events-none">
         <div className={cn(blob, "left-[-10%] bottom-[-16%] h-[44vh] w-[46vw] rotate-[-12deg] rounded-[50%]")} />
-        <div className={cn(blob, "right-[-8%] bottom-[-20%] h-[40vh] w-[40vw] rotate-[18deg] rounded-[48%]")} />
-        <div className={cn(blob, "left-[46%] bottom-[8%] h-[16vh] w-[22vw] rotate-[-38deg] rounded-full")} />
+        {/* Wide and nearly level behind Roni - no capsules (they read as chips). */}
+        <div className={cn(blob, "right-[-12%] bottom-[-16%] h-[26vh] w-[58vw] rotate-[5deg] rounded-[50%]")} />
+        <div className={cn(blob, "left-[44%] bottom-[6%] h-[12vh] w-[30vw] rotate-[-10deg] rounded-[50%]")} />
       </ParallaxLayer>
       {/* The brand word as live text behind Roni - Montserrat ExtraBold like the reference animation
-          (`--font-montserrat` from layout.tsx). Centred up top on phones; on desktop it sits flush left right above
-          the copy block (which is bottom-anchored at 8vh - see TEXT_LAYOUT.boleron), 14-16vw by breakpoint and
+          (`--font-montserrat` from layout.tsx; the rounded faces closer to the logo's Circe - Nunito Black, Fredoka -
+          were tried and read worse). Centred up top on phones; on desktop it sits flush left right above the copy
+          block (which is bottom-anchored at 8vh - see TEXT_LAYOUT.boleron), 14-16vw by breakpoint and
           bottom-anchored so it stays clear of the floating header on short laptop screens. */}
       <ParallaxLayer t={t} depth={0.55} className="pointer-events-none">
         <span
-          className="absolute left-1/2 top-[max(6.5rem,12vh)] -translate-x-1/2 select-none whitespace-nowrap text-[22vw] font-extrabold leading-none tracking-[-0.05em] text-white lg:left-[max(2rem,4vw)] lg:top-auto lg:bottom-[calc(8vh+18rem)] lg:translate-x-0 lg:text-[14vw] xl:text-[15vw] 2xl:bottom-[calc(8vh+20rem)] 2xl:text-[16vw]"
+          className="absolute left-1/2 top-[max(8rem,14vh)] -translate-x-1/2 select-none whitespace-nowrap text-[22vw] font-extrabold leading-none tracking-[-0.05em] text-white lg:left-[max(2rem,4vw)] lg:top-auto lg:bottom-[calc(8vh+18rem)] lg:translate-x-0 lg:text-[14vw] xl:text-[15vw] 2xl:bottom-[calc(8vh+20rem)] 2xl:text-[16vw]"
           style={{ fontFamily: "var(--font-montserrat), Montserrat, sans-serif" }}
           aria-hidden
         >
@@ -132,8 +146,8 @@ function BoleronVisual({ t, framesEnabled }: SceneVisualProps) {
       </ParallaxLayer>
       <ParallaxLayer t={t} depth={-0.05} className="pointer-events-none">
         <div
-          className="absolute left-[72%] top-[62%] size-[min(64vh,600px)] -translate-x-1/2 -translate-y-1/2 rounded-full blur-[36px]"
-          style={{ background: "radial-gradient(circle, rgba(255,255,255,.28) 0%, rgba(255,255,255,0) 66%)" }}
+          className="absolute left-[72%] top-[62%] size-[min(64vh,600px)] -translate-x-1/2 -translate-y-1/2 rounded-full"
+          style={{ background: "radial-gradient(circle, rgba(255,255,255,.26) 0%, rgba(255,255,255,.1) 40%, rgba(255,255,255,0) 70%)" }}
         />
       </ParallaxLayer>
       <div
@@ -142,7 +156,7 @@ function BoleronVisual({ t, framesEnabled }: SceneVisualProps) {
       />
       <ParallaxLayer t={t} depth={-0.1} className="pointer-events-none">
         <motion.div
-          className="absolute left-1/2 top-[39vh] aspect-[1206/1054] h-[34vh] -translate-x-1/2 -translate-y-1/2 [mask-image:linear-gradient(180deg,#000_0%,#000_72%,transparent_97%)] sm:top-[42vh] sm:h-[40vh] lg:left-[72%] lg:top-auto lg:bottom-[3vh] lg:h-[min(76vh,880px)] lg:translate-y-0"
+          className="absolute left-1/2 top-[34vh] aspect-[1206/1054] h-[30vh] -translate-x-1/2 -translate-y-1/2 [mask-image:linear-gradient(180deg,#000_0%,#000_72%,transparent_97%)] sm:top-[42vh] sm:h-[40vh] lg:left-[72%] lg:top-auto lg:bottom-[3vh] lg:h-[min(76vh,880px)] lg:translate-y-0"
           style={{ y: roniSink }}
         >
           <FrameSequence
@@ -189,7 +203,7 @@ function EmblemaVisual({ t, framesEnabled }: SceneVisualProps) {
       </ParallaxLayer>
       {/* Buildings sequence - oversized so the split towers sit well out to the sides of the centred copy. */}
       <ParallaxLayer t={t} depth={0.12} className="pointer-events-none">
-        <div className="absolute left-1/2 top-[max(6.5rem,12vh)] aspect-[1284/716] w-[min(94vw,84vh)] -translate-x-1/2 sm:w-[min(84vw,90vh)] lg:top-auto lg:bottom-[12vh] lg:w-[min(80vw,140vh,1720px)]">
+        <div className="absolute left-1/2 top-[max(6rem,11vh)] aspect-[1284/716] w-[min(84vw,36vh)] -translate-x-1/2 sm:w-[min(66vw,44vh)] lg:top-auto lg:bottom-[12vh] lg:w-[min(80vw,140vh,1720px)]">
           <div className="animate-showcase-breathe absolute inset-0 origin-bottom">
             <div className="absolute left-[6%] top-[58%] h-[90%] w-[60%] -translate-x-1/2 -translate-y-1/2 rounded-full" style={{ background: goldGlow }} />
             <div className="absolute left-[89%] top-[58%] h-[90%] w-[60%] -translate-x-1/2 -translate-y-1/2 rounded-full" style={{ background: goldGlow }} />
@@ -215,9 +229,9 @@ function EmblemaVisual({ t, framesEnabled }: SceneVisualProps) {
               <motion.div
                 key={building.name}
                 className={cn(
-                  "absolute top-[94%] flex -translate-x-1/2 flex-col items-center gap-1.5 text-center",
-                  // Under each tower: the halves sit close on phones, well apart on desktop.
-                  i === 0 ? "left-[24%] lg:left-[5%]" : "left-[76%] lg:left-[91%]"
+                  // Under each tower - desktop only; on phones the towers are small and the labels would crowd them.
+                  "absolute top-[94%] hidden -translate-x-1/2 flex-col items-center gap-1.5 text-center lg:flex",
+                  i === 0 ? "left-[5%]" : "left-[91%]"
                 )}
                 style={{ opacity: labelK, y: labelY }}
               >
@@ -249,9 +263,35 @@ const MINDGUARD = { bg: "#0B1730", teal: "#7DDED2" };
 const MINDGUARD_MARK = "/company_icons/mindguard_logo_dark.png";
 
 /**
+ * Under the headline: where the film was shown - a small teal label over the list, each line with a teal dot
+ * (`showcase.scenes.mindguard`); left-aligned with the column at every breakpoint.
+ */
+function MindguardShownTo() {
+  const { t: dict } = useLanguage();
+  const { label, items } = dict.projects.showcase.scenes.mindguard.shownTo;
+  return (
+    <div className="flex flex-col gap-2 lg:gap-3">
+      <p className="text-[10px] font-semibold uppercase tracking-[0.24em] sm:text-[11px] lg:text-xs" style={{ color: MINDGUARD.teal }}>
+        {label}
+      </p>
+      <ul className="flex flex-col gap-1 text-sm font-medium leading-snug text-white/90 sm:text-base lg:gap-1.5 lg:text-xl">
+        {items.map((item) => (
+          <li key={item} className="flex items-center gap-2.5">
+            <span className="size-1.5 shrink-0 rounded-full" style={{ backgroundColor: MINDGUARD.teal }} aria-hidden />
+            {item}
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+/**
  * Navy world. Copy lives in the left half (right-aligned against the frame),
  * the tablet frame fills the right half; the white Mindguard mark floats,
- * ghosted, above the copy.
+ * ghosted, above the copy. Below lg the tablet sits up top under the header
+ * (its width capped by the viewport height, so it never meets the compact
+ * copy block anchored at the bottom) and the glow / wave move up with it.
  */
 function MindguardVisual({ t, project, shouldMount }: SceneVisualProps) {
   const { t: dict } = useLanguage();
@@ -274,8 +314,10 @@ function MindguardVisual({ t, project, shouldMount }: SceneVisualProps) {
     (v) =>
       `0 0 0 8px rgba(125,222,210,${0.06 * v}), 0 ${50 - 20 * (1 - v)}px 120px rgba(0,0,0,.6), 0 0 ${60 * v}px rgba(125,222,210,${0.25 * v})`
   );
-  const tealGlow = `radial-gradient(closest-side, rgba(125,222,210,.85) 0%, rgba(125,222,210,.45) 35%, rgba(125,222,210,.12) 65%, transparent 100%)`;
-  const anchor = "left-1/2 top-[72%] lg:left-[72%] lg:top-[58%]";
+  // Soft gradients, no blur filters: a blurred layer costs the GPU a full re-blur every frame it moves.
+  const tealGlow = `radial-gradient(closest-side, rgba(125,222,210,.8) 0%, rgba(125,222,210,.42) 34%, rgba(125,222,210,.1) 66%, transparent 100%)`;
+  const tealSlab = `radial-gradient(ellipse closest-side, rgba(125,222,210,.34) 0%, rgba(125,222,210,.28) 58%, rgba(125,222,210,.1) 84%, transparent 100%)`;
+  const anchor = "left-1/2 top-[26%] lg:left-[72%] lg:top-[58%]";
   return (
     <>
       <div
@@ -307,21 +349,21 @@ function MindguardVisual({ t, project, shouldMount }: SceneVisualProps) {
       </ParallaxLayer>
       <ParallaxLayer t={t} depth={-0.12} scale={0.1} className="pointer-events-none">
         <div
-          className={cn("animate-showcase-breathe absolute aspect-square w-[min(920px,62vw)] -translate-x-1/2 -translate-y-1/2 rounded-full blur-[18px] [animation-duration:6s]", anchor)}
+          className={cn("animate-showcase-breathe absolute aspect-square w-[min(920px,62vw)] -translate-x-1/2 -translate-y-1/2 rounded-full [animation-duration:6s]", anchor)}
           style={{ background: tealGlow }}
         />
         <div
-          className={cn("absolute aspect-[16/10.4] w-[min(800px,50vw)] -translate-x-1/2 -translate-y-1/2 rounded-[40px] blur-[40px]", anchor)}
-          style={{ backgroundColor: "rgba(125,222,210,.35)" }}
+          className={cn("absolute aspect-[16/10.4] w-[min(880px,55vw)] -translate-x-1/2 -translate-y-1/2", anchor)}
+          style={{ background: tealSlab }}
         />
       </ParallaxLayer>
       <motion.div
-        className="pointer-events-none absolute inset-x-0 top-[72%] h-px origin-left lg:top-[86%]"
+        className="pointer-events-none absolute inset-x-0 top-[42%] h-px origin-left lg:top-[86%]"
         style={{ backgroundColor: "rgba(125,222,210,.5)", opacity: waveVisible, scaleX: waveK }}
         aria-hidden
       />
       <motion.span
-        className="pointer-events-none absolute top-[72%] size-2 -translate-x-1/2 -translate-y-1/2 rounded-full lg:top-[86%]"
+        className="pointer-events-none absolute top-[42%] size-2 -translate-x-1/2 -translate-y-1/2 rounded-full lg:top-[86%]"
         style={{ backgroundColor: MINDGUARD.teal, boxShadow: "0 0 10px rgba(125,222,210,.9)", left: dotLeft, opacity: dotOpacity }}
         aria-hidden
       />
@@ -329,7 +371,7 @@ function MindguardVisual({ t, project, shouldMount }: SceneVisualProps) {
       {/* Right column (60%): the Mindguard mark above the tablet frame, both pinned bottom-right on desktop. */}
       <ParallaxLayer t={t} depth={-0.12} rotate={-2} className="pointer-events-none">
         <motion.div
-          className="absolute left-1/2 bottom-[9.5rem] flex w-[min(72vw,calc((100svh-36rem)*1.5))] -translate-x-1/2 flex-col items-center gap-4 sm:bottom-[8rem] sm:w-[min(62vw,calc((100svh-38rem)*1.5))] lg:left-auto lg:right-[max(3vw,6rem)] lg:bottom-[6vh] lg:w-[52vw] lg:translate-x-0 lg:items-end lg:gap-[2vw] 2xl:w-[54vw]"
+          className="absolute left-1/2 top-[max(6.5rem,11vh)] flex w-[min(84vw,calc((100svh-34rem)*1.5))] -translate-x-1/2 flex-col items-center gap-4 sm:w-[min(64vw,calc((100svh-36rem)*1.5))] lg:left-auto lg:right-[max(3vw,6rem)] lg:top-auto lg:bottom-[6vh] lg:w-[52vw] lg:translate-x-0 lg:items-end lg:gap-[2vw] 2xl:w-[54vw]"
           style={{ opacity: tabletK, y: tabletY, scale: tabletScale }}
         >
           <motion.div
@@ -338,12 +380,8 @@ function MindguardVisual({ t, project, shouldMount }: SceneVisualProps) {
           >
             <div className="absolute inset-[2.6%] overflow-hidden rounded-2xl" style={{ backgroundColor: "#070F22" }}>
               <ProjectThumbnail project={project} alt={dict.projects.items[project.id].name} sizes="(max-width: 1024px) 84vw, 680px" />
-              {shouldMount ? (
-                <ProjectEmbedCover
-                  project={{ videoId: project.showcaseVideoId ?? project.videoId, orientation: project.orientation }}
-                  boxAspect={16 / 10.4}
-                />
-              ) : null}
+              {/* The stage's clip (MindGuard's UI/UX film on Bunny - `showcaseClip`). */}
+              {shouldMount ? <ProjectEmbedCover project={project} boxAspect={16 / 10.4} /> : null}
             </div>
             <span className="absolute left-1/2 top-[1.1%] size-1.5 -translate-x-1/2 rounded-full" style={{ backgroundColor: "#1B2E52" }} />
           </motion.div>
@@ -376,8 +414,8 @@ function PlasicoVisual({ t, project, shouldMount }: SceneVisualProps) {
       </ParallaxLayer>
       <ParallaxLayer t={t} depth={-0.15} className="pointer-events-none">
         <div
-          className="absolute left-[62%] top-[40%] aspect-square w-[min(720px,60vw)] -translate-x-1/2 -translate-y-1/2 rounded-full blur-[20px]"
-          style={{ background: "radial-gradient(closest-side, rgba(95,191,47,.4) 0%, rgba(95,191,47,.16) 45%, transparent 100%)" }}
+          className="absolute left-[62%] top-[40%] aspect-square w-[min(720px,60vw)] -translate-x-1/2 -translate-y-1/2 rounded-full"
+          style={{ background: "radial-gradient(closest-side, rgba(95,191,47,.38) 0%, rgba(95,191,47,.16) 45%, rgba(95,191,47,.04) 80%, transparent 100%)" }}
         />
       </ParallaxLayer>
       <Sparks colors={[PLASICO.green, PLASICO.lime]} count={28} region={{ left: [4, 96], top: [10, 90] }} glow={8} />
@@ -434,29 +472,13 @@ function OsmoVisual({ t, project, shouldMount }: SceneVisualProps) {
         aria-hidden
       />
       <Sparks colors={[OSMO.deep, OSMO.green]} count={18} region={{ left: [46, 98], top: [10, 92] }} />
-      {/* 4:3 frame (the clip cover-fits it) - bottom-left on desktop, sized so the wordmark riding the same layer
-          right above it (the gap is fixed: frame bottom 6vh + its 4:3 height + 1.5rem) clears the floating header
-          even on short laptop screens. Under the disc on mobile. */}
-      <ParallaxLayer t={t} depth={0.08} dx={0.1} className="pointer-events-none">
-        <div
-          className="absolute left-[5vw] right-[5vw] top-[58vh] aspect-[4/3] overflow-hidden rounded-3xl sm:left-[30vw] sm:top-auto sm:bottom-[6.5rem] lg:left-[max(3vw,6rem)] lg:right-auto lg:bottom-[6vh] lg:w-[36vw] xl:w-[38vw] 2xl:w-[36vw]"
-          style={{ backgroundColor: "#111111", boxShadow: "0 50px 120px rgba(17,17,17,.3)" }}
-        >
-          <ProjectThumbnail project={project} alt={dict.projects.items[project.id].name} sizes="(max-width: 1024px) 90vw, 60vw" />
-          {shouldMount ? <ProjectEmbedCover project={project} boxAspect={4 / 3} /> : null}
-        </div>
-        <Reveal
-          t={t}
-          delay={0.02}
-          className="absolute left-[max(3vw,6rem)] bottom-[calc(6vh+27vw+1.5rem)] hidden lg:block xl:bottom-[calc(6vh+28.5vw+1.5rem)] 2xl:bottom-[calc(6vh+27vw+1.5rem)]"
-        >
-          <Image src={OSMO_MARK} alt="OSMO" width={1064} height={505} sizes="480px" className="h-24 w-auto xl:h-28" />
-        </Reveal>
-      </ParallaxLayer>
-      {/* The copy circle: layered radial highlight, a fine dot pattern, a concentric hairline and a deep soft shadow. */}
+      {/* The copy circle: layered radial highlight, a fine dot pattern, a concentric hairline and a deep soft shadow.
+          Below lg: centred, its top edge just under the header, 88vw / 52vh - the same numbers as
+          `osmoCircleMobile` (showcase-timeline.ts), which the journey's morph takes it over with. Drawn before the
+          frame, so the frame can overlap its bottom cap on phones. */}
       <ParallaxLayer t={t} depth={0.2} scale={0.04} className="pointer-events-none">
         <div
-          className="absolute left-1/2 top-[38vh] aspect-square w-[116vw] -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-full sm:top-[32vh] sm:w-[min(116vw,84vh)] lg:left-[75vw] lg:top-[56vh] lg:w-[min(46vw,88vh)]"
+          className="absolute left-1/2 top-[calc(max(5.75rem,10vh)+min(44vw,26vh))] aspect-square w-[min(88vw,52vh)] -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-full lg:left-[75vw] lg:top-[56vh] lg:w-[min(46vw,88vh)]"
           style={{
             background: `radial-gradient(120% 120% at 28% 22%, ${OSMO.light} 0%, ${OSMO.green} 46%, ${OSMO.deep} 100%)`,
             boxShadow: "0 50px 120px rgba(22,111,54,.38), inset 0 -30px 80px rgba(0,0,0,.18), inset 0 20px 60px rgba(255,255,255,.14)",
@@ -467,10 +489,39 @@ function OsmoVisual({ t, project, shouldMount }: SceneVisualProps) {
           <div className="absolute inset-[13%] rounded-full border border-dashed border-white/10" />
         </div>
       </ParallaxLayer>
-      {/* Wordmark below lg: centred on top of the green disc (white-ink file). */}
+      {/* 4:3 frame (the clip cover-fits it) - bottom-left on desktop, the wordmark riding the same layer right above
+          it (the gap is fixed: frame bottom 6vh + its 4:3 height + 1.5rem) and sized to the room left under the
+          floating header - 6rem on a short laptop screen, up to 11rem on a big one. Below lg it is centred, big (up to 92vw), its top 12% of the disc's diameter
+          up into the disc (over its bottom cap, under the copy block), as tall as the room down to the mobile dock
+          allows. */}
+      <ParallaxLayer t={t} depth={0.08} dx={0.1} className="pointer-events-none">
+        <div
+          className="absolute left-1/2 top-[calc(max(5.75rem,10vh)+min(88vw,52vh)*0.88)] aspect-[4/3] h-[calc(100svh-max(5.75rem,10vh)-min(88vw,52vh)*0.88-6rem)] max-h-[69vw] -translate-x-1/2 overflow-hidden rounded-3xl lg:left-[max(3vw,6rem)] lg:top-auto lg:bottom-[6vh] lg:h-auto lg:max-h-none lg:w-[36vw] lg:translate-x-0 xl:w-[38vw] 2xl:w-[36vw]"
+          style={{ backgroundColor: "#111111", boxShadow: "0 50px 120px rgba(17,17,17,.3)" }}
+        >
+          <ProjectThumbnail project={project} alt={dict.projects.items[project.id].name} sizes="(max-width: 1024px) 92vw, 60vw" />
+          {shouldMount ? <ProjectEmbedCover project={project} boxAspect={4 / 3} /> : null}
+        </div>
+        <Reveal
+          t={t}
+          delay={0.02}
+          className="absolute left-[max(3vw,6rem)] bottom-[calc(6vh+27vw+1.5rem)] hidden lg:block xl:bottom-[calc(6vh+28.5vw+1.5rem)] 2xl:bottom-[calc(6vh+27vw+1.5rem)]"
+        >
+          <Image
+            src={OSMO_MARK}
+            alt="OSMO"
+            width={1064}
+            height={505}
+            sizes="480px"
+            className="h-[clamp(6rem,calc(94vh-27vw-8rem),11rem)] w-auto xl:h-[clamp(6rem,calc(94vh-28.5vw-8rem),11rem)] 2xl:h-[clamp(6rem,calc(94vh-27vw-8rem),11rem)]"
+          />
+        </Reveal>
+      </ParallaxLayer>
+      {/* Wordmark below lg: small, centred inside the top of the green disc (white-ink file); the copy block sits
+          under it (layout `in-circle`). */}
       <ParallaxLayer t={t} depth={0.35} className="pointer-events-none lg:hidden">
-        <Reveal t={t} delay={0.02} className="absolute left-1/2 top-[max(7rem,11vh)] -translate-x-1/2 sm:left-8 sm:top-[max(8rem,12vh)] sm:translate-x-0">
-          <Image src={OSMO_MARK_WHITE} alt="OSMO" width={2400} height={1340} sizes="50vw" className="h-20 w-auto sm:h-24" />
+        <Reveal t={t} delay={0.02} className="absolute left-1/2 top-[calc(max(5.75rem,10vh)+1.75rem)] -translate-x-1/2">
+          <Image src={OSMO_MARK_WHITE} alt="OSMO" width={2400} height={1340} sizes="160px" className="h-[3.25rem] w-auto sm:h-16" />
         </Reveal>
       </ParallaxLayer>
     </>
@@ -505,6 +556,7 @@ const NO_SHAPE: Omit<MorphTarget, "color"> = { w: [0, 0], h: [0, 0], x: 0.5, y: 
 
 const SCENES: Partial<Record<ProjectKey, SceneVisual>> = {
   boleron: {
+    headline: PROJECT_DISPLAY_FONT.boleron,
     tone: "dark",
     background: BOLERON.blue,
     layout: "boleron",
@@ -513,6 +565,10 @@ const SCENES: Partial<Record<ProjectKey, SceneVisual>> = {
     Visual: BoleronVisual,
   },
   emblema: {
+    // The reference animation's Emblema face: Playfair Display, italic - a size under the layout's ramp, and no line
+    // under it: the logo leads, the headline follows.
+    headline: cn(PROJECT_DISPLAY_FONT.emblema, "max-w-[22ch] text-xl sm:text-2xl lg:text-2xl xl:text-3xl 2xl:text-4xl"),
+    highlight: false,
     tone: "light",
     background: EMBLEMA.bg,
     layout: "center-bottom",
@@ -520,6 +576,7 @@ const SCENES: Partial<Record<ProjectKey, SceneVisual>> = {
     Visual: EmblemaVisual,
   },
   mindguard: {
+    headline: PROJECT_DISPLAY_FONT.mindguard,
     tone: "dark",
     background: MINDGUARD.bg,
     layout: "left-column",
@@ -527,10 +584,12 @@ const SCENES: Partial<Record<ProjectKey, SceneVisual>> = {
     // Full-width hairline at mid-height - the scene animates its own copy of it while framed.
     // y values are the scene's own line (86% / 72%) scaled by the 1.04 hold push-in about the stage centre, so the
     // travelling hairline lands exactly on it at hand-off.
-    morph: { w: [1, 0], h: [0, 0], px: 1, x: 0.5, y: 0.8744, yMobile: 0.7288, color: MINDGUARD.teal, alpha: 0.5, ownsShape: true },
+    morph: { w: [1, 0], h: [0, 0], px: 1, x: 0.5, y: 0.8744, yMobile: 0.4168, color: MINDGUARD.teal, alpha: 0.5, ownsShape: true },
+    Detail: MindguardShownTo,
     Visual: MindguardVisual,
   },
   plasico: {
+    headline: PROJECT_DISPLAY_FONT.plasico,
     tone: "light",
     background: "#FFFFFF",
     layout: "top-left-wide",
@@ -542,13 +601,14 @@ const SCENES: Partial<Record<ProjectKey, SceneVisual>> = {
     Overlay: PlasicoOverlay,
   },
   osmo: {
+    headline: PROJECT_DISPLAY_FONT.osmo,
     // Copy sits inside the solid green circle, so the overlay is white-on-green.
     tone: "dark",
     background: "#FFFFFF",
     layout: "in-circle",
     // The morph shape arrives on the scene's copy circle and fades out there (the circle beneath takes over -
     // the overlay must not sit on the copy); the home journey's canvas takes the circle over at the outro.
-    morph: { w: [OSMO_CIRCLE.d, 0], h: [OSMO_CIRCLE.d, 0], x: OSMO_CIRCLE.x, y: OSMO_CIRCLE.y, xMobile: 0.5, yMobile: 0.38, color: OSMO.green, alpha: 0 },
+    morph: { w: [OSMO_CIRCLE.d, 0], h: [OSMO_CIRCLE.d, 0], x: OSMO_CIRCLE.x, y: OSMO_CIRCLE.y, xMobile: 0.5, yMobile: 0.3, color: OSMO.green, alpha: 0 },
     mark: "none",
     Visual: OsmoVisual,
   },
