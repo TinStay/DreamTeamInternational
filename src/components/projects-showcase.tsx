@@ -53,15 +53,18 @@ import { SnapStop } from "@/components/ui/snap-stop";
  * framed (with a slow 4% push-in), the rest it hands over to the next project
  * with one of the TRANSITIONS. The timeline ends with the last project still
  * framed (only its hold), so the sticky stage simply scrolls away into the
- * next section - no empty tail. Kept short (≈0.9 viewport per project) so a
- * couple of wheel ticks advance a scene; the spring below is stiff enough
- * that the frame sequences track the wheel without visible lag.
+ * next section - no empty tail. About 0.7 viewport of scroll per project -
+ * most of it the framed stay, the hand-over a fifth of a viewport; the spring
+ * below is stiff enough that the frame sequences track the wheel without
+ * visible lag.
  */
 const PROJECTS = SHOWCASE_PROJECTS;
 const COUNT = PROJECTS.length;
 const INTRO = SHOWCASE_INTRO;
 const SPAN = SHOWCASE_SPAN;
 const HOLD = SHOWCASE_HOLD;
+/** Scene-local time past which an outgoing scene is parked (inert): 40% into its hand-over. */
+const PARKED_AFTER = HOLD + 0.4 * (1 - HOLD);
 const UNITS = SHOWCASE_UNITS;
 /** Curtain reveal of the first scene, in timeline units. */
 const CURTAIN_START = 0.35;
@@ -133,14 +136,15 @@ function sceneFrame(t: number, index: number): SceneFrame {
       : null
     : transitionFor(index - 1);
   const local = out ? t : t + 1;
-  const hold = type === "flow" ? 0.25 : HOLD;
+  // The flow wipe is the slow one: it starts a little before the hold ends.
+  const hold = type === "flow" ? HOLD - 0.1 : HOLD;
   const k = type ? easeInOut(clamp01((local - hold) / (1 - hold))) : 0;
   const holdScale = out ? 1 + 0.04 * Math.min(t / HOLD, 1) : 1;
   if (out) frame.transform = `scale(${holdScale})`;
   if (!type) {
     // Last scene: fade away at the very end so the page background shows through the transparent stage.
     if (last) {
-      frame.opacity = 1 - easeInOut(clamp01((t - 0.45) / 0.05));
+      frame.opacity = 1 - easeInOut(clamp01((t - (HOLD - 0.05)) / 0.05));
       if (frame.opacity <= 0.001) frame.visibility = "hidden";
     }
     return frame;
@@ -435,7 +439,7 @@ function ProjectScene({
   // scene's own time so the outgoing scene stays interactive while it is still visually framed.
   const [parked, setParked] = useState(index !== 0);
   useMotionValueEvent(t, "change", (v) => {
-    const next = v < -0.1 || v > 0.7;
+    const next = v < -0.1 || v > PARKED_AFTER;
     setParked((prev) => (prev === next ? prev : next));
   });
   // Last scene: the copy fades out before the outro disc appears (and leaves the tab order), and the whole scene
@@ -458,7 +462,7 @@ function ProjectScene({
       <Visual project={project} t={t} shouldMount={shouldMount} framesEnabled={framesEnabled} />
 
       {/* Name, headline, highlight, tags, CTA - placed per scene layout. */}
-      <ParallaxLayer t={t} depth={0.35} dx={-0.05} className="pointer-events-none">
+      <ParallaxLayer t={t} depth={0.25} dx={-0.05} className="pointer-events-none">
         <motion.div
           className={cn("absolute flex flex-col gap-4 sm:gap-5", TEXT_LAYOUT[layout].block)}
           style={{ opacity: copyOpacity, visibility: copyVisibility }}
@@ -751,7 +755,7 @@ export function ProjectsShowcase({ className }: { className?: string }) {
   // End-of-timeline dissolve on the RAW scroll progress (no spring lag): fully transparent the instant the stage unpins.
   const endFade = useTransform(scrollYProgress, (v) => {
     const tLast = (v * UNITS - INTRO) / SPAN - (COUNT - 1);
-    return 1 - easeInOut(clamp01((tLast - 0.42) / 0.08));
+    return 1 - easeInOut(clamp01((tLast - (HOLD - 0.08)) / 0.08));
   });
   const furnitureVisibility = useTransform(furnitureOpacity, (v) => (v <= 0.001 ? "hidden" : "visible"));
 

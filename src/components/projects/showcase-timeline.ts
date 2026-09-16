@@ -7,10 +7,14 @@
 
 import { SHOWCASE_PROJECT_KEYS } from "@/lib/projects";
 
-/** Timeline units: the intro, one span per project, and the last project's hold. */
+/**
+ * Timeline units: the intro, one span per project, and the last project's hold. A scene sits framed for
+ * `HOLD` of its span (about half a viewport of scroll - a long, calm stay) and hands over in the rest (a fifth of a
+ * viewport - quick).
+ */
 export const SHOWCASE_INTRO = 0.55;
-export const SHOWCASE_SPAN = 0.7;
-export const SHOWCASE_HOLD = 0.5;
+export const SHOWCASE_SPAN = 0.9;
+export const SHOWCASE_HOLD = 0.72;
 export const SHOWCASE_UNITS = SHOWCASE_INTRO + (SHOWCASE_PROJECT_KEYS.length - 1) * SHOWCASE_SPAN + SHOWCASE_HOLD * SHOWCASE_SPAN;
 /**
  * Scroll (viewports) per timeline unit: the section is UNITS × 100svh tall with a 100svh sticky stage, so its scroll
@@ -23,8 +27,8 @@ export const SHOWCASE_UNIT_VH = (SHOWCASE_UNITS - 1) / SHOWCASE_UNITS;
  * (`Reveal`, the CTA last) by 0.24 - where the rail jumps to and where phones snap to (`SnapStop`).
  */
 export const SCENE_FRAMED = 0.27;
-/** Scene-local time at which the OSMO copy starts fading (after its stagger + a beat of hold, past `SCENE_FRAMED`). */
-export const OSMO_OUTRO_START = 0.3;
+/** Scene-local time at which the OSMO copy starts fading - 0.2 before the hold ends (well past `SCENE_FRAMED`). */
+export const OSMO_OUTRO_START = SHOWCASE_HOLD - 0.2;
 /** How long the copy takes to fade; the disc only appears once it is gone (`OSMO_HANDOFF_START`). */
 export const OSMO_COPY_FADE = 0.08;
 /** The OSMO copy circle: centre + diameter (stage fractions) on desktop (`lg`); below that see `osmoCircleMobile`. */
@@ -42,10 +46,11 @@ export const OSMO_GREEN = "#1E9E4A";
 
 /**
  * Scene-local time from which the journey's canvas draws the copy circle itself (same spot, same size, on top), so
- * the showcase can dissolve underneath and the circle keeps going into the stats' ring. The showcase's own fade
- * starts at 0.42.
+ * the showcase can dissolve underneath and the circle keeps going into the stats' ring - 0.12 before the hold
+ * ends, once the copy has faded (`OSMO_OUTRO_START` + `OSMO_COPY_FADE`). The showcase's own fade starts 0.08
+ * before the hold ends.
  */
-export const OSMO_HANDOFF_START = 0.38;
+export const OSMO_HANDOFF_START = SHOWCASE_HOLD - 0.12;
 /** The circle's layer while it is handed over: the hold push-in (about the stage centre) and its own parallax. */
 export function osmoCircleLayer(t: number) {
   return {
