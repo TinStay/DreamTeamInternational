@@ -15,6 +15,12 @@ import { SHOWCASE_PROJECT_KEYS } from "@/lib/projects";
 export const SHOWCASE_INTRO = 0.55;
 export const SHOWCASE_SPAN = 0.9;
 export const SHOWCASE_HOLD = 0.72;
+/**
+ * On phones (coarse pointer, below lg) a scene starts handing over this early instead, so the hand-over spans most
+ * of the swipe between two snap stops and the next scene moves with the finger, reels-style; the last scene's
+ * outro still runs on `SHOWCASE_HOLD`.
+ */
+export const SHOWCASE_HOLD_MOBILE = 0.3;
 export const SHOWCASE_UNITS = SHOWCASE_INTRO + (SHOWCASE_PROJECT_KEYS.length - 1) * SHOWCASE_SPAN + SHOWCASE_HOLD * SHOWCASE_SPAN;
 /**
  * Scroll (viewports) per timeline unit: the section is UNITS × 100svh tall with a 100svh sticky stage, so its scroll

@@ -29,12 +29,14 @@ import {
   OSMO_OUTRO_START,
   SCENE_FRAMED,
   SHOWCASE_HOLD,
+  SHOWCASE_HOLD_MOBILE,
   SHOWCASE_INTRO,
   SHOWCASE_SPAN,
   SHOWCASE_UNITS,
 } from "@/components/projects/showcase-timeline";
 import { ButtonWithIcon } from "@/components/ui/button-with-icon";
 import { useLanguage } from "@/lib/i18n/language-context";
+import { useMediaQuery } from "@/lib/use-media-query";
 import { PARTNERS, PARTNER_ICON_BASE } from "@/lib/partners";
 import { SHOWCASE_PROJECTS, type Project } from "@/lib/projects";
 import { projectPath } from "@/lib/routes";
@@ -63,8 +65,6 @@ const COUNT = PROJECTS.length;
 const INTRO = SHOWCASE_INTRO;
 const SPAN = SHOWCASE_SPAN;
 const HOLD = SHOWCASE_HOLD;
-/** Scene-local time past which an outgoing scene is parked (inert): 40% into its hand-over. */
-const PARKED_AFTER = HOLD + 0.4 * (1 - HOLD);
 const UNITS = SHOWCASE_UNITS;
 /** Curtain reveal of the first scene, in timeline units. */
 const CURTAIN_START = 0.35;
@@ -102,8 +102,10 @@ const HIDDEN_FRAME: SceneFrame = {
  * leads to the next project; incoming ones (t < 0) play the transition that
  * led from the previous project. Incoming scenes sit *below* the outgoing one
  * until their transition starts, so nothing peeks through during the hold.
+ * `hold` is where the hand-over starts (the hold on desktop, earlier on
+ * phones so the next scene moves with the finger).
  */
-function sceneFrame(t: number, index: number): SceneFrame {
+function sceneFrame(t: number, index: number, hold: number = HOLD): SceneFrame {
   // The first scene is revealed by the curtains - always solid until it leaves.
   const beforeFirst = index === 0 && t <= 0;
   // The last scene has nothing to hand over to: it stays framed while the stage scrolls away.
@@ -136,9 +138,9 @@ function sceneFrame(t: number, index: number): SceneFrame {
       : null
     : transitionFor(index - 1);
   const local = out ? t : t + 1;
-  // The flow wipe is the slow one: it starts a little before the hold ends.
-  const hold = type === "flow" ? HOLD - 0.1 : HOLD;
-  const k = type ? easeInOut(clamp01((local - hold) / (1 - hold))) : 0;
+  // The flow wipe is the slow one: on desktop it starts a little before the hold ends.
+  const start = type === "flow" ? Math.max(hold - 0.1, SHOWCASE_HOLD_MOBILE) : hold;
+  const k = type ? easeInOut(clamp01((local - start) / (1 - start))) : 0;
   const holdScale = out ? 1 + 0.04 * Math.min(t / HOLD, 1) : 1;
   if (out) frame.transform = `scale(${holdScale})`;
   if (!type) {
@@ -247,7 +249,7 @@ const TEXT_LAYOUT = {
   // Below lg the blocks sit low, just above the mobile dock (`bottom-[5.5rem]`), with tighter gaps.
   "center-bottom": {
     block:
-      "inset-x-5 bottom-[5.5rem] mx-auto max-w-[min(88vw,32rem)] items-center gap-3 text-center sm:inset-x-8 sm:gap-4 lg:inset-x-0 lg:bottom-[9vh] lg:max-w-[min(70ch,48vw)] lg:gap-5 2xl:top-[49%] 2xl:bottom-auto 2xl:-translate-y-1/2",
+      "inset-x-5 bottom-[max(6.5rem,17vh)] mx-auto max-w-[min(88vw,32rem)] items-center gap-3 text-center sm:inset-x-8 sm:gap-4 lg:inset-x-0 lg:bottom-[9vh] lg:max-w-[min(70ch,48vw)] lg:gap-5 2xl:top-[49%] 2xl:bottom-auto 2xl:-translate-y-1/2",
     row: "flex justify-center",
     chips: "justify-center",
   },
@@ -272,7 +274,7 @@ const TEXT_LAYOUT = {
   // Below lg: a compact block inside the top of the (smaller) disc, under the white mark (see `OsmoVisual`).
   "in-circle": {
     block:
-      "left-[12vw] right-[12vw] top-[calc(max(5.75rem,10vh)+5.75rem)] items-center gap-2 text-center sm:left-[22vw] sm:right-[22vw] sm:top-[calc(max(5.75rem,10vh)+7.5rem)] sm:gap-3 lg:left-auto lg:right-[7vw] lg:top-[56vh] lg:w-[36vw] lg:-translate-y-1/2 lg:gap-4",
+      "left-[12vw] right-[12vw] top-[calc(max(5.75rem,10vh)+6.75rem)] items-center gap-2 text-center sm:left-[22vw] sm:right-[22vw] sm:top-[calc(max(5.75rem,10vh)+8.5rem)] sm:gap-3 lg:left-auto lg:right-[7vw] lg:top-[56vh] lg:w-[36vw] lg:-translate-y-1/2 lg:gap-4",
     row: "flex justify-center",
     chips: `justify-center ${DENSE_CHIPS}`,
   },
@@ -311,13 +313,13 @@ const HIGHLIGHT_SIZE = {
 } as const;
 
 /** The scene root's position on stage for local time `t` (see `sceneFrame`), as motion values. */
-function useSceneFrameStyle(t: MotionValue<number>, index: number) {
-  const opacity = useTransform(t, (v) => sceneFrame(v, index).opacity);
-  const transform = useTransform(t, (v) => sceneFrame(v, index).transform);
-  const filter = useTransform(t, (v) => sceneFrame(v, index).filter);
-  const clipPath = useTransform(t, (v) => sceneFrame(v, index).clipPath);
-  const zIndex = useTransform(t, (v) => sceneFrame(v, index).zIndex);
-  const visibility = useTransform(t, (v) => sceneFrame(v, index).visibility);
+function useSceneFrameStyle(t: MotionValue<number>, index: number, hold: number) {
+  const opacity = useTransform(t, (v) => sceneFrame(v, index, hold).opacity);
+  const transform = useTransform(t, (v) => sceneFrame(v, index, hold).transform);
+  const filter = useTransform(t, (v) => sceneFrame(v, index, hold).filter);
+  const clipPath = useTransform(t, (v) => sceneFrame(v, index, hold).clipPath);
+  const zIndex = useTransform(t, (v) => sceneFrame(v, index, hold).zIndex);
+  const visibility = useTransform(t, (v) => sceneFrame(v, index, hold).visibility);
   return { opacity, transform, filter, clipPath, zIndex, visibility };
 }
 
@@ -410,6 +412,7 @@ function ProjectScene({
   project,
   index,
   u,
+  hold,
   shouldMount,
   framesEnabled,
   endFade,
@@ -418,6 +421,8 @@ function ProjectScene({
   index: number;
   /** Timeline position in units (see the header comment). */
   u: MotionValue<number>;
+  /** Scene-local time the hand-over starts at (see `sceneFrame`). */
+  hold: number;
   /** Only the visible scenes + the next one up keep a player mounted. */
   shouldMount: boolean;
   framesEnabled: boolean;
@@ -433,13 +438,14 @@ function ProjectScene({
   const markRow = (TEXT_LAYOUT[layout] as { mark?: string }).mark;
 
   const t = useTransform(u, (v) => (v - INTRO) / SPAN - index);
-  const frameStyle = useSceneFrameStyle(t, index);
+  const frameStyle = useSceneFrameStyle(t, index, hold);
   const last = index === COUNT - 1;
   // Parked scenes (not yet arriving / mostly gone) are inert: out of the tab order and the a11y tree. Driven by the
   // scene's own time so the outgoing scene stays interactive while it is still visually framed.
   const [parked, setParked] = useState(index !== 0);
+  const parkedAfter = hold + 0.4 * (1 - hold);
   useMotionValueEvent(t, "change", (v) => {
-    const next = v < -0.1 || v > PARKED_AFTER;
+    const next = v < -0.1 || v > parkedAfter;
     setParked((prev) => (prev === next ? prev : next));
   });
   // Last scene: the copy fades out before the outro disc appears (and leaves the tab order), and the whole scene
@@ -449,7 +455,7 @@ function ProjectScene({
   const opacity = useTransform([frameStyle.opacity, endFade], ([o, e]: number[]) => (last ? o * e : o));
   // Recompute visibility from the frame + the end fade (a fully transparent scene must leave hit-testing / tab order).
   const visibility = useTransform([t, endFade], ([v, e]: number[]) => {
-    const f = sceneFrame(v, index);
+    const f = sceneFrame(v, index, hold);
     return f.visibility === "hidden" || (last && f.opacity * e <= 0.001) ? "hidden" : "visible";
   });
 
@@ -530,6 +536,7 @@ function SceneOverlay({
   project,
   index,
   u,
+  hold,
   shouldMount,
   framesEnabled,
   endFade,
@@ -537,20 +544,21 @@ function SceneOverlay({
   project: Project;
   index: number;
   u: MotionValue<number>;
+  hold: number;
   shouldMount: boolean;
   framesEnabled: boolean;
   endFade: MotionValue<number>;
 }) {
   const { Overlay } = sceneVisualFor(project);
   const t = useTransform(u, (v) => (v - INTRO) / SPAN - index);
-  const frameStyle = useSceneFrameStyle(t, index);
+  const frameStyle = useSceneFrameStyle(t, index, hold);
   const last = index === COUNT - 1;
   // Always above the morph shape (+30); during the hand-over it fades exactly with the incoming scene's cover so
   // it is gone the moment the next world is opaque (the incoming scene's local time is t - 1).
   const zIndex = useTransform(frameStyle.zIndex, (z) => z + 30);
   const opacity = useTransform([t, endFade], ([v, e]: number[]) => {
-    const own = sceneFrame(v, index).opacity;
-    const incoming = !last && v >= 0 ? sceneFrame(v - 1, index + 1).opacity : 0;
+    const own = sceneFrame(v, index, hold).opacity;
+    const incoming = !last && v >= 0 ? sceneFrame(v - 1, index + 1, hold).opacity : 0;
     return own * (1 - incoming) * (last ? e : 1);
   });
   const visibility = useTransform(opacity, (o) => (o <= 0.001 ? "hidden" : "visible"));
@@ -593,21 +601,22 @@ function useIsLg() {
   return isLg;
 }
 
-function MorphOverlay({ u }: { u: MotionValue<number> }) {
+function MorphOverlay({ u, hold }: { u: MotionValue<number>; hold: number }) {
   const isLg = useIsLg();
   const state = useTransform(u, (v) => {
     const uc = (v - INTRO) / SPAN;
     const i0 = clamp(Math.floor(uc), 0, COUNT - 1);
     const i1 = Math.min(i0 + 1, COUNT - 1);
     const f = uc - i0;
-    const k = uc < 0 ? 0 : easeInOut(clamp01((f - HOLD) / (1 - HOLD)));
+    // The shape travels with the scenes' hand-over (earlier on phones, see `sceneFrame`).
+    const k = uc < 0 ? 0 : easeInOut(clamp01((f - hold) / (1 - hold)));
     const A = MORPH_TARGETS[i0];
     const B = MORPH_TARGETS[i1];
     const ca = hexToRgb(A.color);
     const cb = hexToRgb(B.color);
     const rgb = ca.map((c, j) => Math.round(lerp(c, cb[j], k))).join(",");
     // A scene that draws the shape itself keeps the overlay hidden while framed (fast 6% hand-off).
-    const ownHide = A.ownsShape ? 1 - clamp01((f - HOLD) / 0.06) : B.ownsShape ? k : 0;
+    const ownHide = A.ownsShape ? 1 - clamp01((f - hold) / 0.06) : B.ownsShape ? k : 0;
     const px = lerp(A.px ?? 0, B.px ?? 0, k);
     return {
       width: `calc(${lerp(A.w[0], B.w[0], k) * 100}% + ${lerp(A.w[1], B.w[1], k) * 100}svh + ${px}px)`,
@@ -695,6 +704,8 @@ export function ProjectsShowcase({ className }: { className?: string }) {
   const { t } = useLanguage();
   const p = t.projects;
   const reduceMotion = useReducedMotion();
+  // Phones hand over early so the next scene moves with the finger between two snap stops (reels-style).
+  const hold = useMediaQuery("(max-width: 1023px) and (pointer: coarse)") ? SHOWCASE_HOLD_MOBILE : HOLD;
   const sectionRef = useRef<HTMLElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
   const [active, setActive] = useState(0);
@@ -849,12 +860,13 @@ export function ProjectsShowcase({ className }: { className?: string }) {
                 project={project}
                 index={index}
                 u={u}
+                hold={hold}
                 shouldMount={stageOnScreen && mounted.includes(index)}
                 framesEnabled={framesEnabled}
                 endFade={endFade}
               />
             ))}
-            <MorphOverlay u={u} />
+            <MorphOverlay u={u} hold={hold} />
             {PROJECTS.map((project, index) =>
               sceneVisualFor(project).Overlay ? (
                 <SceneOverlay
@@ -862,6 +874,7 @@ export function ProjectsShowcase({ className }: { className?: string }) {
                   project={project}
                   index={index}
                   u={u}
+                  hold={hold}
                   shouldMount={stageOnScreen && mounted.includes(index)}
                   framesEnabled={framesEnabled}
                   endFade={endFade}

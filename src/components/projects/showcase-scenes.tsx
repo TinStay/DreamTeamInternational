@@ -14,7 +14,8 @@ import {
   Reveal,
   Sparks,
 } from "@/components/projects/showcase-primitives";
-import { OSMO_CIRCLE, OSMO_GREEN } from "@/components/projects/showcase-timeline";
+import { OSMO_CIRCLE, OSMO_GREEN, SHOWCASE_HOLD, SHOWCASE_HOLD_MOBILE } from "@/components/projects/showcase-timeline";
+import { useMediaQuery } from "@/lib/use-media-query";
 import { useLanguage } from "@/lib/i18n/language-context";
 import { PROJECT_DISPLAY_FONT } from "@/lib/project-fonts";
 import type { Project, ProjectKey } from "@/lib/projects";
@@ -110,7 +111,11 @@ function BoleronVisual({ t, framesEnabled }: SceneVisualProps) {
   // Roni raises the phone while the scene frames (done by t≈0.15, so the final
   // pose holds for most of the stay); then sinks away as the wipe passes.
   const roniProgress = useTransform(t, (v) => (v + 0.6) / 0.75);
-  const roniSink = useTransform(t, (v) => `${70 * easeInOut(clamp01((v - 0.25) / 0.75))}vh`);
+  // He leaves as the scene hands over: on phones from the early hand-over, fast; on desktop with the flow wipe.
+  const compact = useMediaQuery("(max-width: 1023px) and (pointer: coarse)");
+  const leaveAt = compact ? SHOWCASE_HOLD_MOBILE : SHOWCASE_HOLD - 0.1;
+  const roniSink = useTransform(t, (v) => `${70 * easeInOut(clamp01((v - leaveAt) / (compact ? 0.3 : 0.4)))}vh`);
+  const roniFade = useTransform(t, (v) => 1 - clamp01((v - leaveAt) / (compact ? 0.16 : 0.3)));
   const blob = "absolute rounded-[46%] bg-white/[0.07]";
   return (
     <>
@@ -157,7 +162,7 @@ function BoleronVisual({ t, framesEnabled }: SceneVisualProps) {
       <ParallaxLayer t={t} depth={-0.1} className="pointer-events-none">
         <motion.div
           className="absolute left-1/2 top-[34vh] aspect-[1206/1054] h-[30vh] -translate-x-1/2 -translate-y-1/2 [mask-image:linear-gradient(180deg,#000_0%,#000_72%,transparent_97%)] sm:top-[42vh] sm:h-[40vh] lg:left-[72%] lg:top-auto lg:bottom-[3vh] lg:h-[min(76vh,880px)] lg:translate-y-0"
-          style={{ y: roniSink }}
+          style={{ y: roniSink, opacity: roniFade }}
         >
           <FrameSequence
             progress={roniProgress}
@@ -203,7 +208,7 @@ function EmblemaVisual({ t, framesEnabled }: SceneVisualProps) {
       </ParallaxLayer>
       {/* Buildings sequence - oversized so the split towers sit well out to the sides of the centred copy. */}
       <ParallaxLayer t={t} depth={0.12} className="pointer-events-none">
-        <div className="absolute left-1/2 top-[max(6rem,11vh)] aspect-[1284/716] w-[min(84vw,36vh)] -translate-x-1/2 sm:w-[min(66vw,44vh)] lg:top-auto lg:bottom-[12vh] lg:w-[min(80vw,140vh,1720px)]">
+        <div className="absolute left-1/2 top-[max(8rem,20vh)] aspect-[1284/716] w-[min(100vw,60vh)] -translate-x-1/2 sm:w-[min(80vw,52vh)] lg:top-auto lg:bottom-[12vh] lg:w-[min(80vw,140vh,1720px)]">
           <div className="animate-showcase-breathe absolute inset-0 origin-bottom">
             <div className="absolute left-[6%] top-[58%] h-[90%] w-[60%] -translate-x-1/2 -translate-y-1/2 rounded-full" style={{ background: goldGlow }} />
             <div className="absolute left-[89%] top-[58%] h-[90%] w-[60%] -translate-x-1/2 -translate-y-1/2 rounded-full" style={{ background: goldGlow }} />
@@ -521,7 +526,7 @@ function OsmoVisual({ t, project, shouldMount }: SceneVisualProps) {
           under it (layout `in-circle`). */}
       <ParallaxLayer t={t} depth={0.35} className="pointer-events-none lg:hidden">
         <Reveal t={t} delay={0.02} className="absolute left-1/2 top-[calc(max(5.75rem,10vh)+1.75rem)] -translate-x-1/2">
-          <Image src={OSMO_MARK_WHITE} alt="OSMO" width={2400} height={1340} sizes="160px" className="h-[3.25rem] w-auto sm:h-16" />
+          <Image src={OSMO_MARK_WHITE} alt="OSMO" width={2400} height={1340} sizes="200px" className="h-[4.25rem] w-auto sm:h-20" />
         </Reveal>
       </ParallaxLayer>
     </>

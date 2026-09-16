@@ -74,12 +74,12 @@ export function MobileNav() {
               <button
                 className={cn(
                   primaryGradientInteractiveClassName,
-                  "flex h-12 w-12 shrink-0 items-center justify-center rounded-full text-white outline-none active:scale-95"
+                  "me-1 flex size-[3.25rem] shrink-0 items-center justify-center rounded-full text-white outline-none active:scale-95"
                 )}
               />
             }
           >
-            <IconMenu2 className="h-[22px] w-[22px] drop-shadow-sm" />
+            <IconMenu2 className="size-[26px] drop-shadow-sm" />
           </SheetTrigger>
           {/* Full viewport width — kill the glass side borders so the sheet
               reads edge-to-edge instead of an inset panel. */}

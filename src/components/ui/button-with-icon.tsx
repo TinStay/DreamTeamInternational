@@ -48,18 +48,19 @@ export function ButtonWithIcon({
   // the disc glides to the far edge on hover (4px in).
   const geometry = {
     sm: "h-9 ps-4 pe-11 text-sm hover:ps-11 hover:pe-4",
-    md: "h-12 ps-6 pe-14 text-sm lg:text-base hover:ps-14 hover:pe-6",
+    md: "h-12 ps-6 pe-[3.25rem] text-sm lg:text-base hover:ps-[3.25rem] hover:pe-6",
     lg: "h-14 ps-7 pe-16 text-base lg:text-lg hover:ps-16 hover:pe-7",
   }[size];
   // A named group, so only the pill's own hover moves the disc - not a hovered card around it.
   const discSize = {
-    sm: "size-7 group-hover/cta:right-[calc(100%-32px)]",
-    md: "size-10 group-hover/cta:right-[calc(100%-44px)]",
-    lg: "size-12 group-hover/cta:right-[calc(100%-52px)]",
+    sm: "right-1 size-7 group-hover/cta:right-[calc(100%-32px)]",
+    // A touch smaller than the pill's inner height, concentric in it (6px from every edge).
+    md: "right-1.5 size-9 group-hover/cta:right-[calc(100%-42px)]",
+    lg: "right-1 size-12 group-hover/cta:right-[calc(100%-52px)]",
   }[size];
   // The arrow disc always carries the brand gradient (red → violet), on either surface.
   const disc = cn(
-    "absolute right-1 flex items-center justify-center rounded-full bg-gradient-to-br from-[var(--primary-gradient-start)] to-[var(--primary-gradient-end)] text-white shadow-[0_6px_16px_var(--primary-elevated-shadow)] transition-all duration-500 group-hover/cta:rotate-45",
+    "absolute top-1/2 flex -translate-y-1/2 items-center justify-center rounded-full bg-gradient-to-br from-[var(--primary-gradient-start)] to-[var(--primary-gradient-end)] text-white shadow-[0_6px_16px_var(--primary-elevated-shadow)] transition-all duration-500 group-hover/cta:rotate-45",
     discSize
   );
   const shared = cn(
