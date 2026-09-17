@@ -136,18 +136,19 @@ export function Sparks({
  * drawn onto a canvas: `progress` 0 → 1 picks the frame. Frames only start
  * downloading once `enabled` (the section is near the viewport); while a
  * frame is still on its way the nearest ready neighbour is drawn instead.
- * On a **coarse pointer** (phones, tablets) every other frame is loaded and
- * kept as a decoded `ImageBitmap` at the size it shows at (1.5 × the CSS
- * size, at most `COARSE_BITMAP_MAX` wide - about 25–60 MB a sequence): a
- * phone drops decoded images from its cache between frames and re-decodes
- * one per drawn frame, which is what made the scrub stutter; 36 retained
- * bitmaps scrub for free. A fine pointer keeps the plain decoded `<img>`s
- * (all 72 - the desktop cache holds them). `split` draws the same frame onto
+ * On a **coarse pointer** (phones, tablets) every frame is loaded and kept
+ * as a decoded `ImageBitmap` at the size it shows at (1.5 × the CSS size, at
+ * most `COARSE_BITMAP_MAX` wide - about 50–130 MB a sequence): a phone
+ * drops decoded images from its cache between frames and re-decodes one per
+ * drawn frame, which is what made the scrub stutter; retained bitmaps scrub
+ * for free. All 72 of them - every other one was tried and the page tween
+ * skipped source frames at its peak, which read as steps. A fine pointer
+ * keeps the plain decoded `<img>`s (all 72 - the desktop cache holds them). `split` draws the same frame onto
  * two canvases showing the left / right halves, pulled apart by
  * `--split-gap` (a percentage, set by the caller's class so it can differ
  * per breakpoint; 15% if unset - the Emblema buildings).
  */
-const COARSE_BITMAP_MAX = 720;
+const COARSE_BITMAP_MAX = 560;
 export function FrameSequence({
   progress,
   base,
@@ -206,8 +207,8 @@ export function FrameSequence({
   useEffect(() => {
     if (!enabled || ready.current.size > 0) return;
     const coarse = window.matchMedia("(pointer: coarse)").matches;
-    // Coarse: every other frame, as a bitmap at 1.5 × the CSS size (never above the canvas or the cap).
-    const stride = coarse ? 2 : 1;
+    // Coarse: every frame, as a bitmap at 1.5 × the CSS size (never above the canvas or the cap).
+    const stride = 1;
     const shown = canvases.current[0]?.clientWidth || 0;
     const bitmapW = Math.min(width, COARSE_BITMAP_MAX, shown > 0 ? Math.round(shown * Math.min(window.devicePixelRatio || 1, 1.5)) : width);
     const bitmapH = Math.round((bitmapW * height) / width);

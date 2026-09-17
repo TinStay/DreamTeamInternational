@@ -10,7 +10,7 @@ import { JourneyItem } from "@/components/ui/scroll-journey";
 import { cn } from "@/lib/utils";
 import { PROJECT_DISPLAY_FONT } from "@/lib/project-fonts";
 import { useLanguage } from "@/lib/i18n/language-context";
-import { homePath, portfolioPath } from "@/lib/routes";
+import { homePath } from "@/lib/routes";
 import { HERO_VIDEO, bunnyBackgroundEmbedSrc } from "@/lib/bunny-stream";
 import { YOUTUBE_IFRAME_ALLOW, YOUTUBE_REFERRER_POLICY } from "@/lib/youtube-embeds";
 
@@ -25,9 +25,9 @@ const HERO_GLOW_LAYERS = [
 
 export function HeroSection() {
   const { t, language } = useLanguage();
-  // Primary CTA jumps to the quote wizard further down the home page.
+  // The primary CTA jumps to the service cards (the quote wizard's first step), the second to the projects stage.
   const quoteHref = `${homePath(language)}#quote`;
-  const portfolioHref = portfolioPath(language);
+  const projectsHref = `${homePath(language)}#projects`;
   const shouldRenderTitleGap = Boolean(t.hero.titleBefore) && Boolean(t.hero.titleGlow);
   // Space must live OUTSIDE the inline-block spans — leading whitespace inside
   // an inline-block is trimmed by CSS, which glued the words together.
@@ -143,9 +143,10 @@ export function HeroSection() {
         </JourneyItem>
 
         <JourneyItem index={0} from="bottom" className="flex w-full flex-col items-center">
-        {/* One short line, in a pale violet (the brand's violet end, lightened) rather than the muted grey. */}
+        {/* One short line: a deep violet on the light theme's white wash, the pale violet (the brand's violet end,
+            lightened) on the dark one - the brand's hue either way, never the muted grey. */}
         <motion.p
-          className="mx-auto mt-5 max-w-xl text-base leading-relaxed text-[#E4DBFF] [text-shadow:0_1px_12px_rgba(0,0,0,0.35)] sm:mt-6 sm:text-lg"
+          className="mx-auto mt-5 max-w-xl text-base leading-relaxed text-[#2E1F5E] [text-shadow:0_1px_10px_rgba(255,255,255,0.55)] sm:mt-6 sm:text-lg dark:text-[#E4DBFF] dark:[text-shadow:0_1px_12px_rgba(0,0,0,0.35)]"
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4, duration: 0.55, ease: EASE }}
@@ -165,7 +166,7 @@ export function HeroSection() {
           </ButtonWithIcon>
 
           <Link
-            href={portfolioHref}
+            href={projectsHref}
             className={cn(
               buttonVariants({ variant: "ghost", size: "default" }),
               "flex h-12 w-full items-center justify-center gap-1.5 rounded-full px-5 text-sm font-semibold text-foreground shadow-none transition-[transform,background-color] duration-200 hover:scale-[1.02] hover:bg-foreground/5 active:scale-[0.98] sm:w-auto"

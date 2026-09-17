@@ -77,7 +77,8 @@ export type Project = {
    * Plasico, MindGuard, OSMO) - YouTube or Bunny, `null` = placeholder.
    */
   story?: {
-    films?: { clip: StoryClip | null; orientation: "wide" | "tall" }[];
+    /** `null` for an item = copy only, no film frame at all (Emblema's third). */
+    films?: ({ clip: StoryClip | null; orientation: "wide" | "tall" } | null)[];
     clips?: Record<string, StoryClip | null>;
   };
   /** Brand accent pair — drives the scroll-showcase background for this project. */
@@ -187,16 +188,16 @@ export const PROJECTS: Project[] = [
     since: null,
     platforms: [yt("8dw7O71wawY")],
     accent: ["#b45309", "#f59e0b"],
-    // The three films on Bunny Stream, in the order of `stories.emblema.films.items`: "Eria Video 1 - Movie
-    // Style" (4K, wide), then the two vertical social cuts - "Eria Video 3" (the cyclist, "Повече място за живот")
-    // under the second item and "Eria Video 2" (the family in the park) under the third, the client's order.
-    // NOTE(content): the third item's copy still describes the District Living film - both vertical clips are
-    // ERIA social cuts.
+    // The films on Bunny Stream, in the order of `stories.emblema.films.items`: "Eria Video 1 - Movie Style"
+    // (4K, wide), then the vertical social cut "Eria Video 3" (the cyclist, "Повече място за живот") under the
+    // second item; the third item (District Living) is copy only - its frame ("Eria Video 2", the family in the
+    // park, an ERIA cut that did not match the copy) is off at the client's ask.
     story: {
       films: [
         { clip: { bunny: { library: "750681", id: "28f54810-3c7b-4beb-9a0a-f6f0926323d5" } }, orientation: "wide" },
         { clip: { bunny: { library: "750681", id: "d491c5e2-2f68-489b-8318-bdae7816a1a9" } }, orientation: "tall" },
-        { clip: { bunny: { library: "750681", id: "521631f9-1eb7-4dca-a39d-603bf7d61c3f" } }, orientation: "tall" },
+        // { clip: { bunny: { library: "750681", id: "521631f9-1eb7-4dca-a39d-603bf7d61c3f" } }, orientation: "tall" },
+        null,
       ],
     },
   },

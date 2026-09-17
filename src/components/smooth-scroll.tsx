@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
+import { usePathname } from "next/navigation";
 import Lenis from "lenis";
 import { scrollToElement } from "@/lib/smooth-scroll";
 
@@ -11,9 +12,40 @@ import { scrollToElement } from "@/lib/smooth-scroll";
  * media query itself), nested scrollers (dropdowns, sheets) keep their own
  * wheel. Same-page hash links (`/bg#quote` from `/bg`, and plain `#…`) scroll
  * through it too, clear of the floating header; programmatic scrolls go
- * through `scrollToElement` / `scrollToY` in `lib/smooth-scroll.ts`.
+ * through `scrollToElement` / `scrollToY` in `lib/smooth-scroll.ts`. A route
+ * change (a link to another page) lands at the top of the new page - both the
+ * window and Lenis's own position are reset, so a case study opened from deep
+ * in the home page never starts part-way down; back / forward keep the
+ * browser's restored position.
  */
 export function SmoothScroll() {
+  const pathname = usePathname();
+  const popped = useRef(false);
+  const first = useRef(true);
+  useEffect(() => {
+    const onPop = () => {
+      popped.current = true;
+    };
+    window.addEventListener("popstate", onPop);
+    return () => window.removeEventListener("popstate", onPop);
+  }, []);
+  useEffect(() => {
+    // The first run is the initial load (the browser owns that position - a reload restores it); back / forward
+    // are the browser's too. A link to another page: to the top, and Lenis with it - mid-glide, it would carry its
+    // old target over and scroll the new page down to it.
+    if (first.current) {
+      first.current = false;
+      return;
+    }
+    if (popped.current) {
+      popped.current = false;
+      return;
+    }
+    if (location.hash) return;
+    window.scrollTo(0, 0);
+    window.__lenis?.scrollTo(0, { immediate: true, force: true });
+  }, [pathname]);
+
   useEffect(() => {
     // lerp 0.07: a longer glide than the default 0.1 (about a quarter second to settle) - the scroll-driven choreography
     // reads as motion even on a single wheel tick, without the page feeling like ice.

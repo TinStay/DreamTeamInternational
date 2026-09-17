@@ -176,13 +176,14 @@ type FilmCopy = { project: string; title: string; text: string; tags: string[] }
  */
 function FilmEntry({ film, media, index, side, title, placeholder }: {
   film: FilmCopy;
-  media: { clip: StoryClip | null; orientation: "wide" | "tall" };
+  /** The film's frame; `null` = copy only, across the full width (the third item). */
+  media: { clip: StoryClip | null; orientation: "wide" | "tall" } | null;
   index: string;
   side: "left" | "right";
   title: string;
   placeholder: string;
 }) {
-  const tall = media.orientation === "tall";
+  const tall = media?.orientation === "tall";
   const head = (
     <div>
       <span className="mb-3 block font-heading text-sm tracking-[0.22em] text-[var(--story-accent)]">{index}</span>
@@ -210,6 +211,22 @@ function FilmEntry({ film, media, index, side, title, placeholder }: {
       </motion.ul>
     </motion.div>
   );
+  if (!media) {
+    // Copy only: the number, the title and the project on the left, the text and the tags on the right, across the
+    // full width - the same two columns as under the wide film, with no frame above them.
+    return (
+      <motion.div
+        className="grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.25fr)] lg:gap-16"
+        initial="hidden"
+        whileInView="visible"
+        viewport={VIEWPORT}
+        variants={stagger(0.12)}
+      >
+        {head}
+        {text}
+      </motion.div>
+    );
+  }
   const frame = (
     <motion.div variants={frameIn} className={cn(tall && (side === "right" ? "lg:order-2" : "lg:order-1"))}>
       <FilmMedia clip={media.clip} orientation={media.orientation} title={title} placeholder={placeholder} />
@@ -355,7 +372,8 @@ export function EmblemaStory({ project }: { project: Project }) {
         </div>
         <div className="mt-14 grid gap-20 lg:gap-32">
           {story.films.items.map((film, i) => {
-            const media = films[i] ?? { clip: null, orientation: "wide" as const };
+            // A missing entry is a wide placeholder; `null` is copy only (no frame).
+            const media = i < films.length ? films[i] : { clip: null, orientation: "wide" as const };
             const index = String(i + 1).padStart(2, "0");
             return (
               <FilmEntry

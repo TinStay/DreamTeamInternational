@@ -22,6 +22,7 @@ import {
   Reveal,
   ParallaxLayer,
 } from "@/components/projects/showcase-primitives";
+import { useScenePager } from "@/components/projects/scene-pager";
 import { sceneVisualFor, type MorphTarget } from "@/components/projects/showcase-scenes";
 import {
   OSMO_COPY_FADE,
@@ -719,10 +720,20 @@ export function ProjectsShowcase({ className }: { className?: string }) {
   const { t } = useLanguage();
   const p = t.projects;
   const reduceMotion = useReducedMotion();
-  // Phones hand over early so the next scene moves with the finger between two snap stops (reels-style).
-  const hold = useMediaQuery("(max-width: 1023px) and (pointer: coarse)") ? SHOWCASE_HOLD_MOBILE : HOLD;
+  // Phones page scene by scene (`useScenePager`) and hand over early, so a page is mostly the hand-over itself.
+  const phone = useMediaQuery("(max-width: 1023px) and (pointer: coarse)");
+  const hold = phone ? SHOWCASE_HOLD_MOBILE : HOLD;
   const sectionRef = useRef<HTMLElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
+  // The stage's stops for the phone pager: the intro, then each scene framed - the same positions as the snap stops.
+  const stops = useCallback(() => {
+    const section = sectionRef.current;
+    const stage = stageRef.current;
+    if (!section || !stage) return [];
+    const top = section.getBoundingClientRect().top + window.scrollY;
+    return [top, ...PROJECTS.map((_, index) => scrollTargetFor(section, stage, index))];
+  }, []);
+  useScenePager(phone && !reduceMotion, stops);
   const [active, setActive] = useState(0);
   /** Scenes that keep a player mounted: the framed one, the previous one while it is still leaving, and the next one from 10% into the hold. */
   const [mounted, setMounted] = useState<number[]>([0, 1]);

@@ -500,7 +500,9 @@
 
 /*
  * Mobile scene snapping: the home page (`main[data-snap-sections]`) marks the projects stage's stops with `SnapStop`
- * markers (ui/snap-stop.tsx) and the root snaps to them - `always`, so one swipe is one scene, TikTok-style.
+ * markers (ui/snap-stop.tsx) and the root snaps to them - `always`, one stop per fling. A touch gesture inside the
+ * stage is paged by `useScenePager` (projects/scene-pager.ts) instead - a tween to the next stop, one per swipe,
+ * which switches this snapping off inline for its duration; the rule stays for a fling that began outside the stage.
  * `proximity`, not `mandatory`: the stops are only in the stage (half a viewport apart, so it always snaps in there)
  * and the rest of the page must scroll free - it only ever snaps within about a third of a viewport of a stop.
  * Coarse pointers below lg only, never under reduced motion, and off while a field has focus so the keyboard's own

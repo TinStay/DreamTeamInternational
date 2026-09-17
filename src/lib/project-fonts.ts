@@ -12,8 +12,9 @@ export const PROJECT_DISPLAY_FONT: Record<ShowcaseProjectKey, string> = {
   boleron: "font-[family-name:var(--font-montserrat)] font-bold tracking-tight",
   // The reference animation's Emblema face: Playfair Display, italic, sentence case.
   emblema: "font-[family-name:var(--font-playfair)] font-medium normal-case italic tracking-normal",
-  // Big and strong: Unbounded (a wide face - size it a step under the others).
-  mindguard: "font-[family-name:var(--font-unbounded)] font-bold tracking-tight",
+  // The platform's own face (mymindguard.ai, and its page's titles): Space Grotesk - no Cyrillic, so Manrope
+  // stands in for the Bulgarian glyphs, as on the page.
+  mindguard: "font-[family-name:var(--font-space-grotesk),var(--font-manrope)] font-bold tracking-[-0.02em]",
   // Tech: Exo 2, uppercase.
   plasico: "font-[family-name:var(--font-exo)] font-bold uppercase tracking-tight",
   // The face of the client's case study: Manrope, semibold, a touch tight (its h1 / h2).

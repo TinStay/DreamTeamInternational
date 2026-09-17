@@ -198,8 +198,10 @@ const EMBLEMA_FRAMES = 72;
 function EmblemaVisual({ t, framesEnabled }: SceneVisualProps) {
   const { t: dict } = useLanguage();
   const buildings = dict.projects.showcase.scenes.emblema.buildings;
-  // Buildings rise from the ground once the scene is framed and finish during the hold.
-  const buildProgress = useTransform(t, (v) => clamp01((v + 0.3) / 0.75));
+  // Buildings rise from the ground once the scene is framed and finish during the hold - on phones by the
+  // stop (t 0.27, `SCENE_FRAMED`), so they stand complete when the page settles.
+  const compact = useMediaQuery("(max-width: 1023px) and (pointer: coarse)");
+  const buildProgress = useTransform(t, (v) => clamp01((v + 0.3) / (compact ? 0.57 : 0.75)));
   const labelK = useTransform(buildProgress, (v) => easeOut(clamp01((v - 0.35) / 0.25)));
   const labelY = useTransform(labelK, (v) => (1 - v) * 14);
   const goldGlow = `radial-gradient(closest-side, rgba(184,150,90,.55) 0%, rgba(184,150,90,.28) 45%, rgba(184,150,90,.08) 75%, transparent 100%)`;
@@ -469,7 +471,10 @@ function PlasicoOverlay({ t }: SceneVisualProps) {
         height={128}
         sizes="(max-width: 1024px) 60vw, 36vw"
         loading="eager"
-        className="absolute left-[2vw] top-[var(--pl-top)] h-auto w-[60vw] drop-shadow-[0_22px_38px_rgba(31,162,42,0.28)] sm:w-[48vw] lg:left-[max(2rem,3vw)] lg:top-auto lg:bottom-[3vh] lg:w-[min(36vw,560px)]"
+        // From lg the logo is sized by its height - 9.5vh, never over 6.5rem nor wider than the screen allows (7vw
+        // of height ≈ 27vw of width) - so it always stays under the copy block's CTA, whose bottom sits at about
+        // 83vh (36vw of width used to run up into it on a short, wide screen).
+        className="absolute left-[2vw] top-[var(--pl-top)] h-auto w-[60vw] drop-shadow-[0_22px_38px_rgba(31,162,42,0.28)] sm:w-[48vw] lg:left-[max(2rem,3vw)] lg:top-auto lg:bottom-[3vh] lg:h-[clamp(3rem,min(9.5vh,7vw),6.5rem)] lg:w-auto"
       />
     </ParallaxLayer>
   );

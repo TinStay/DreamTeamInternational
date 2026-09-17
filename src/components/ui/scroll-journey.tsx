@@ -361,6 +361,11 @@ export function JourneyScene({
     !mounted ? 1 : off ? 0 : sceneOpacity(isFirst, !leaves, p, c)
   );
   useMotionValueEvent(offStage, "change", (v) => setParked(v === 1));
+  // Click-through while (near) transparent: an arriving box overlaps the previous scene's tail from the start of
+  // the hand-over, before its own parts are in - it covered the training cards' CTAs, the contact section's social
+  // links and, over the showcase, the OSMO CTA (a parked box is inert, but an arriving one is not). The pointer
+  // reaches the box only once its content shows.
+  const pointerEvents = useTransform(opacity, (o) => (o < 0.5 ? "none" : "auto"));
 
   // The marker refs must stay attached: `useFlowProgress` measures them.
   if (reduceMotion) {
@@ -396,6 +401,7 @@ export function JourneyScene({
           marginTop: mounted && overlap ? `${-overlapBy * 100}svh` : 0,
           y,
           opacity,
+          pointerEvents,
         }}
         inert={parked ? true : undefined}
         // For `scrollToElement`: a scene's flow position is its start marker's (the previous sibling) less this
