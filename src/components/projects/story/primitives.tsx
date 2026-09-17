@@ -292,8 +292,24 @@ export function BodyXL({ paragraphs }: { paragraphs: string[] }) {
   );
 }
 
-/** Two columns from lg: a (sticky) heading column and the copy - the heading first, the copy a beat after it. */
-export function Split({ left, right, sticky = true, ratio = "0.9/1.1" }: { left: ReactNode; right: ReactNode; sticky?: boolean; ratio?: "0.9/1.1" | "1/2" }) {
+/**
+ * Two columns from lg: a (sticky) heading column and the copy - the heading first, the copy a beat after it.
+ * `leftReveal={false}` leaves the heading column still (a story whose titles reveal themselves - Emblema's CSS
+ * ones), so nothing JS-driven stands between the reader and the title.
+ */
+export function Split({
+  left,
+  right,
+  sticky = true,
+  ratio = "0.9/1.1",
+  leftReveal = true,
+}: {
+  left: ReactNode;
+  right: ReactNode;
+  sticky?: boolean;
+  ratio?: "0.9/1.1" | "1/2";
+  leftReveal?: boolean;
+}) {
   return (
     <motion.div
       className={cn(
@@ -305,7 +321,7 @@ export function Split({ left, right, sticky = true, ratio = "0.9/1.1" }: { left:
       viewport={VIEWPORT}
       variants={stagger(0)}
     >
-      <motion.div variants={fadeUp} className={cn(sticky && "lg:sticky lg:top-28")}>
+      <motion.div variants={leftReveal ? fadeUp : undefined} className={cn(sticky && "lg:sticky lg:top-28")}>
         {left}
       </motion.div>
       <motion.div variants={fadeUpAfter(COPY_DELAY)}>{right}</motion.div>
@@ -682,6 +698,7 @@ export function CtaBand({
   words = false,
   eyebrow,
   lead,
+  titleNode,
   children,
 }: {
   title: string;
@@ -695,6 +712,8 @@ export function CtaBand({
   /** Above / below the title (Emblema's eyebrow and lead). */
   eyebrow?: ReactNode;
   lead?: ReactNode;
+  /** The title rendered by the story itself (Emblema's CSS-revealed lines) in place of the string / `Words`. */
+  titleNode?: ReactNode;
   /** Decoration layers (backgrounds, marks) - rendered first, behind the copy. */
   children?: ReactNode;
 }) {
@@ -739,7 +758,7 @@ export function CtaBand({
             "leading-[1.08]"
           )}
         >
-          {center || words ? <Words text={title} base={rise ? 0.25 : 0} /> : title}
+          {titleNode ?? (center || words ? <Words text={title} base={rise ? 0.25 : 0} /> : title)}
         </h2>
         {lead}
       </motion.div>

@@ -246,17 +246,18 @@ const TEXT_LAYOUT = {
     row: "flex justify-center",
     chips: "justify-center",
   },
-  // Below lg the blocks sit low, just above the mobile dock (`bottom-[5.5rem]`), with tighter gaps.
+  // Below lg the block (mark, headline, CTA) heads a stack centred on the screen, the towers under it (`--emb-top`,
+  // the Emblema scene's variables - see `EmblemaVisual`).
   "center-bottom": {
     block:
-      "inset-x-5 bottom-[max(6.5rem,17vh)] mx-auto max-w-[min(88vw,32rem)] items-center gap-3 text-center sm:inset-x-8 sm:gap-4 lg:inset-x-0 lg:bottom-[9vh] lg:max-w-[min(70ch,48vw)] lg:gap-5 2xl:top-[49%] 2xl:bottom-auto 2xl:-translate-y-1/2",
+      "inset-x-5 top-[var(--emb-top)] mx-auto max-w-[min(88vw,32rem)] items-center gap-3 text-center sm:inset-x-8 sm:gap-4 lg:inset-x-0 lg:top-auto lg:bottom-[9vh] lg:max-w-[min(70ch,48vw)] lg:gap-5 2xl:top-[49%] 2xl:bottom-auto 2xl:-translate-y-1/2",
     row: "flex justify-center",
     chips: "justify-center",
   },
   boleron: {
     // 20vw left margin; the bottom margin grows toward 20vh on tall viewports but stays clear of the lockup on short ones.
     block:
-      "left-[8vw] right-[8vw] bottom-[5.5rem] gap-3 sm:gap-4 lg:left-[max(2rem,4vw)] lg:right-auto lg:bottom-[8vh] lg:w-[min(50vw,calc(60vw-12rem))] lg:gap-5",
+      "left-[8vw] right-[8vw] top-[calc(var(--bol-top)_+_var(--bol-word)_+_1rem)] gap-3 sm:gap-4 lg:left-[max(2rem,4vw)] lg:right-auto lg:top-auto lg:bottom-[8vh] lg:w-[min(50vw,calc(60vw-12rem))] lg:gap-5",
     row: "",
     chips: DENSE_CHIPS,
   },
@@ -267,14 +268,14 @@ const TEXT_LAYOUT = {
   },
   "top-left-wide": {
     block:
-      "left-5 right-10 top-[max(9rem,18vh)] sm:left-8 sm:right-14 lg:left-12 lg:right-auto lg:top-[52vh] lg:max-w-[28vw] lg:-translate-y-1/2 xl:max-w-[30vw]",
+      "left-5 right-10 top-[calc(var(--pl-top)_+_var(--pl-name)_+_1.5rem)] sm:left-8 sm:right-14 lg:left-12 lg:right-auto lg:top-[52vh] lg:max-w-[28vw] lg:-translate-y-1/2 xl:max-w-[30vw]",
     row: "",
     chips: "",
   },
   // Below lg: a compact block inside the top of the (smaller) disc, under the white mark (see `OsmoVisual`).
   "in-circle": {
     block:
-      "left-[12vw] right-[12vw] top-[calc(max(5.75rem,10vh)+6.75rem)] items-center gap-2 text-center sm:left-[22vw] sm:right-[22vw] sm:top-[calc(max(5.75rem,10vh)+8.5rem)] sm:gap-3 lg:left-[var(--osmo-cx)] lg:right-auto lg:top-[56vh] lg:w-[32vw] lg:-translate-x-1/2 lg:-translate-y-1/2 lg:gap-4",
+      "left-[12vw] right-[12vw] top-[calc(max(5.75rem,10vh)+6.5rem)] items-center gap-2 text-center sm:left-[22vw] sm:right-[22vw] sm:top-[calc(max(5.75rem,10vh)+8.75rem)] sm:gap-3 lg:left-[var(--osmo-cx)] lg:right-auto lg:top-[56vh] lg:w-[32vw] lg:-translate-x-1/2 lg:-translate-y-1/2 lg:gap-4",
     row: "flex justify-center",
     chips: `justify-center ${DENSE_CHIPS}`,
   },
@@ -298,8 +299,8 @@ const HEADLINE_SIZE = {
   "center-bottom": "text-3xl sm:text-4xl lg:text-4xl xl:text-5xl 2xl:text-6xl",
   "top-left": "text-3xl sm:text-4xl lg:text-4xl xl:text-5xl",
   "top-left-wide": "text-3xl sm:text-4xl lg:text-5xl xl:text-5xl 2xl:text-7xl",
-  "left-column": "text-2xl sm:text-3xl lg:text-4xl xl:text-5xl 2xl:text-6xl",
-  "in-circle": "text-xl sm:text-2xl lg:text-5xl xl:text-6xl 2xl:text-7xl",
+  "left-column": "text-3xl sm:text-4xl lg:text-4xl xl:text-5xl 2xl:text-6xl",
+  "in-circle": "text-2xl sm:text-3xl lg:text-5xl xl:text-6xl 2xl:text-7xl",
 } as const;
 const HIGHLIGHT_SIZE = {
   "bottom-left": "text-base sm:text-lg lg:text-xl",
@@ -307,9 +308,9 @@ const HIGHLIGHT_SIZE = {
   center: "text-base sm:text-lg lg:text-xl",
   "center-bottom": "text-base sm:text-lg lg:text-xl",
   "top-left": "text-base sm:text-lg",
-  "top-left-wide": "text-base sm:text-lg lg:text-xl 2xl:text-2xl",
+  "top-left-wide": "text-base max-lg:[@media(max-height:700px)]:hidden sm:text-lg lg:text-xl 2xl:text-2xl",
   "left-column": "text-sm sm:text-base lg:text-xl",
-  "in-circle": "text-xs sm:text-sm lg:text-xl xl:text-2xl",
+  "in-circle": "text-sm sm:text-base lg:text-xl xl:text-2xl",
 } as const;
 
 /** The scene root's position on stage for local time `t` (see `sceneFrame`), as motion values. */
@@ -387,15 +388,16 @@ function BrandMark({
         alt={partner.ariaLabel}
         width={400}
         height={140}
-        sizes={size === "xl" ? "(max-width: 1024px) 380px, 640px" : size === "lg" ? "(max-width: 1024px) 220px, 480px" : "200px"}
+        loading="eager"
+        sizes={size === "xl" ? "(max-width: 1024px) 380px, 640px" : size === "lg" ? "(max-width: 1024px) 260px, 480px" : "200px"}
         className={cn(
           "w-auto object-contain",
           size === "xl"
             ? // Desktop: sized by the viewport height, so a 15" laptop (a short viewport) gets a smaller mark than a
               // tall monitor - about 14rem at 864px tall, 18rem from 1100px up.
-              "h-20 max-w-[320px] sm:h-24 sm:max-w-[380px] lg:h-[clamp(9rem,22vh,13rem)] lg:max-w-[30vw] xl:h-[clamp(10rem,24vh,14rem)] 2xl:h-[clamp(11rem,26vh,18rem)]"
+              "h-24 max-w-[340px] sm:h-28 sm:max-w-[400px] lg:h-[clamp(9rem,22vh,13rem)] lg:max-w-[30vw] xl:h-[clamp(10rem,24vh,14rem)] 2xl:h-[clamp(11rem,26vh,18rem)]"
             : size === "lg"
-              ? "h-11 max-w-[220px] sm:h-14 lg:h-24 lg:max-w-[340px] xl:h-28 xl:max-w-[400px] 2xl:h-36 2xl:max-w-[480px]"
+              ? "h-16 max-w-[280px] sm:h-20 lg:h-24 lg:max-w-[340px] xl:h-28 xl:max-w-[400px] 2xl:h-36 2xl:max-w-[480px]"
               : "h-9 max-w-[200px] sm:h-11 lg:h-12",
           invert && "invert"
         )}
@@ -434,7 +436,7 @@ function ProjectScene({
   const { t: dict, language } = useLanguage();
   const p = dict.projects;
   const copy = p.items[project.id];
-  const { tone, background, layout, mark, Mark, Visual, headline, Detail, highlight: showHighlight = true, className: sceneClass } = sceneVisualFor(project);
+  const { tone, background, layout, mark, Mark, Visual, headline, Detail, highlight: showHighlight = true } = sceneVisualFor(project);
   const colors = TONE[tone];
   // A layout may pull its mark row back over the copy (the MindGuard file's transparent left padding).
   const markRow = (TEXT_LAYOUT[layout] as { mark?: string }).mark;
@@ -463,7 +465,7 @@ function ProjectScene({
 
   return (
     <motion.div
-      className={cn("absolute inset-0 overflow-clip will-change-[transform,opacity]", sceneClass)}
+      className="absolute inset-0 overflow-clip will-change-[transform,opacity]"
       style={{ ...frameStyle, opacity, visibility, backgroundColor: background }}
       inert={parked ? true : undefined}
     >
@@ -577,6 +579,10 @@ function SceneOverlay({
 /* ------------------------------------------------------------------------ */
 
 const MORPH_TARGETS: MorphTarget[] = PROJECTS.map((project) => sceneVisualFor(project).morph);
+/** The worlds' geometry variables (`SceneVisual.className`), all on the scenes' wrapper. */
+const SCENE_VARS = PROJECTS.map((project) => sceneVisualFor(project).className)
+  .filter(Boolean)
+  .join(" ");
 
 function hexToRgb(hex: string): [number, number, number] {
   const v = parseInt(hex.slice(1), 16);
@@ -620,11 +626,19 @@ function MorphOverlay({ u, hold }: { u: MotionValue<number>; hold: number }) {
     // A scene that draws the shape itself keeps the overlay hidden while framed (fast 6% hand-off).
     const ownHide = A.ownsShape ? 1 - clamp01((f - hold) / 0.06) : B.ownsShape ? k : 0;
     const px = lerp(A.px ?? 0, B.px ?? 0, k);
+    // A target's vertical position / height as CSS: a stage fraction (+ svh / px), or (below lg) a length a scene
+    // set as a variable.
+    const yOf = (target: MorphTarget) => {
+      const y = isLg ? target.y : (target.yMobile ?? target.y);
+      return typeof y === "number" ? `${y * 100}%` : y;
+    };
+    const hOf = (target: MorphTarget) =>
+      !isLg && target.hMobile ? target.hMobile : `${target.h[0] * 100}% + ${target.h[1] * 100}svh + ${target.px ?? 0}px`;
     return {
       width: `calc(${lerp(A.w[0], B.w[0], k) * 100}% + ${lerp(A.w[1], B.w[1], k) * 100}svh + ${px}px)`,
-      height: `calc(${lerp(A.h[0], B.h[0], k) * 100}% + ${lerp(A.h[1], B.h[1], k) * 100}svh + ${px}px)`,
+      height: `calc(${(1 - k).toFixed(4)} * (${hOf(A)}) + ${k.toFixed(4)} * (${hOf(B)}))`,
       left: `${lerp(isLg ? A.x : (A.xMobile ?? A.x), isLg ? B.x : (B.xMobile ?? B.x), k) * 100}%`,
-      top: `${lerp(isLg ? A.y : (A.yMobile ?? A.y), isLg ? B.y : (B.yMobile ?? B.y), k) * 100}%`,
+      top: `calc(${(1 - k).toFixed(4)} * (${yOf(A)}) + ${k.toFixed(4)} * (${yOf(B)}))`,
       rotate: k * (1 - k) * 90,
       backgroundColor: `rgba(${rgb},${lerp(A.alpha, B.alpha, k)})`,
       mixBlendMode: (k < 0.5 ? A : B).blend ?? "normal",
@@ -854,8 +868,8 @@ export function ProjectsShowcase({ className }: { className?: string }) {
             </p>
           </motion.div>
 
-          {/* Scenes */}
-          <div className="absolute inset-0">
+          {/* Scenes (+ the worlds' geometry variables, which the morph shape reads too) */}
+          <div className={cn("absolute inset-0", SCENE_VARS)}>
             {PROJECTS.map((project, index) => (
               <ProjectScene
                 key={project.id}

@@ -143,8 +143,9 @@ export function HeroSection() {
         </JourneyItem>
 
         <JourneyItem index={0} from="bottom" className="flex w-full flex-col items-center">
+        {/* One short line, in a pale violet (the brand's violet end, lightened) rather than the muted grey. */}
         <motion.p
-          className="mx-auto mt-5 max-w-xl text-base leading-relaxed text-muted-foreground sm:mt-6 sm:text-lg"
+          className="mx-auto mt-5 max-w-xl text-base leading-relaxed text-[#E4DBFF] [text-shadow:0_1px_12px_rgba(0,0,0,0.35)] sm:mt-6 sm:text-lg"
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4, duration: 0.55, ease: EASE }}

@@ -53,9 +53,15 @@ export type MorphTarget = {
   px?: number;
   x: number;
   y: number;
-  /** `x` / `y` below the lg breakpoint (where scenes lay out differently); default to `x` / `y`. */
+  /**
+   * `x` / `y` below the lg breakpoint (where scenes lay out differently); default to `x` / `y`. `yMobile` may
+   * also be a CSS length (a variable the scene sets on the scenes' wrapper - Plasico's name centre), so the shape
+   * can follow a phone layout that is not a fixed fraction of the stage.
+   */
   xMobile?: number;
-  yMobile?: number;
+  yMobile?: number | string;
+  /** The height below lg as a CSS length (Plasico's bar, only as tall as its name there); `h` otherwise. */
+  hMobile?: string;
   color: string;
   alpha: number;
   blend?: "normal" | "multiply" | "screen";
@@ -98,7 +104,10 @@ export type SceneVisual = {
   Visual: ComponentType<SceneVisualProps>;
   /** Optional layer the showcase draws *above* the morph shape (same scene transform). */
   Overlay?: ComponentType<SceneVisualProps>;
-  /** Classes on the scene's root - a world's geometry as CSS variables, for its visual and the copy block alike. */
+  /**
+   * Classes on the scenes' wrapper (all scenes' together) - a world's geometry as CSS variables, for its visual,
+   * the copy block and the morph shape alike.
+   */
   className?: string;
 };
 
@@ -144,7 +153,7 @@ function BoleronVisual({ t, framesEnabled }: SceneVisualProps) {
           bottom-anchored so it stays clear of the floating header on short laptop screens. */}
       <ParallaxLayer t={t} depth={0.55} className="pointer-events-none">
         <span
-          className="absolute left-1/2 top-[max(8rem,14vh)] -translate-x-1/2 select-none whitespace-nowrap text-[22vw] font-extrabold leading-none tracking-[-0.05em] text-white lg:left-[max(2rem,4vw)] lg:top-auto lg:bottom-[calc(8vh+18rem)] lg:translate-x-0 lg:text-[14vw] xl:text-[15vw] 2xl:bottom-[calc(8vh+20rem)] 2xl:text-[16vw]"
+          className="absolute left-1/2 top-[var(--bol-top)] -translate-x-1/2 select-none whitespace-nowrap text-[22vw] font-extrabold leading-none tracking-[-0.05em] text-white lg:left-[max(2rem,4vw)] lg:top-auto lg:bottom-[calc(8vh+18rem)] lg:translate-x-0 lg:text-[14vw] xl:text-[15vw] 2xl:bottom-[calc(8vh+20rem)] 2xl:text-[16vw]"
           style={{ fontFamily: "var(--font-montserrat), Montserrat, sans-serif" }}
           aria-hidden
         >
@@ -163,7 +172,7 @@ function BoleronVisual({ t, framesEnabled }: SceneVisualProps) {
       />
       <ParallaxLayer t={t} depth={-0.1} className="pointer-events-none">
         <motion.div
-          className="absolute left-1/2 top-[34vh] aspect-[1206/1054] h-[30vh] -translate-x-1/2 -translate-y-1/2 [mask-image:linear-gradient(180deg,#000_0%,#000_72%,transparent_97%)] sm:top-[42vh] sm:h-[40vh] lg:left-[72%] lg:top-auto lg:bottom-[3vh] lg:h-[min(76vh,880px)] lg:translate-y-0"
+          className="absolute left-1/2 top-[calc(var(--bol-top)_+_var(--bol-word)_+_var(--bol-block)_+_2rem)] aspect-[1206/1054] h-[var(--bol-roni)] -translate-x-1/2 [mask-image:linear-gradient(180deg,#000_0%,#000_72%,transparent_97%)] lg:left-[72%] lg:top-auto lg:bottom-[3vh] lg:h-[min(76vh,880px)]"
           style={{ y: roniSink, opacity: roniFade }}
         >
           <FrameSequence
@@ -208,9 +217,11 @@ function EmblemaVisual({ t, framesEnabled }: SceneVisualProps) {
       <ParallaxLayer t={t} depth={-0.2} className="pointer-events-none">
         <div className="absolute inset-x-0 bottom-[12vh] h-px bg-gradient-to-r from-transparent via-[#B8965A]/45 to-transparent" />
       </ParallaxLayer>
-      {/* Buildings sequence - oversized so the split towers sit well out to the sides of the centred copy. */}
+      {/* Buildings sequence - oversized so the split towers sit well out to the sides of the centred copy on desktop;
+          below lg they stand 1.5rem under the copy block, the full width (80vw from sm) - the two together one
+          stack centred on the screen (`--emb-top`, on the scene config). */}
       <ParallaxLayer t={t} depth={0.12} className="pointer-events-none">
-        <div className="absolute left-1/2 top-[max(8rem,20vh)] aspect-[1284/716] w-[min(100vw,60vh)] -translate-x-1/2 sm:w-[min(80vw,52vh)] lg:top-auto lg:bottom-[12vh] lg:w-[min(80vw,140vh,1720px)]">
+        <div className="absolute left-1/2 top-[calc(var(--emb-top)_+_var(--emb-block)_+_1.5rem)] aspect-[1284/716] w-[100vw] -translate-x-1/2 sm:w-[80vw] lg:top-auto lg:bottom-[12vh] lg:w-[min(80vw,140vh,1720px)]">
           <div className="animate-showcase-breathe absolute inset-0 origin-bottom">
             <div className="absolute left-[6%] top-[58%] h-[90%] w-[60%] -translate-x-1/2 -translate-y-1/2 rounded-full" style={{ background: goldGlow }} />
             <div className="absolute left-[89%] top-[58%] h-[90%] w-[60%] -translate-x-1/2 -translate-y-1/2 rounded-full" style={{ background: goldGlow }} />
@@ -230,7 +241,7 @@ function EmblemaVisual({ t, framesEnabled }: SceneVisualProps) {
               height={537}
               enabled={framesEnabled}
               split
-              className="absolute inset-0 drop-shadow-[0_12px_22px_rgba(30,27,23,0.18)] [--split-gap:5%] lg:[--split-gap:18%]"
+              className="absolute inset-0 drop-shadow-[0_12px_22px_rgba(30,27,23,0.18)] [--split-gap:-10%] lg:[--split-gap:18%]"
             />
             {buildings.map((building, i) => (
               <motion.div
@@ -400,6 +411,8 @@ function MindguardVisual({ t, project, shouldMount }: SceneVisualProps) {
 
 /* ---------------------------------------------------------------- Plasico */
 
+/** The client's logo (green "plasico · IT superstore", 497 × 128) - the giant mark of the scene. */
+const PLASICO_LOGO = "/company_icons/plasico_logo_light.png";
 const PLASICO = { green: "#1FA22A", lime: "#5FBF2F", soft: "#D3ECC7" };
 // "Plasico - Back to Work 4K" on Bunny Stream - parked for now; the frame plays the YouTube clip like every other scene.
 // import { bunnyBackgroundEmbedSrc, type BunnyVideo } from "@/lib/bunny-stream";
@@ -430,7 +443,7 @@ function PlasicoVisual({ t, project, shouldMount }: SceneVisualProps) {
           (clear of the giant name along the bottom); under the copy on mobile. */}
       <ParallaxLayer t={t} depth={-0.12} rotate={-1.5} className="pointer-events-none">
         <div
-          className="absolute left-[6vw] top-[55vh] aspect-video w-[88vw] overflow-hidden rounded-2xl sm:left-[10vw] sm:top-[48vh] sm:w-[80vw] lg:left-auto lg:right-[max(3vw,6rem)] lg:top-[47vh] lg:w-[54vw] lg:-translate-y-1/2 xl:w-[56vw] 2xl:w-[52vw]"
+          className="absolute left-[6vw] top-[calc(var(--pl-top)_+_var(--pl-name)_+_var(--pl-block)_+_2.5rem)] aspect-video w-[88vw] overflow-hidden rounded-2xl sm:left-[10vw] sm:w-[80vw] lg:left-auto lg:right-[max(3vw,6rem)] lg:top-[47vh] lg:w-[54vw] lg:-translate-y-1/2 xl:w-[56vw] 2xl:w-[52vw]"
           style={{ backgroundColor: "#EAF6E6", boxShadow: "0 40px 100px rgba(31,162,42,.25)" }}
         >
           <ProjectThumbnail project={project} alt="" sizes="(max-width: 1024px) 88vw, 56vw" />
@@ -441,17 +454,23 @@ function PlasicoVisual({ t, project, shouldMount }: SceneVisualProps) {
   );
 }
 
-/** Giant green name, bottom-left, drawn *above* the morph bar so the bar runs behind the letters. */
+/**
+ * The client's logo, big - bottom-left on desktop, drawn *above* the morph bar so the bar runs behind it; below lg
+ * it leads the stack (logo, copy, video - `--pl-top`, its height `--pl-name`), the bar behind it there too
+ * (`--pl-name-cy`).
+ */
 function PlasicoOverlay({ t }: SceneVisualProps) {
   return (
     <ParallaxLayer t={t} depth={0.3} dx={-0.12} className="pointer-events-none">
-      <span
-        className="absolute left-[2vw] bottom-[5.5rem] select-none whitespace-nowrap font-heading text-[12vw] font-black uppercase leading-none tracking-[-0.02em] drop-shadow-[0_22px_38px_rgba(31,162,42,0.28)] sm:text-[15vw] lg:-bottom-[0.18em] lg:text-[15vw] 2xl:text-[19vw]"
-        style={{ color: PLASICO.green }}
-        aria-hidden
-      >
-        Plasico
-      </span>
+      <Image
+        src={PLASICO_LOGO}
+        alt="Plasico"
+        width={497}
+        height={128}
+        sizes="(max-width: 1024px) 60vw, 36vw"
+        loading="eager"
+        className="absolute left-[2vw] top-[var(--pl-top)] h-auto w-[60vw] drop-shadow-[0_22px_38px_rgba(31,162,42,0.28)] sm:w-[48vw] lg:left-[max(2rem,3vw)] lg:top-auto lg:bottom-[3vh] lg:w-[min(36vw,560px)]"
+      />
     </ParallaxLayer>
   );
 }
@@ -502,12 +521,11 @@ function OsmoVisual({ t, project, shouldMount }: SceneVisualProps) {
           height (`--osmo-frame-h`: 62vh, never wider than 36vw), a 2vw gap to the circle, the wordmark
           riding the same layer right above it (the gap is fixed: frame bottom 6vh + the frame's height + 1.5rem)
           and sized to the room left under the floating header - 6rem on a short laptop screen, up to 11rem on a
-          big one. Below lg it is centred, its top 12% of the disc's diameter up into the disc (over its bottom
-          cap, under the copy block), as tall as the room down to the mobile dock allows and never wider than
-          92vw. */}
+          big one. Below lg it is centred, its top 4% of the disc's diameter up into the disc (under the copy
+          block's CTA), as tall as the room down to the mobile dock allows and never wider than 92vw. */}
       <ParallaxLayer t={t} depth={0.08} dx={0.1} className="pointer-events-none">
         <div
-          className="absolute left-1/2 top-[calc(max(5.75rem,10vh)+min(88vw,52vh)*0.88)] aspect-[4/5] h-[calc(100svh-max(5.75rem,10vh)-min(88vw,52vh)*0.88-6rem)] max-h-[115vw] -translate-x-1/2 overflow-hidden rounded-3xl lg:left-[var(--osmo-left)] lg:top-auto lg:bottom-[6vh] lg:h-[var(--osmo-frame-h)] lg:max-h-none lg:translate-x-0"
+          className="absolute left-1/2 top-[calc(max(5.75rem,10vh)+min(88vw,52vh)*0.96)] aspect-[4/5] h-[calc(100svh-max(5.75rem,10vh)-min(88vw,52vh)*0.96-6rem)] max-h-[115vw] -translate-x-1/2 overflow-hidden rounded-3xl lg:left-[var(--osmo-left)] lg:top-auto lg:bottom-[6vh] lg:h-[var(--osmo-frame-h)] lg:max-h-none lg:translate-x-0"
           style={{ backgroundColor: "#111111", boxShadow: "0 50px 120px rgba(17,17,17,.3)" }}
         >
           <ProjectThumbnail project={project} alt={dict.projects.items[project.id].name} sizes="(max-width: 1024px) 92vw, 40vw" />
@@ -520,8 +538,8 @@ function OsmoVisual({ t, project, shouldMount }: SceneVisualProps) {
       {/* Wordmark below lg: small, centred inside the top of the green disc (white-ink file); the copy block sits
           under it (layout `in-circle`). */}
       <ParallaxLayer t={t} depth={0.35} className="pointer-events-none lg:hidden">
-        <Reveal t={t} delay={0.02} className="absolute left-1/2 top-[calc(max(5.75rem,10vh)+1.75rem)] -translate-x-1/2">
-          <Image src={OSMO_MARK_WHITE} alt="OSMO" width={2400} height={1340} sizes="200px" className="h-[4.25rem] w-auto sm:h-20" />
+        <Reveal t={t} delay={0.02} className="absolute left-1/2 top-[calc(max(5.75rem,10vh)+1.25rem)] -translate-x-1/2">
+          <Image src={OSMO_MARK_WHITE} alt="OSMO" width={2400} height={1340} sizes="240px" className="h-20 w-auto sm:h-24" />
         </Reveal>
       </ParallaxLayer>
     </>
@@ -562,6 +580,12 @@ const SCENES: Partial<Record<ProjectKey, SceneVisual>> = {
     layout: "boleron",
     morph: { ...NO_SHAPE, color: BOLERON.violet },
     mark: "none",
+    // Below lg: the word (22vw tall), the copy block (about 11.5rem, 13.5rem from sm) a rem under it and Roni two
+    // rem under that - a stack centred on the screen; the word never higher than 8rem (its parallax layer, depth
+    // 0.55, lifts it about 5vh by the time the scene is framed, and it must stay under the header), and Roni as
+    // tall as 36vh (44vh from sm) or whatever room is left down to the dock.
+    className:
+      "[--bol-word:22vw] [--bol-block:11.5rem] [--bol-roni:min(36vh,calc(100svh_-_8rem_-_var(--bol-word)_-_var(--bol-block)_-_5rem))] [--bol-top:max(8rem,calc((100svh_-_var(--bol-word)_-_var(--bol-block)_-_var(--bol-roni)_-_2rem)/2))] sm:[--bol-block:13.5rem] sm:[--bol-roni:min(44vh,calc(100svh_-_8rem_-_var(--bol-word)_-_var(--bol-block)_-_5rem))]",
     Visual: BoleronVisual,
   },
   emblema: {
@@ -574,6 +598,10 @@ const SCENES: Partial<Record<ProjectKey, SceneVisual>> = {
     background: EMBLEMA.bg,
     layout: "center-bottom",
     morph: { ...NO_SHAPE, color: EMBLEMA.gold },
+    // Below lg: the copy block (about 14rem, 16.5rem from sm) and the full-width towers (1284:716 - 55.76vw tall,
+    // 44.61vw at 80vw from sm) stack 1.5rem apart, the stack centred on the screen but never up into the header.
+    className:
+      "[--emb-block:14rem] [--emb-towers:55.76vw] [--emb-top:max(6rem,calc((100svh_-_var(--emb-block)_-_var(--emb-towers)_-_1.5rem)/2))] sm:[--emb-block:16.5rem] sm:[--emb-towers:44.61vw]",
     Visual: EmblemaVisual,
   },
   mindguard: {
@@ -594,10 +622,18 @@ const SCENES: Partial<Record<ProjectKey, SceneVisual>> = {
     tone: "light",
     background: "#FFFFFF",
     layout: "top-left-wide",
-    // Full-width green bar along the bottom.
-    // Full-width bar along the bottom in the soft secondary green.
-    morph: { w: [1, 0], h: [0, 0.09], x: 0.5, y: 0.93, yMobile: 0.87, color: PLASICO.soft, alpha: 0.9 },
+    // Full-width bar along the bottom in the soft secondary green; below lg it rides the giant name (the stack's
+    // variables, `--pl-name-cy`).
+    morph: { w: [1, 0], h: [0, 0.09], x: 0.5, y: 0.93, yMobile: "var(--pl-name-cy)", hMobile: "calc(var(--pl-name) * 1.2)", color: PLASICO.soft, alpha: 0.9 },
     mark: "none",
+    // Below lg: the logo (60vw wide - 15.45vw tall at its 497:128; 48vw / 12.36vw from sm), the copy block (about
+    // 12rem, 13.5rem from sm) 1.5rem under it and the 16:9 frame (88vw wide, 80vw from sm) a rem under that - a
+    // stack centred on the screen but never up into the header. The bar behind the logo is only 1.2 × the logo's
+    // height there (`hMobile`), so it never reaches the headline; its centre (`--pl-name-cy`) sits 2.8vh above the
+    // logo's resting centre: the logo rides a parallax layer (depth 0.3, −35vh × depth × t) and has drifted that
+    // far up by the time the scene is framed (t 0.27), the bar has not.
+    className:
+      "[--pl-name:15.45vw] [--pl-block:12rem] [--pl-video:49.5vw] [--pl-top:max(6rem,calc((100svh_-_var(--pl-name)_-_var(--pl-block)_-_var(--pl-video)_-_2.5rem)/2))] [--pl-name-cy:calc(var(--pl-top)_+_var(--pl-name)/2_-_2.8vh)] sm:[--pl-name:12.36vw] sm:[--pl-block:13.5rem] sm:[--pl-video:45vw]",
     Visual: PlasicoVisual,
     Overlay: PlasicoOverlay,
   },

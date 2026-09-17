@@ -183,13 +183,15 @@ export const PROJECTS: Project[] = [
     platforms: [yt("8dw7O71wawY")],
     accent: ["#b45309", "#f59e0b"],
     // The three films on Bunny Stream, in the order of `stories.emblema.films.items`: "Eria Video 1 - Movie
-    // Style" (4K, wide) and "Eria Video 2 / 3 - Social Media" (both vertical). NOTE(content): the third item's copy
-    // still describes the District Living film - the clip delivered as the third is an ERIA social cut.
+    // Style" (4K, wide), then the two vertical social cuts - "Eria Video 3" (the cyclist, "Повече място за живот")
+    // under the second item and "Eria Video 2" (the family in the park) under the third, the client's order.
+    // NOTE(content): the third item's copy still describes the District Living film - both vertical clips are
+    // ERIA social cuts.
     story: {
       films: [
         { clip: { bunny: { library: "750681", id: "28f54810-3c7b-4beb-9a0a-f6f0926323d5" } }, orientation: "wide" },
-        { clip: { bunny: { library: "750681", id: "521631f9-1eb7-4dca-a39d-603bf7d61c3f" } }, orientation: "tall" },
         { clip: { bunny: { library: "750681", id: "d491c5e2-2f68-489b-8318-bdae7816a1a9" } }, orientation: "tall" },
+        { clip: { bunny: { library: "750681", id: "521631f9-1eb7-4dca-a39d-603bf7d61c3f" } }, orientation: "tall" },
       ],
     },
   },

@@ -296,6 +296,33 @@
   }
 
   /**
+   * Emblema's soft title reveal (`SoftTitle` in projects/story/emblema-story.tsx):
+   * a line settles in out of a slight blur. The hero's lines play on load
+   * (time-based, staggered through --soft-delay); every other title runs on a
+   * scroll-driven timeline as it enters the viewport - pure CSS, so a title can
+   * never wait for hydration or a JS reveal. A browser without
+   * animation-timeline shows the plain title; so does reduced motion.
+   */
+  @keyframes soft-title-in {
+    from { opacity: 0; transform: translateY(12px) scale(1.035); filter: blur(10px); }
+    to { opacity: 1; transform: none; filter: none; }
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .soft-title-load {
+      animation: soft-title-in 1.25s cubic-bezier(0.22, 1, 0.36, 1) both;
+      animation-delay: var(--soft-delay, 0s);
+    }
+    @supports (animation-timeline: view()) {
+      .soft-title-view {
+        animation: soft-title-in cubic-bezier(0.22, 1, 0.36, 1) both;
+        animation-timeline: view();
+        /* From the line's top crossing the bottom edge to a quarter of the way up the viewport. */
+        animation-range: cover 0% cover 26%;
+      }
+    }
+  }
+
+  /**
    * Long-form case study ("story") frames: arch-topped film frames and the
    * film grain that sits over its dark bands (see projects/project-story.tsx).
    */

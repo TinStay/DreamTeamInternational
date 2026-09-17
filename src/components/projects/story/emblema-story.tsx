@@ -17,9 +17,10 @@ import { Body, COPY_DELAY, CtaBand, EASE, Eyebrow, HERO_TITLE, Lead, PlayRing, S
  * logo's copper -
  * headings in the copper gradient, eyebrows / numerals / hairlines in the mid
  * tone - headings are airy and uppercase and settle in softly (`SoftTitle`:
- * a slight blur, a wider tracking and a breath of scale easing out, not the
- * kit's rising words), a small arch draws itself at the head of the key
- * sections and the film frames are arch-topped. The hero is copy alone -
+ * a slight blur and a breath of scale easing out - pure CSS, the hero's on
+ * load and the rest on a scroll-driven timeline, so a title never waits for
+ * JS; not the kit's rising words), a small arch draws itself at the head of
+ * the key sections and the film frames are arch-topped. The hero is copy alone -
  * title, line and meta strip, the logo big on the right from `lg` (on top on
  * phones), no film (the client wanted it clean); the films follow, the wide
  * one across the page, each vertical one in its arch beside its copy, sides
@@ -34,46 +35,40 @@ const COPPER = { light: "#DDB27A", mid: "#C08F55", deep: "#95693A" };
 const INK = "bg-gradient-to-br from-[#DDB27A] via-[#C08F55] to-[#95693A] bg-clip-text text-transparent";
 
 /**
- * Emblema's heading reveal - its own, and soft: each line fades up out of a slight blur while its letters settle in
- * from a wider tracking and a breath of scale (a transform, so a wrapping line never re-breaks mid-way). The
- * copper ink sits on each line, not on the heading: a filter or an opacity on a child of a `bg-clip-text` element
- * would leave the ink untouched. `lines` are the hero's explicit lines; a section title is one line that wraps.
+ * Emblema's heading reveal - its own, soft, and pure CSS (`soft-title-in` in globals.css), so a title is on the
+ * page the moment it paints and never waits for hydration or a JS reveal: each line settles in out of a slight
+ * blur with a breath of scale (a transform, so a wrapping line never re-breaks mid-way) - the hero's lines on
+ * load, staggered (`--soft-delay`), every other title on a scroll-driven timeline as it enters the viewport (a
+ * browser without one shows it plain). The copper ink sits on each line, not on the heading: a filter or an
+ * opacity on a child of a `bg-clip-text` element would leave the ink untouched. `lines` are the hero's explicit
+ * lines; a section title is one line that wraps.
  */
-const SOFT_VIEWPORT = { once: true, margin: "0px 0px 6% 0px" } as const;
-const SOFT = {
-  hidden: { opacity: 0, y: 12, scale: 1.035, letterSpacing: "0.05em", filter: "blur(10px)" },
-  visible: { opacity: 1, y: 0, scale: 1, letterSpacing: "0.005em", filter: "blur(0px)" },
-};
-const SOFT_TAGS = { h1: motion.h1, h2: motion.h2, h3: motion.h3 } as const;
 function SoftTitle({
-  as = "h2",
+  as: Tag = "h2",
   lines,
   className,
   base = 0,
   step = 0.16,
   onLoad = false,
 }: {
-  as?: keyof typeof SOFT_TAGS;
+  as?: "h1" | "h2" | "h3" | "span";
   lines: string[];
   className?: string;
   base?: number;
   step?: number;
-  /** The hero: play on load rather than when scrolled into view. */
+  /** The hero: play on load rather than as it scrolls into view. */
   onLoad?: boolean;
 }) {
-  const Tag = SOFT_TAGS[as];
   return (
     <Tag className={className}>
       {lines.map((line, i) => (
-        <motion.span
+        <span
           key={line}
-          className={cn("block origin-bottom-left", INK)}
-          initial={SOFT.hidden}
-          {...(onLoad ? { animate: SOFT.visible } : { whileInView: SOFT.visible, viewport: SOFT_VIEWPORT })}
-          transition={{ duration: 1.25, ease: EASE, delay: base + i * step }}
+          className={cn("block origin-bottom-left", INK, onLoad ? "soft-title-load" : "soft-title-view")}
+          style={onLoad ? ({ "--soft-delay": `${base + i * step}s` } as CSSProperties) : undefined}
         >
           {line}
-        </motion.span>
+        </span>
       ))}
     </Tag>
   );
@@ -189,7 +184,7 @@ function FilmEntry({ film, media, index, side, title, placeholder }: {
 }) {
   const tall = media.orientation === "tall";
   const head = (
-    <motion.div variants={fadeUp}>
+    <div>
       <span className="mb-3 block font-heading text-sm tracking-[0.22em] text-[var(--story-accent)]">{index}</span>
       <SoftTitle
         as="h3"
@@ -197,7 +192,7 @@ function FilmEntry({ film, media, index, side, title, placeholder }: {
         className={cn("font-heading text-2xl font-extralight uppercase sm:text-3xl", tall && "lg:text-4xl xl:text-5xl", "leading-[1.16]")}
       />
       <p className="mt-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--story-muted)]">{film.project}</p>
-    </motion.div>
+    </div>
   );
   const text = (
     <motion.div variants={fadeUpAfter(COPY_DELAY)}>
@@ -329,6 +324,7 @@ export function EmblemaStory({ project }: { project: Project }) {
       {/* ---------------- THE CLIENT ---------------- */}
       <Section>
         <Split
+          leftReveal={false}
           left={
             <>
               <Eyebrow>{story.client.eyebrow}</Eyebrow>
@@ -348,10 +344,10 @@ export function EmblemaStory({ project }: { project: Project }) {
 
       {/* ---------------- THE FILMS ---------------- */}
       <Section className="pt-0 sm:pt-0 lg:pt-0">
-        <motion.div initial="hidden" whileInView="visible" viewport={VIEWPORT} variants={fadeUp}>
+        <div>
           <Eyebrow>{story.films.eyebrow}</Eyebrow>
           <Heading text={story.films.title} />
-        </motion.div>
+        </div>
         <div className="mt-14 grid gap-20 lg:gap-32">
           {story.films.items.map((film, i) => {
             const media = films[i] ?? { clip: null, orientation: "wide" as const };
@@ -375,6 +371,7 @@ export function EmblemaStory({ project }: { project: Project }) {
       {/* ---------------- THE CHALLENGE ---------------- */}
       <Section>
         <Split
+          leftReveal={false}
           left={
             <>
               <Eyebrow>{story.challenge.eyebrow}</Eyebrow>
@@ -394,11 +391,11 @@ export function EmblemaStory({ project }: { project: Project }) {
 
       {/* ---------------- THE APPROACH ---------------- */}
       <Section className="pt-0 sm:pt-0 lg:pt-0">
-        <motion.div initial="hidden" whileInView="visible" viewport={VIEWPORT} variants={fadeUp}>
+        <div>
           <ArchMark />
           <Eyebrow>{story.principles.eyebrow}</Eyebrow>
           <Heading text={story.principles.title} className="max-w-[18ch]" />
-        </motion.div>
+        </div>
         <motion.div
           className="mt-14 grid gap-px border-y border-[var(--story-line)] bg-[var(--story-line)] md:grid-cols-3"
           initial="hidden"
@@ -418,11 +415,11 @@ export function EmblemaStory({ project }: { project: Project }) {
 
       {/* ---------------- THE PROCESS ---------------- */}
       <Section>
-        <motion.div initial="hidden" whileInView="visible" viewport={VIEWPORT} variants={fadeUp}>
+        <div>
           <ArchMark />
           <Eyebrow>{story.process.eyebrow}</Eyebrow>
           <Heading text={story.process.title} />
-        </motion.div>
+        </div>
         <motion.ol className="mt-14 border-t border-[var(--story-line)]" initial="hidden" whileInView="visible" viewport={VIEWPORT} variants={stagger(0.07)}>
           {story.process.steps.map((step, i) => (
             <motion.li
@@ -442,10 +439,10 @@ export function EmblemaStory({ project }: { project: Project }) {
 
       {/* ---------------- THE HARD PARTS ---------------- */}
       <Section className="pt-0 sm:pt-0 lg:pt-0">
-        <motion.div initial="hidden" whileInView="visible" viewport={VIEWPORT} variants={fadeUp}>
+        <div>
           <Eyebrow>{story.problems.eyebrow}</Eyebrow>
           <Heading text={story.problems.title} className="max-w-[20ch]" />
-        </motion.div>
+        </div>
         <motion.div
           className="mt-14 grid gap-px border-y border-[var(--story-line)] bg-[var(--story-line)]"
           initial="hidden"
@@ -471,6 +468,7 @@ export function EmblemaStory({ project }: { project: Project }) {
       {/* ---------------- THE RESULT ---------------- */}
       <Section>
         <Split
+          leftReveal={false}
           left={
             <>
               <ArchMark />
@@ -515,8 +513,9 @@ export function EmblemaStory({ project }: { project: Project }) {
           center
           className={cn(
             "rounded-3xl border border-[color:color-mix(in_srgb,#C08F55_30%,transparent)] bg-[color:color-mix(in_srgb,#C08F55_8%,var(--story-ground))] px-6 py-14 shadow-[0_30px_90px_-40px_rgba(192,143,85,0.5)] sm:py-16",
-            "[&_h2]:font-extralight [&_h2]:uppercase [&_h2]:leading-[1.1] [&_h2]:bg-gradient-to-br [&_h2]:from-[#DDB27A] [&_h2]:via-[#C08F55] [&_h2]:to-[#95693A] [&_h2]:bg-clip-text [&_h2]:text-transparent"
+            "[&_h2]:font-extralight [&_h2]:uppercase [&_h2]:leading-[1.1]"
           )}
+          titleNode={<SoftTitle as="span" lines={[story.cta.title]} className="block" />}
           eyebrow={<Eyebrow center>{story.cta.eyebrow}</Eyebrow>}
           lead={<Lead className="mx-auto mt-6 text-center">{story.cta.lead}</Lead>}
         >

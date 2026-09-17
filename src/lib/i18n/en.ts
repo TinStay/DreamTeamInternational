@@ -19,7 +19,7 @@ export const en = {
     titleAfter: "is the limit.",
     seoHeading:
       "DreamTeam - AI video production and AI-powered video ads for brands in Bulgaria and worldwide",
-    subtitle: "An AI video and media production company - ads, mascots and content for brands worldwide.",
+    subtitle: "If you can imagine it, we can deliver it - AI video and media production for your brand.",
     cta1: "Request a quote",
     cta2: "View Our Work"
   },
@@ -27,6 +27,7 @@ export const en = {
     metaTitle: "Contact & Process | DreamTeam",
     metaDescription:
       "How we work from brief to delivery, and how to reach DreamTeam for AI video production.",
+    quoteLead: "After a quote for a specific project? Pick a service and fill in the steps below.",
   },
   process: {
     title1: "Our",
@@ -704,7 +705,7 @@ export const en = {
         headline: "Four product videos that sell",
         description:
           "Four vertical AI promo videos for OSMO's products, made for TikTok, Reels and Shorts - and they lifted sales of the featured products.",
-        highlight: "The right shot sells on its own.",
+        highlight: "Each product in the setting it was made for - entirely with AI.",
         tags: ["Social spots", "Product ad"],
         mission:
           "Cut through crowded social feeds with a fast, vertical product spot that stops the scroll and drives traffic to the online shop.",
