@@ -16,7 +16,6 @@ export const PROJECT_KEYS = [
   "plasico",
   "mindguard",
   "emblema",
-  "isupport",
   "osmo",
 ] as const;
 export type ProjectKey = (typeof PROJECT_KEYS)[number];
@@ -103,14 +102,17 @@ export const PROJECTS: Project[] = [
     orientation: "wide",
     since: null,
     platforms: [yt("I6EmmL9u678")],
-    // Story: the Shorts cut and the YouTube pre-roll are on YouTube, the Facebook / TikTok cuts show placeholders,
-    // and the eight product ads (all 16:9) are on Bunny Stream - keyed by product, in `AD_KEYS` order on the page.
+    // Story: everything on Bunny Stream - the TV spot, the three vertical cuts in the social phones, the film
+    // beside the character section and the one in the YouTube section (the client's picks: the same clips as
+    // two of the ads), and the eight product ads (all 16:9) keyed by product, in `AD_KEYS` order on the page.
     story: {
       clips: {
-        shorts: { youtube: "L4fGQjib0A8" },
-        youtube: { youtube: "j4cCnQ6rpq4" },
-        facebook: null,
-        tiktok: null,
+        tv: { bunny: { library: "750681", id: "da5e80fb-24ce-40d1-98a7-c0c56f96ac2a" } }, // "Boleron TV 3"
+        shorts: { bunny: { library: "750681", id: "dc6e898d-c894-427a-8b33-ab5fb7cbe899" } }, // "Boleron Автокаско 3 Vertical"
+        facebook: { bunny: { library: "750681", id: "315b0817-c32b-49aa-9bfe-cc03cbd08c97" } }, // "Boleron - Автокаско 4 (вертикално)"
+        tiktok: { bunny: { library: "750681", id: "8f2d311f-ca79-4658-9585-18891c4b991d" } }, // "Гражданска отговорност - вертикално"
+        character: { bunny: { library: "750681", id: "d3c562b7-d5e9-4a8b-979c-0619227e97bf" } }, // "Гражданска 2" (= liability2)
+        youtube: { bunny: { library: "750681", id: "aeb0681d-6e2f-4aff-bfc7-463e87c443f4" } }, // "Гражданска Отговорност 3 - Хоризонтално 4k" (= liability3)
         summer: { bunny: { library: "750681", id: "879d538c-1bb4-46d3-bbd0-6bd9d3cab9eb" } }, // "Boleron - Лятна Реклама"
         casco4: { bunny: { library: "750681", id: "57df0c8a-c7aa-46cc-a581-b71019803c70" } }, // "Boleron - Автокаско 4"
         liability3: { bunny: { library: "750681", id: "aeb0681d-6e2f-4aff-bfc7-463e87c443f4" } }, // "Гражданска Отговорност 3 - Хоризонтално 4k"
@@ -155,8 +157,9 @@ export const PROJECTS: Project[] = [
     clip: bunny("dbb13635-0fda-4d13-8ff6-1a832cbc54af"),
     // The showcase tablet plays the UI/UX film (the interface, made for TV).
     showcaseClip: bunny("973736cf-0b6c-417e-b0fe-45c5e2dfa14b"),
-    // Story: the four films, keyed as `stories.mindguard.film.items` - the PR film (Klaus Schwab), the user film
-    // (the President of Switzerland), the UI/UX film for TV, and the TV block stream on Ukraine's national TV.
+    // Story: the four films of the client's case study - the PR film (the presentation to Klaus Schwab), the user
+    // film (the presentation to the President of Switzerland), the UI/UX film (the 1+1 TV presentation) and the
+    // TV segment on Ukraine's national TV (under it).
     story: {
       clips: {
         pr: { bunny: { library: "750681", id: "dbb13635-0fda-4d13-8ff6-1a832cbc54af" } },
@@ -194,17 +197,6 @@ export const PROJECTS: Project[] = [
         { clip: { bunny: { library: "750681", id: "521631f9-1eb7-4dca-a39d-603bf7d61c3f" } }, orientation: "tall" },
       ],
     },
-  },
-  {
-    id: "isupport",
-    category: "products",
-    style: "semi-realistic",
-    partnerId: "isupport",
-    videoId: null, // TODO: not in the portfolio catalogue yet
-    orientation: "wide",
-    since: null,
-    platforms: [],
-    accent: ["#0e7490", "#22d3ee"],
   },
   {
     id: "osmo",

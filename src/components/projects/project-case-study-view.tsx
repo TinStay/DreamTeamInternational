@@ -46,8 +46,7 @@ import {
 import { projectsPath } from "@/lib/routes";
 import { cn } from "@/lib/utils";
 import { PROJECT_STORIES } from "./project-story";
-import { STORY_CONTAINER } from "./story/primitives";
-import { CtaBand } from "./story/primitives";
+import { ClientSite, CtaBand, STORY_CONTAINER } from "./story/primitives";
 import { YOUTUBE_IFRAME_ALLOW, YOUTUBE_REFERRER_POLICY } from "@/lib/youtube-embeds";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
@@ -179,11 +178,13 @@ function ProjectCaseStudyDefault({ project }: { project: Project }) {
                 <div className="flex flex-wrap items-center justify-between gap-4">
                   <div className="flex h-24 items-center sm:h-28">
                     {partner ? (
-                      <PartnerLogo
-                        p={partner}
-                        imgClass="h-20 w-auto max-w-[380px] object-contain sm:h-28"
-                        sizes="380px"
-                      />
+                      <ClientSite href={partner.href} name={copy.name}>
+                        <PartnerLogo
+                          p={partner}
+                          imgClass="h-20 w-auto max-w-[380px] object-contain sm:h-28"
+                          sizes="380px"
+                        />
+                      </ClientSite>
                     ) : (
                       <span className="font-heading text-2xl font-bold text-foreground">
                         {copy.name}

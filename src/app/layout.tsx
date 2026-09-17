@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Exo_2, Montserrat, Nunito, Playfair_Display, Unbounded } from "next/font/google";
+import { DM_Sans, Exo_2, Manrope, Montserrat, Playfair_Display, Space_Grotesk, Unbounded } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { SmoothScroll } from "@/components/smooth-scroll";
@@ -22,8 +22,10 @@ import Script from "next/script";
 /**
  * The projects showcase's display faces - one per brand world (`showcase-scenes.tsx`, `headline`), all with
  * Cyrillic: Montserrat (the giant "Boleron" word, the face the reference animation uses, and Boleron's corporate
- * headline), Playfair Display (Emblema, as in the reference), Exo 2 (Plasico's tech), Nunito (OSMO's home-friendly
- * rounded), Unbounded (MindGuard's big, strong one).
+ * headline), Playfair Display (Emblema, as in the reference), Exo 2 (Plasico's tech), Manrope (OSMO - the face of
+ * the client's case study, its page's body too), Unbounded (MindGuard's big, strong one). MindGuard's own page
+ * runs in the platform's faces from mymindguard.ai - Space Grotesk for the headings, DM Sans for the body; neither
+ * has Cyrillic, so Manrope follows them in the stack and stands in for the Bulgarian glyphs.
  */
 const montserrat = Montserrat({
   subsets: ["latin", "cyrillic"],
@@ -48,10 +50,21 @@ const exo = Exo_2({
   variable: "--font-exo",
   display: "swap",
 });
-const nunito = Nunito({
+// A variable font (200–800), so no weight list: OSMO's page runs its body at 400 and its titles at 600.
+const manrope = Manrope({
   subsets: ["latin", "cyrillic"],
-  weight: ["800"],
-  variable: "--font-nunito",
+  variable: "--font-manrope",
+  display: "swap",
+});
+// The platform's faces (mymindguard.ai), Latin only - variable fonts, no weight list.
+const spaceGrotesk = Space_Grotesk({
+  subsets: ["latin"],
+  variable: "--font-space-grotesk",
+  display: "swap",
+});
+const dmSans = DM_Sans({
+  subsets: ["latin"],
+  variable: "--font-dm-sans",
   display: "swap",
 });
 const unbounded = Unbounded({
@@ -215,7 +228,7 @@ export default function RootLayout({
     // resolved on `:root`, so the families must be defined there too.
     <html
       lang="bg"
-      className={`dark ${exo.variable} ${montserrat.variable} ${playfair.variable} ${nunito.variable} ${unbounded.variable}`}
+      className={`dark ${exo.variable} ${montserrat.variable} ${playfair.variable} ${manrope.variable} ${unbounded.variable} ${spaceGrotesk.variable} ${dmSans.variable}`}
       style={{ colorScheme: "dark" }}
       suppressHydrationWarning
     >

@@ -8,7 +8,7 @@ export const en = {
     quoteCta: "Request a quote",
     contactCta: "Contact us",
     training: "Training",
-    projects: "Projects",
+    projects: "Case Studies",
     phoneCopy: "Copy phone number",
     emailCopy: "Copy email",
     phoneCopied: "Copied!"
@@ -86,27 +86,28 @@ export const en = {
     title: "Trusted By"
   },
   projects: {
-    metaTitle: "Projects & case studies | DreamTeam",
+    metaTitle: "Case Studies | DreamTeam",
     metaDescription:
       "Case studies of AI video campaigns DreamTeam produced for clients in software, products and construction - goals, results and where each video ran.",
-    title1: "Selected",
-    title2: "projects",
+    title1: "Case",
+    title2: "Studies",
     subtitle:
       "A closer look at videos we produced for clients - software, products and construction, each with its own story.",
-    explore: "Explore projects",
+    explore: "Explore the case studies",
     categoriesLabel: "Categories",
     cta: "Request a quote",
-    viewProject: "View project",
-    viewAll: "View all projects",
+    viewProject: "View case study",
+    visitSite: "Visit website",
+    viewAll: "View all case studies",
     scrollHint: "Scroll to explore",
     watch: "Watch the video",
     similar: "Want a similar video?",
     showcase: {
-      eyebrow: "Our projects",
+      eyebrow: "Our case studies",
       title1: "Step into the",
       title2: "cinema",
       subtitle: "Real brands, real campaigns - each with a world of its own.",
-      railLabel: "Jump to a project",
+      railLabel: "Jump to a case study",
       highlights: "Highlights",
       scenes: {
         boleron: { tagline: "Online insurance" },
@@ -448,7 +449,6 @@ export const en = {
           title: "From the first meeting to the airwaves",
           stats: [
             { num: "20+", suffix: "", label: "videos in 7 months" },
-            { num: "10+", suffix: "", label: "social media posts" },
             { num: "50", suffix: "M+", label: "views" },
             { num: "1", suffix: "", label: "hero the whole of Bulgaria recognises" }
           ],
@@ -518,69 +518,93 @@ export const en = {
       },
       mindguard: {
         hero: {
-          title: "Calm you can see",
-          lead: "A 60-second explainer for MindGuard — a Swiss mental-resilience platform built together with Ukraine's veterans. An abstract product, made clear from the first frame."
+          eyebrow: "Case study · MindGuard",
+          title: "AI presentation videos for one of Switzerland's most promising start-ups",
+          lead: "How we prepared MindGuard's presentation videos - shown on television and at key meetings with the President of Switzerland, Guy Parmelin, and with Klaus Schwab."
         },
         facts: [
-          { label: "Client", value: ["MindGuard", "Switzerland · Ukraine"] },
-          { label: "Industry", value: ["Mental health", "DeepTech"] },
-          { label: "Format", value: ["Explainer video", "60 s · 16:9"] },
-          { label: "Shown to", value: ["Prof. Klaus Schwab", "the President of Switzerland", "Ukraine's largest TV channel"] }
+          { label: "Client", value: ["MindGuard AG"] },
+          { label: "Industry", value: ["Mental health tech"] },
+          { label: "Product", value: ["A mental-resilience app built with veterans from Ukraine"] },
+          { label: "Delivered", value: ["Presentation videos", "User interface video", "PR video", "Corporate videos"] },
+          { label: "Partnership", value: ["1+ year"] }
         ],
-        product: {
-          eyebrow: "The product",
-          title: "War doesn't end on the battlefield",
-          body: [
-            "MindGuard is a mental-resilience platform built in Switzerland together with Ukraine's veterans — for everyone affected by the war. Short daily actions — push-ups, breathwork, resilience exercises — that reduce stress, bring sleep back and build healthy habits.",
-            "Neuroscience runs underneath. Every exercise is verified by the phone's camera, an accountability buddy keeps you in rhythm, small wins reset the brain's dopamine system, and streaks and community make the habit stick. Five weeks in, about 74% of veterans are still training — against 3–5% for typical mental-health apps."
-          ],
-          loopLabel: "The MindGuard loop, every day",
-          loop: ["Daily action", "Peer accountability", "Dopamine incentives", "Progress tracking", "Reinforcement"]
-        },
         challenge: {
-          eyebrow: "The challenge",
-          title: "How do you show something that happens in the brain?",
+          eyebrow: "Challenge",
+          title: "Videos for key strategic meetings and national television",
           body: [
-            "The platform is serious science — neurobiology, behavioural mechanisms, dopamine. Screenshots would never explain it, and dry terms would move no one.",
-            "The brief: in 60 seconds the viewer feels the problem, understands what MindGuard does and sees the benefit — within the first ten seconds."
+            "MindGuard is a Swiss start-up building a mental-resilience platform together with veterans from Ukraine - short daily actions for body, mind and spirit that reduce stress and bring back discipline. Behind the project stands its founder and CEO, Benjamin B. Bargetzi.",
+            "The task was to prepare corporate presentation videos for his key meetings - with Klaus Schwab, the founder of the World Economic Forum, and with the President of Switzerland, Guy Parmelin. The videos had to present the platform clearly and convincingly within minutes, to an audience that gives no second chances, and look like the work of a company of a far bigger scale.",
+            "Alongside that, a separate video was needed for Ukraine's leading TV channel 1+1 - for Benjamin's interview during his visit to Ukraine. A different audience, a different language and format, but the same high bar for quality and the same short deadlines."
           ]
         },
-        approach: {
-          eyebrow: "How we visualised it",
-          title: "Real people. Modern technology.",
-          body: [
-            "We built it on human shots: realistic scenes with people — a veteran doing push-ups at dawn, breathwork in a quiet room, meeting his accountability buddy. Created with the latest AI video models, directed and cut like real live-action film.",
-            "Over them, the animated interface and graphics — the app's loop, the streaks, the small wins. The emotion comes from the people, the clarity from the screen. Modern technology for something deeply human."
-          ],
-          points: [
-            { title: "Human shots", text: "Realistic AI scenes of people in real situations — instead of abstract illustration." },
-            { title: "The interface in motion", text: "Animated UI and graphics that show the app's loop in seconds." },
-            { title: "The first 10 seconds", text: "The problem and the benefit — before the viewer decides whether to keep watching." }
-          ]
-        },
-        film: {
-          eyebrow: "The film",
-          title: "60 seconds that explain everything",
-          note: "PR film · 16:9 · presented to Prof. Klaus Schwab",
-          items: {
-            president: { title: "The user film", note: "Presented to the President of Switzerland" },
-            tv: { title: "The UI/UX film for TV", note: "The platform's interface, frame by frame" },
-            broadcast: { title: "On air", note: "A TV block with Ben on Ukraine's largest TV channel" }
+        solutions: {
+          eyebrow: "Solution",
+          schwab: {
+            title: "The presentation to Klaus Schwab",
+            body: [
+              "The video was presented in person to Klaus Schwab - the founder of the World Economic Forum, who sits on MindGuard's board of directors. In a few minutes it tells why the platform exists, how it works and the scale of the problem it solves.",
+              "We built it entirely with artificial intelligence - scenes with veterans, the app's interface in real use and cinematic shots that give the start-up the visual weight of an established company."
+            ],
+            meta: [
+              { label: "Format", value: "16:9" },
+              { label: "Length", value: "1:33 min" },
+              { label: "Use", value: "Live presentation" }
+            ]
+          },
+          parmelin: {
+            title: "The presentation to the President of Switzerland, Guy Parmelin",
+            body: [
+              "The second presentation was for a meeting with the President of Switzerland, Guy Parmelin - for feedback from the very top, institutional support and access to investors. An audience before which the video has to sound like state policy, not a start-up pitch.",
+              "So we moved the emphasis from the product to the mission: the scale of the post-war mental-health problem, Switzerland's role as Ukraine's partner, and MindGuard as a concrete, measurable answer. The visual language stayed the same, so the brand is recognised from one meeting to the next."
+            ],
+            meta: [
+              { label: "Format", value: "16:9" },
+              { label: "Length", value: "1:43 min" },
+              { label: "Use", value: "Live presentation" }
+            ]
+          },
+          tv: {
+            title: "The presentation on Ukrainian TV channel 1+1",
+            body: [
+              "After the meeting with the President, Benjamin's next task was to present the app directly to the Ukrainian market - in an interview for the leading national TV channel 1+1.",
+              "For it we prepared a user interface video assembled from real footage of the workshops with veterans that Benjamin took part in himself - not generated scenes but the real people the platform was built for. With it came an updated UI/UX design of the platform, fully translated into Ukrainian, so viewers would see it the way they will use it.",
+              "The challenge was the deadline: everything had to be ready in three days, right before the broadcast. Editing, translation, the new interface and the final export - delivered on time, with no compromise on quality."
+            ],
+            meta: [
+              { label: "Format", value: "16:9" },
+              { label: "Language", value: "Ukrainian" },
+              { label: "Deadline", value: "3 days" }
+            ],
+            caption: "An excerpt from the TV segment on 1+1 with Benjamin B. Bargetzi's interview"
           }
         },
         results: {
-          eyebrow: "The result",
-          title: "Shown at the highest level",
-          body: "The film introduced MindGuard to Prof. Klaus Schwab, the President of Switzerland and Ukraine's largest TV channel — and became the way the platform explains itself.",
+          eyebrow: "Result",
+          title: "Videos on a short deadline for strategic meetings and broadcast",
           stats: [
-            { num: "60", suffix: "s", label: "the whole platform, explained" },
-            { num: "1,064", suffix: "", label: "veterans MindGuard was built with" },
-            { num: "74", suffix: "%", label: "of veterans still active after five weeks" }
+            { num: "3", suffix: "", label: "videos delivered on short deadlines" },
+            { num: "3", suffix: " days", label: "from the brief to the broadcast on TV channel 1+1" },
+            { num: "1", suffix: "M+", label: "views on air and before key figures" }
           ],
-          source: "Platform figures: mymindguard.ai"
+          closing: "MindGuard's videos were shown to Klaus Schwab, to the President of Switzerland, Guy Parmelin, and to the viewers of Ukraine's most-watched TV channel. Three different audiences, one recognisable visual language - created with artificial intelligence and delivered professionally on short deadlines by Dream Team."
+        },
+        testimonials: {
+          eyebrow: "Client testimonial",
+          items: [
+            {
+              quote: "I am literally 100% happy! Will recommend you guys to literally anyone asking me for a video team / creative guys. I love you guys! Dinner on me when we meet next in Bulgaria!",
+              name: "Benjamin B. Bargetzi",
+              role: "Founder & CEO, MindGuard"
+            },
+            { quote: "Their process was structured and easy to follow.", name: "Denis Müller", role: "Co-Founder & CTO, MindGuard" }
+          ]
         },
         placeholder: "The film — coming soon",
-        cta: { title: "Have a product that is hard to explain?", quote: "Request a quote", contact: "Contact us" }
+        cta: {
+          title: "Need corporate videos for strategic presentations and meetings with investors and key figures?",
+          contact: "Contact us"
+        }
       }
     },
     categories: {
@@ -621,7 +645,7 @@ export const en = {
       months: "months together",
       tbd: "-",
       noPlatforms: "Publishing details will be added once the campaign goes live.",
-      backToProjects: "Back to all projects",
+      backToProjects: "Back to all case studies",
       platformNames: {
         youtube: "YouTube",
         instagram: "Instagram",
@@ -685,20 +709,6 @@ export const en = {
         campaign: "Off-plan sales",
         format: "16:9",
         deliverable: "Property visualization"
-      },
-      isupport: {
-        name: "iSupport",
-        headline: "Products in motion",
-        description:
-          "Short product clips presenting the iSupport range through AI-generated demonstrations.",
-        highlight: "Short demonstrations instead of static photos - the products in use, vertical for social feeds.",
-        tags: ["9:16", "Product clips", "AI demonstrations"],
-        mission:
-          "Replace static product photos with short demonstrations that show the products in use and work natively in vertical social feeds.",
-        industry: "Consumer products",
-        campaign: "Product launch",
-        format: "9:16",
-        deliverable: "Product clips"
       },
       osmo: {
         name: "OSMO",

@@ -13,6 +13,7 @@ import {
   BodyXL,
   COPY_DELAY,
   Collage,
+  ClientSite,
   CtaBand,
   Display,
   Eyebrow,
@@ -33,18 +34,22 @@ import {
 } from "./primitives";
 
 /*
- * OSMO's story - the material world of the client: paper white and OSMO
- * green. The hero clip (a fan of real colour samples) sits in the green
- * leaf-cornered frame (`GreenFrame`: a fine green edge, a soft green light
- * behind it, particles drifting up its sides); four product films follow,
- * each in its own frame with format / length / channel; the page then sinks
- * into OSMO green for the results, the client's words and the CTA card - in
- * the same frame, light and particles. Copy in `projects.stories.osmo`; the
- * films are on Bunny Stream (`Project.story.clips`), the hero clip
- * self-hosted under `public/projects/osmo/story/`.
+ * OSMO's story - in the dress of the client's case study (`OSMO-Case-Study.html`):
+ * Manrope for everything, the page one gradient from white down into OSMO
+ * green (`GROUND` - white for the first third, a pale green under the films,
+ * the results, the client's words and the CTA on the green), the hero clip (a
+ * fan of real colour samples) bare on the white, no frame - multiplied, so
+ * its white ground is the page's; four product films follow, each in its own
+ * frame with format / length / channel; the results in white on the green;
+ * the CTA card in the leaf shape with the green edge, light and particles.
+ * Copy in `projects.stories.osmo`; the films are on Bunny Stream
+ * (`Project.story.clips`), the hero clip self-hosted under
+ * `public/projects/osmo/story/`.
  */
 
 const OSMO = { green: "#108C3C", deep: "#0B6E2F", light: "#2FA55A" };
+/** The page's ground, as the delivered case study sets it: white, then sinking into OSMO green by the bottom. */
+const GROUND = "linear-gradient(180deg, #FFFFFF 0%, #FFFFFF 38%, #EAF4EC 58%, #5FB27A 80%, #108C3C 100%)";
 const BASE = "/projects/osmo/story";
 const HERO_CLIP = { src: `${BASE}/hero-samples.mp4`, poster: `${BASE}/hero-samples-poster.webp` };
 const COLLAGE = [1, 2, 3, 4].map((n) => `${BASE}/collage-${n}.webp`);
@@ -59,14 +64,11 @@ const FILMS = [
   { key: "decking", aspect: "aspect-[4/5]", width: "max-w-[440px]" },
 ] as const;
 
-/** The leaf: a big radius on two opposite corners, a small one on the others (the hero frame and the CTA card). */
+/** The leaf: a big radius on two opposite corners, a small one on the others (the CTA card). */
 const LEAF = "rounded-[2.75rem_1.25rem]";
-const LEAF_INNER = "rounded-[calc(2.75rem-3px)_calc(1.25rem-3px)]";
-/** The frame's 3px edge: a fine gradient of the greens at half strength. */
-const EDGE = "linear-gradient(150deg, rgba(63,191,108,0.75) 0%, rgba(16,140,60,0.35) 45%, rgba(11,110,47,0.8) 100%)";
 /**
- * The same edge on the CTA card itself (a transparent 3px border, the card colour on the padding box and the
- * gradient on the border box), so it rises with the card.
+ * The card's 3px edge - a fine gradient of the greens at half strength - on the CTA card itself (a transparent
+ * 3px border, the card colour on the padding box and the gradient on the border box), so it rises with the card.
  */
 const EDGE_CARD = "border-[3px] border-transparent [background:linear-gradient(#fff,#fff)_padding-box,linear-gradient(150deg,rgba(63,191,108,0.75)_0%,rgba(16,140,60,0.35)_45%,rgba(11,110,47,0.8)_100%)_border-box] dark:[background:linear-gradient(#0F2418,#0F2418)_padding-box,linear-gradient(150deg,rgba(63,191,108,0.75)_0%,rgba(16,140,60,0.35)_45%,rgba(11,110,47,0.8)_100%)_border-box]";
 
@@ -94,18 +96,6 @@ function GreenAura({ pale = false }: { pale?: boolean }) {
   );
 }
 
-/** OSMO's frame: the leaf shape with a fine green gradient edge around a white inner, its light and particles behind. */
-function GreenFrame({ className, children }: { className?: string; children: React.ReactNode }) {
-  return (
-    <div className={cn("relative", className)}>
-      <GreenAura />
-      <div className={cn("relative p-[3px] shadow-[0_30px_70px_-30px_rgba(16,140,60,0.5)]", LEAF)} style={{ background: EDGE }}>
-        <div className={cn("overflow-hidden bg-white", LEAF_INNER)}>{children}</div>
-      </div>
-    </div>
-  );
-}
-
 export function OsmoStory({ project }: { project: Project }) {
   const { t } = useLanguage();
   const story = t.projects.stories.osmo;
@@ -124,14 +114,18 @@ export function OsmoStory({ project }: { project: Project }) {
       style={style}
       accent={OSMO.green}
       display={PROJECT_DISPLAY_FONT.osmo}
-      className="[--story-ground:#F4F8F2] dark:[--story-ground:#0C1912]"
-      ground={
-        // Paper with a hint of green / a deep green-black, a soft green light top-right in both.
-        <div className="absolute inset-0 overflow-hidden bg-[var(--story-ground)]" aria-hidden>
-          <div className="absolute right-[-12%] top-[-4%] aspect-square w-[min(820px,80vw)] rounded-full bg-[radial-gradient(closest-side,rgba(47,165,90,0.16)_0%,transparent_100%)] dark:bg-[radial-gradient(closest-side,rgba(47,165,90,0.24)_0%,transparent_100%)]" />
-        </div>
-      }
+      // The case study's face for the whole block - the body at 400; the large letters wear `display` (600).
+      font="font-[family-name:var(--font-manrope)]"
+      // Locked light whatever the visitor's theme: the story runs from white down into the green (`GROUND`, drawn
+      // over the story block), and the wizard after it sits on that green, its heading in white.
+      theme="light"
+      className="[--story-ground:#108C3C]"
+      wizardHeading="[--foreground:#fff] [--muted-foreground:rgba(255,255,255,0.78)]"
+      ground={<div className="absolute inset-0 bg-[var(--story-ground)]" aria-hidden />}
     >
+      {/* The delivered page's ground over the story block: white up top, the green by the CTA. */}
+      <div className="pointer-events-none absolute inset-0" style={{ background: GROUND }} aria-hidden />
+
       {/* ---------------- HERO ---------------- */}
       <Section tight className="pt-4 sm:pt-6 lg:pt-8">
         <motion.div
@@ -143,7 +137,9 @@ export function OsmoStory({ project }: { project: Project }) {
           <div>
             {partner ? (
               <motion.div variants={fadeUp} className="mb-10">
-                <PartnerLogo p={partner} imgClass="h-24 w-auto md:h-36" sizes="520px" />
+                <ClientSite href={partner.href} name={name}>
+                  <PartnerLogo p={partner} imgClass="h-24 w-auto md:h-36" sizes="520px" />
+                </ClientSite>
               </motion.div>
             ) : null}
             <h1 className={cn(HERO_TITLE.long, "font-heading font-bold tracking-tight text-balance", PROJECT_DISPLAY_FONT.osmo, "leading-[1.06]")}>
@@ -154,23 +150,19 @@ export function OsmoStory({ project }: { project: Project }) {
             </motion.p>
           </div>
           <motion.div variants={fadeUp} className="mx-auto w-full max-w-[520px]">
-            <GreenFrame>
-              {/* The fan of colour samples on white, cover-fit into a 4:5 frame (the clip is 9:16 - its centre is
-                  the fan) - multiplied so the clip's white ground is the frame's. */}
-              <div className="relative aspect-[4/5] w-full overflow-hidden bg-white">
-                <video
-                  className="absolute inset-0 h-full w-full object-cover mix-blend-multiply"
-                  src={HERO_CLIP.src}
-                  poster={HERO_CLIP.poster}
-                  autoPlay
-                  muted
-                  loop
-                  playsInline
-                  preload="auto"
-                  aria-label={name}
-                />
-              </div>
-            </GreenFrame>
+            {/* The fan of colour samples bare on the page, no frame - the clip at its own frame (9:16), as tall as
+                the room allows, multiplied so its white ground is the page's white. */}
+            <video
+              className="mx-auto h-auto max-h-[min(82vh,780px)] w-full object-contain mix-blend-multiply"
+              src={HERO_CLIP.src}
+              poster={HERO_CLIP.poster}
+              autoPlay
+              muted
+              loop
+              playsInline
+              preload="auto"
+              aria-label={name}
+            />
           </motion.div>
         </motion.div>
       </Section>
@@ -264,10 +256,8 @@ export function OsmoStory({ project }: { project: Project }) {
         );
       })}
 
-      {/* ---------------- RESULTS (a pale green tint, the theme's own ink) ---------------- */}
-      <Section
-        className="bg-[color:color-mix(in_srgb,#2FA55A_14%,var(--story-ground))] [--story-rule:#108C3C] dark:[--story-rule:rgba(255,255,255,0.7)]"
-      >
+      {/* ---------------- RESULTS (in white, on the green) ---------------- */}
+      <Section className="border-t border-white/25 text-white [--story-accent:rgba(255,255,255,0.8)] [--story-muted:rgba(255,255,255,0.8)] [--story-rule:rgba(255,255,255,0.7)]">
         <Reveal>
           <Eyebrow>{story.results.eyebrow}</Eyebrow>
           <Display text={story.results.title} className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl" />
@@ -278,17 +268,12 @@ export function OsmoStory({ project }: { project: Project }) {
         </Reveal>
       </Section>
 
-      {/* ---------------- QUOTE · CTA (the page sinks into OSMO green) ---------------- */}
-      <div
-        className="text-white [--story-accent:rgba(255,255,255,0.85)] [--story-muted:rgba(255,255,255,0.8)] [--story-line:rgba(255,255,255,0.25)]"
-        style={{
-          background: `linear-gradient(180deg, color-mix(in srgb, ${OSMO.light} 14%, var(--story-ground)) 0%, ${OSMO.light} 30%, ${OSMO.green} 65%, ${OSMO.deep} 100%)`,
-        }}
-      >
-        <Section tight className="pt-16 sm:pt-20 lg:pt-24">
+      {/* ---------------- QUOTE · CTA (on the green) ---------------- */}
+      <div className="text-white [--story-accent:rgba(255,255,255,0.85)] [--story-muted:rgba(255,255,255,0.8)] [--story-line:rgba(255,255,255,0.25)]">
+        <Section tight className="pt-0 sm:pt-0 lg:pt-0">
           <Reveal className="rounded-2xl bg-white px-7 py-10 text-[#181418] [--story-accent:#108C3C] [--story-muted:rgba(24,20,24,0.55)] sm:px-12 sm:py-14">
             <Eyebrow>{story.quote.eyebrow}</Eyebrow>
-            <span className="mb-5 block font-heading text-7xl font-bold leading-[0.6] text-[var(--story-accent)]" aria-hidden>
+            <span className={cn(PROJECT_DISPLAY_FONT.osmo, "mb-5 block text-7xl font-bold leading-[0.6] text-[var(--story-accent)]")} aria-hidden>
               “
             </span>
             <blockquote className="max-w-[48rem] text-2xl leading-snug sm:text-3xl">{story.quote.text}</blockquote>

@@ -118,7 +118,10 @@ export function Reveal({ className, children, delay = 0 }: { className?: string;
  * own tokens (its cards and fields follow the theme); a colour world hands
  * `wizardHeading` white ink tokens for its heading alone. The ground runs
  * right down to the footer - the footer's top margin is the article's bottom
- * padding here - and the footer sits on the normal page ground.
+ * padding here - and the footer sits on the normal page ground. `theme`
+ * locks the whole block - story, breadcrumbs and wizard - to one theme
+ * whatever the visitor's (`theme-light` / `theme-dark`, see `globals.css`);
+ * the header and the footer around it keep the site's theme.
  */
 /**
  * The story's display face (see `PROJECT_DISPLAY_FONT`): `Display` headings and the CTA band's title read it from
@@ -136,6 +139,9 @@ export function StoryShell({
   className,
   wizardHeading,
   display,
+  theme,
+  font,
+  wizard = true,
   children,
 }: {
   style: CSSProperties;
@@ -145,6 +151,12 @@ export function StoryShell({
   wizardHeading?: string;
   /** The brand's display face for the large letters (`PROJECT_DISPLAY_FONT[id]`). */
   display?: string;
+  /** Lock the block to one theme (the client's colours whatever the visitor's theme); unset = follows the theme. */
+  theme?: "light" | "dark";
+  /** Classes for the story block alone (not the wizard) - OSMO's page runs in Manrope, body and headings. */
+  font?: string;
+  /** The quote wizard after the story (on by default); MindGuard's page ends on its own CTA instead. */
+  wizard?: boolean;
   children: ReactNode;
 }) {
   return (
@@ -154,24 +166,54 @@ export function StoryShell({
       </div>
       <SiteHeader />
       <ProgressLine accent={accent} />
-      <article className={cn("relative z-10 flex w-full flex-1 flex-col pb-20", className)}>
+      <article className={cn("relative z-10 flex w-full flex-1 flex-col pb-20", theme === "light" && "theme-light", theme === "dark" && "theme-dark", className)}>
         {ground}
-        <div className="relative text-foreground" style={style}>
+        <div className={cn("relative text-foreground", font)} style={style}>
           <div className={cn("relative z-[1] pt-24 lg:pt-32", STORY_CONTAINER)}>
             <PageBreadcrumbs className="mb-6" />
           </div>
           <StoryDisplayContext.Provider value={display}>{children}</StoryDisplayContext.Provider>
         </div>
         {/* Same multi-step quote wizard as the home page, on the story's ground. */}
-        <div className="relative z-[1]">
-          <QuoteFormSection className="mt-6" headingClassName={wizardHeading} />
-        </div>
+        {wizard ? (
+          <div className="relative z-[1]">
+            <QuoteFormSection className="mt-6" headingClassName={wizardHeading} />
+          </div>
+        ) : null}
       </article>
       <div className="relative z-10 [&>footer]:mt-0">
         <Footer />
       </div>
       <MobileNav />
     </main>
+  );
+}
+
+/**
+ * The client's website, up top of every case study: the logo itself is the
+ * link (a new tab; the accessible name says so - `projects.visitSite` - and
+ * the title carries the domain), nothing else. Without an `href` the logo
+ * stands alone. `className` is the link's own box (MindGuard pulls its padded
+ * mark back in line with it).
+ */
+export function ClientSite({ href, name, className, children }: { href?: string; name: string; className?: string; children: ReactNode }) {
+  const { t } = useLanguage();
+  if (!href) return <div className={cn("inline-block", className)}>{children}</div>;
+  const host = new URL(href).hostname.replace(/^www\./, "");
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label={`${name} - ${t.projects.visitSite} (${host})`}
+      title={host}
+      className={cn(
+        "inline-block cursor-pointer rounded-md transition-[transform,opacity] duration-200 ease-out hover:-translate-y-0.5 hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-current",
+        className
+      )}
+    >
+      {children}
+    </a>
   );
 }
 

@@ -534,17 +534,19 @@ export function PortfolioSection({
 
   const Heading = headingLevel;
 
+  // `size-*` so shadcn `Button` doesn't clamp SVGs to `size-4`; 20px on desktop, where the chips are the small ones.
+  const CATEGORY_ICON = "size-6 sm:size-7 lg:size-5";
   const CATEGORIES: { key: string; label: string; icon: React.ReactNode }[] = useMemo(
     () => [
-      // Use `size-*` so shadcn `Button` doesn't clamp SVGs to `size-4`.
-      { key: "all", label: t.portfolio.categories.all, icon: <IconLayoutGrid className="size-6 sm:size-7" /> },
-      { key: "construction", label: t.portfolio.categories.construction, icon: <IconHome2Filled className="size-6 sm:size-7" /> },
-      { key: "mascots", label: t.portfolio.categories.mascots, icon: <IconCookieManFilled className="size-6 sm:size-7" /> },
-      { key: "tv", label: t.portfolio.categories.tv, icon: <IconDiamondFilled className="size-6 sm:size-7" /> },
-      { key: "cars", label: t.portfolio.categories.cars, icon: <IconCarFilled className="size-6 sm:size-7" /> },
-      { key: "product", label: t.portfolio.categories.product, icon: <IconBottleFilled className="size-6 sm:size-7" /> },
-      { key: "services", label: t.portfolio.categories.services, icon: <IconDeviceTabletFilled className="size-6 sm:size-7" /> },
-      { key: "animated", label: t.portfolio.categories.animated, icon: <IconMickeyFilled className="size-6 sm:size-7" /> },
+      // Desktop gets the smaller chips (a step down from the tablet's) - the bar sits right under the header there.
+      { key: "all", label: t.portfolio.categories.all, icon: <IconLayoutGrid className={CATEGORY_ICON} /> },
+      { key: "construction", label: t.portfolio.categories.construction, icon: <IconHome2Filled className={CATEGORY_ICON} /> },
+      { key: "mascots", label: t.portfolio.categories.mascots, icon: <IconCookieManFilled className={CATEGORY_ICON} /> },
+      { key: "tv", label: t.portfolio.categories.tv, icon: <IconDiamondFilled className={CATEGORY_ICON} /> },
+      { key: "cars", label: t.portfolio.categories.cars, icon: <IconCarFilled className={CATEGORY_ICON} /> },
+      { key: "product", label: t.portfolio.categories.product, icon: <IconBottleFilled className={CATEGORY_ICON} /> },
+      { key: "services", label: t.portfolio.categories.services, icon: <IconDeviceTabletFilled className={CATEGORY_ICON} /> },
+      { key: "animated", label: t.portfolio.categories.animated, icon: <IconMickeyFilled className={CATEGORY_ICON} /> },
     ],
     [t]
   );
@@ -579,7 +581,7 @@ export function PortfolioSection({
   const categoryChipClass = (active: boolean) =>
     cn(
       "group relative shrink-0 cursor-pointer rounded-full font-semibold inline-flex items-center gap-1.5",
-      "h-9 px-3 text-xs sm:h-10 sm:gap-2 sm:px-4 sm:text-sm",
+      "h-9 px-3 text-xs sm:h-10 sm:gap-2 sm:px-4 sm:text-sm lg:h-9 lg:gap-1.5 lg:px-3.5 lg:text-[13px]",
       "border border-transparent !shadow-none hover:!shadow-none focus-visible:!shadow-none active:!shadow-none",
       "transition-[background-color,border-color,color,box-shadow,transform] duration-200 ease-out will-change-transform",
       active
@@ -607,10 +609,10 @@ export function PortfolioSection({
 
           {/* Sticky controls + grid stay fully opaque so lazy IO works reliably */}
           <div className="flex flex-col gap-8 pb-12">
-            <div className="sticky top-[max(0.75rem,env(safe-area-inset-top))] z-40 -mx-4 flex flex-col gap-2 px-4 sm:gap-2.5 lg:top-[7.25rem] lg:-mx-6 lg:px-6">
+            <div className="sticky top-[max(0.75rem,env(safe-area-inset-top))] z-40 -mx-4 flex flex-col gap-2 px-4 sm:gap-2.5 lg:top-[6rem] lg:-mx-6 lg:gap-2 lg:px-6">
               {/* Categories (top) */}
               <div className="w-fit max-w-full rounded-full border border-border/25 bg-background/95 p-1 shadow-[0_12px_40px_rgba(15,23,42,0.15)] backdrop-blur-lg supports-[backdrop-filter]:bg-background/85 dark:border-border/30 dark:shadow-[0_12px_48px_rgba(0,0,0,0.45)]">
-                <div className="relative rounded-full bg-muted/10 px-2 py-1 sm:px-2.5">
+                <div className="relative rounded-full bg-muted/10 px-2 py-1 sm:px-2.5 lg:px-2 lg:py-0.5">
                   <div className="flex w-fit max-w-full items-center gap-1.5 overflow-x-auto overflow-y-hidden py-0.5 no-scrollbar">
                     {CATEGORIES.map((cat) => (
                       <Button
@@ -641,7 +643,7 @@ export function PortfolioSection({
               </div>
 
               {/* Resolution tabs (bottom) — hug content on mobile; same on sm+ */}
-              <div className="w-fit max-w-full self-start rounded-full border border-border/25 bg-background/95 px-2 py-2 shadow-[0_12px_40px_rgba(15,23,42,0.1)] backdrop-blur-lg supports-[backdrop-filter]:bg-background/85 dark:border-border/30 dark:shadow-[0_12px_48px_rgba(0,0,0,0.45)] sm:px-3 sm:py-2">
+              <div className="w-fit max-w-full self-start rounded-full border border-border/25 bg-background/95 px-2 py-2 shadow-[0_12px_40px_rgba(15,23,42,0.1)] backdrop-blur-lg supports-[backdrop-filter]:bg-background/85 dark:border-border/30 dark:shadow-[0_12px_48px_rgba(0,0,0,0.45)] sm:px-3 sm:py-2 lg:px-2 lg:py-1">
                 <Tabs
                   value={format}
                   onValueChange={(v) => {
@@ -656,21 +658,21 @@ export function PortfolioSection({
                     variant="default"
                     className={cn(
                       "h-auto min-h-8 w-fit max-w-full justify-center gap-0.5 rounded-2xl border-0 bg-muted/25 p-0.5 text-[10px] shadow-none",
-                      "sm:min-h-8 sm:text-[11px]"
+                      "sm:min-h-8 sm:text-[11px] lg:min-h-7"
                     )}
                   >
                     <TabsTrigger
                       value="all"
                       aria-label={t.portfolio.format.all}
                       className={cn(
-                        "cursor-pointer flex-none rounded-2xl border border-transparent px-1.5 py-1 text-[10px] font-semibold sm:px-2 sm:py-1 sm:text-[11px]",
+                        "cursor-pointer flex-none rounded-2xl border border-transparent px-1.5 py-1 text-[10px] font-semibold sm:px-2 sm:py-1 sm:text-[11px] lg:px-1.5 lg:py-0.5",
                         "data-active:border-0 data-active:bg-gradient-to-r data-active:from-[var(--primary-gradient-start)] data-active:to-[var(--primary-gradient-end)] data-active:text-white data-active:!shadow-none",
                         "[&_svg]:icon-on-brand data-active:[&_svg]:text-white data-active:[&_svg]:filter-none",
                         "hover:text-foreground data-active:hover:scale-[1.03] data-active:hover:from-[color-mix(in_srgb,var(--primary-gradient-start)_86%,white)] data-active:hover:to-[color-mix(in_srgb,var(--primary-gradient-end)_84%,#f3ecff)] data-active:hover:text-white"
                       )}
                     >
                       <IconLayoutGrid
-                        className="h-3.5 w-3.5 shrink-0 sm:h-4 sm:w-4"
+                        className="h-3.5 w-3.5 shrink-0 sm:h-4 sm:w-4 lg:h-3.5 lg:w-3.5"
                         fill="currentColor"
                         stroke="none"
                       />
@@ -679,14 +681,14 @@ export function PortfolioSection({
                       value="desktop"
                       aria-label={t.portfolio.format.desktop}
                       className={cn(
-                        "cursor-pointer flex-none gap-0.5 rounded-2xl border border-transparent px-1.5 py-1 text-[10px] font-semibold sm:px-2 sm:py-1 sm:text-[11px]",
+                        "cursor-pointer flex-none gap-0.5 rounded-2xl border border-transparent px-1.5 py-1 text-[10px] font-semibold sm:px-2 sm:py-1 sm:text-[11px] lg:px-1.5 lg:py-0.5",
                         "data-active:border-0 data-active:bg-gradient-to-r data-active:from-[var(--primary-gradient-start)] data-active:to-[var(--primary-gradient-end)] data-active:text-white data-active:!shadow-none",
                         "[&_svg]:icon-on-brand data-active:[&_svg]:text-white data-active:[&_svg]:filter-none",
                         "hover:text-foreground data-active:hover:scale-[1.03] data-active:hover:from-[color-mix(in_srgb,var(--primary-gradient-start)_86%,white)] data-active:hover:to-[color-mix(in_srgb,var(--primary-gradient-end)_84%,#f3ecff)] data-active:hover:text-white"
                       )}
                     >
                       <IconDeviceDesktop
-                        className="h-3.5 w-3.5 shrink-0 sm:h-4 sm:w-4"
+                        className="h-3.5 w-3.5 shrink-0 sm:h-4 sm:w-4 lg:h-3.5 lg:w-3.5"
                         fill="currentColor"
                         stroke="none"
                       />
@@ -696,14 +698,14 @@ export function PortfolioSection({
                       value="mobile"
                       aria-label={t.portfolio.format.mobile}
                       className={cn(
-                        "cursor-pointer flex-none gap-0.5 rounded-2xl border border-transparent px-1.5 py-1 text-[10px] font-semibold shadow-none sm:px-2 sm:py-1 sm:text-[11px]",
+                        "cursor-pointer flex-none gap-0.5 rounded-2xl border border-transparent px-1.5 py-1 text-[10px] font-semibold shadow-none sm:px-2 sm:py-1 sm:text-[11px] lg:px-1.5 lg:py-0.5",
                         "data-active:border-0 data-active:bg-gradient-to-r data-active:from-[var(--primary-gradient-start)] data-active:to-[var(--primary-gradient-end)] data-active:text-white data-active:!shadow-none",
                         "[&_svg]:icon-on-brand data-active:[&_svg]:text-white data-active:[&_svg]:filter-none",
                         "hover:text-foreground data-active:hover:scale-[1.03] data-active:hover:from-[color-mix(in_srgb,var(--primary-gradient-start)_86%,white)] data-active:hover:to-[color-mix(in_srgb,var(--primary-gradient-end)_84%,#f3ecff)] data-active:hover:text-white"
                       )}
                     >
                       <IconDeviceMobile
-                        className="h-3.5 w-3.5 shrink-0 sm:h-4 sm:w-4"
+                        className="h-3.5 w-3.5 shrink-0 sm:h-4 sm:w-4 lg:h-3.5 lg:w-3.5"
                         fill="currentColor"
                         stroke="none"
                       />

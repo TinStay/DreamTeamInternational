@@ -10,7 +10,7 @@ import type { Project } from "@/lib/projects";
 import { cn } from "@/lib/utils";
 import { EmbedCover } from "@/components/projects/showcase-primitives";
 import { bunnyBackgroundEmbedSrc } from "@/lib/bunny-stream";
-import { BodyXL, CtaBand, Eyebrow, HERO_TITLE, MediaFrame, STORY_CONTAINER, Section, StoryShell, VIEWPORT, Words, fadeUp, frameIn, stagger } from "./primitives";
+import { BodyXL, ClientSite, CtaBand, Eyebrow, HERO_TITLE, MediaFrame, STORY_CONTAINER, Section, StoryShell, VIEWPORT, Words, fadeUp, frameIn, stagger } from "./primitives";
 
 /*
  * Plasico's story - the store's world from the home showcase: white, the
@@ -100,7 +100,9 @@ export function PlasicoStory({ project }: { project: Project }) {
                   style={{ background: "radial-gradient(closest-side, rgba(95,191,47,0.22) 0%, transparent 100%)" }}
                   aria-hidden
                 />
-                <PartnerLogo p={partner} imgClass="relative h-24 w-auto max-w-full md:h-28 xl:h-36" sizes="440px" />
+                <ClientSite href={partner.href} name={name} className="relative">
+                  <PartnerLogo p={partner} imgClass="relative h-24 w-auto max-w-full md:h-28 xl:h-36" sizes="440px" />
+                </ClientSite>
               </motion.div>
             ) : null}
           </div>

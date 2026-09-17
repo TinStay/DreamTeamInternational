@@ -9,7 +9,7 @@ import { bunnyPlayerEmbedSrc } from "@/lib/bunny-stream";
 import type { Project, StoryClip } from "@/lib/projects";
 import { cn } from "@/lib/utils";
 import { YOUTUBE_IFRAME_ALLOW, YOUTUBE_REFERRER_POLICY } from "@/lib/youtube-embeds";
-import { Body, COPY_DELAY, CtaBand, EASE, Eyebrow, HERO_TITLE, Lead, PlayRing, Section, Split, StoryShell, VIEWPORT, fadeUp, fadeUpAfter, frameIn, stagger } from "./primitives";
+import { Body, COPY_DELAY, ClientSite, CtaBand, EASE, Eyebrow, HERO_TITLE, Lead, PlayRing, Section, Split, StoryShell, VIEWPORT, fadeUp, fadeUpAfter, frameIn, stagger } from "./primitives";
 
 /*
  * Emblema's story - the editorial world on Emblema's own ground (cream in the
@@ -262,6 +262,9 @@ export function EmblemaStory({ project }: { project: Project }) {
       style={style}
       accent={COPPER.mid}
       className="[--story-ground:#F3EFE8] dark:[--story-ground:#17130F]"
+      // Locked light: the client's cream and copper whatever the visitor's theme (the warm-black set stays for
+      // the day the lock is lifted).
+      theme="light"
       ground={
         // The showcase's cream (a soft white light at the top) / a warm black with a faint copper light.
         <div className="absolute inset-0 overflow-hidden bg-[var(--story-ground)]" aria-hidden>
@@ -279,7 +282,9 @@ export function EmblemaStory({ project }: { project: Project }) {
         >
           {partner ? (
             <motion.div variants={fadeUp} className="lg:order-2 lg:justify-self-center">
-              <PartnerLogo p={partner} imgClass="h-20 w-auto md:h-28 lg:h-48 xl:h-56 2xl:h-64" sizes="(max-width: 1024px) 420px, 640px" />
+              <ClientSite href={partner.href} name={partner.ariaLabel}>
+                <PartnerLogo p={partner} imgClass="h-20 w-auto md:h-28 lg:h-48 xl:h-56 2xl:h-64" sizes="(max-width: 1024px) 420px, 640px" />
+              </ClientSite>
             </motion.div>
           ) : null}
           <div className="lg:order-1">

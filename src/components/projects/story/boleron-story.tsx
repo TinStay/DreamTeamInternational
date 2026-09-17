@@ -12,6 +12,7 @@ import type { Project } from "@/lib/projects";
 import { cn } from "@/lib/utils";
 import {
   ClipCollage,
+  ClientSite,
   CtaBand,
   Display,
   Drift,
@@ -33,33 +34,35 @@ import {
 
 /*
  * Boleron's story - the whole page is the client's world: the blue → violet
- * gradient (a deeper cut of it in the dark theme) with white type. Roni, the
+ * gradient (the same one in both themes) with white type. Roni, the
  * mascot, stands in the hero as a composited clip (colour + matte, drawn on a
  * canvas so he floats over the gradient with no box) that tilts toward the
  * pointer; phones get the plain clip in a frame. Then the facts, the bTV spot
- * (the first film), the numbers, and a run of alternating sections - a short
+ * (the first film, on Bunny), the numbers, and a run of alternating sections - a short
  * title and description on one side, the media on the other, drifting a
- * little with the scroll: the challenge with Roni's scenes, the character with
- * his clip - then the eight product ads (Bunny Stream, all 16:9) as the
- * skewed collage (hover to open a panel and play it muted, click for the
- * full player), the YouTube pre-roll, the social cuts and the CTA card. Copy in
- * `projects.stories.boleron`; the published clips in `Project.story.clips`
- * (`null` = branded placeholder).
+ * little with the scroll: the challenge with Roni's scenes, the character
+ * beside one of his films - then the eight product ads (Bunny Stream, all
+ * 16:9) as the skewed collage (hover to open a panel and play it muted, click
+ * for the full player), the YouTube film, the three vertical cuts in phones
+ * and the CTA card. Copy in `projects.stories.boleron`; the clips in
+ * `Project.story.clips` (`null` = branded placeholder).
  */
 
 /** The client's key-visual gradient, as the home showcase draws it (cyan → blue → violet, with its deep blue). */
 const BOLERON = { cyan: "#25C7EA", blue: "#2B7BE6", violet: "#8A3BD6", deep: "#1E3FB5", accent: "#3F86D9" };
 /**
- * The ground per theme: the showcase gradient in the light theme, the same three hues a few steps deeper in the
- * dark one (they sit next to the site's dark slate), a white light top-right and a deep-blue settle toward the
- * bottom - as CSS variables on the shell, so the ground and the cards read the theme's set.
+ * The ground: the showcase gradient, a white light top-right and a deep-blue settle toward the bottom - as CSS
+ * variables on the shell, so the ground and the cards read the one set. The same in both themes: the client
+ * wants the page in its key-visual colours whatever the theme (a deeper cut of the gradient for the dark theme
+ * was tried and dropped).
  */
 const GROUND_VARS =
-  "[--bol-a:#25C7EA] [--bol-b:#2B7BE6] [--bol-c:#8A3BD6] [--bol-light:rgba(255,255,255,0.22)] [--bol-settle:rgba(30,63,181,0.35)] dark:[--bol-a:#0F86A6] dark:[--bol-b:#1E4FA8] dark:[--bol-c:#5A2699] dark:[--bol-light:rgba(255,255,255,0.1)] dark:[--bol-settle:rgba(8,16,52,0.72)]";
+  "[--bol-a:#25C7EA] [--bol-b:#2B7BE6] [--bol-c:#8A3BD6] [--bol-light:rgba(255,255,255,0.22)] [--bol-settle:rgba(30,63,181,0.35)]";
 const BASE = "/projects/boleron/story";
 /** Roni: the stacked colour + matte clip for the canvas, the plain clip (poster too) for phones / reduced motion. */
 const RONI = { alpha: `${BASE}/roni-alpha.mp4`, plain: `${BASE}/roni.mp4`, poster: `${BASE}/roni-poster.webp` };
-const TV = { src: `${BASE}/tv-btv.mp4`, poster: `${BASE}/tv-btv-poster.webp`, badge: `${BASE}/btv.png` };
+/** The channel's mark for the bTV spot's badge and its meta row (the spot itself is `clips.tv` on Bunny). */
+const TV_BADGE = `${BASE}/btv.png`;
 const COLLAGE = [1, 2, 3, 4, 5].map((n) => `${BASE}/collage-${n}.webp`);
 /** The matte clip is two frames stacked: colour on top, alpha (as luminance) below. */
 const RONI_W = 540;
@@ -153,12 +156,17 @@ function RoniScene({ label }: { label: string }) {
   return (
     <div
       ref={boxRef}
-      className="relative mx-auto w-full max-w-[520px] lg:min-h-[560px] [perspective:1100px]"
+      className="relative mx-auto w-full max-w-[520px] [perspective:1100px]"
       onPointerMove={onPointerMove}
       onPointerLeave={onPointerLeave}
     >
       {composite ? (
-        <motion.div className="relative aspect-[9/13] w-full [transform-style:preserve-3d]" style={{ rotateX: tiltX, rotateY: tiltY }}>
+        // As tall as the first screen allows (the header, the breadcrumbs and a margin come off the viewport), so
+        // the whole of him - legs included - is on screen, centred against the copy; the width follows (9:16).
+        <motion.div
+          className="relative mx-auto w-[min(100%,calc((100svh_-_14rem)_*_9_/_16))] [transform-style:preserve-3d]"
+          style={{ rotateX: tiltX, rotateY: tiltY }}
+        >
           {/* Floor shadow, a step behind. */}
           <div
             className="absolute bottom-[6%] left-1/2 h-[7%] w-[60%] -translate-x-1/2 [transform:translateZ(-40px)] blur-[6px]"
@@ -185,7 +193,7 @@ function RoniScene({ label }: { label: string }) {
   );
 }
 
-/** The plain Roni clip in a rounded frame (the hero on phones, the character section). */
+/** The plain Roni clip in a rounded frame (the hero on phones / under reduced motion). */
 function RoniClip({ label, className }: { label: string; className?: string }) {
   const reduceMotion = useReducedMotion();
   return (
@@ -214,6 +222,7 @@ function RoniClip({ label, className }: { label: string; className?: string }) {
 function Feature({
   side,
   align = "center",
+  ratio = "even",
   eyebrow,
   title,
   body,
@@ -225,6 +234,8 @@ function Feature({
   side: "left" | "right";
   /** Where the media sits against the copy: centred, or at the top (a long copy beside a short frame). */
   align?: "center" | "start";
+  /** The columns: about even, or the copy taking the bigger share (`copy` - for `side="right"`, where the copy is the first column). */
+  ratio?: "even" | "copy";
   eyebrow: string;
   title: string;
   body: readonly string[];
@@ -236,7 +247,11 @@ function Feature({
   return (
     <Section className={cn("pt-0 sm:pt-0 lg:pt-0", className)}>
       <motion.div
-        className={cn("grid gap-10 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] lg:gap-16 xl:gap-20", align === "start" ? "items-start" : "items-center")}
+        className={cn(
+          "grid gap-10 lg:gap-16 xl:gap-20",
+          ratio === "copy" ? "lg:grid-cols-[minmax(0,1.3fr)_minmax(0,0.9fr)]" : "lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)]",
+          align === "start" ? "items-start" : "items-center"
+        )}
         initial="hidden"
         whileInView="visible"
         viewport={VIEWPORT}
@@ -305,6 +320,9 @@ export function BoleronStory({ project }: { project: Project }) {
       accent={BOLERON.accent}
       display={PROJECT_DISPLAY_FONT.boleron}
       className={GROUND_VARS}
+      // The client's colours whatever the visitor's theme: the block is locked light (a light wizard on the
+      // gradient, the CTA card white).
+      theme="light"
       // The wizard's heading in white on the gradient; its cards and fields keep the theme's look.
       wizardHeading="[--foreground:#fff] [--muted-foreground:rgba(255,255,255,0.78)]"
       ground={
@@ -316,19 +334,21 @@ export function BoleronStory({ project }: { project: Project }) {
         </div>
       }
     >
-      {/* ---------------- HERO (right at the top: title left, Roni right, both top-aligned) ---------------- */}
+      {/* ---------------- HERO (right at the top: title left, Roni right, centred against each other) ---------------- */}
       <Section tight className="pt-0 sm:pt-0 lg:pt-0">
         <motion.div
-          className="grid items-start gap-12 lg:grid-cols-[1.1fr_0.9fr] lg:gap-16"
+          className="grid items-start gap-12 lg:grid-cols-[1.1fr_0.9fr] lg:items-center lg:gap-16"
           initial="hidden"
           animate="visible"
           variants={stagger(0.08, 0.1)}
         >
           <div>
             {partner ? (
-              // The client's dark-ink mark as a white silhouette on the gradient.
+              // The client's dark-ink mark as a white silhouette on the gradient, linking to boleron.bg.
               <motion.div variants={fadeUp} className="mb-10">
-                <PartnerLogo p={partner} imgClass="h-16 w-auto brightness-0 invert md:h-24" sizes="400px" />
+                <ClientSite href={partner.href} name={name}>
+                  <PartnerLogo p={partner} imgClass="h-16 w-auto brightness-0 invert md:h-24" sizes="400px" />
+                </ClientSite>
               </motion.div>
             ) : null}
             <h1 className={cn(HERO_TITLE.long, "max-w-[18ch] font-heading font-bold tracking-tight text-balance", PROJECT_DISPLAY_FONT.boleron, "leading-[1.06]")}>
@@ -353,6 +373,7 @@ export function BoleronStory({ project }: { project: Project }) {
       <Feature
         side="right"
         align="start"
+        ratio="copy"
         className="pt-20 sm:pt-24 lg:pt-32"
         eyebrow={story.tv.eyebrow}
         title={story.tv.title}
@@ -362,26 +383,28 @@ export function BoleronStory({ project }: { project: Project }) {
             ? {
                 label: item.label,
                 value: (
-                  <span className="inline-flex rounded-lg bg-white px-2.5 py-1.5 shadow-md">
-                    <Image src={TV.badge} alt={item.value} width={400} height={234} sizes="72px" className="h-7 w-auto sm:h-8" />
+                  <span className="inline-flex rounded-xl bg-white px-4 py-2.5 shadow-md">
+                    <Image src={TV_BADGE} alt={item.value} width={400} height={234} sizes="72px" className="h-7 w-auto sm:h-8" />
                   </span>
                 ),
               }
             : item
         )}
         media={
+          // The spot is a 960 × 1080 file - an 8:9 frame, a touch under half the column wide.
           <div className="relative mx-auto w-full max-w-md">
             <MediaFrame
-              src={TV.src}
-              poster={TV.poster}
+              clip={clips.tv ?? null}
               title={`${name} · ${story.tv.title}`}
               aspect="aspect-[8/9]"
-              placeholder=""
+              placeholder={story.social.placeholder}
               className="rounded-3xl border border-white/15 bg-black shadow-2xl"
+              placeholderClass={placeholderClass}
+              ringClass="border-white/40 text-white/70"
             />
-            {/* The channel badge. */}
-            <div className="pointer-events-none absolute right-4 top-4 rounded-xl bg-white/95 px-3 py-2 shadow-lg">
-              <Image src={TV.badge} alt="bTV" width={400} height={234} sizes="60px" className="h-6 w-auto md:h-7" />
+            {/* The channel badge, in the frame's corner. */}
+            <div className="pointer-events-none absolute right-4 top-4 rounded-xl bg-white/95 px-4 py-3 shadow-lg">
+              <Image src={TV_BADGE} alt="bTV" width={400} height={234} sizes="60px" className="h-6 w-auto md:h-7" />
             </div>
           </div>
         }
@@ -405,7 +428,7 @@ export function BoleronStory({ project }: { project: Project }) {
               {story.results.closing}
             </motion.p>
           </div>
-          <StatGrid stats={story.results.stats} columns={4} rule="top" className="mt-12 lg:mt-16" />
+          <StatGrid stats={story.results.stats} columns={3} rule="top" className="mt-12 lg:mt-16" />
         </motion.div>
       </Section>
 
@@ -418,13 +441,23 @@ export function BoleronStory({ project }: { project: Project }) {
         media={<Mosaic panels={COLLAGE.map((src, i) => ({ src, label: story.collage[i] ?? "" }))} />}
       />
 
-      {/* ---------------- THE CHARACTER ---------------- */}
+      {/* ---------------- THE CHARACTER: one of his films beside the copy ---------------- */}
       <Feature
         side="right"
         eyebrow={story.solution.eyebrow}
         title={story.solution.title}
         body={story.solution.body}
-        media={<RoniClip label={name} className="max-w-[340px]" />}
+        media={
+          <MediaFrame
+            clip={clips.character ?? null}
+            title={`${name} · ${story.solution.title}`}
+            aspect="aspect-video"
+            placeholder={story.social.placeholder}
+            className="rounded-3xl border border-white/15 bg-black shadow-2xl"
+            placeholderClass={placeholderClass}
+            ringClass="border-white/40 text-white/70"
+          />
+        }
       />
 
       {/* ---------------- THE ADS: the eight product films as the collage ---------------- */}
@@ -480,7 +513,7 @@ export function BoleronStory({ project }: { project: Project }) {
         }
       />
 
-      {/* ---------------- SOCIAL: the three phones ---------------- */}
+      {/* ---------------- SOCIAL: the three vertical cuts in phones (stacked below sm) ---------------- */}
       <Feature
         side="right"
         eyebrow={story.social.eyebrow}
@@ -488,9 +521,9 @@ export function BoleronStory({ project }: { project: Project }) {
         body={story.social.body}
         note={story.social.note}
         media={
-          <div className="grid grid-cols-3 items-end gap-3 sm:gap-4">
+          <div className="grid grid-cols-1 items-end gap-8 sm:grid-cols-3 sm:gap-4">
             {(["shorts", "facebook", "tiktok"] as const).map((key, i) => (
-              <motion.figure key={key} variants={fadeUp} className={cn("m-0 min-w-0", i === 1 && "lg:-translate-y-6")}>
+              <motion.figure key={key} variants={fadeUp} className={cn("m-0 w-full min-w-0 max-w-[18rem] justify-self-center sm:max-w-none", i === 1 && "lg:-translate-y-6")}>
                 <MediaFrame
                   clip={clips[key] ?? null}
                   title={`${name} · ${story.social.items[i]}`}

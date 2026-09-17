@@ -17,14 +17,9 @@ export const PARTNERS: Partner[] = [
     id: "mindguard",
     light: null,
     dark: "mindguard_logo_dark.png", // white-ink mark only
+    href: "https://mymindguard.ai/",
     ariaLabel: "Mindguard",
     invertOnLight: true,
-  },
-  {
-    id: "isupport",
-    light: "isupport_logo_light.png",
-    dark: "isupport_logo_dark.png",
-    ariaLabel: "iSupport",
   },
   // Parked (not shown for now): Asia Event Agency, Hubchev Properties, Valtcan, Designed by GG.
   // {

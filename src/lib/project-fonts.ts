@@ -16,6 +16,6 @@ export const PROJECT_DISPLAY_FONT: Record<ShowcaseProjectKey, string> = {
   mindguard: "font-[family-name:var(--font-unbounded)] font-bold tracking-tight",
   // Tech: Exo 2, uppercase.
   plasico: "font-[family-name:var(--font-exo)] font-bold uppercase tracking-tight",
-  // Home-friendly: Nunito, rounded.
-  osmo: "font-[family-name:var(--font-nunito)] font-extrabold tracking-tight",
+  // The face of the client's case study: Manrope, semibold, a touch tight (its h1 / h2).
+  osmo: "font-[family-name:var(--font-manrope)] font-semibold tracking-[-0.02em]",
 };
