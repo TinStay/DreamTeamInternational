@@ -241,7 +241,7 @@ function EmblemaVisual({ t, framesEnabled }: SceneVisualProps) {
               height={537}
               enabled={framesEnabled}
               split
-              className="absolute inset-0 drop-shadow-[0_12px_22px_rgba(30,27,23,0.18)] [--split-gap:-10%] lg:[--split-gap:18%]"
+              className="absolute inset-0 [--split-gap:-10%] lg:drop-shadow-[0_12px_22px_rgba(30,27,23,0.18)] lg:[--split-gap:18%]"
             />
             {buildings.map((building, i) => (
               <motion.div

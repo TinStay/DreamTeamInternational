@@ -252,6 +252,15 @@
   border: 1px solid rgba(0, 0, 0, 0.06);
 }
 
+/* A coarse pointer (phones): a lighter backdrop blur on the bars - the blur is re-run every frame the page moves
+   under them, and a phone GPU feels a 20px one. */
+@media (pointer: coarse) {
+  .liquid-glass,
+  .liquid-glass-header {
+    backdrop-filter: blur(12px);
+  }
+}
+
 @layer utilities {
   /** Vertical marquee used by `InfiniteSlider` (reviews columns). */
   @keyframes marquee-y {

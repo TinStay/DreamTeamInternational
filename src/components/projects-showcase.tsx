@@ -7,7 +7,6 @@ import {
   useInView,
   useMotionValueEvent,
   useReducedMotion,
-  useScroll,
   useSpring,
   useTransform,
   type MotionValue,
@@ -40,7 +39,7 @@ import { useMediaQuery } from "@/lib/use-media-query";
 import { PARTNERS, PARTNER_ICON_BASE } from "@/lib/partners";
 import { SHOWCASE_PROJECTS, type Project } from "@/lib/projects";
 import { projectPath } from "@/lib/routes";
-import { scrollToY, useScrollEased } from "@/lib/smooth-scroll";
+import { scrollToY, useFlowProgress, useScrollEased } from "@/lib/smooth-scroll";
 import { cn } from "@/lib/utils";
 import { SnapStop } from "@/components/ui/snap-stop";
 
@@ -732,10 +731,8 @@ export function ProjectsShowcase({ className }: { className?: string }) {
   // Players only live while the stage itself is on screen - nothing keeps playing under the rest of the page.
   const stageOnScreen = useInView(sectionRef);
 
-  const { scrollYProgress } = useScroll({
-    target: sectionRef,
-    offset: ["start start", "end end"],
-  });
+  // The section's position measured once (and on layout changes), not per frame - `useFlowProgress`.
+  const scrollYProgress = useFlowProgress(sectionRef, (top, height, vh) => [top, top + height - vh]);
   // Under native scrolling: over-damped so the stage glides after each wheel tick without overshooting, but quick
   // (~50 ms) so canvases and players don't trail the scroll. While Lenis glides the wheel the raw progress is used.
   const smooth = useScrollEased(
@@ -765,7 +762,8 @@ export function ProjectsShowcase({ className }: { className?: string }) {
   const introOpacity = useTransform(introGone, (v) => 1 - v);
   const introScale = useTransform(introT, (v) => 1 + v * 0.35);
   const introY = useTransform(introT, (v) => -v * 40);
-  const introFilter = useTransform(introGone, (v) => `blur(${v * 10}px)`);
+  const coarse = useMediaQuery("(pointer: coarse)");
+  const introFilter = useTransform(introGone, (v) => (coarse ? "none" : `blur(${v * 10}px)`));
   // The cinema behind the headline: a faint letterbox band across the middle of the stage - the screen the first
   // scene opens from (the slit in `sceneFrame` is at the same 50%) - with a streak of light along its centre line
   // that wakes as the headline leaves, and a soft pool of light. All of it fades as the picture grows past it.
@@ -832,7 +830,7 @@ export function ProjectsShowcase({ className }: { className?: string }) {
           />
         ))}
         {/* Transparent stage: the page background shows through the intro and between scenes. */}
-        <div ref={stageRef} className="sticky top-0 h-[100svh] overflow-clip">
+        <div ref={stageRef} className="ph-no-capture sticky top-0 h-[100svh] overflow-clip">
           {/* The cinema (under the headline and the scenes): the pool of light, the letterbox band widening a little
               as the intro plays, and the streak along its centre line - theme tokens, so it is as quiet on the
               off-white ground as on the dark one. */}

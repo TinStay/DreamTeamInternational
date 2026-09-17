@@ -75,13 +75,23 @@ export function ProcessSection() {
   );
   const progress = useSpring(source, { stiffness: 120, damping: 26, mass: 0.6, restDelta: 0.001 });
   const pathLength = useTransform(progress, (p) => Math.max(0.001, p));
+  // The paths are static: their lengths are measured once (a `getTotalLength` per frame was a forced SVG layout).
+  const lengths = useRef(new WeakMap<SVGPathElement, number>());
+  const along = (el: SVGPathElement, p: number) => {
+    let total = lengths.current.get(el);
+    if (total === undefined) {
+      total = el.getTotalLength();
+      lengths.current.set(el, total);
+    }
+    return el.getPointAtLength(p * total);
+  };
   const beadX = useTransform(progress, (p) => {
     const el = pathRef.current;
-    return el ? el.getPointAtLength(p * el.getTotalLength()).x : 0;
+    return el ? along(el, p).x : 0;
   });
   const beadY = useTransform(progress, (p) => {
     const el = pathRef.current;
-    return el ? el.getPointAtLength(p * el.getTotalLength()).y : 0;
+    return el ? along(el, p).y : 0;
   });
   // The bead is an HTML dot (an SVG circle would stretch with the non-uniform viewBox).
   const beadLeft = useTransform(beadX, (x) => `${x / 10}%`);
@@ -96,11 +106,11 @@ export function ProcessSection() {
   const curveLength = useTransform(curve, (p) => Math.max(0.001, p));
   const curveBeadLeft = useTransform(curve, (p) => {
     const el = curveRef.current;
-    return el ? `${el.getPointAtLength(p * el.getTotalLength()).x}%` : "50%";
+    return el ? `${along(el, p).x}%` : "50%";
   });
   const curveBeadTop = useTransform(curve, (p) => {
     const el = curveRef.current;
-    return el ? `${el.getPointAtLength(p * el.getTotalLength()).y / 10}%` : "0%";
+    return el ? `${along(el, p).y / 10}%` : "0%";
   });
   const curveBeadOpacity = useTransform(curve, (p) => (p > 0.02 && p < 0.98 ? 1 : 0));
 

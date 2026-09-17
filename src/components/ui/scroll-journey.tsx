@@ -19,13 +19,12 @@ import {
   useMotionValue,
   useMotionValueEvent,
   useReducedMotion,
-  useScroll,
   useSpring,
   useTransform,
   type MotionValue,
 } from "motion/react";
 import { cn } from "@/lib/utils";
-import { useScrollEased } from "@/lib/smooth-scroll";
+import { useFlowProgress, useScrollEased } from "@/lib/smooth-scroll";
 import { useHydrated } from "@/lib/use-media-query";
 
 /*
@@ -315,16 +314,17 @@ export function JourneyScene({
   const reduceMotion = useReducedMotion();
 
   // `travel`: the box's top going from the viewport bottom (its marker meets the bottom - the previous scene has
-  // just pinned) up to the top of the viewport - the whole of it is the hand-over.
-  const { scrollYProgress: travel } = useScroll({ target: startRef, offset: ["start end", `start ${overlapBy}`] });
+  // just pinned) up to the top of the viewport - the whole of it is the hand-over. (The markers' positions are
+  // measured once, not per frame - `useFlowProgress`.)
+  const travel = useFlowProgress(startRef, (top, _h, vh) => [top - vh, top - overlapBy * vh], [overlapBy]);
   // The box's bottom doing the same - which is exactly the next scene's hand-over.
-  const { scrollYProgress: leaving } = useScroll({ target: endRef, offset: ["start end", `start ${overlapBy}`] });
+  const leaving = useFlowProgress(endRef, (top, _h, vh) => [top - vh, top - overlapBy * vh], [overlapBy]);
   const never = useMotionValue(0);
   // Raw scroll values straight into the easing (both progresses are already clamped 0 → 1): a derived value in
   // between would be recomputed in the same frame step as the easing and could leave it a frame behind.
   const cover = leaves ? leaving : never;
   // The scene's own scroll: its box top at the viewport top (end marker at `height`) → its bottom pinned.
-  const { scrollYProgress: within } = useScroll({ target: endRef, offset: [`start ${Math.max(height, 1)}px`, "start end"] });
+  const within = useFlowProgress(endRef, (top, _h, vh) => [top - Math.max(height, 1), top - vh], [height]);
   const enter = useScrollEased(travel, useSpring(travel, SPRING));
   const leave = useScrollEased(cover, useSpring(cover, SPRING));
 
@@ -362,7 +362,7 @@ export function JourneyScene({
   );
   useMotionValueEvent(offStage, "change", (v) => setParked(v === 1));
 
-  // The marker refs must stay attached: useScroll asserts its targets are hydrated.
+  // The marker refs must stay attached: `useFlowProgress` measures them.
   if (reduceMotion) {
     return (
       <>
@@ -398,6 +398,10 @@ export function JourneyScene({
           opacity,
         }}
         inert={parked ? true : undefined}
+        // For `scrollToElement`: a scene's flow position is its start marker's (the previous sibling) less this
+        // overlap (a viewport fraction) - the box's own rect is wherever it is pinned.
+        data-journey-scene=""
+        data-journey-overlap={mounted && overlap ? overlapBy : 0}
       >
         <JourneyContext.Provider value={{ enter, leave, travel, within, lead: isFirst }}>{children}</JourneyContext.Provider>
       </motion.div>
@@ -470,11 +474,8 @@ export function ScrollJourney({
   // `exit` 0 → 1 as the tail marker rises from the fold to mid-viewport (the footer coming up under the last scene).
   const headRef = useRef<HTMLDivElement>(null);
   const tailRef = useRef<HTMLDivElement>(null);
-  const { scrollYProgress: approach } = useScroll({
-    target: headRef,
-    offset: [`start ${100 + Math.max(prelude, 0.01) * 100}%`, "start 100%"],
-  });
-  const { scrollYProgress: exit } = useScroll({ target: tailRef, offset: ["start 100%", "start 50%"] });
+  const approach = useFlowProgress(headRef, (top, _h, vh) => [top - (1 + Math.max(prelude, 0.01)) * vh, top - vh], [prelude]);
+  const exit = useFlowProgress(tailRef, (top, _h, vh) => [top - vh, top - 0.5 * vh]);
   // Continuous journey position: -1 → 0 over the prelude, then the arrivals.
   const position = useTransform([arrived, approach], ([sum, q]: number[]) => sum + q - 1);
   // The canvas is up as soon as the prelude has begun and gone once the tail has cleared the fold.

@@ -12,6 +12,9 @@ export function PostHogProvider({ children }: { children: React.ReactNode }) {
       person_profiles: 'identified_only',
       capture_pageview: false, // We capture manually using PostHogPageView
       capture_pageleave: true,
+      // No scroll-depth properties: their listener reads the document's scroll height on every scroll event, which
+      // forces a layout in the middle of the scroll-linked animations (it was the single hottest thing on a phone).
+      disable_scroll_properties: true,
     })
   }, [])
 

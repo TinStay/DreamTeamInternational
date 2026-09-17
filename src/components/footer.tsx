@@ -4,8 +4,9 @@ import Link from "next/link";
 import Image from "next/image";
 import { Sphere } from "./iridescent-shapes";
 import { LanguageToggle } from "./language-toggle";
+import { IconMapPin } from "@tabler/icons-react";
 import { ClutchBadge, GoogleReviewsBadge } from "@/components/review-badges";
-import { EMAIL_PRIMARY, PHONE_PRIMARY, PHONE_SECONDARY } from "@/lib/contact-info";
+import { EMAIL_PRIMARY, GOOGLE_REVIEWS, PHONE_PRIMARY, PHONE_SECONDARY } from "@/lib/contact-info";
 import { useLanguage } from "@/lib/i18n/language-context";
 import {
   contactProcessPath,
@@ -17,10 +18,12 @@ import {
   trainingPath,
 } from "@/lib/routes";
 import { SOCIAL_LINKS } from "@/lib/social-links";
+import { cn } from "@/lib/utils";
 
 /*
  * The site footer: the brand column (logo, line, language), the links, the
- * contact column (email, both phones, the social icons) and the reviews
+ * contact column (email, both phones, the office address as a pin on Google
+ * Maps, the social icons) and the reviews
  * column (the Google rating badge and the Clutch widget), with the legal
  * links and the copyright along the bottom.
  */
@@ -74,6 +77,16 @@ export function Footer() {
             </a>
             <a href={PHONE_SECONDARY.href} className={linkClass}>
               {PHONE_SECONDARY.label}
+            </a>
+            {/* The office: the address as a link to the place on Google Maps, a pin in front. */}
+            <a
+              href={GOOGLE_REVIEWS.mapUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={cn(linkClass, "group inline-flex max-w-xs items-start gap-2 text-left")}
+            >
+              <IconMapPin className="mt-0.5 size-4 shrink-0 text-primary transition-transform duration-200 ease-out group-hover:-translate-y-0.5" aria-hidden />
+              <span>{t.contact.addressVal}</span>
             </a>
             <div className="mt-2 flex items-center gap-3">
               {SOCIAL_LINKS.map((s) => (

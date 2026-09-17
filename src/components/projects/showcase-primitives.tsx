@@ -135,11 +135,19 @@ export function Sparks({
  * Scroll-scrubbed image sequence (`<base>/f000.webp` … `f{count-1}.webp`)
  * drawn onto a canvas: `progress` 0 → 1 picks the frame. Frames only start
  * downloading once `enabled` (the section is near the viewport); while a
- * frame is still loading the nearest loaded neighbour is drawn instead.
- * `split` draws the same frame onto two canvases showing the left / right
- * halves, pulled apart by `--split-gap` (a percentage, set by the caller's
- * class so it can differ per breakpoint; 15% if unset - the Emblema buildings).
+ * frame is still on its way the nearest ready neighbour is drawn instead.
+ * On a **coarse pointer** (phones, tablets) every other frame is loaded and
+ * kept as a decoded `ImageBitmap` at the size it shows at (1.5 × the CSS
+ * size, at most `COARSE_BITMAP_MAX` wide - about 25–60 MB a sequence): a
+ * phone drops decoded images from its cache between frames and re-decodes
+ * one per drawn frame, which is what made the scrub stutter; 36 retained
+ * bitmaps scrub for free. A fine pointer keeps the plain decoded `<img>`s
+ * (all 72 - the desktop cache holds them). `split` draws the same frame onto
+ * two canvases showing the left / right halves, pulled apart by
+ * `--split-gap` (a percentage, set by the caller's class so it can differ
+ * per breakpoint; 15% if unset - the Emblema buildings).
  */
+const COARSE_BITMAP_MAX = 720;
 export function FrameSequence({
   progress,
   base,
@@ -161,9 +169,8 @@ export function FrameSequence({
   className?: string;
 }) {
   const canvases = useRef<(HTMLCanvasElement | null)[]>([]);
-  const frames = useRef<HTMLImageElement[]>([]);
-  /** Frames whose pixels are decoded and safe to draw synchronously. */
-  const decoded = useRef<boolean[]>([]);
+  /** Frames ready to draw: the decoded `<img>` (fine pointer) or the display-sized bitmap (coarse). */
+  const ready = useRef<Map<number, CanvasImageSource>>(new Map());
   const wanted = useRef(0);
   /** The frame index last requested (`drawn`) and the frame actually painted for it (`painted`, may be a stand-in). */
   const drawn = useRef(-1);
@@ -172,22 +179,23 @@ export function FrameSequence({
   const draw = useCallback(
     (index: number, force = false) => {
       if (!force && index === drawn.current) return;
-      const ready = (idx: number) => decoded.current[idx] === true;
-      let source = ready(index) ? index : -1;
+      const has = (idx: number) => ready.current.has(idx);
+      let source = has(index) ? index : -1;
       if (source < 0) {
-        // Nearest decoded neighbour as a stand-in.
+        // Nearest ready neighbour as a stand-in.
         for (let d = 1; d < count && source < 0; d++) {
-          if (ready(index - d)) source = index - d;
-          else if (ready(index + d)) source = index + d;
+          if (has(index - d)) source = index - d;
+          else if (has(index + d)) source = index + d;
         }
         if (source < 0) return;
       }
-      const img = frames.current[source];
+      const pixels = ready.current.get(source);
+      if (!pixels) return;
       for (const canvas of canvases.current) {
         const ctx = canvas?.getContext("2d");
         if (!canvas || !ctx) continue;
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        ctx.drawImage(pixels, 0, 0, canvas.width, canvas.height);
       }
       drawn.current = index;
       painted.current = source;
@@ -196,30 +204,56 @@ export function FrameSequence({
   );
 
   useEffect(() => {
-    if (!enabled || frames.current.length > 0) return;
+    if (!enabled || ready.current.size > 0) return;
+    const coarse = window.matchMedia("(pointer: coarse)").matches;
+    // Coarse: every other frame, as a bitmap at 1.5 × the CSS size (never above the canvas or the cap).
+    const stride = coarse ? 2 : 1;
+    const shown = canvases.current[0]?.clientWidth || 0;
+    const bitmapW = Math.min(width, COARSE_BITMAP_MAX, shown > 0 ? Math.round(shown * Math.min(window.devicePixelRatio || 1, 1.5)) : width);
+    const bitmapH = Math.round((bitmapW * height) / width);
     // Coarse-to-fine: the held pose (last frame) and every 8th frame first, so
     // scrubbing has stand-ins almost immediately, then the gaps - six requests
     // in flight at a time rather than all `count` at once.
     const order: number[] = [count - 1];
-    for (const step of [8, 4, 2, 1]) for (let i = 0; i < count; i += step) if (!order.includes(i)) order.push(i);
+    for (const step of [8, 4, 2, 1]) {
+      if (step < stride) break;
+      for (let i = 0; i < count; i += step) if (!order.includes(i)) order.push(i);
+    }
     let next = 0;
     let cancelled = false;
+    const bitmaps: ImageBitmap[] = [];
     const startOne = () => {
       if (cancelled || next >= order.length) return;
       const i = order[next++];
       const img = new Image();
       img.decoding = "async";
-      frames.current[i] = img;
-      const landed = () => {
-        if (cancelled) return;
-        decoded.current[i] = true;
+      const landed = (pixels: CanvasImageSource) => {
+        if (cancelled) {
+          if (pixels instanceof ImageBitmap) pixels.close();
+          return;
+        }
+        ready.current.set(i, pixels);
         // Repaint when this frame is closer to what we want than the stand-in on screen.
         const want = wanted.current;
         if (drawn.current < 0 || Math.abs(i - want) < Math.abs(painted.current - want)) draw(want, true);
         startOne();
       };
       img.onload = () => {
-        img.decode().then(landed, () => startOne());
+        if (cancelled) return;
+        if (coarse) {
+          // The resize options first (Chrome, Firefox, Safari 15.4+); a plain bitmap where they are not supported.
+          createImageBitmap(img, { resizeWidth: bitmapW, resizeHeight: bitmapH, resizeQuality: "medium" })
+            .catch(() => createImageBitmap(img))
+            .then(
+              (bitmap) => {
+                bitmaps.push(bitmap);
+                landed(bitmap);
+              },
+              () => startOne()
+            );
+        } else {
+          img.decode().then(() => landed(img), () => startOne());
+        }
       };
       img.onerror = () => startOne();
       img.src = `${base}/f${String(i).padStart(3, "0")}.webp`;
@@ -228,18 +262,19 @@ export function FrameSequence({
     return () => {
       // A cancelled run leaves nothing behind, so a re-run (StrictMode, deps) restarts cleanly from the browser cache.
       cancelled = true;
-      frames.current = [];
-      decoded.current = [];
+      for (const bitmap of bitmaps) bitmap.close();
+      ready.current.clear();
       drawn.current = -1;
       painted.current = -1;
     };
-  }, [enabled, base, count, draw]);
+  }, [enabled, base, count, width, height, draw]);
 
   const index = useTransform(progress, (v) => Math.min(count - 1, Math.floor(clamp01(v) * count)));
   useMotionValueEvent(index, "change", (i) => {
     wanted.current = i;
     draw(i);
   });
+
 
   const canvasClass = "absolute inset-0 block h-full w-full will-change-transform [transform:translateZ(0)]";
   return (
