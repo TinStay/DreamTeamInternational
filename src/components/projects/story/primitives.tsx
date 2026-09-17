@@ -50,6 +50,13 @@ export const fadeUp = {
   hidden: { opacity: 0, y: 26 },
   visible: { opacity: 1, y: 0, transition: { duration: 1, ease: EASE } },
 };
+/** `fadeUp` starting `delay` seconds late - the copy under a heading, so the title is always read first. */
+export const fadeUpAfter = (delay: number) => ({
+  hidden: fadeUp.hidden,
+  visible: { ...fadeUp.visible, transition: { ...fadeUp.visible.transition, delay } },
+});
+/** How long the copy waits for its heading (the heading's words are up within this). */
+export const COPY_DELAY = 0.25;
 /** A frame (or card) rising and settling into place as it scrolls in. */
 export const frameIn = {
   hidden: { opacity: 0, y: 48, scale: 0.975 },
@@ -90,7 +97,7 @@ export function Reveal({ className, children, delay = 0 }: { className?: string;
       initial="hidden"
       whileInView="visible"
       viewport={VIEWPORT}
-      variants={{ hidden: fadeUp.hidden, visible: { ...fadeUp.visible, transition: { ...fadeUp.visible.transition, delay } } }}
+      variants={fadeUpAfter(delay)}
     >
       {children}
     </motion.div>
@@ -204,8 +211,14 @@ export function Eyebrow({ children, center = false, className }: { children: Rea
   );
 }
 
-/** Heading text that rises word by word from under an invisible line (once, when scrolled into view). */
-export function Words({ text, base = 0, step = 0.04 }: { text: string; base?: number; step?: number }) {
+/** The words start a little *before* their heading enters the viewport (the other reveals wait until 8% in). */
+const WORDS_VIEWPORT = { once: true, margin: "0px 0px 6% 0px" } as const;
+
+/**
+ * Heading text that rises word by word from under an invisible line - once, and early: it starts a little before
+ * the heading enters the viewport and runs quick, so the words are in place by the time the reader reaches them.
+ */
+export function Words({ text, base = 0, step = 0.025 }: { text: string; base?: number; step?: number }) {
   const parts = text.split(" ");
   return (
     <>
@@ -216,8 +229,8 @@ export function Words({ text, base = 0, step = 0.04 }: { text: string; base?: nu
               className="inline-block"
               initial={{ y: "108%" }}
               whileInView={{ y: 0 }}
-              viewport={VIEWPORT}
-              transition={{ duration: 0.95, ease: [0.2, 0.9, 0.25, 1], delay: base + i * step }}
+              viewport={WORDS_VIEWPORT}
+              transition={{ duration: 0.65, ease: [0.2, 0.9, 0.25, 1], delay: base + i * step }}
             >
               {word}
             </motion.span>
@@ -279,7 +292,7 @@ export function BodyXL({ paragraphs }: { paragraphs: string[] }) {
   );
 }
 
-/** Two columns from lg: a (sticky) heading column and the copy. */
+/** Two columns from lg: a (sticky) heading column and the copy - the heading first, the copy a beat after it. */
 export function Split({ left, right, sticky = true, ratio = "0.9/1.1" }: { left: ReactNode; right: ReactNode; sticky?: boolean; ratio?: "0.9/1.1" | "1/2" }) {
   return (
     <motion.div
@@ -290,10 +303,12 @@ export function Split({ left, right, sticky = true, ratio = "0.9/1.1" }: { left:
       initial="hidden"
       whileInView="visible"
       viewport={VIEWPORT}
-      variants={fadeUp}
+      variants={stagger(0)}
     >
-      <div className={cn(sticky && "lg:sticky lg:top-28")}>{left}</div>
-      <div>{right}</div>
+      <motion.div variants={fadeUp} className={cn(sticky && "lg:sticky lg:top-28")}>
+        {left}
+      </motion.div>
+      <motion.div variants={fadeUpAfter(COPY_DELAY)}>{right}</motion.div>
     </motion.div>
   );
 }

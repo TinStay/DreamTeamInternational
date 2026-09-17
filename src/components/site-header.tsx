@@ -28,6 +28,14 @@ import {
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
+/**
+ * The nav links' ink: the brand's red → violet gradient sits under the letters, clipped to them, and shows as the
+ * text colour fades out on hover (`text-transparent`) - a plain link lifts a pixel with it; a dropdown's label
+ * does the same while its menu is open.
+ */
+const NAV_INK = "bg-gradient-to-r from-[var(--primary-gradient-start)] to-[var(--primary-gradient-end)] bg-clip-text transition-[color,transform] duration-200 ease-out";
+const NAV_LINK = cn(NAV_INK, "inline-block whitespace-nowrap hover:-translate-y-px hover:text-transparent");
+
 type DropdownItem = { href: string; label: string; icon: ReactNode; /** The tile behind the icon: the theme's tint, or white for a client's logo. */ tile?: "tint" | "white" };
 
 /**
@@ -77,11 +85,12 @@ function NavDropdown({
         href={href}
         aria-expanded={open}
         aria-haspopup="menu"
-        className="inline-flex items-center gap-1 whitespace-nowrap transition-colors hover:text-primary"
+        className="group/nav inline-flex items-center gap-1 whitespace-nowrap transition-transform duration-200 ease-out hover:-translate-y-px"
       >
-        {label}
+        {/* The gradient on the letters only - the chevron keeps its ink. */}
+        <span className={cn(NAV_INK, "group-hover/nav:text-transparent group-aria-expanded/nav:text-transparent")}>{label}</span>
         <IconChevronDown
-          className={cn("size-4 transition-transform duration-200", open && "rotate-180")}
+          className={cn("size-4 transition-[transform,color] duration-200 group-hover/nav:text-primary", open && "rotate-180 text-primary")}
           aria-hidden
         />
       </Link>
@@ -247,8 +256,8 @@ export function SiteHeader() {
 
             {/* Absolutely centred from xl up; below that it flows from the left.
                 Never `overflow-x-auto` — that clips the dropdown panels. */}
-            <nav className="flex min-w-0 flex-1 items-center gap-5 overflow-visible whitespace-nowrap px-2 text-base font-semibold text-foreground/80 xl:gap-8 xl:text-lg 2xl:pointer-events-none 2xl:absolute 2xl:left-1/2 2xl:w-auto 2xl:flex-none 2xl:-translate-x-1/2 2xl:px-0 2xl:text-xl 2xl:[&>*]:pointer-events-auto">
-              <Link href={portfolioPath(language)} className="whitespace-nowrap transition-colors hover:text-primary">
+            <nav className="flex min-w-0 flex-1 items-center gap-5 overflow-visible whitespace-nowrap px-2 text-[0.9375rem] font-semibold text-foreground/80 xl:gap-8 xl:text-base 2xl:pointer-events-none 2xl:absolute 2xl:left-1/2 2xl:w-auto 2xl:flex-none 2xl:-translate-x-1/2 2xl:px-0 2xl:text-lg 2xl:[&>*]:pointer-events-auto">
+              <Link href={portfolioPath(language)} className={NAV_LINK}>
                 {t.header.portfolio}
               </Link>
               {/* The case studies: a dropdown of the clients (logo + name), the label itself the listing. */}
@@ -256,7 +265,7 @@ export function SiteHeader() {
               <NavDropdown label={t.header.services} href={servicesPath(language)} items={serviceItems} />
               <NavDropdown label={t.header.training} href={trainingPath(language)} items={trainingItems} />
               {/* Scrolls to the home page's contact form (smooth on the home page itself, a jump from any other page). */}
-              <Link href={`${homeHref}#contact`} className="whitespace-nowrap transition-colors hover:text-primary">
+              <Link href={`${homeHref}#contact`} className={NAV_LINK}>
                 {t.header.contact}
               </Link>
             </nav>

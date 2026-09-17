@@ -70,8 +70,9 @@ export function PlasicoStory({ project }: { project: Project }) {
       {/* ---------------- HERO: the title across the page, the lead under it, then the film beside the mark ---------------- */}
       <Section tight className="pt-0 sm:pt-0 lg:pt-0">
         <motion.div initial="hidden" animate="visible" variants={stagger(0.08, 0.1)}>
-          <h1 className={cn(HERO_TITLE.short, "font-heading font-bold tracking-tight text-balance", PROJECT_DISPLAY_FONT.plasico, "leading-[0.98]")}>
-            <Words text={story.hero.title} base={0.1} step={0.06} />
+          {/* A step under the short scale on desktop - the uppercase Exo 2 reads loud enough at 3.75–4.4rem. */}
+          <h1 className={cn("text-[clamp(2.5rem,1.25rem+2.6vw,5rem)] font-heading font-bold tracking-tight text-balance", PROJECT_DISPLAY_FONT.plasico, "leading-[0.98]")}>
+            <Words text={story.hero.title} base={0.05} step={0.04} />
           </h1>
           <motion.p variants={fadeUp} className="mt-8 max-w-[60ch] text-lg leading-relaxed text-[var(--story-muted)] sm:text-xl xl:text-2xl">
             {story.hero.lead}

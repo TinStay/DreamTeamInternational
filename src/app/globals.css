@@ -1,5 +1,5 @@
-/* Sofia Sans (headings) + Fira Sans (body/UI) are self-hosted via `next/font`
-   in `layout.tsx`, which sets --font-sofia-sans / --font-fira-sans. */
+/* Exo 2 - headings and body / UI alike - is self-hosted via `next/font` in
+   `layout.tsx`, which sets --font-exo. */
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
@@ -29,8 +29,8 @@
   --color-spacing: var(--spacing);
   --color-font-mono: var(--font-mono);
   --color-font-sans: var(--font-sans);
-  /* `font-heading` utility — Sofia Sans (variable 1..1000, self-hosted). */
-  --font-heading: var(--font-sofia-sans), "Sofia Sans", sans-serif;
+  /* `font-heading` utility — Exo 2 (variable, self-hosted), the same face as the body. */
+  --font-heading: var(--font-exo), "Exo 2", sans-serif;
   --color-secondary: var(--secondary);
   --color-background: var(--background);
   --color-font-serif: var(--font-serif);
@@ -110,7 +110,7 @@
   --sidebar: #f5f8fb;
   --spacing: 0.27rem;
   --font-mono: IBM Plex Mono, monospace;
-  --font-sans: var(--font-fira-sans), "Fira Sans", sans-serif;
+  --font-sans: var(--font-exo), "Exo 2", sans-serif;
   --secondary: #eef2ff;
   --background: #ffffff;
   --font-serif: Lora, serif;
@@ -179,7 +179,7 @@
   --sidebar: #161618;
   --spacing: 0.27rem;
   --font-mono: IBM Plex Mono, monospace;
-  --font-sans: var(--font-fira-sans), "Fira Sans", sans-serif;
+  --font-sans: var(--font-exo), "Exo 2", sans-serif;
   --secondary: #252342;
   --background: #020617;
   --font-serif: Lora, serif;

@@ -17,7 +17,8 @@ export function SmoothScroll() {
   useEffect(() => {
     // lerp 0.07: a longer glide than the default 0.1 (about a quarter second to settle) - the scroll-driven choreography
     // reads as motion even on a single wheel tick, without the page feeling like ice.
-    const lenis = new Lenis({ lerp: 0.07, autoRaf: true, allowNestedScroll: true });
+    // wheelMultiplier 0.85: a wheel tick moves the page a little less, so the pages read at a calmer pace.
+    const lenis = new Lenis({ lerp: 0.06, wheelMultiplier: 0.85, autoRaf: true, allowNestedScroll: true });
     window.__lenis = lenis;
 
     // Hash links to this very page: Lenis handles `#…` hrefs itself; ours mostly carry the locale path in front.

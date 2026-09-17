@@ -161,7 +161,7 @@ export function MindguardStory({ project }: { project: Project }) {
               </motion.div>
             ) : null}
             <h1 className={cn(HERO_TITLE.long, "max-w-[16ch] font-heading font-bold tracking-tight text-balance", PROJECT_DISPLAY_FONT.mindguard, "leading-[1.04]")}>
-              <Words text={story.hero.title} base={0.1} step={0.06} />
+              <Words text={story.hero.title} base={0.05} step={0.04} />
             </h1>
             <motion.p variants={fadeUp} className="mt-8 max-w-[44ch] text-lg leading-relaxed text-[var(--story-muted)] sm:text-xl xl:text-2xl">
               {story.hero.lead}

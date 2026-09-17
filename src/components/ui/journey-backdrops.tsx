@@ -4,7 +4,7 @@ import { useEffect, useRef, type CSSProperties } from "react";
 import { motion, useMotionTemplate, useMotionValue, useTransform, type MotionValue } from "motion/react";
 import { cn } from "@/lib/utils";
 import type { JourneyBackdrop, JourneyBackdropProps, JourneyMorph } from "@/components/ui/scroll-journey";
-import { OSMO_CIRCLE, OSMO_HANDOFF_START, SHOWCASE_HOLD, osmoCircleLayer, osmoCircleMobile } from "@/components/projects/showcase-timeline";
+import { OSMO_HANDOFF_START, SHOWCASE_HOLD, osmoCircleDesktop, osmoCircleLayer, osmoCircleMobile } from "@/components/projects/showcase-timeline";
 
 /*
  * Background furniture for the home journeys, drawn on the journey's fixed
@@ -53,10 +53,10 @@ function stations(vp: Viewport): Geo[] {
   const { w: vw, h: vh } = vp;
   const lg = vw >= 1024;
   const md = vw >= 768;
-  const mobileDisc = osmoCircleMobile(vw, vh);
+  const disc = lg ? osmoCircleDesktop(vw, vh) : osmoCircleMobile(vw, vh);
   return [
     // 0 · the OSMO copy circle (× its outro swell, applied by the caller) - where the showcase leaves it
-    lg ? circle(OSMO_CIRCLE.x * vw, OSMO_CIRCLE.y * vh, Math.min(0.46 * vw, 0.88 * vh)) : circle(mobileDisc.x, mobileDisc.y, mobileDisc.d),
+    circle(disc.x, disc.y, disc.d),
     // 1 · the ring behind the stats
     circle(0.5 * vw, 0.58 * vh, Math.min(0.46 * vw, 0.72 * vh)),
     // 2 · the two lines beside the reviews: a rectangle taller than the viewport, so only its sides show (they sit

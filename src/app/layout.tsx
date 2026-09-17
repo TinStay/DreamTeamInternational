@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Exo_2, Fira_Sans, Montserrat, Nunito, Playfair_Display, Sofia_Sans, Unbounded } from "next/font/google";
+import { Exo_2, Montserrat, Nunito, Playfair_Display, Unbounded } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { SmoothScroll } from "@/components/smooth-scroll";
@@ -14,22 +14,10 @@ import Script from "next/script";
 /**
  * Fonts are self-hosted by `next/font` (no runtime request to Google), so they
  * can't fail to load behind a CSS `@import`. Cyrillic subsets are required —
- * the site is Bulgarian-first. Sofia Sans is variable (1–1000), so no `weight`;
- * Fira Sans ships static faces, so the used weights are listed explicitly.
+ * the site is Bulgarian-first. Exo 2 (headings and body alike) is variable
+ * (100–900), so no `weight`; the display faces that ship static files list
+ * the weights they are used at.
  */
-const sofiaSans = Sofia_Sans({
-  subsets: ["latin", "latin-ext", "cyrillic"],
-  variable: "--font-sofia-sans",
-  display: "swap",
-});
-
-const firaSans = Fira_Sans({
-  subsets: ["latin", "latin-ext", "cyrillic"],
-  weight: ["300", "400", "500", "600", "700"],
-  style: ["normal", "italic"],
-  variable: "--font-fira-sans",
-  display: "swap",
-});
 
 /**
  * The projects showcase's display faces - one per brand world (`showcase-scenes.tsx`, `headline`), all with
@@ -50,9 +38,13 @@ const playfair = Playfair_Display({
   variable: "--font-playfair",
   display: "swap",
 });
+/**
+ * Exo 2 - the site's one face: headings (`font-heading`) and body / UI (`font-sans`) alike, and Plasico's showcase
+ * headline. A variable font (100–900 + italic), so no weight list; `globals.css` maps both tokens to it.
+ */
 const exo = Exo_2({
-  subsets: ["latin", "cyrillic"],
-  weight: ["700"],
+  subsets: ["latin", "latin-ext", "cyrillic"],
+  style: ["normal", "italic"],
   variable: "--font-exo",
   display: "swap",
 });
@@ -223,7 +215,7 @@ export default function RootLayout({
     // resolved on `:root`, so the families must be defined there too.
     <html
       lang="bg"
-      className={`dark ${sofiaSans.variable} ${firaSans.variable} ${montserrat.variable} ${playfair.variable} ${exo.variable} ${nunito.variable} ${unbounded.variable}`}
+      className={`dark ${exo.variable} ${montserrat.variable} ${playfair.variable} ${nunito.variable} ${unbounded.variable}`}
       style={{ colorScheme: "dark" }}
       suppressHydrationWarning
     >

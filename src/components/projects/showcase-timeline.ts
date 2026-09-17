@@ -37,8 +37,25 @@ export const SCENE_FRAMED = 0.27;
 export const OSMO_OUTRO_START = SHOWCASE_HOLD - 0.2;
 /** How long the copy takes to fade; the disc only appears once it is gone (`OSMO_HANDOFF_START`). */
 export const OSMO_COPY_FADE = 0.08;
-/** The OSMO copy circle: centre + diameter (stage fractions) on desktop (`lg`); below that see `osmoCircleMobile`. */
-export const OSMO_CIRCLE = { x: 0.75, y: 0.56, d: 0.46 };
+/**
+ * The OSMO copy circle on desktop (`lg`): its nominal centre + diameter as stage fractions (the morph target; the
+ * real centre depends on the frame beside it - `osmoCircleDesktop`); below `lg` see `osmoCircleMobile`.
+ */
+export const OSMO_CIRCLE = { x: 0.65, y: 0.56, d: 0.46 };
+/**
+ * Desktop: the 4:5 frame and the circle stand as one group centred on the screen - the frame (its height
+ * `min(62vh, 45vw)`) on the left, a 2vw gap, then the circle (`min(46vw, 88vh)` wide); a gap, not an overlap,
+ * because the journey's canvas draws the circle *over* the stage at the hand-off and would cover a frame under
+ * it. Px for a viewport; `showcase-scenes.tsx` spells the same numbers as CSS variables on the scene
+ * (`--osmo-frame-h`, `--osmo-d`, `--osmo-left`, `--osmo-cx`), so keep the two in step.
+ */
+export function osmoCircleDesktop(vw: number, vh: number) {
+  const d = Math.min(0.46 * vw, 0.88 * vh);
+  const frameW = 0.8 * Math.min(0.62 * vh, 0.45 * vw);
+  const gap = 0.02 * vw;
+  const frameLeft = (vw - frameW - d - gap) / 2;
+  return { x: frameLeft + frameW + gap + d / 2, y: OSMO_CIRCLE.y * vh, d, frameLeft };
+}
 /**
  * Below `lg` the disc is centred, its top edge just under the floating header (5.75rem, or 10vh on tall phones) and
  * no wider than 88vw / 52vh - px for a viewport; `showcase-scenes.tsx` spells the same numbers as CSS

@@ -8,6 +8,7 @@ import { ButtonWithIcon } from "@/components/ui/button-with-icon";
 import { PartnersSection } from "@/components/partners-section";
 import { JourneyItem } from "@/components/ui/scroll-journey";
 import { cn } from "@/lib/utils";
+import { PROJECT_DISPLAY_FONT } from "@/lib/project-fonts";
 import { useLanguage } from "@/lib/i18n/language-context";
 import { homePath, portfolioPath } from "@/lib/routes";
 import { HERO_VIDEO, bunnyBackgroundEmbedSrc } from "@/lib/bunny-stream";
@@ -74,8 +75,12 @@ export function HeroSection() {
           is the "title" (leaves first as the page scrolls on), subtitle + CTAs and the partners strip follow. */}
       <div className="relative z-20 mx-auto flex w-full max-w-7xl flex-1 flex-col items-center justify-end px-4 pt-28 pb-1 text-center sm:pt-32 sm:pb-2 lg:pb-3">
         <JourneyItem kind="title" className="flex w-full flex-col items-center">
+        {/* The Plasico display style (Exo 2 bold, uppercase) - the client's pick for the page's big letters. */}
         <motion.p
-          className="w-full min-w-0 max-w-4xl font-heading text-[clamp(2.25rem,7.5vw+0.35rem,3rem)] font-extrabold leading-[1.06] tracking-tight text-balance text-white [text-shadow:0_2px_16px_rgba(0,0,0,0.35)] [overflow-wrap:anywhere] break-words sm:text-6xl sm:leading-[1.04] md:text-7xl md:leading-[1.02] lg:text-8xl"
+          className={cn(
+            "w-full min-w-0 max-w-4xl font-heading text-[clamp(2.25rem,7.5vw+0.35rem,3rem)] font-extrabold leading-[1.06] tracking-tight text-balance text-white [text-shadow:0_2px_16px_rgba(0,0,0,0.35)] [overflow-wrap:anywhere] break-words sm:text-6xl sm:leading-[1.04] md:text-7xl md:leading-[1.02] lg:text-8xl",
+            PROJECT_DISPLAY_FONT.plasico
+          )}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.45 }}

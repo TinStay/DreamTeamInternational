@@ -19,8 +19,8 @@ export function bunnyThumbnailUrl({ id }: BunnyVideo) {
   return `${BUNNY_PULL_ZONE}/${id}/thumbnail.jpg`;
 }
 
-/** The home hero's background film (share link `player.mediadelivery.net/play/750681/e41dfa9d-…`). */
-export const HERO_VIDEO: BunnyVideo = { library: "750681", id: "e41dfa9d-2e2b-422a-81b8-cd4ab4f360c9" };
+/** The home hero's background film (share link `player.mediadelivery.net/play/750681/d856fe05-…`). */
+export const HERO_VIDEO: BunnyVideo = { library: "750681", id: "d856fe05-54ae-4955-9043-c4eebc9208a4" };
 
 /** The regular player (controls; no autoplay unless asked - a lightbox opens playing) for a film frame. */
 export function bunnyPlayerEmbedSrc({ library, id }: BunnyVideo, { autoplay = false }: { autoplay?: boolean } = {}) {

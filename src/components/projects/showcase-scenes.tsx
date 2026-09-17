@@ -98,6 +98,8 @@ export type SceneVisual = {
   Visual: ComponentType<SceneVisualProps>;
   /** Optional layer the showcase draws *above* the morph shape (same scene transform). */
   Overlay?: ComponentType<SceneVisualProps>;
+  /** Classes on the scene's root - a world's geometry as CSS variables, for its visual and the copy block alike. */
+  className?: string;
 };
 
 const DEEP = "#070b1a";
@@ -461,8 +463,10 @@ const OSMO_MARK = "/company_icons/osmo_logo_light.png";
 const OSMO_MARK_WHITE = "/company_icons/osmo_logo_dark.png";
 
 /**
- * White world. One green circle on the right carries the copy; the left
- * column has the wordmark up top and the 4:3 frame at the bottom. Through the
+ * White world. One green circle carries the copy, the wordmark and the 4:5
+ * frame stand on its left, a 2vw gap between - one group centred on the
+ * screen (the geometry: the `--osmo-*` variables on the scene root,
+ * `osmoCircleDesktop` in showcase-timeline.ts in px). Through the
  * final hold the copy fades and the home journey's canvas takes the circle
  * itself over (`journeyMorph`, the same spot and size), then the white world
  * dissolves under it and the circle slides on into the stats' ring.
@@ -476,14 +480,14 @@ function OsmoVisual({ t, project, shouldMount }: SceneVisualProps) {
         className="pointer-events-none absolute inset-0 opacity-[0.05] [background-image:linear-gradient(#111_1px,transparent_1px),linear-gradient(90deg,#111_1px,transparent_1px)] [background-size:56px_56px]"
         aria-hidden
       />
-      <Sparks colors={[OSMO.deep, OSMO.green]} count={18} region={{ left: [46, 98], top: [10, 92] }} />
+      <Sparks colors={[OSMO.deep, OSMO.green]} count={18} region={{ left: [34, 92], top: [10, 92] }} />
       {/* The copy circle: layered radial highlight, a fine dot pattern, a concentric hairline and a deep soft shadow.
           Below lg: centred, its top edge just under the header, 88vw / 52vh - the same numbers as
           `osmoCircleMobile` (showcase-timeline.ts), which the journey's morph takes it over with. Drawn before the
           frame, so the frame can overlap its bottom cap on phones. */}
       <ParallaxLayer t={t} depth={0.2} scale={0.04} className="pointer-events-none">
         <div
-          className="absolute left-1/2 top-[calc(max(5.75rem,10vh)+min(44vw,26vh))] aspect-square w-[min(88vw,52vh)] -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-full lg:left-[75vw] lg:top-[56vh] lg:w-[min(46vw,88vh)]"
+          className="absolute left-1/2 top-[calc(max(5.75rem,10vh)+min(44vw,26vh))] aspect-square w-[min(88vw,52vh)] -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-full lg:left-[var(--osmo-cx)] lg:top-[56vh] lg:w-[var(--osmo-d)]"
           style={{
             background: `radial-gradient(120% 120% at 28% 22%, ${OSMO.light} 0%, ${OSMO.green} 46%, ${OSMO.deep} 100%)`,
             boxShadow: "0 50px 120px rgba(22,111,54,.38), inset 0 -30px 80px rgba(0,0,0,.18), inset 0 20px 60px rgba(255,255,255,.14)",
@@ -494,32 +498,23 @@ function OsmoVisual({ t, project, shouldMount }: SceneVisualProps) {
           <div className="absolute inset-[13%] rounded-full border border-dashed border-white/10" />
         </div>
       </ParallaxLayer>
-      {/* 4:3 frame (the clip cover-fits it) - bottom-left on desktop, the wordmark riding the same layer right above
-          it (the gap is fixed: frame bottom 6vh + its 4:3 height + 1.5rem) and sized to the room left under the
-          floating header - 6rem on a short laptop screen, up to 11rem on a big one. Below lg it is centred, big (up to 92vw), its top 12% of the disc's diameter
-          up into the disc (over its bottom cap, under the copy block), as tall as the room down to the mobile dock
-          allows. */}
+      {/* 4:5 frame (the clip cover-fits it) - on desktop at the group's left edge (`--osmo-left`), sized by its
+          height (`--osmo-frame-h`: 62vh, never wider than 36vw), a 2vw gap to the circle, the wordmark
+          riding the same layer right above it (the gap is fixed: frame bottom 6vh + the frame's height + 1.5rem)
+          and sized to the room left under the floating header - 6rem on a short laptop screen, up to 11rem on a
+          big one. Below lg it is centred, its top 12% of the disc's diameter up into the disc (over its bottom
+          cap, under the copy block), as tall as the room down to the mobile dock allows and never wider than
+          92vw. */}
       <ParallaxLayer t={t} depth={0.08} dx={0.1} className="pointer-events-none">
         <div
-          className="absolute left-1/2 top-[calc(max(5.75rem,10vh)+min(88vw,52vh)*0.88)] aspect-[4/3] h-[calc(100svh-max(5.75rem,10vh)-min(88vw,52vh)*0.88-6rem)] max-h-[69vw] -translate-x-1/2 overflow-hidden rounded-3xl lg:left-[max(3vw,6rem)] lg:top-auto lg:bottom-[6vh] lg:h-auto lg:max-h-none lg:w-[36vw] lg:translate-x-0 xl:w-[38vw] 2xl:w-[36vw]"
+          className="absolute left-1/2 top-[calc(max(5.75rem,10vh)+min(88vw,52vh)*0.88)] aspect-[4/5] h-[calc(100svh-max(5.75rem,10vh)-min(88vw,52vh)*0.88-6rem)] max-h-[115vw] -translate-x-1/2 overflow-hidden rounded-3xl lg:left-[var(--osmo-left)] lg:top-auto lg:bottom-[6vh] lg:h-[var(--osmo-frame-h)] lg:max-h-none lg:translate-x-0"
           style={{ backgroundColor: "#111111", boxShadow: "0 50px 120px rgba(17,17,17,.3)" }}
         >
-          <ProjectThumbnail project={project} alt={dict.projects.items[project.id].name} sizes="(max-width: 1024px) 92vw, 60vw" />
-          {shouldMount ? <ProjectEmbedCover project={project} boxAspect={4 / 3} /> : null}
+          <ProjectThumbnail project={project} alt={dict.projects.items[project.id].name} sizes="(max-width: 1024px) 92vw, 40vw" />
+          {shouldMount ? <ProjectEmbedCover project={project} boxAspect={4 / 5} /> : null}
         </div>
-        <Reveal
-          t={t}
-          delay={0.02}
-          className="absolute left-[max(3vw,6rem)] bottom-[calc(6vh+27vw+1.5rem)] hidden lg:block xl:bottom-[calc(6vh+28.5vw+1.5rem)] 2xl:bottom-[calc(6vh+27vw+1.5rem)]"
-        >
-          <Image
-            src={OSMO_MARK}
-            alt="OSMO"
-            width={1064}
-            height={505}
-            sizes="480px"
-            className="h-[clamp(6rem,calc(94vh-27vw-8rem),11rem)] w-auto xl:h-[clamp(6rem,calc(94vh-28.5vw-8rem),11rem)] 2xl:h-[clamp(6rem,calc(94vh-27vw-8rem),11rem)]"
-          />
+        <Reveal t={t} delay={0.02} className="absolute left-[var(--osmo-left)] bottom-[calc(6vh+var(--osmo-frame-h)+1.5rem)] hidden lg:block">
+          <Image src={OSMO_MARK} alt="OSMO" width={1064} height={505} sizes="480px" className="h-[clamp(6rem,calc(94vh-var(--osmo-frame-h)-8rem),11rem)] w-auto" />
         </Reveal>
       </ParallaxLayer>
       {/* Wordmark below lg: small, centred inside the top of the green disc (white-ink file); the copy block sits
@@ -571,8 +566,9 @@ const SCENES: Partial<Record<ProjectKey, SceneVisual>> = {
   },
   emblema: {
     // The reference animation's Emblema face: Playfair Display, italic - a size under the layout's ramp, and no line
-    // under it: the logo leads, the headline follows.
-    headline: cn(PROJECT_DISPLAY_FONT.emblema, "max-w-[22ch] text-xl sm:text-2xl lg:text-2xl xl:text-3xl 2xl:text-4xl"),
+    // under it: the logo leads, the headline follows. The cap breaks „Емоцията на дома, разказана кинематографично"
+    // into two balanced lines.
+    headline: cn(PROJECT_DISPLAY_FONT.emblema, "max-w-[28ch] text-xl sm:text-2xl lg:text-2xl xl:text-3xl 2xl:text-4xl"),
     highlight: false,
     tone: "light",
     background: EMBLEMA.bg,
@@ -615,6 +611,10 @@ const SCENES: Partial<Record<ProjectKey, SceneVisual>> = {
     // the overlay must not sit on the copy); the home journey's canvas takes the circle over at the outro.
     morph: { w: [OSMO_CIRCLE.d, 0], h: [OSMO_CIRCLE.d, 0], x: OSMO_CIRCLE.x, y: OSMO_CIRCLE.y, xMobile: 0.5, yMobile: 0.3, color: OSMO.green, alpha: 0 },
     mark: "none",
+    // The desktop geometry (see `osmoCircleDesktop`): the frame's height, the circle's diameter, the group's left
+    // edge (the frame's) and the circle's centre - frame, a 2vw gap, circle, the pair centred.
+    className:
+      "[--osmo-frame-h:min(62vh,45vw)] [--osmo-d:min(46vw,88vh)] [--osmo-frame-w:calc(var(--osmo-frame-h)*0.8)] [--osmo-left:calc((100vw_-_var(--osmo-frame-w)_-_var(--osmo-d)_-_2vw)/2)] [--osmo-cx:calc(var(--osmo-left)_+_var(--osmo-frame-w)_+_2vw_+_var(--osmo-d)/2)]",
     Visual: OsmoVisual,
   },
 };

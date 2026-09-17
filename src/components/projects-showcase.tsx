@@ -274,7 +274,7 @@ const TEXT_LAYOUT = {
   // Below lg: a compact block inside the top of the (smaller) disc, under the white mark (see `OsmoVisual`).
   "in-circle": {
     block:
-      "left-[12vw] right-[12vw] top-[calc(max(5.75rem,10vh)+6.75rem)] items-center gap-2 text-center sm:left-[22vw] sm:right-[22vw] sm:top-[calc(max(5.75rem,10vh)+8.5rem)] sm:gap-3 lg:left-auto lg:right-[7vw] lg:top-[56vh] lg:w-[36vw] lg:-translate-y-1/2 lg:gap-4",
+      "left-[12vw] right-[12vw] top-[calc(max(5.75rem,10vh)+6.75rem)] items-center gap-2 text-center sm:left-[22vw] sm:right-[22vw] sm:top-[calc(max(5.75rem,10vh)+8.5rem)] sm:gap-3 lg:left-[var(--osmo-cx)] lg:right-auto lg:top-[56vh] lg:w-[32vw] lg:-translate-x-1/2 lg:-translate-y-1/2 lg:gap-4",
     row: "flex justify-center",
     chips: `justify-center ${DENSE_CHIPS}`,
   },
@@ -391,7 +391,9 @@ function BrandMark({
         className={cn(
           "w-auto object-contain",
           size === "xl"
-            ? "h-20 max-w-[320px] sm:h-24 sm:max-w-[380px] lg:h-52 lg:max-w-[520px] xl:h-56 xl:max-w-[560px] 2xl:h-72 2xl:max-w-[720px]"
+            ? // Desktop: sized by the viewport height, so a 15" laptop (a short viewport) gets a smaller mark than a
+              // tall monitor - about 14rem at 864px tall, 18rem from 1100px up.
+              "h-20 max-w-[320px] sm:h-24 sm:max-w-[380px] lg:h-[clamp(9rem,22vh,13rem)] lg:max-w-[30vw] xl:h-[clamp(10rem,24vh,14rem)] 2xl:h-[clamp(11rem,26vh,18rem)]"
             : size === "lg"
               ? "h-11 max-w-[220px] sm:h-14 lg:h-24 lg:max-w-[340px] xl:h-28 xl:max-w-[400px] 2xl:h-36 2xl:max-w-[480px]"
               : "h-9 max-w-[200px] sm:h-11 lg:h-12",
@@ -432,7 +434,7 @@ function ProjectScene({
   const { t: dict, language } = useLanguage();
   const p = dict.projects;
   const copy = p.items[project.id];
-  const { tone, background, layout, mark, Mark, Visual, headline, Detail, highlight: showHighlight = true } = sceneVisualFor(project);
+  const { tone, background, layout, mark, Mark, Visual, headline, Detail, highlight: showHighlight = true, className: sceneClass } = sceneVisualFor(project);
   const colors = TONE[tone];
   // A layout may pull its mark row back over the copy (the MindGuard file's transparent left padding).
   const markRow = (TEXT_LAYOUT[layout] as { mark?: string }).mark;
@@ -461,7 +463,7 @@ function ProjectScene({
 
   return (
     <motion.div
-      className="absolute inset-0 overflow-clip will-change-[transform,opacity]"
+      className={cn("absolute inset-0 overflow-clip will-change-[transform,opacity]", sceneClass)}
       style={{ ...frameStyle, opacity, visibility, backgroundColor: background }}
       inert={parked ? true : undefined}
     >

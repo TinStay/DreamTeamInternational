@@ -634,7 +634,7 @@ export const en = {
         headline: "Insurance explained in 15 seconds",
         description:
           "Proof that new technology can reinvent an old industry - insurance told with fresh ideas, in over 20 AI videos and 75 million views.",
-        highlight: "A video mascot with over 75 million views, 20+ videos and 6 platforms - YouTube, TikTok, Instagram, Facebook, TV and LinkedIn.",
+        highlight: "A brand mascot and AI ads for Boleron - on air, on social media and on YouTube.",
         tags: ["75M+ views", "Mascot", "20+ videos", "Software ad"],
         mission:
           "Make a mandatory, dry insurance product feel simple and human, so visitors understand it in seconds and finish the purchase online instead of calling an agent.",
@@ -673,7 +673,7 @@ export const en = {
       },
       emblema: {
         name: "Emblema",
-        headline: "The feeling of home, before it's built",
+        headline: "The emotion of a home, told cinematically",
         description:
           "Two cinematic AI films for Emblema's residential projects - District Living by Chavdar bridge and Eria in Ovcha Kupel - so buyers feel the building before the first brick is laid.",
         highlight: "The emotion of home, told cinematically.",
@@ -1556,6 +1556,8 @@ export const en = {
   footer: {
     desc: "At DreamTeam, we handle end-to-end video production using the latest AI technologies.",
     links: "Links",
+    reviews: "Reviews",
+    googleReviews: "reviews on Google",
     legal: "Legal",
     terms: "Terms and Conditions",
     privacy: "Privacy Policy",

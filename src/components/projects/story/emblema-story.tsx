@@ -1,27 +1,29 @@
 "use client";
 
 import type { CSSProperties } from "react";
-import Image from "next/image";
 import { motion } from "motion/react";
 import { PartnerLogo } from "@/components/partner-logo";
 import { useLanguage } from "@/lib/i18n/language-context";
 import { PARTNERS } from "@/lib/partners";
-import { youtubeThumbnailUrl } from "@/lib/portfolio-highlights";
-import { EmbedCover } from "@/components/projects/showcase-primitives";
-import { bunnyBackgroundEmbedSrc, bunnyPlayerEmbedSrc } from "@/lib/bunny-stream";
-import { PROJECT_DISPLAY_FONT } from "@/lib/project-fonts";
+import { bunnyPlayerEmbedSrc } from "@/lib/bunny-stream";
 import type { Project, StoryClip } from "@/lib/projects";
 import { cn } from "@/lib/utils";
 import { YOUTUBE_IFRAME_ALLOW, YOUTUBE_REFERRER_POLICY } from "@/lib/youtube-embeds";
-import { Body, CtaBand, Display, EASE, Eyebrow, HERO_TITLE, Lead, PlayRing, Section, Split, StoryShell, VIEWPORT, Words, fadeUp, stagger } from "./primitives";
+import { Body, COPY_DELAY, CtaBand, EASE, Eyebrow, HERO_TITLE, Lead, PlayRing, Section, Split, StoryShell, VIEWPORT, fadeUp, fadeUpAfter, frameIn, stagger } from "./primitives";
 
 /*
  * Emblema's story - the editorial world on Emblema's own ground (cream in the
  * light theme, warm black in the dark one, no bands): the type carries the
  * logo's copper -
  * headings in the copper gradient, eyebrows / numerals / hairlines in the mid
- * tone - headings are airy and uppercase, a small arch draws itself at the
- * head of the key sections and the film frames are arch-topped. Copy in
+ * tone - headings are airy and uppercase and settle in softly (`SoftTitle`:
+ * a slight blur, a wider tracking and a breath of scale easing out, not the
+ * kit's rising words), a small arch draws itself at the head of the key
+ * sections and the film frames are arch-topped. The hero is copy alone -
+ * title, line and meta strip, the logo big on the right from `lg` (on top on
+ * phones), no film (the client wanted it clean); the films follow, the wide
+ * one across the page, each vertical one in its arch beside its copy, sides
+ * alternating. Copy in
  * `projects.stories.emblema`; which films exist (and their clips - Bunny
  * Stream today) in `Project.story.films`.
  */
@@ -30,6 +32,52 @@ import { Body, CtaBand, Display, EASE, Eyebrow, HERO_TITLE, Lead, PlayRing, Sect
 const COPPER = { light: "#DDB27A", mid: "#C08F55", deep: "#95693A" };
 /** Headings wear the logo gradient. */
 const INK = "bg-gradient-to-br from-[#DDB27A] via-[#C08F55] to-[#95693A] bg-clip-text text-transparent";
+
+/**
+ * Emblema's heading reveal - its own, and soft: each line fades up out of a slight blur while its letters settle in
+ * from a wider tracking and a breath of scale (a transform, so a wrapping line never re-breaks mid-way). The
+ * copper ink sits on each line, not on the heading: a filter or an opacity on a child of a `bg-clip-text` element
+ * would leave the ink untouched. `lines` are the hero's explicit lines; a section title is one line that wraps.
+ */
+const SOFT_VIEWPORT = { once: true, margin: "0px 0px 6% 0px" } as const;
+const SOFT = {
+  hidden: { opacity: 0, y: 12, scale: 1.035, letterSpacing: "0.05em", filter: "blur(10px)" },
+  visible: { opacity: 1, y: 0, scale: 1, letterSpacing: "0.005em", filter: "blur(0px)" },
+};
+const SOFT_TAGS = { h1: motion.h1, h2: motion.h2, h3: motion.h3 } as const;
+function SoftTitle({
+  as = "h2",
+  lines,
+  className,
+  base = 0,
+  step = 0.16,
+  onLoad = false,
+}: {
+  as?: keyof typeof SOFT_TAGS;
+  lines: string[];
+  className?: string;
+  base?: number;
+  step?: number;
+  /** The hero: play on load rather than when scrolled into view. */
+  onLoad?: boolean;
+}) {
+  const Tag = SOFT_TAGS[as];
+  return (
+    <Tag className={className}>
+      {lines.map((line, i) => (
+        <motion.span
+          key={line}
+          className={cn("block origin-bottom-left", INK)}
+          initial={SOFT.hidden}
+          {...(onLoad ? { animate: SOFT.visible } : { whileInView: SOFT.visible, viewport: SOFT_VIEWPORT })}
+          transition={{ duration: 1.25, ease: EASE, delay: base + i * step }}
+        >
+          {line}
+        </motion.span>
+      ))}
+    </Tag>
+  );
+}
 
 /** A small arch that draws itself at the head of a section. */
 function ArchMark() {
@@ -114,9 +162,90 @@ function FilmMedia({ clip, orientation, title, placeholder }: { clip: StoryClip 
   );
 }
 
-/** A section heading in the logo's copper, airy and uppercase. */
+/** A section heading in the logo's copper, airy and uppercase, settling in softly. */
 function Heading({ text, className }: { text: string; className?: string }) {
-  return <Display tone="light" text={text} className={cn("text-3xl sm:text-4xl lg:text-5xl xl:text-6xl", INK, className)} />;
+  return (
+    <SoftTitle
+      lines={[text]}
+      className={cn("font-heading font-extralight uppercase tracking-[0.01em] text-balance text-3xl sm:text-4xl lg:text-5xl xl:text-6xl", className, "leading-[1.12]")}
+    />
+  );
+}
+
+type FilmCopy = { project: string; title: string; text: string; tags: string[] };
+
+/**
+ * One film: the frame rising in, the number / title / project first, the text and tags a beat after. A wide film
+ * runs across the page with its copy under it; a vertical one stands in its arch beside the copy - on the left or
+ * the right (`side`), so the tall films alternate down the page.
+ */
+function FilmEntry({ film, media, index, side, title, placeholder }: {
+  film: FilmCopy;
+  media: { clip: StoryClip | null; orientation: "wide" | "tall" };
+  index: string;
+  side: "left" | "right";
+  title: string;
+  placeholder: string;
+}) {
+  const tall = media.orientation === "tall";
+  const head = (
+    <motion.div variants={fadeUp}>
+      <span className="mb-3 block font-heading text-sm tracking-[0.22em] text-[var(--story-accent)]">{index}</span>
+      <SoftTitle
+        as="h3"
+        lines={[film.title]}
+        className={cn("font-heading text-2xl font-extralight uppercase sm:text-3xl", tall && "lg:text-4xl xl:text-5xl", "leading-[1.16]")}
+      />
+      <p className="mt-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--story-muted)]">{film.project}</p>
+    </motion.div>
+  );
+  const text = (
+    <motion.div variants={fadeUpAfter(COPY_DELAY)}>
+      <Body className={cn(tall && "max-w-[52ch] xl:text-xl")}>{film.text}</Body>
+      <motion.ul className="mt-6 flex flex-wrap gap-2.5 border-t border-[var(--story-line)] pt-5" variants={stagger(0.07)}>
+        {film.tags.map((tag) => (
+          <motion.li
+            key={tag}
+            variants={fadeUp}
+            className="rounded-full border border-[color:color-mix(in_srgb,var(--story-accent)_45%,transparent)] px-3.5 py-1.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--story-accent)]"
+          >
+            {tag}
+          </motion.li>
+        ))}
+      </motion.ul>
+    </motion.div>
+  );
+  const frame = (
+    <motion.div variants={frameIn} className={cn(tall && (side === "right" ? "lg:order-2" : "lg:order-1"))}>
+      <FilmMedia clip={media.clip} orientation={media.orientation} title={title} placeholder={placeholder} />
+    </motion.div>
+  );
+  if (tall) {
+    return (
+      <motion.div
+        className="grid items-center gap-10 lg:grid-cols-2 lg:gap-16 xl:gap-24"
+        initial="hidden"
+        whileInView="visible"
+        viewport={VIEWPORT}
+        variants={stagger(0.12)}
+      >
+        {frame}
+        <div className={cn("lg:max-w-[52ch]", side === "right" ? "lg:order-1 lg:justify-self-end" : "lg:order-2")}>
+          {head}
+          <div className="mt-6">{text}</div>
+        </div>
+      </motion.div>
+    );
+  }
+  return (
+    <motion.div initial="hidden" whileInView="visible" viewport={VIEWPORT} variants={stagger(0.12)}>
+      {frame}
+      <div className="mt-8 grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.25fr)] lg:gap-16">
+        {head}
+        {text}
+      </div>
+    </motion.div>
+  );
 }
 
 export function EmblemaStory({ project }: { project: Project }) {
@@ -125,10 +254,6 @@ export function EmblemaStory({ project }: { project: Project }) {
   const copy = t.projects.items[project.id];
   const partner = PARTNERS.find((p) => p.id === project.partnerId);
   const films = project.story?.films ?? [];
-  // The hero: the first film on Bunny plays muted in the arch; without one, the project's YouTube thumbnail (the
-  // Bunny posters are not served to the image optimizer), or the first film that is on YouTube.
-  const heroClip = films.map((film) => (film.clip && "bunny" in film.clip ? film.clip.bunny : null)).find(Boolean) ?? null;
-  const cover = project.videoId ?? films.map((film) => (film.clip && "youtube" in film.clip ? film.clip.youtube : null)).find(Boolean) ?? null;
   const style = {
     "--story-accent": COPPER.mid,
     "--story-accent-bright": COPPER.light,
@@ -141,7 +266,6 @@ export function EmblemaStory({ project }: { project: Project }) {
     <StoryShell
       style={style}
       accent={COPPER.mid}
-      display={PROJECT_DISPLAY_FONT.emblema}
       className="[--story-ground:#F3EFE8] dark:[--story-ground:#17130F]"
       ground={
         // The showcase's cream (a soft white light at the top) / a warm black with a faint copper light.
@@ -153,79 +277,52 @@ export function EmblemaStory({ project }: { project: Project }) {
       {/* ---------------- HERO ---------------- */}
       <Section tight className="pt-4 sm:pt-6 lg:pt-8">
         <motion.div
-          className="grid items-center gap-12 lg:grid-cols-[1.05fr_0.95fr] lg:gap-16"
+          className="grid gap-10 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] lg:items-center lg:gap-16"
           initial="hidden"
           animate="visible"
-          variants={stagger(0.07, 0.1)}
+          variants={stagger(0, 0.05)}
         >
-          <div>
-            {partner ? (
-              <motion.div variants={fadeUp} className="mb-10">
-                <PartnerLogo p={partner} imgClass="h-20 w-auto md:h-28" sizes="420px" />
-              </motion.div>
-            ) : null}
-            <h1 className={cn(HERO_TITLE.light, "font-heading font-extralight uppercase tracking-[0.005em]", PROJECT_DISPLAY_FONT.emblema, INK, "leading-[1.1]")}>
-              {story.hero.titleLines.map((line, i) => (
-                <span key={line} className="block whitespace-nowrap">
-                  <Words text={line} base={0.1 + i * 0.16} />
-                </span>
-              ))}
-              <span className="block whitespace-nowrap">
-                <Words text={story.hero.titleAccent} base={0.1 + story.hero.titleLines.length * 0.16} />
-              </span>
-            </h1>
-            <motion.p variants={fadeUp} className="mt-7 max-w-[54ch] text-lg leading-relaxed text-[var(--story-muted)] sm:text-xl xl:text-2xl">
+          {partner ? (
+            <motion.div variants={fadeUp} className="lg:order-2 lg:justify-self-center">
+              <PartnerLogo p={partner} imgClass="h-20 w-auto md:h-28 lg:h-48 xl:h-56 2xl:h-64" sizes="(max-width: 1024px) 420px, 640px" />
+            </motion.div>
+          ) : null}
+          <div className="lg:order-1">
+            <SoftTitle
+              as="h1"
+              lines={[...story.hero.titleLines, story.hero.titleAccent]}
+              onLoad
+              base={0.15}
+              className={cn(HERO_TITLE.light, "font-heading font-extralight uppercase tracking-[0.005em] whitespace-nowrap", "leading-[1.1]")}
+            />
+            <motion.p variants={fadeUpAfter(0.6)} className="mt-7 max-w-[54ch] text-lg leading-relaxed text-[var(--story-muted)] sm:text-xl xl:text-2xl">
               {story.hero.sub}
             </motion.p>
-
-            <motion.dl
-              variants={stagger(0.07, 0.5)}
-              className="mt-12 grid grid-cols-2 gap-x-6 gap-y-6 border-y border-[var(--story-line)] py-7 sm:grid-cols-3"
-            >
-              {story.hero.meta.map((m) => (
-                <motion.div key={m.label} variants={fadeUp}>
-                  <dt className="mb-2 text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--story-accent)]">{m.label}</dt>
-                  {/* A field listing several things (the two projects) reads as separate lines, each with a dash. */}
-                  {Array.isArray(m.value) ? (
-                    m.value.map((v) => (
-                      <dd
-                        key={v}
-                        className="relative pl-4 font-heading text-xl font-light leading-tight text-foreground before:absolute before:left-0 before:top-[0.66em] before:h-px before:w-2 before:bg-[var(--story-accent)]"
-                      >
-                        {v}
-                      </dd>
-                    ))
-                  ) : (
-                    <dd className="font-heading text-xl font-light leading-tight text-foreground">{m.value}</dd>
-                  )}
-                </motion.div>
-              ))}
-            </motion.dl>
           </div>
 
-          {/* The first film, muted and looping, in an arch-topped frame (a thumbnail when no film is on Bunny). */}
-          <motion.div variants={fadeUp} className="relative">
-            <div className="arch-wide relative aspect-[4/5] w-full overflow-hidden border border-[color:color-mix(in_srgb,#C08F55_35%,transparent)] bg-[#1a1715] sm:aspect-[5/6] lg:aspect-[4/5]">
-              {heroClip ? (
-                <EmbedCover src={bunnyBackgroundEmbedSrc(heroClip)} orientation="wide" boxAspect={4 / 5} />
-              ) : cover ? (
-                <Image src={youtubeThumbnailUrl(cover)} alt="" fill priority sizes="(max-width: 1024px) 100vw, 48vw" className="scale-[1.02] object-cover" />
-              ) : (
-                <div
-                  className="absolute inset-0"
-                  style={{
-                    background:
-                      "radial-gradient(88% 72% at 78% 0%, rgba(192,143,85,0.3) 0%, rgba(192,143,85,0) 62%), linear-gradient(168deg, #3a2622 0%, #1c1715 58%, #100f0e 100%)",
-                  }}
-                >
-                  <Arches className="h-[70%] w-[70%] opacity-30" />
-                </div>
-              )}
-              <div className="pointer-events-none absolute inset-0" style={{ background: "linear-gradient(to top, rgba(20,17,16,0.45) 0%, rgba(20,17,16,0) 40%)" }} aria-hidden />
-            </div>
-            {/* A copper hairline under the frame, like the floor line of the placeholders. */}
-            <span className="mt-4 block h-px w-full bg-gradient-to-r from-transparent via-[#C08F55] to-transparent opacity-60" aria-hidden />
-          </motion.div>
+          <motion.dl
+            variants={stagger(0.07, 0.85)}
+            className="grid grid-cols-2 gap-x-6 gap-y-6 border-y border-[var(--story-line)] py-7 sm:grid-cols-3 lg:order-3 lg:col-span-2 lg:mt-2 lg:grid-cols-5"
+          >
+            {story.hero.meta.map((m) => (
+              <motion.div key={m.label} variants={fadeUp}>
+                <dt className="mb-2 text-[10px] font-semibold uppercase tracking-[0.22em] text-[var(--story-accent)]">{m.label}</dt>
+                {/* A field listing several things (the two projects) reads as separate lines, each with a dash. */}
+                {Array.isArray(m.value) ? (
+                  m.value.map((v) => (
+                    <dd
+                      key={v}
+                      className="relative pl-4 font-heading text-xl font-light leading-tight text-foreground before:absolute before:left-0 before:top-[0.66em] before:h-px before:w-2 before:bg-[var(--story-accent)]"
+                    >
+                      {v}
+                    </dd>
+                  ))
+                ) : (
+                  <dd className="font-heading text-xl font-light leading-tight text-foreground">{m.value}</dd>
+                )}
+              </motion.div>
+            ))}
+          </motion.dl>
         </motion.div>
       </Section>
 
@@ -260,43 +357,16 @@ export function EmblemaStory({ project }: { project: Project }) {
             const media = films[i] ?? { clip: null, orientation: "wide" as const };
             const index = String(i + 1).padStart(2, "0");
             return (
-              <motion.div key={film.title} initial="hidden" whileInView="visible" viewport={VIEWPORT} variants={fadeUp}>
-                <FilmMedia
-                  clip={media.clip}
-                  orientation={media.orientation}
-                  title={`${copy.name} · ${film.title}`}
-                  placeholder={story.films.placeholder.replace("{n}", index)}
-                />
-                <div className="mt-8 grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.25fr)] lg:gap-16">
-                  <div>
-                    <span className="mb-3 block font-heading text-sm tracking-[0.22em] text-[var(--story-accent)]">{index}</span>
-                    <h3 className={cn("font-heading text-2xl font-extralight uppercase sm:text-3xl", PROJECT_DISPLAY_FONT.emblema, INK, "leading-[1.16]")}>
-                      <Words text={film.title} />
-                    </h3>
-                    <p className="mt-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-[var(--story-muted)]">{film.project}</p>
-                  </div>
-                  <div>
-                    <Body>{film.text}</Body>
-                    <motion.ul
-                      className="mt-6 flex flex-wrap gap-2.5 border-t border-[var(--story-line)] pt-5"
-                      initial="hidden"
-                      whileInView="visible"
-                      viewport={VIEWPORT}
-                      variants={stagger(0.07, 0.15)}
-                    >
-                      {film.tags.map((tag) => (
-                        <motion.li
-                          key={tag}
-                          variants={fadeUp}
-                          className="rounded-full border border-[color:color-mix(in_srgb,var(--story-accent)_45%,transparent)] px-3.5 py-1.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--story-accent)]"
-                        >
-                          {tag}
-                        </motion.li>
-                      ))}
-                    </motion.ul>
-                  </div>
-                </div>
-              </motion.div>
+              <FilmEntry
+                key={film.title}
+                film={film}
+                media={media}
+                index={index}
+                // The tall films alternate: the first on the left of its copy, the next on the right.
+                side={i % 2 === 1 ? "left" : "right"}
+                title={`${copy.name} · ${film.title}`}
+                placeholder={story.films.placeholder.replace("{n}", index)}
+              />
             );
           })}
         </div>
