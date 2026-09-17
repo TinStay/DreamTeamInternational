@@ -133,13 +133,15 @@ export const PROJECTS: Project[] = [
     videoId: "dvqlJZPQynw", // "Plasico 1"
     // The home showcase frame plays the "Back to Work 4K" ad from Bunny Stream.
     showcaseClip: bunny("481d2093-0dc0-44db-bda4-4d562c20d8fe"),
-    // Story: the three ads in the order they were made, all on Bunny Stream - "Back to Work 4K" (the office one,
-    // 16:9), "Back to School" (the vertical 9:16 cut, with subtitles) and the "Hot Summer Sale" spot.
+    // Story: the three ads, all on Bunny Stream, in the client's order on the page - the office spot ("v1 3rd
+    // voice 2nd music", 16:9) under the first title, "Back to Work 4K" (16:9, the hero's film too) under the
+    // second, "Back to School" (the vertical 9:16 cut, with subtitles) under the third; the "Hot Summer Sale" spot
+    // (eeaa9212-f44d-4d7c-b69a-b3054c758eed) is off the page.
     story: {
       clips: {
-        first: { bunny: { library: "750681", id: "481d2093-0dc0-44db-bda4-4d562c20d8fe" } },
-        second: { bunny: { library: "750681", id: "9bbc728d-de27-4404-994c-3f987516db83" } },
-        third: { bunny: { library: "750681", id: "eeaa9212-f44d-4d7c-b69a-b3054c758eed" } },
+        office: { bunny: { library: "750681", id: "3f0113df-90d2-425e-9d5b-84fec0d32932" } },
+        backToWork: { bunny: { library: "750681", id: "481d2093-0dc0-44db-bda4-4d562c20d8fe" } },
+        backToSchool: { bunny: { library: "750681", id: "9bbc728d-de27-4404-994c-3f987516db83" } },
       },
     },
     orientation: "wide",

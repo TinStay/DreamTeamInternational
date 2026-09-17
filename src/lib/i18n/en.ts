@@ -492,7 +492,7 @@ export const en = {
               "For the second video we went for a catchier concept and catchier lines — not just entertaining, but speaking straight to the viewer's problem.",
               "Again with top-tier AI visuals. The result is a video that is one of a kind in the industry."
             ],
-            note: "9:16 · vertical · subtitled"
+            note: "16:9 · 4K"
           },
           {
             eyebrow: "Ad 03",
@@ -501,7 +501,7 @@ export const en = {
               "The third video is a dynamic 15-second ad with everything we had learned so far poured into it.",
               "In fifteen seconds the viewer travels from the beach to the gaming room — and feels both."
             ],
-            note: "15 s · 16:9 · 4K"
+            note: "9:16 · vertical · subtitled"
           }
         ],
         method: {

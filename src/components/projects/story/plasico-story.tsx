@@ -15,23 +15,28 @@ import { BodyXL, ClientSite, CtaBand, Eyebrow, HERO_TITLE, MediaFrame, STORY_CON
 /*
  * Plasico's story - the store's world from the home showcase: white, the
  * Plasico green and faint diagonal pinstripes - told in big, short titles
- * (they are what gets read) over large type: the hero, the brief, the three
- * ads in the order they were made (each a title + a couple of lines + a
- * full-width frame), how the two teams work together, and the CTA. Every
+ * (they are what gets read) over large type: the hero (the mark on top, the
+ * title and the lead under it, the film on the right), the brief, the three
+ * ads (the two wide ones a title, a couple of lines and then a full-width
+ * frame; the vertical one beside its copy), how the two teams work together,
+ * and the CTA. Every
  * block reveals once on the way down. Copy in `projects.stories.plasico`;
- * the clips in `Project.story.clips` (all three on Bunny Stream; the second
- * ad is the vertical cut, so it gets a 9:16 frame).
+ * the clips in `Project.story.clips` (all three on Bunny Stream; the third
+ * ad is the vertical cut, so it gets a 9:16 frame beside its copy).
  */
 
 const PLASICO = { green: "#1FA22A", lime: "#5FBF2F", soft: "#EAF6E6" };
+/** The green band and the CTA card at the foot of the page: the brand gradient a shade darker (the client's ask). */
+const BAND = "linear-gradient(120deg, #1A8E25, #52AC28)";
 /**
- * The three ads' clips (`Project.story.clips`) and frames - the second is the vertical "Back to School" cut, laid
- * out beside its copy (title + text left, the 9:16 frame right) rather than under it.
+ * The three ads' clips (`Project.story.clips`) and frames, in the client's order: the office spot, then "Back to
+ * Work" (the hero's film) - both full-width 16:9 -, then the vertical "Back to School" cut, laid out beside its
+ * copy (title + text left, the 9:16 frame right) rather than under it.
  */
 const ADS = [
-  { key: "first", aspect: "aspect-video", beside: false },
-  { key: "second", aspect: "aspect-[9/16]", beside: true },
-  { key: "third", aspect: "aspect-video", beside: false },
+  { key: "office", aspect: "aspect-video", beside: false },
+  { key: "backToWork", aspect: "aspect-video", beside: false },
+  { key: "backToSchool", aspect: "aspect-[9/16]", beside: true },
 ] as const;
 
 /** A short title, big. */
@@ -67,17 +72,32 @@ export function PlasicoStory({ project }: { project: Project }) {
         </div>
       }
     >
-      {/* ---------------- HERO: the title across the page, the lead under it, then the film beside the mark ---------------- */}
+      {/* ---------------- HERO: the mark on top, the title and the lead under it, the film on the right ---------------- */}
       <Section tight className="pt-0 sm:pt-0 lg:pt-0">
-        <motion.div initial="hidden" animate="visible" variants={stagger(0.08, 0.1)}>
-          {/* A step under the short scale on desktop - the uppercase Exo 2 reads loud enough at 3.75–4.4rem. */}
-          <h1 className={cn("text-[clamp(2.5rem,1.25rem+2.6vw,5rem)] font-heading font-bold tracking-tight text-balance", PROJECT_DISPLAY_FONT.plasico, "leading-[0.98]")}>
-            <Words text={story.hero.title} base={0.05} step={0.04} />
-          </h1>
-          <motion.p variants={fadeUp} className="mt-8 max-w-[60ch] text-lg leading-relaxed text-[var(--story-muted)] sm:text-xl xl:text-2xl">
-            {story.hero.lead}
-          </motion.p>
-          <div className="mt-12 grid items-center gap-10 lg:mt-16 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)] lg:gap-14 xl:gap-20">
+        <motion.div
+          className="grid items-center gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] lg:gap-14 xl:gap-20"
+          initial="hidden"
+          animate="visible"
+          variants={stagger(0.08, 0.1)}
+        >
+          <div>
+            {partner ? (
+              // The client's mark (the link to its site) leading the copy.
+              <motion.div variants={fadeUp} className="mb-8">
+                <ClientSite href={partner.href} name={name}>
+                  <PartnerLogo p={partner} imgClass="h-16 w-auto max-w-full md:h-20 xl:h-24" sizes="360px" />
+                </ClientSite>
+              </motion.div>
+            ) : null}
+            {/* A step under the short scale on desktop - the uppercase Exo 2 reads loud enough at 3.5–4rem. */}
+            <h1 className={cn("text-[clamp(2.5rem,1rem+2.4vw,4.5rem)] font-heading font-bold tracking-tight text-balance", PROJECT_DISPLAY_FONT.plasico, "leading-[0.98]")}>
+              <Words text={story.hero.title} base={0.05} step={0.04} />
+            </h1>
+            <motion.p variants={fadeUp} className="mt-8 max-w-[48ch] text-lg leading-relaxed text-[var(--story-muted)] sm:text-xl xl:text-2xl">
+              {story.hero.lead}
+            </motion.p>
+          </div>
+          <div>
             <motion.div variants={frameIn} className="relative w-full">
               {/* The glow behind the frame - a radial, no blur filter. */}
               <div
@@ -87,24 +107,11 @@ export function PlasicoStory({ project }: { project: Project }) {
               />
               {/* The first ad, muted and looping, cover-fit in a rounded 16:9 frame; the full players follow below. */}
               <div className="relative aspect-video w-full overflow-hidden rounded-[2rem] border border-[#1FA22A]/25 bg-[#0F2318] shadow-[0_40px_100px_-20px_rgba(31,162,42,0.45)] dark:border-[#5FBF2F]/25">
-                {clips.first && "bunny" in clips.first ? (
-                  <EmbedCover src={bunnyBackgroundEmbedSrc(clips.first.bunny)} orientation="wide" boxAspect={16 / 9} />
+                {clips.backToWork && "bunny" in clips.backToWork ? (
+                  <EmbedCover src={bunnyBackgroundEmbedSrc(clips.backToWork.bunny)} orientation="wide" boxAspect={16 / 9} />
                 ) : null}
               </div>
             </motion.div>
-            {partner ? (
-              // The client's mark beside the film (under it on phones), on a soft green light.
-              <motion.div variants={fadeUp} className="relative flex items-center justify-center py-6 lg:py-0">
-                <div
-                  className="pointer-events-none absolute left-1/2 top-1/2 aspect-square w-[80%] -translate-x-1/2 -translate-y-1/2 rounded-full"
-                  style={{ background: "radial-gradient(closest-side, rgba(95,191,47,0.22) 0%, transparent 100%)" }}
-                  aria-hidden
-                />
-                <ClientSite href={partner.href} name={name} className="relative">
-                  <PartnerLogo p={partner} imgClass="relative h-24 w-auto max-w-full md:h-28 xl:h-36" sizes="440px" />
-                </ClientSite>
-              </motion.div>
-            ) : null}
           </div>
         </motion.div>
       </Section>
@@ -170,20 +177,19 @@ export function PlasicoStory({ project }: { project: Project }) {
                 </motion.div>
               </motion.div>
             ) : (
+              // The wide cuts: the title, the description under it, then the film across the page.
               <motion.div initial="hidden" whileInView="visible" viewport={VIEWPORT} variants={stagger(0.12)}>
-                <div className="grid gap-8 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)] lg:items-end lg:gap-20">
-                  <motion.div variants={fadeUp}>
-                    <Eyebrow>{ad.eyebrow}</Eyebrow>
-                    <h2 className={cn(TITLE, "max-w-[16ch]")}>
-                      <Words text={ad.title} />
-                    </h2>
-                  </motion.div>
-                  <motion.div variants={fadeUp}>
-                    <BodyXL paragraphs={ad.body} />
-                    <p className="mt-6 text-sm font-semibold uppercase tracking-[0.16em] text-[var(--story-accent)]">{ad.note}</p>
-                  </motion.div>
-                </div>
-                <motion.div variants={frameIn} className="mt-12 lg:mt-16">
+                <motion.div variants={fadeUp}>
+                  <Eyebrow>{ad.eyebrow}</Eyebrow>
+                  <h2 className={TITLE}>
+                    <Words text={ad.title} />
+                  </h2>
+                </motion.div>
+                <motion.div variants={fadeUp} className="mt-8 lg:max-w-[60%]">
+                  <BodyXL paragraphs={ad.body} />
+                  <p className="mt-6 text-sm font-semibold uppercase tracking-[0.16em] text-[var(--story-accent)]">{ad.note}</p>
+                </motion.div>
+                <motion.div variants={frameIn} className="mt-12 lg:mt-14">
                   {frame}
                 </motion.div>
               </motion.div>
@@ -194,7 +200,7 @@ export function PlasicoStory({ project }: { project: Project }) {
 
       {/* ---------------- HOW WE WORK (a full-bleed green band) ---------------- */}
       <section className="relative isolate py-16 text-white [--story-accent:rgba(255,255,255,0.85)] [--story-muted:rgba(255,255,255,0.82)] [--story-line:rgba(255,255,255,0.25)] sm:py-20 lg:py-24">
-        <div className="absolute inset-0 -z-[1]" style={{ background: `linear-gradient(120deg, ${PLASICO.green}, ${PLASICO.lime})` }} aria-hidden />
+        <div className="absolute inset-0 -z-[1]" style={{ background: BAND }} aria-hidden />
         <div className="absolute inset-0 -z-[1] opacity-[0.12] [background-image:repeating-linear-gradient(-32deg,#fff_0_1px,transparent_1px_22px)]" aria-hidden />
         <motion.div
           className={cn("grid gap-10 py-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] lg:gap-20 lg:py-10", STORY_CONTAINER)}
@@ -229,7 +235,7 @@ export function PlasicoStory({ project }: { project: Project }) {
 
       {/* ---------------- CTA ---------------- */}
       <Section tight>
-        {/* Plasico's green card: the green → lime gradient, the pinstripes and a white light, as on its world. */}
+        {/* Plasico's green card: the green → lime gradient a shade darker, the pinstripes and a white light. */}
         <CtaBand
           title={story.cta.title}
           quote={story.cta.quote}
@@ -237,7 +243,7 @@ export function PlasicoStory({ project }: { project: Project }) {
           tone="dark"
           className="rounded-3xl p-8 text-white shadow-[0_30px_90px_-30px_rgba(31,162,42,0.6)] sm:p-12 lg:p-14"
         >
-          <div className="absolute inset-0" style={{ background: `linear-gradient(120deg, ${PLASICO.green}, ${PLASICO.lime})` }} aria-hidden />
+          <div className="absolute inset-0" style={{ background: BAND }} aria-hidden />
           <div className="absolute inset-0 opacity-[0.12] [background-image:repeating-linear-gradient(-32deg,#fff_0_1px,transparent_1px_22px)]" aria-hidden />
           <div className="absolute -right-20 -top-20 size-72 rounded-full bg-[radial-gradient(closest-side,rgba(255,255,255,0.3),transparent)]" aria-hidden />
         </CtaBand>
