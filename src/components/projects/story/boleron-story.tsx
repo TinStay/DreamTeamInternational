@@ -287,17 +287,20 @@ function Feature({
   );
 }
 
-/** Roni's scenes as a mosaic: one tall panel, four squares, each with its small label. */
+/**
+ * Roni's scenes as a mosaic from sm: one tall panel, four squares, each with its small label; on phones the five
+ * stack one per row (the client's ask - the mosaic's cells were too small there), each a square.
+ */
 function Mosaic({ panels }: { panels: { src: string; label: string }[] }) {
   return (
-    <motion.div className="grid grid-cols-[1.15fr_1fr_1fr] grid-rows-2 gap-3 sm:gap-4" variants={stagger(0.08)}>
+    <motion.div className="grid grid-cols-1 gap-4 sm:grid-cols-[1.15fr_1fr_1fr] sm:grid-rows-2" variants={stagger(0.08)}>
       {panels.map((panel, i) => (
         <motion.figure
           key={panel.src}
           variants={fadeUp}
-          className={cn("relative m-0 overflow-hidden rounded-2xl border border-white/15 bg-black/20 shadow-xl", i === 0 ? "row-span-2" : "aspect-square")}
+          className={cn("relative m-0 overflow-hidden rounded-2xl border border-white/15 bg-black/20 shadow-xl", i === 0 ? "aspect-square sm:row-span-2 sm:aspect-auto" : "aspect-square")}
         >
-          <Image src={panel.src} alt={panel.label} fill sizes="(max-width: 1024px) 45vw, 22vw" className="object-cover" />
+          <Image src={panel.src} alt={panel.label} fill sizes="(max-width: 639px) 100vw, (max-width: 1024px) 45vw, 22vw" className="object-cover" />
           <figcaption className="absolute bottom-2.5 left-2.5 rounded-full border border-white/30 bg-black/25 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] text-white backdrop-blur-md">
             {panel.label}
           </figcaption>
