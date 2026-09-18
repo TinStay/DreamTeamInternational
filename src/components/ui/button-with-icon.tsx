@@ -14,7 +14,10 @@ import { cn } from "@/lib/utils";
  */
 export function sideTabClass(active: boolean) {
   return cn(
-    "group relative inline-flex h-12 w-full cursor-pointer items-center justify-start gap-3 rounded-full border-0 ps-1.5 pe-5 text-sm font-semibold whitespace-normal text-left shadow-none",
+    // The disc sits 10px in from the pill's top, bottom and left (a 36px disc in a 56px pill). `flex-none`: in a
+    // column of tabs the primitive's `flex-1` (a zero flex basis) would size the row to its content and ignore the
+    // height - the disc then touched the pill's edges.
+    "group relative inline-flex h-14 min-h-14 w-full flex-none cursor-pointer items-center justify-start gap-3 rounded-full border-0 ps-2.5 py-0 pe-6 text-sm font-semibold whitespace-normal text-left shadow-none",
     "transition-[background-color,color,transform,box-shadow] duration-200 ease-out will-change-transform focus-visible:ring-2 focus-visible:ring-ring/50",
     active
       ? "translate-x-0 bg-neutral-900 text-white shadow-[0_12px_32px_rgba(0,0,0,0.18)] hover:bg-neutral-800 hover:text-white dark:bg-white dark:text-neutral-900 dark:shadow-[0_12px_32px_rgba(255,255,255,0.14)] dark:hover:bg-white dark:hover:text-neutral-900"

@@ -261,12 +261,10 @@ export function ProjectRow({ project, index, flip = index % 2 === 1 }: { project
         </div>
       ) : null}
 
-      {/* The film - a deep shadow around the frame. */}
+      {/* The film - a shadow in the logo's colour around the frame (`Project.glow`). */}
       <div
-        className={cn(
-          "group relative aspect-[16/10] w-full overflow-hidden rounded-[2rem] bg-card-elevated shadow-[0_30px_70px_-18px_rgba(2,6,23,0.5)] ring-1 ring-black/5 dark:shadow-[0_30px_80px_-14px_rgba(0,0,0,0.85)] dark:ring-white/10",
-          flip && "lg:order-2"
-        )}
+        className={cn("group relative aspect-[16/10] w-full overflow-hidden rounded-[2rem] bg-card-elevated ring-1 ring-black/5 dark:ring-white/10", flip && "lg:order-2")}
+        style={{ boxShadow: `0 28px 70px -16px color-mix(in srgb, ${project.glow} 62%, transparent), 0 10px 30px -10px color-mix(in srgb, ${project.glow} 45%, transparent)` }}
       >
         {project.clip ? (
           <ProjectCardMedia clip={project.clip} playing={playing} />

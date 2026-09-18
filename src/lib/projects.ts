@@ -11,11 +11,12 @@ export type ProjectCategoryKey = (typeof PROJECT_CATEGORY_KEYS)[number];
 export const PROJECT_STYLE_KEYS = ["animated", "realistic", "semi-realistic"] as const;
 export type ProjectStyleKey = (typeof PROJECT_STYLE_KEYS)[number];
 
+// The showcase's order - the /projects rows, the header's dropdown and the sitemap follow it.
 export const PROJECT_KEYS = [
   "boleron",
-  "plasico",
-  "mindguard",
   "emblema",
+  "mindguard",
+  "plasico",
   "osmo",
 ] as const;
 export type ProjectKey = (typeof PROJECT_KEYS)[number];
@@ -84,6 +85,8 @@ export type Project = {
   };
   /** Brand accent pair — drives the scroll-showcase background for this project. */
   accent: [string, string];
+  /** The logo's colour - the shadow under the film frame on `/projects`. */
+  glow: string;
 };
 
 const yt = (id: string, views: number | null = null): ProjectPlatform => ({
@@ -128,31 +131,33 @@ export const PROJECTS: Project[] = [
       },
     },
     accent: ["#1d6fe0", "#22c1c3"],
+    glow: "#2B7BE6",
   },
   {
-    id: "plasico",
-    category: "products",
+    id: "emblema",
+    category: "construction",
     style: "realistic",
-    partnerId: "plasico",
-    videoId: "dvqlJZPQynw", // "Plasico 1"
-    // The /projects card and the home showcase frame play the "Back to Work 4K" ad from Bunny Stream.
-    clip: bunny("481d2093-0dc0-44db-bda4-4d562c20d8fe"),
-    showcaseClip: bunny("481d2093-0dc0-44db-bda4-4d562c20d8fe"),
-    // Story: the three ads, all on Bunny Stream, in the client's order on the page - the office spot ("v1 3rd
-    // voice 2nd music", 16:9) under the first title, "Back to Work 4K" (16:9, the hero's film too) under the
-    // second, "Back to School" (the vertical 9:16 cut, with subtitles) under the third; the "Hot Summer Sale" spot
-    // (eeaa9212-f44d-4d7c-b69a-b3054c758eed) is off the page.
-    story: {
-      clips: {
-        office: { bunny: { library: "750681", id: "3f0113df-90d2-425e-9d5b-84fec0d32932" } },
-        backToWork: { bunny: { library: "750681", id: "481d2093-0dc0-44db-bda4-4d562c20d8fe" } },
-        backToSchool: { bunny: { library: "750681", id: "9bbc728d-de27-4404-994c-3f987516db83" } },
-      },
-    },
+    partnerId: "emblema",
+    videoId: "8dw7O71wawY", // "Aria Emblema 1"
+    // The /projects card plays "Eria Video 1 - Movie Style" (the story's first film).
+    clip: bunny("28f54810-3c7b-4beb-9a0a-f6f0926323d5"),
     orientation: "wide",
     since: null,
-    platforms: [yt("dvqlJZPQynw")],
-    accent: ["#16a34a", "#a3e635"],
+    platforms: [yt("8dw7O71wawY")],
+    accent: ["#b45309", "#f59e0b"],
+    glow: "#C08F55",
+    // The films on Bunny Stream, in the order of `stories.emblema.films.items`: "Eria Video 1 - Movie Style"
+    // (4K, wide), then the vertical social cut "Eria Video 3" (the cyclist, "Повече място за живот") under the
+    // second item; the third item (District Living) is copy only - its frame ("Eria Video 2", the family in the
+    // park, an ERIA cut that did not match the copy) is off at the client's ask.
+    story: {
+      films: [
+        { clip: { bunny: { library: "750681", id: "28f54810-3c7b-4beb-9a0a-f6f0926323d5" } }, orientation: "wide" },
+        { clip: { bunny: { library: "750681", id: "d491c5e2-2f68-489b-8318-bdae7816a1a9" } }, orientation: "tall" },
+        // { clip: { bunny: { library: "750681", id: "521631f9-1eb7-4dca-a39d-603bf7d61c3f" } }, orientation: "tall" },
+        null,
+      ],
+    },
   },
   {
     id: "mindguard",
@@ -181,31 +186,33 @@ export const PROJECTS: Project[] = [
     since: null,
     platforms: [],
     accent: ["#7c3aed", "#db2777"],
+    glow: "#45A199",
   },
   {
-    id: "emblema",
-    category: "construction",
+    id: "plasico",
+    category: "products",
     style: "realistic",
-    partnerId: "emblema",
-    videoId: "8dw7O71wawY", // "Aria Emblema 1"
-    // The /projects card plays "Eria Video 1 - Movie Style" (the story's first film).
-    clip: bunny("28f54810-3c7b-4beb-9a0a-f6f0926323d5"),
+    partnerId: "plasico",
+    videoId: "dvqlJZPQynw", // "Plasico 1"
+    // The /projects card and the home showcase frame play the "Back to Work 4K" ad from Bunny Stream.
+    clip: bunny("481d2093-0dc0-44db-bda4-4d562c20d8fe"),
+    showcaseClip: bunny("481d2093-0dc0-44db-bda4-4d562c20d8fe"),
+    // Story: the three ads, all on Bunny Stream, in the client's order on the page - the office spot ("v1 3rd
+    // voice 2nd music", 16:9) under the first title, "Back to Work 4K" (16:9, the hero's film too) under the
+    // second, "Back to School" (the vertical 9:16 cut, with subtitles) under the third; the "Hot Summer Sale" spot
+    // (eeaa9212-f44d-4d7c-b69a-b3054c758eed) is off the page.
+    story: {
+      clips: {
+        office: { bunny: { library: "750681", id: "3f0113df-90d2-425e-9d5b-84fec0d32932" } },
+        backToWork: { bunny: { library: "750681", id: "481d2093-0dc0-44db-bda4-4d562c20d8fe" } },
+        backToSchool: { bunny: { library: "750681", id: "9bbc728d-de27-4404-994c-3f987516db83" } },
+      },
+    },
     orientation: "wide",
     since: null,
-    platforms: [yt("8dw7O71wawY")],
-    accent: ["#b45309", "#f59e0b"],
-    // The films on Bunny Stream, in the order of `stories.emblema.films.items`: "Eria Video 1 - Movie Style"
-    // (4K, wide), then the vertical social cut "Eria Video 3" (the cyclist, "Повече място за живот") under the
-    // second item; the third item (District Living) is copy only - its frame ("Eria Video 2", the family in the
-    // park, an ERIA cut that did not match the copy) is off at the client's ask.
-    story: {
-      films: [
-        { clip: { bunny: { library: "750681", id: "28f54810-3c7b-4beb-9a0a-f6f0926323d5" } }, orientation: "wide" },
-        { clip: { bunny: { library: "750681", id: "d491c5e2-2f68-489b-8318-bdae7816a1a9" } }, orientation: "tall" },
-        // { clip: { bunny: { library: "750681", id: "521631f9-1eb7-4dca-a39d-603bf7d61c3f" } }, orientation: "tall" },
-        null,
-      ],
-    },
+    platforms: [yt("dvqlJZPQynw")],
+    accent: ["#16a34a", "#a3e635"],
+    glow: "#1FA22A",
   },
   {
     id: "osmo",
@@ -229,6 +236,7 @@ export const PROJECTS: Project[] = [
       },
     },
     accent: ["#e11d48", "#f97316"],
+    glow: "#108C3C",
   },
 ];
 
