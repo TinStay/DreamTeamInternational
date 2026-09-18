@@ -351,7 +351,8 @@ export function MindguardStory({ project }: { project: Project }) {
           viewport={VIEWPORT}
           variants={frameIn}
         >
-          <h2 className={cn(HEADING, "text-[clamp(1.75rem,2.6vw,2.5rem)] font-bold tracking-[-0.02em] text-balance leading-[1.06]")}>{story.cta.title}</h2>
+          {/* A size under the section titles - it is a question beside a pill, not a headline. */}
+          <h2 className={cn(HEADING, "max-w-[34ch] text-[clamp(1.25rem,1.8vw,1.75rem)] font-semibold tracking-[-0.015em] text-balance leading-[1.2]")}>{story.cta.title}</h2>
           <Link
             href={contactProcessPath(language)}
             className="inline-block shrink-0 cursor-pointer whitespace-nowrap rounded-full bg-[#35827C] px-9 py-4 text-[1.05rem] font-bold text-white transition-[background-color,transform,box-shadow] duration-200 ease-out hover:-translate-y-0.5 hover:bg-[#45A199] hover:shadow-[0_14px_30px_-12px_rgba(69,161,153,0.7)] focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-[#45A199]"

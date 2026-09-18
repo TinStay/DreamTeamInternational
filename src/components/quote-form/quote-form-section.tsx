@@ -2,7 +2,6 @@
 
 import * as React from "react";
 import Image from "next/image";
-import Link from "next/link";
 import { motion } from "motion/react";
 import {
   IconAlertTriangle,
@@ -12,11 +11,8 @@ import {
   IconSend,
 } from "@tabler/icons-react";
 
-import {
-  Button,
-  ctaPillClassName,
-  primaryGradientInteractiveClassName,
-} from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
+import { ButtonWithIcon } from "@/components/ui/button-with-icon";
 import { JourneyItem } from "@/components/ui/scroll-journey";
 import { useLanguage } from "@/lib/i18n/language-context";
 import { scrollToElement } from "@/lib/smooth-scroll";
@@ -357,12 +353,10 @@ export function QuoteFormSection({
                     variants={successItemVariants}
                     className="mt-7 flex flex-col items-center gap-3 sm:flex-row"
                   >
-                    <Link
-                      href={servicesPath(language)}
-                      className={cn(primaryGradientInteractiveClassName, ctaPillClassName)}
-                    >
+                    {/* The site's main CTA pill (the services page), the "again" outline pill beside it. */}
+                    <ButtonWithIcon href={servicesPath(language)} surface="dark">
                       {q.successCta}
-                    </Link>
+                    </ButtonWithIcon>
                     <Button
                       type="button"
                       variant="outline"
