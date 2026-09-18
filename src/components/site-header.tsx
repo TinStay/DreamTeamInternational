@@ -279,8 +279,9 @@ export function SiteHeader() {
               <EmailCopyButton />
               <PhoneCopyButton />
               {/* The site's main CTA - the projects' arrow-disc pill at the slim header size, hugging the bar's right end
-                  (the bar's end padding equals its vertical one) under a faint brand-gradient glow. */}
-              <ButtonWithIcon href={`${homeHref}#quote`} surface="auto" size="sm" glow className="shrink-0">
+                  (the bar's end padding equals its vertical one) under a faint brand-gradient glow - opens the services
+                  page (its cards carry the quote pills). */}
+              <ButtonWithIcon href={servicesPath(language)} surface="auto" size="sm" glow className="shrink-0">
                 {t.header.quoteCta}
               </ButtonWithIcon>
             </div>

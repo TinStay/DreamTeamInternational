@@ -9,6 +9,7 @@ import { ContactInquiryForm } from "@/components/contact-inquiry-form";
 import { JourneyItem } from "@/components/ui/scroll-journey";
 import { SOCIAL_LINKS } from "@/lib/social-links";
 import { ClutchBadge, GoogleReviewsBadge } from "@/components/review-badges";
+import { ButtonWithIcon } from "@/components/ui/button-with-icon";
 import { GradientMailIcon, GradientMapPinIcon, GradientPhoneIcon } from "@/components/ui/gradient-icons";
 
 const MotionLink = motion.a;
@@ -84,10 +85,13 @@ const contactIconClass =
 export function ContactSection({
   className,
   reviews = false,
+  quoteCta = false,
 }: {
   className?: string;
   /** The Google rating + the Clutch widget in a row under the social icons (the contact page). */
   reviews?: boolean;
+  /** The site's quote pill under the heading's line, down to the service cards + step form (`#quote`; the contact page). */
+  quoteCta?: boolean;
 }) {
   const { t } = useLanguage();
 
@@ -130,6 +134,11 @@ export function ContactSection({
             <span className="text-section-accent">{t.contact.title2}</span>
           </h2>
           <p className="mx-auto max-w-2xl text-lg text-muted-foreground">{t.contact.subtitle}</p>
+          {quoteCta ? (
+            <ButtonWithIcon href="#quote" surface="auto" className="mx-auto mt-7">
+              {t.services.quoteCta}
+            </ButtonWithIcon>
+          ) : null}
         </JourneyItem>
 
         <div className="grid items-start gap-12 lg:grid-cols-[minmax(0,60%)_minmax(0,40%)] lg:gap-16">

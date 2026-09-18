@@ -27,7 +27,6 @@ export const en = {
     metaTitle: "Contact & Process | DreamTeam",
     metaDescription:
       "How we work from brief to delivery, and how to reach DreamTeam for AI video production.",
-    quoteLead: "After a quote for a specific project? Pick a service and fill in the steps below.",
   },
   process: {
     title1: "Our",

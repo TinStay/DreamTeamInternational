@@ -36,9 +36,8 @@ export function MobileNav() {
   const trainingHref = trainingPath(language);
   const contactHref = contactProcessPath(language);
   const portfolioHref = portfolioPath(language);
-  // The dock's Projects goes to the home page's projects stage (a smooth scroll on the home page itself, a jump
-  // from any other page); the sheet's link is the listing.
-  const projectsHref = `${homeHref}#projects`;
+  // The dock's Projects opens the listing (it pointed at the home page's projects stage for a while).
+  const projectsHref = projectsPath(language);
   const servicesHref = servicesPath(language);
 
   return (

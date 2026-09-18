@@ -578,6 +578,17 @@ export function PortfolioSection({
 
   const isActiveTab = (key: string) => key === activeCategory;
 
+  // The side menu's rows (from lg): full-width, the active one on the brand gradient, the rest nudging right on hover.
+  const categorySideClass = (active: boolean) =>
+    cn(
+      "group relative w-full cursor-pointer justify-start rounded-xl font-semibold inline-flex items-center gap-2.5 h-10 px-3.5 text-sm",
+      "border border-transparent !shadow-none hover:!shadow-none focus-visible:!shadow-none active:!shadow-none",
+      "transition-[background-color,border-color,color,box-shadow,transform] duration-200 ease-out will-change-transform",
+      active
+        ? "border-0 bg-gradient-to-r from-[var(--primary-gradient-start)] to-[var(--primary-gradient-end)] text-primary-foreground hover:from-[color-mix(in_srgb,var(--primary-gradient-start)_86%,white)] hover:to-[color-mix(in_srgb,var(--primary-gradient-end)_84%,#f3ecff)] hover:text-primary-foreground"
+        : "text-foreground hover:translate-x-0.5 hover:bg-muted/60"
+    );
+
   const categoryChipClass = (active: boolean) =>
     cn(
       "group relative shrink-0 cursor-pointer rounded-full font-semibold inline-flex items-center gap-1.5",
@@ -607,12 +618,14 @@ export function PortfolioSection({
             <p className="max-w-xl text-base text-muted-foreground">{t.portfolio.subtitle}</p>
           </div>
 
-          {/* Sticky controls + grid stay fully opaque so lazy IO works reliably */}
-          <div className="flex flex-col gap-8 pb-12">
-            <div className="sticky top-[max(0.75rem,env(safe-area-inset-top))] z-40 -mx-4 flex flex-col gap-2 px-4 sm:gap-2.5 lg:top-[6rem] lg:-mx-6 lg:gap-2 lg:px-6">
-              {/* Categories (top) */}
-              <div className="w-fit max-w-full rounded-full border border-border/25 bg-background/95 p-1 shadow-[0_12px_40px_rgba(15,23,42,0.15)] backdrop-blur-lg supports-[backdrop-filter]:bg-background/85 dark:border-border/30 dark:shadow-[0_12px_48px_rgba(0,0,0,0.45)]">
-                <div className="relative rounded-full bg-muted/10 px-2 py-1 sm:px-2.5 lg:px-2 lg:py-0.5">
+          {/* Controls + grid stay fully opaque so lazy IO works reliably. From lg the categories are a sticky side
+              menu on the left and the format tabs sit on top of the grid; below lg the category chip row sticks
+              under the mobile bar and the format tabs stay in flow above the grid. */}
+          <div className="flex flex-col gap-6 pb-12 lg:grid lg:grid-cols-[15rem_minmax(0,1fr)] lg:items-start lg:gap-10">
+            <div className="sticky top-[calc(max(0.5rem,env(safe-area-inset-top))_+_4.25rem)] z-40 -mx-4 px-4 lg:top-[6rem] lg:mx-0 lg:px-0">
+              {/* Categories below lg: the chip row */}
+              <div className="w-fit max-w-full rounded-full border border-border/25 bg-background/95 p-1 shadow-[0_12px_40px_rgba(15,23,42,0.15)] backdrop-blur-lg supports-[backdrop-filter]:bg-background/85 dark:border-border/30 dark:shadow-[0_12px_48px_rgba(0,0,0,0.45)] lg:hidden">
+                <div className="relative rounded-full bg-muted/10 px-2 py-1 sm:px-2.5">
                   <div className="flex w-fit max-w-full items-center gap-1.5 overflow-x-auto overflow-y-hidden py-0.5 no-scrollbar">
                     {CATEGORIES.map((cat) => (
                       <Button
@@ -642,8 +655,42 @@ export function PortfolioSection({
                 </div>
               </div>
 
-              {/* Resolution tabs (bottom) — hug content on mobile; same on sm+ */}
-              <div className="w-fit max-w-full self-start rounded-full border border-border/25 bg-background/95 px-2 py-2 shadow-[0_12px_40px_rgba(15,23,42,0.1)] backdrop-blur-lg supports-[backdrop-filter]:bg-background/85 dark:border-border/30 dark:shadow-[0_12px_48px_rgba(0,0,0,0.45)] sm:px-3 sm:py-2 lg:px-2 lg:py-1">
+              {/* Categories from lg: the side menu */}
+              <nav
+                aria-label={t.projects.categoriesLabel}
+                className="hidden flex-col gap-1 rounded-2xl border border-border/25 bg-background/95 p-2 shadow-[0_12px_40px_rgba(15,23,42,0.12)] backdrop-blur-lg supports-[backdrop-filter]:bg-background/85 lg:flex dark:border-border/30 dark:shadow-[0_12px_48px_rgba(0,0,0,0.45)]"
+              >
+                {CATEGORIES.map((cat) => (
+                  <Button
+                    key={cat.key}
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    aria-current={isActiveTab(cat.key) ? "true" : undefined}
+                    onClick={() => {
+                      setActiveCategory(cat.key);
+                      setPortfolioPage(0);
+                    }}
+                    className={categorySideClass(isActiveTab(cat.key))}
+                  >
+                    <span
+                      className={cn(
+                        "opacity-90 transition-transform duration-200 ease-out",
+                        !isActiveTab(cat.key) && "group-hover:scale-[1.06]",
+                        isActiveTab(cat.key) && "text-primary-foreground opacity-100"
+                      )}
+                    >
+                      {cat.icon}
+                    </span>
+                    <span>{cat.label}</span>
+                  </Button>
+                ))}
+              </nav>
+            </div>
+
+            <div className="flex min-w-0 flex-col gap-6">
+              {/* Format tabs on top of the grid, in flow - hug their content */}
+              <div className="w-fit max-w-full rounded-full border border-border/25 bg-background/95 px-2 py-2 shadow-[0_12px_40px_rgba(15,23,42,0.1)] backdrop-blur-lg supports-[backdrop-filter]:bg-background/85 dark:border-border/30 dark:shadow-[0_12px_48px_rgba(0,0,0,0.45)] sm:px-3 sm:py-2 lg:px-2 lg:py-1">
                 <Tabs
                   value={format}
                   onValueChange={(v) => {
@@ -714,9 +761,8 @@ export function PortfolioSection({
                   </TabsList>
                 </Tabs>
               </div>
-            </div>
 
-            <PortfolioTabBody
+              <PortfolioTabBody
               key={`${activeCategory}-${format}`}
               wideEmbeds={embeds.wide}
               shortEmbeds={embeds.short}
@@ -773,6 +819,7 @@ export function PortfolioSection({
                 </p>
               </div>
             ) : null}
+            </div>
           </div>
 
           {/*

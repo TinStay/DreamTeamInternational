@@ -217,13 +217,13 @@ function ProjectCardMedia({ clip, playing }: { clip: BunnyVideo; playing: boolea
 /**
  * A case study as a row: the film in a rounded frame on one side (playing
  * while the row is hovered - or, on a coarse pointer, while it is mostly on
- * screen), and on the other, centred, the client's mark (big), the headline
- * - clean and large, in the brand's own display face, the one its home
- * showcase headline wears -, the description and the site's CTA pill; `flip`
- * puts the film on the right. On phones the mark leads the stack, the full
- * width of the screen, then the film, then the copy (the mark is rendered
- * twice, one per layout - one of the two is always `display: none`). Reveals
- * on scroll.
+ * screen), and on the other the client's mark (big), the headline - clean
+ * and large, in the brand's own display face, the one its home showcase
+ * headline wears -, the description and the site's CTA pill; `flip` puts the
+ * film on the right and the copy, right-aligned, on the left. On phones the
+ * mark leads the stack, the full width of the screen, then the film, then the
+ * copy (the mark is rendered twice, one per layout - one of the two is always
+ * `display: none`). Reveals on scroll.
  */
 export function ProjectRow({ project, index, flip = index % 2 === 1 }: { project: Project; index: number; flip?: boolean }) {
   const { t, language } = useLanguage();
@@ -277,8 +277,9 @@ export function ProjectRow({ project, index, flip = index % 2 === 1 }: { project
         )}
       </div>
 
-      {/* The copy, centred: the mark (from lg), the headline in the brand's display face, the description, the CTA. */}
-      <div className={cn("flex min-w-0 flex-col items-center text-center lg:px-2", flip && "lg:order-1")}>
+      {/* The copy: the mark (from lg), the headline in the brand's display face, the description, the CTA -
+          right-aligned on a row whose film is on the right, so the copy reads toward it. */}
+      <div className={cn("flex min-w-0 flex-col items-start lg:px-2", flip && "lg:order-1 lg:items-end lg:text-right")}>
         {partner ? (
           <div className="hidden lg:block">
             <PartnerLogo p={partner} imgClass="h-28 w-auto max-w-full object-contain xl:h-32" sizes="480px" />
@@ -286,7 +287,7 @@ export function ProjectRow({ project, index, flip = index % 2 === 1 }: { project
         ) : null}
         <h3
           className={cn(
-            "font-heading text-[2rem] font-bold tracking-tight text-balance text-foreground sm:text-4xl lg:mt-8 lg:text-[3.5rem] xl:text-[4rem] 2xl:text-[4.5rem]",
+            "font-heading text-2xl font-bold tracking-tight text-balance text-foreground sm:text-[1.75rem] lg:mt-7 lg:text-[2.25rem] xl:text-[2.625rem] 2xl:text-[3rem]",
             projectDisplayFont(project.id),
             "leading-[1.04]"
           )}
@@ -323,15 +324,14 @@ export function ProjectsSection({
   return (
     <section id="projects" className={cn("relative w-full pb-4", className)}>
       <div className="relative z-10 mx-auto w-full max-w-none px-4 lg:px-8">
-        <header className="mb-8 flex flex-wrap items-end justify-between gap-4 lg:mb-10">
-          <div>
-            <Heading className="mb-4 font-heading text-4xl font-bold text-foreground md:text-5xl">
-              {p.title1} <span className="text-section-accent">{p.title2}</span>
-            </Heading>
-            <p className="max-w-2xl text-lg text-muted-foreground">{p.subtitle}</p>
-          </div>
-          {/* The site's main CTA, as everywhere else - down to the page's own service cards (the wizard, `#quote`). */}
-          <ButtonWithIcon href="#quote" surface="auto" className="shrink-0">
+        <header className="mb-10 lg:mb-14">
+          <Heading className="mb-4 font-heading text-4xl font-bold text-foreground md:text-5xl">
+            {p.title1} <span className="text-section-accent">{p.title2}</span>
+          </Heading>
+          <p className="max-w-2xl text-lg text-muted-foreground">{p.subtitle}</p>
+          {/* The site's main CTA, as everywhere else, under the line - down to the page's own service cards (the
+              wizard, `#quote`). */}
+          <ButtonWithIcon href="#quote" surface="auto" className="mt-6">
             {p.cta}
           </ButtonWithIcon>
         </header>

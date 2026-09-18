@@ -3,7 +3,6 @@ import { MobileNav } from "@/components/mobile-nav";
 import { Footer } from "@/components/footer";
 import { ProcessSection } from "@/components/process-section";
 import { ContactSection } from "@/components/contact-section";
-import { ContactQuoteCta } from "@/components/contact-quote-cta";
 import { QuoteFormSection } from "@/components/quote-form/quote-form-section";
 import { GradientBlurPageBg } from "@/components/ui/gradient-blur-bg";
 import { MAIN_WITH_FIXED_PAGE_BG_CLASS } from "@/lib/page-shell";
@@ -22,12 +21,9 @@ export function ContactProcessLayout() {
         <div className="mx-auto w-full max-w-7xl px-4">
           <PageBreadcrumbs className="mb-6" />
         </div>
-        {/* The form + details, with the review badges under the social icons. */}
-        <ContactSection className="pt-0 sm:pt-0 lg:pt-0" reviews />
-        {/* Under the form: the slim quote card, whose pill scrolls on to the service cards + wizard right below. */}
-        <div className="mx-auto w-full max-w-7xl px-4">
-          <ContactQuoteCta className="mb-2" />
-        </div>
+        {/* The form + details: the quote pill under the heading's line (down to the wizard below) and the review
+            badges under the social icons. */}
+        <ContactSection className="pt-0 sm:pt-0 lg:pt-0" reviews quoteCta />
         {/* The home page's service cards + step form (`#quote`). */}
         <QuoteFormSection />
         <ProcessSection />
