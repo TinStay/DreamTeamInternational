@@ -86,12 +86,15 @@ export function ContactSection({
   className,
   reviews = false,
   quoteCta = false,
+  align = "center",
 }: {
   className?: string;
   /** The Google rating + the Clutch widget in a row under the social icons (the contact page). */
   reviews?: boolean;
   /** The site's quote pill under the heading's line, down to the service cards + step form (`#quote`; the contact page). */
   quoteCta?: boolean;
+  /** The heading block: centred (the home section) or on the left (the contact page). */
+  align?: "center" | "left";
 }) {
   const { t } = useLanguage();
 
@@ -128,14 +131,14 @@ export function ContactSection({
     >
       <div className="relative z-10 mx-auto max-w-7xl px-4">
         {/* Journey parts (home): heading first, then the form from the left and the details from the right. */}
-        <JourneyItem kind="title" className="mb-10 text-center lg:mb-12">
+        <JourneyItem kind="title" className={cn("mb-10 lg:mb-12", align === "left" ? "text-left" : "text-center")}>
           <h2 className="mb-6 font-heading text-[2.75rem] leading-[1.06] font-extrabold sm:text-5xl md:text-6xl text-foreground">
             {t.contact.title1}{" "}
             <span className="text-section-accent">{t.contact.title2}</span>
           </h2>
-          <p className="mx-auto max-w-2xl text-lg text-muted-foreground">{t.contact.subtitle}</p>
+          <p className={cn("max-w-2xl text-lg text-muted-foreground", align === "center" && "mx-auto")}>{t.contact.subtitle}</p>
           {quoteCta ? (
-            <ButtonWithIcon href="#quote" surface="auto" className="mx-auto mt-7">
+            <ButtonWithIcon href="#quote" surface="auto" className={cn("mt-7", align === "center" && "mx-auto")}>
               {t.services.quoteCta}
             </ButtonWithIcon>
           ) : null}

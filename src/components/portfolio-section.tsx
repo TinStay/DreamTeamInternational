@@ -7,6 +7,7 @@ import { scrollToElement } from "@/lib/smooth-scroll";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { primaryGradientInteractiveClassName } from "@/components/ui/button";
+import { sideTabClass, sideTabDiscClass } from "@/components/ui/button-with-icon";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   YOUTUBE_IFRAME_ALLOW,
@@ -578,17 +579,6 @@ export function PortfolioSection({
 
   const isActiveTab = (key: string) => key === activeCategory;
 
-  // The side menu's rows (from lg): full-width, the active one on the brand gradient, the rest nudging right on hover.
-  const categorySideClass = (active: boolean) =>
-    cn(
-      "group relative w-full cursor-pointer justify-start rounded-xl font-semibold inline-flex items-center gap-2.5 h-10 px-3.5 text-sm",
-      "border border-transparent !shadow-none hover:!shadow-none focus-visible:!shadow-none active:!shadow-none",
-      "transition-[background-color,border-color,color,box-shadow,transform] duration-200 ease-out will-change-transform",
-      active
-        ? "border-0 bg-gradient-to-r from-[var(--primary-gradient-start)] to-[var(--primary-gradient-end)] text-primary-foreground hover:from-[color-mix(in_srgb,var(--primary-gradient-start)_86%,white)] hover:to-[color-mix(in_srgb,var(--primary-gradient-end)_84%,#f3ecff)] hover:text-primary-foreground"
-        : "text-foreground hover:translate-x-0.5 hover:bg-muted/60"
-    );
-
   const categoryChipClass = (active: boolean) =>
     cn(
       "group relative shrink-0 cursor-pointer rounded-full font-semibold inline-flex items-center gap-1.5",
@@ -655,10 +645,10 @@ export function PortfolioSection({
                 </div>
               </div>
 
-              {/* Categories from lg: the side menu */}
+              {/* Categories from lg: the side menu - the active row in the main CTA's dress (`sideTabClass`). */}
               <nav
                 aria-label={t.projects.categoriesLabel}
-                className="hidden flex-col gap-1 rounded-2xl border border-border/25 bg-background/95 p-2 shadow-[0_12px_40px_rgba(15,23,42,0.12)] backdrop-blur-lg supports-[backdrop-filter]:bg-background/85 lg:flex dark:border-border/30 dark:shadow-[0_12px_48px_rgba(0,0,0,0.45)]"
+                className="hidden flex-col gap-1.5 rounded-[1.75rem] border border-border/25 bg-background/95 p-2 shadow-[0_12px_40px_rgba(15,23,42,0.12)] backdrop-blur-lg supports-[backdrop-filter]:bg-background/85 lg:flex dark:border-border/30 dark:shadow-[0_12px_48px_rgba(0,0,0,0.45)]"
               >
                 {CATEGORIES.map((cat) => (
                   <Button
@@ -671,17 +661,9 @@ export function PortfolioSection({
                       setActiveCategory(cat.key);
                       setPortfolioPage(0);
                     }}
-                    className={categorySideClass(isActiveTab(cat.key))}
+                    className={sideTabClass(isActiveTab(cat.key))}
                   >
-                    <span
-                      className={cn(
-                        "opacity-90 transition-transform duration-200 ease-out",
-                        !isActiveTab(cat.key) && "group-hover:scale-[1.06]",
-                        isActiveTab(cat.key) && "text-primary-foreground opacity-100"
-                      )}
-                    >
-                      {cat.icon}
-                    </span>
+                    <span className={sideTabDiscClass(isActiveTab(cat.key))}>{cat.icon}</span>
                     <span>{cat.label}</span>
                   </Button>
                 ))}

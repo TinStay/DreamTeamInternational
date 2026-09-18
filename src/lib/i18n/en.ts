@@ -1085,42 +1085,62 @@ export const en = {
     title2: "Asked Questions",
     subtitle:
       "Answers to the questions clients ask us most - about pricing, timelines, rights, and how we work.",
-    items: [
+    cta: "Get in touch",
+    // The questions in three topics: the menu on the left of the FAQ (`key` picks the icon).
+    groups: [
       {
-        q: "How much does an AI video cost?",
-        a: "The price depends on the complexity and length of the video, so we work with individual quotes rather than fixed packages. Describe your project through the quote form and you get a specific price for your case.",
+        key: "pricing",
+        label: "Pricing & timing",
+        items: [
+          {
+            q: "How much does an AI video cost?",
+            a: "The price depends on the complexity and length of the video, so we work with individual quotes rather than fixed packages. Describe your project through the quote form and you get a specific price for your case.",
+          },
+          {
+            q: "How long does a video take?",
+            a: "Usually between 5 and 12 working days depending on the video's complexity, length, and revisions. If you need it sooner, we offer a paid priority option. If you want the highest quality, we take the time it needs - meeting your expectations always comes first.",
+          },
+          {
+            q: "Is AI video cheaper than traditional filming?",
+            a: "In most cases, yes. There are no film crews, extras, locations, or props to hire, so you get a high-end look on a smaller budget. It's especially cost-effective for scenes that would be expensive or hard to shoot in real life.",
+          },
+        ],
       },
       {
-        q: "Which tools and AI models do you use?",
-        a: "We use the best tools on the market and pick the right one for each scenario. We work with different AI and video models and know the strengths and weaknesses of each, so we choose the one that fits your project.",
+        key: "process",
+        label: "How we work",
+        items: [
+          {
+            q: "What do you need from me to get started?",
+            a: "Your idea or message and a few assets are enough - product photos, logo, and brand guidelines. If you don't have a concept ready, we propose one that fits your company and audience.",
+          },
+          {
+            q: "Can you match my brand style and provide voiceover?",
+            a: "Yes. We work from your colors, logo, and tone so the video looks like part of your brand. We also provide professional voiceover with a male or female voice in Bulgarian, English, and other languages when needed.",
+          },
+          {
+            q: "Do you work with clients across Bulgaria and abroad?",
+            a: "Yes. We are based in Sofia but work fully online with clients across Bulgaria and around the world. The whole process - from brief to delivery - runs remotely, with no need to meet in person.",
+          },
+        ],
       },
       {
-        q: "How long does a video take?",
-        a: "Usually between 5 and 12 working days depending on the video's complexity, length, and revisions. If you need it sooner, we offer a paid priority option. If you want the highest quality, we take the time it needs - meeting your expectations always comes first.",
-      },
-      {
-        q: "What types of videos can you make?",
-        a: "We make AI-powered video ads for TV and social media (TikTok, Instagram, Reels, YouTube), product videos, corporate video, tutorials, and stories with AI avatars. We can show your product in settings traditional filming can't easily reach.",
-      },
-      {
-        q: "Is AI video cheaper than traditional filming?",
-        a: "In most cases, yes. There are no film crews, extras, locations, or props to hire, so you get a high-end look on a smaller budget. It's especially cost-effective for scenes that would be expensive or hard to shoot in real life.",
-      },
-      {
-        q: "Do I get full commercial usage rights to the video?",
-        a: "Yes. After final delivery the video is yours to use for advertising, social media, your website, TV, and any commercial purpose. We put the details in the quote so everything is clear before we start.",
-      },
-      {
-        q: "Do you work with clients across Bulgaria and abroad?",
-        a: "Yes. We are based in Sofia but work fully online with clients across Bulgaria and around the world. The whole process - from brief to delivery - runs remotely, with no need to meet in person.",
-      },
-      {
-        q: "What do you need from me to get started?",
-        a: "Your idea or message and a few assets are enough - product photos, logo, and brand guidelines. If you don't have a concept ready, we propose one that fits your company and audience.",
-      },
-      {
-        q: "Can you match my brand style and provide voiceover?",
-        a: "Yes. We work from your colors, logo, and tone so the video looks like part of your brand. We also provide professional voiceover with a male or female voice in Bulgarian, English, and other languages when needed.",
+        key: "videos",
+        label: "Videos & rights",
+        items: [
+          {
+            q: "What types of videos can you make?",
+            a: "We make AI-powered video ads for TV and social media (TikTok, Instagram, Reels, YouTube), product videos, corporate video, tutorials, and stories with AI avatars. We can show your product in settings traditional filming can't easily reach.",
+          },
+          {
+            q: "Which tools and AI models do you use?",
+            a: "We use the best tools on the market and pick the right one for each scenario. We work with different AI and video models and know the strengths and weaknesses of each, so we choose the one that fits your project.",
+          },
+          {
+            q: "Do I get full commercial usage rights to the video?",
+            a: "Yes. After final delivery the video is yours to use for advertising, social media, your website, TV, and any commercial purpose. We put the details in the quote so everything is clear before we start.",
+          },
+        ],
       },
     ],
   },

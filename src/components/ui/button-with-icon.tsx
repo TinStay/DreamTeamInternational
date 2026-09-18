@@ -7,6 +7,31 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 /**
+ * A side-menu row in the main CTA's dress (the portfolio's categories, the
+ * FAQ's topics): the active row is the `auto` pill - dark in the light
+ * theme, white in the dark one - with its icon in the brand-gradient disc at
+ * its left end, the others plain rows nudging right on hover.
+ */
+export function sideTabClass(active: boolean) {
+  return cn(
+    "group relative inline-flex h-12 w-full cursor-pointer items-center justify-start gap-3 rounded-full border-0 ps-1.5 pe-5 text-sm font-semibold whitespace-normal text-left shadow-none",
+    "transition-[background-color,color,transform,box-shadow] duration-200 ease-out will-change-transform focus-visible:ring-2 focus-visible:ring-ring/50",
+    active
+      ? "translate-x-0 bg-neutral-900 text-white shadow-[0_12px_32px_rgba(0,0,0,0.18)] hover:bg-neutral-800 hover:text-white dark:bg-white dark:text-neutral-900 dark:shadow-[0_12px_32px_rgba(255,255,255,0.14)] dark:hover:bg-white dark:hover:text-neutral-900"
+      : "bg-transparent text-foreground hover:translate-x-0.5 hover:bg-muted/60 hover:text-foreground"
+  );
+}
+/** The icon disc of a side-menu row: the brand gradient on the active row, a muted disc otherwise. */
+export function sideTabDiscClass(active: boolean) {
+  return cn(
+    "flex size-9 shrink-0 items-center justify-center rounded-full transition-[background-color,color,transform] duration-200 ease-out",
+    active
+      ? "bg-gradient-to-br from-[var(--primary-gradient-start)] to-[var(--primary-gradient-end)] text-white shadow-[0_6px_16px_var(--primary-elevated-shadow)]"
+      : "bg-muted/70 text-foreground/75 group-hover:scale-[1.06]"
+  );
+}
+
+/**
  * The site's main CTA - the projects' pill with a sliding arrow disc: the
  * label sits left with the disc on the right; on hover the disc glides to the
  * left edge (rotating 45°) while the padding swaps sides so the label slides
