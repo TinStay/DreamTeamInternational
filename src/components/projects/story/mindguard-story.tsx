@@ -185,8 +185,8 @@ export function MindguardStory({ project }: { project: Project }) {
               // The logo (the link to the client's site) right above the title - the mark's file carries transparent
               // padding on its left, the link pulls it back in line.
               <motion.div variants={fadeUp} className="mb-8">
-                <ClientSite href={partner.href} name={name} className="-ml-[0.75rem] md:-ml-[1rem]">
-                  <PartnerLogo p={partner} imgClass="h-[4.5rem] w-auto md:h-24" sizes="480px" />
+                <ClientSite href={partner.href} name={name} className="block w-full md:-ml-[1rem] md:inline-block md:w-auto">
+                  <PartnerLogo p={partner} imgClass="h-auto w-full md:h-24 md:w-auto" sizes="(max-width: 767px) 100vw, 480px" />
                 </ClientSite>
               </motion.div>
             ) : null}
@@ -195,7 +195,7 @@ export function MindguardStory({ project }: { project: Project }) {
             </motion.p>
             <motion.h1
               variants={fadeUp}
-              className={cn(HEADING, "mt-5 text-[2.25rem] font-medium tracking-[-0.012em] text-balance md:text-[clamp(1.7rem,3.6vw,4.2rem)] leading-[1.18]")}
+              className={cn(HEADING, "mt-5 text-[2.5rem] font-medium tracking-[-0.012em] text-balance md:text-[clamp(1.7rem,3.6vw,4.2rem)] leading-[1.18]")}
             >
               {story.hero.title}
             </motion.h1>

@@ -7,6 +7,8 @@ import { useLanguage } from "@/lib/i18n/language-context";
 import { GradientBlurPageBg } from "@/components/ui/gradient-blur-bg";
 import { MAIN_WITH_FIXED_PAGE_BG_CLASS } from "@/lib/page-shell";
 import { PageBreadcrumbs } from "@/components/page-breadcrumbs";
+import { ContactSection } from "@/components/contact-section";
+import { QuoteFormSection } from "@/components/quote-form/quote-form-section";
 import { TrainingCardsGrid } from "./training-cards-grid";
 
 export function TrainingPageView() {
@@ -21,8 +23,8 @@ export function TrainingPageView() {
 
       <SiteHeader />
 
-      <div className="relative z-10 flex w-full flex-1 px-4 pb-28 pt-24 lg:pb-32 lg:pt-32">
-        <div className="mx-auto w-full max-w-7xl xl:max-w-[86rem] 2xl:max-w-[96rem]">
+      <div className="relative z-10 flex w-full flex-1 flex-col pb-8 pt-24 lg:pt-32">
+        <div className="mx-auto w-full max-w-7xl px-4 xl:max-w-[86rem] 2xl:max-w-[96rem]">
           <PageBreadcrumbs className="mb-6" />
 
           <header className="mb-10 lg:mb-12">
@@ -34,6 +36,9 @@ export function TrainingPageView() {
 
           <TrainingCardsGrid />
         </div>
+        {/* Under the trainings: the service cards + step form, then the contact form. */}
+        <QuoteFormSection className="mt-10 lg:mt-14" />
+        <ContactSection />
       </div>
 
       <div className="relative z-10">

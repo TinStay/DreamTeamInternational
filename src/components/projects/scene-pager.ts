@@ -71,8 +71,11 @@ export function useScenePager(enabled: boolean, stops: () => number[]) {
     const onMove = (e: TouchEvent) => {
       if (!gesture || e.touches.length !== 1) return;
       if (animating) {
-        // Locked until the scene has settled: the page must not move, and this gesture will not page either.
+        // Locked until the scene has settled: the page must not move, and this gesture will not page either - nor
+        // scroll natively once the tween has landed (a gesture begun during the lock is swallowed to its end; left
+        // undecided, its next move after the landing was handed to the browser, which flung the page on).
         if (e.cancelable) e.preventDefault();
+        gesture.captured = true;
         gesture.consumed = true;
         return;
       }

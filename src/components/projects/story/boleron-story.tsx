@@ -76,12 +76,19 @@ const AD_KEYS = ["summer", "casco4", "liability3", "property", "travel", "liabil
  * Roni without a box: the clip carries its own matte in its lower half; each
  * video frame is un-premultiplied against it and painted to a canvas, so only
  * the character shows over the gradient. Runs per video frame, only while on
- * screen; the scene tilts toward the pointer (springs) inside a perspective.
+ * screen - on every screen (a coarse pointer works at 0.6 of the size, a third
+ * of the pixels: the plain clip in a frame that phones used to get showed as
+ * a box on the gradient); only reduced motion keeps that clip. The scene
+ * tilts toward the pointer (springs) inside a perspective.
  */
 function RoniScene({ label }: { label: string }) {
   const reduceMotion = useReducedMotion();
-  // The composite is for pointers and big screens; phones and reduced motion get the plain clip.
-  const composite = useMediaQuery("(min-width: 1024px) and (hover: hover)") && !reduceMotion;
+  const composite = !reduceMotion;
+  // Phones: the composite at 0.6 of the size (324 × 576) - a third of the pixel work per frame.
+  const coarse = useMediaQuery("(pointer: coarse)");
+  const res = coarse ? 0.6 : 1;
+  const w = Math.round(RONI_W * res);
+  const h = Math.round(RONI_H * res);
   const boxRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -95,8 +102,8 @@ function RoniScene({ label }: { label: string }) {
     if (!composite || !video || !canvas || !onScreen) return;
     const ctx = canvas.getContext("2d", { willReadFrequently: true });
     const off = document.createElement("canvas");
-    off.width = RONI_W;
-    off.height = RONI_H * 2;
+    off.width = w;
+    off.height = h * 2;
     const octx = off.getContext("2d", { willReadFrequently: true });
     if (!ctx || !octx) return;
     let cancelled = false;
@@ -104,9 +111,9 @@ function RoniScene({ label }: { label: string }) {
     const draw = () => {
       if (cancelled) return;
       if (video.readyState >= 2) {
-        octx.drawImage(video, 0, 0, RONI_W, RONI_H * 2);
-        const colour = octx.getImageData(0, 0, RONI_W, RONI_H);
-        const matte = octx.getImageData(0, RONI_H, RONI_W, RONI_H);
+        octx.drawImage(video, 0, 0, w, h * 2);
+        const colour = octx.getImageData(0, 0, w, h);
+        const matte = octx.getImageData(0, h, w, h);
         const c = colour.data;
         const m = matte.data;
         for (let i = 0; i < c.length; i += 4) {
@@ -137,7 +144,7 @@ function RoniScene({ label }: { label: string }) {
       else cancelAnimationFrame(handle);
       video.pause();
     };
-  }, [composite, onScreen]);
+  }, [composite, onScreen, w, h]);
 
   const onPointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
     const box = boxRef.current;
@@ -184,7 +191,7 @@ function RoniScene({ label }: { label: string }) {
             preload="auto"
             aria-hidden
           />
-          <canvas ref={canvasRef} width={RONI_W} height={RONI_H} className="relative z-[1] block aspect-[9/16] h-auto w-full" aria-label={label} role="img" />
+          <canvas ref={canvasRef} width={w} height={h} className="relative z-[1] block aspect-[9/16] h-auto w-full" aria-label={label} role="img" />
         </motion.div>
       ) : (
         <RoniClip label={label} className="max-w-[380px]" />
@@ -193,7 +200,7 @@ function RoniScene({ label }: { label: string }) {
   );
 }
 
-/** The plain Roni clip in a rounded frame (the hero on phones / under reduced motion). */
+/** The plain Roni clip in a rounded frame (the hero under reduced motion). */
 function RoniClip({ label, className }: { label: string; className?: string }) {
   const reduceMotion = useReducedMotion();
   return (
@@ -234,8 +241,8 @@ function Feature({
   side: "left" | "right";
   /** Where the media sits against the copy: centred, or at the top (a long copy beside a short frame). */
   align?: "center" | "start";
-  /** The columns: about even, or the copy taking the bigger share (`copy` - for `side="right"`, where the copy is the first column). */
-  ratio?: "even" | "copy";
+  /** The columns: about even, or the copy / the media taking the bigger share (`copy` / `media` - for `side="right"`, where the copy is the first column). */
+  ratio?: "even" | "copy" | "media";
   eyebrow: string;
   title: string;
   body: readonly string[];
@@ -249,7 +256,11 @@ function Feature({
       <motion.div
         className={cn(
           "grid gap-10 lg:gap-16 xl:gap-20",
-          ratio === "copy" ? "lg:grid-cols-[minmax(0,1.3fr)_minmax(0,0.9fr)]" : "lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)]",
+          ratio === "copy"
+            ? "lg:grid-cols-[minmax(0,1.3fr)_minmax(0,0.9fr)]"
+            : ratio === "media"
+              ? "lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)]"
+              : "lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)]",
           align === "start" ? "items-start" : "items-center"
         )}
         initial="hidden"
@@ -259,7 +270,7 @@ function Feature({
       >
         <motion.div variants={fadeUp} className={cn("max-w-[58ch]", side === "left" ? "lg:order-2" : "lg:order-1")}>
           <Eyebrow>{eyebrow}</Eyebrow>
-          <Display text={title} className="text-3xl sm:text-4xl lg:text-[2.75rem] xl:text-5xl" />
+          <Display text={title} className="text-4xl sm:text-5xl lg:text-[3.25rem] xl:text-6xl" />
           <div className="mt-6 text-lg leading-relaxed text-[var(--story-muted)] sm:text-xl [&>p+p]:mt-4">
             {body.map((paragraph) => (
               <p key={paragraph}>{paragraph}</p>
@@ -310,7 +321,9 @@ export function BoleronStory({ project }: { project: Project }) {
     "--story-line": "rgba(255,255,255,0.22)",
     "--story-rule": "rgba(255,255,255,0.6)",
   } as CSSProperties;
-  const phone = "relative mx-auto aspect-[9/16] w-full overflow-hidden rounded-[1.75rem] border-4 border-white/10 bg-black";
+  // A 9:16 phone frame (the clips are 9:16 too, so the player fills it) with a deep shadow and a cyan glow around it.
+  const phone =
+    "relative mx-auto aspect-[9/16] w-full overflow-hidden rounded-[1.75rem] border-4 border-white/10 bg-black shadow-[0_30px_70px_-18px_rgba(10,10,50,0.7),0_0_70px_-6px_rgba(37,199,234,0.55)]";
   const placeholderClass = "text-white/40 [background:repeating-linear-gradient(45deg,rgba(255,255,255,0.04)_0_10px,rgba(255,255,255,0.02)_10px_20px)]";
   const gradient = `linear-gradient(90deg, ${BOLERON.cyan}, ${BOLERON.blue} 46%, ${BOLERON.violet})`;
 
@@ -346,12 +359,13 @@ export function BoleronStory({ project }: { project: Project }) {
             {partner ? (
               // The client's dark-ink mark as a white silhouette on the gradient, linking to boleron.bg.
               <motion.div variants={fadeUp} className="mb-10">
-                <ClientSite href={partner.href} name={name}>
-                  <PartnerLogo p={partner} imgClass="h-16 w-auto brightness-0 invert md:h-24" sizes="400px" />
+                <ClientSite href={partner.href} name={name} className="block w-full md:inline-block md:w-auto">
+                  <PartnerLogo p={partner} imgClass="h-auto w-full brightness-0 invert md:h-24 md:w-auto" sizes="(max-width: 767px) 100vw, 400px" />
                 </ClientSite>
               </motion.div>
             ) : null}
-            <h1 className={cn(HERO_TITLE.long, "max-w-[18ch] font-heading font-bold tracking-tight text-balance", PROJECT_DISPLAY_FONT.boleron, "leading-[1.06]")}>
+            {/* A size up from the long scale (the client wanted the page's titles bigger). */}
+            <h1 className={cn(HERO_TITLE.boleron, "max-w-[18ch] font-heading font-bold tracking-tight text-balance", PROJECT_DISPLAY_FONT.boleron, "leading-[1.06]")}>
               <Words text={story.hero.title} base={0.05} step={0.03} />
             </h1>
             <motion.p variants={fadeUp} className="mt-7 max-w-[40ch] text-lg leading-relaxed text-[var(--story-muted)] sm:text-xl xl:text-2xl">
@@ -419,10 +433,11 @@ export function BoleronStory({ project }: { project: Project }) {
           viewport={VIEWPORT}
           variants={{ ...frameIn, visible: { ...frameIn.visible, transition: { ...frameIn.visible.transition, staggerChildren: 0.1, delayChildren: 0.15 } } }}
         >
-          <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] lg:items-end lg:gap-16">
+          {/* The title column the wider one: at its new size the title wants the room (one word a line otherwise). */}
+          <div className="grid gap-8 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] lg:items-end lg:gap-16">
             <motion.div variants={fadeUp}>
               <Eyebrow>{story.results.eyebrow}</Eyebrow>
-              <Display text={story.results.title} className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl" />
+              <Display text={story.results.title} className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl" />
             </motion.div>
             <motion.p variants={fadeUp} className="text-lg leading-relaxed text-[var(--story-muted)] sm:text-xl">
               {story.results.closing}
@@ -463,7 +478,7 @@ export function BoleronStory({ project }: { project: Project }) {
       {/* ---------------- THE ADS: the eight product films as the collage ---------------- */}
       <Section className="pt-0 sm:pt-0 lg:pt-0" inner="lg:max-w-none lg:px-6">
         <motion.div
-          className={cn("grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] lg:items-end lg:gap-16", STORY_CONTAINER, "lg:px-0")}
+          className={cn("grid gap-6 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] lg:items-end lg:gap-16", STORY_CONTAINER, "lg:px-0")}
           initial="hidden"
           whileInView="visible"
           viewport={VIEWPORT}
@@ -471,7 +486,7 @@ export function BoleronStory({ project }: { project: Project }) {
         >
           <motion.div variants={fadeUp}>
             <Eyebrow>{story.ads.eyebrow}</Eyebrow>
-            <Display text={story.ads.title} className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl" />
+            <Display text={story.ads.title} className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl" />
           </motion.div>
           <motion.div variants={fadeUp} className="text-lg leading-relaxed text-[var(--story-muted)] sm:text-xl [&>p+p]:mt-4">
             {story.ads.body.map((paragraph) => (
@@ -513,15 +528,22 @@ export function BoleronStory({ project }: { project: Project }) {
         }
       />
 
-      {/* ---------------- SOCIAL: the three vertical cuts in phones (stacked below sm) ---------------- */}
+      {/* ---------------- SOCIAL: the three vertical cuts in phones (stacked below sm), on a glow ---------------- */}
       <Feature
         side="right"
+        ratio="media"
         eyebrow={story.social.eyebrow}
         title={story.social.title}
         body={story.social.body}
         note={story.social.note}
         media={
-          <div className="grid grid-cols-1 items-end gap-8 sm:grid-cols-3 sm:gap-4">
+          <div className="relative grid grid-cols-1 items-end gap-10 sm:grid-cols-3 sm:gap-5">
+            {/* The light behind the phones - a radial, never a blur filter. */}
+            <div
+              className="pointer-events-none absolute left-1/2 top-1/2 -z-[1] aspect-square w-[120%] -translate-x-1/2 -translate-y-1/2 rounded-full"
+              style={{ background: "radial-gradient(closest-side, rgba(255,255,255,0.28) 0%, rgba(37,199,234,0.18) 40%, transparent 72%)" }}
+              aria-hidden
+            />
             {(["shorts", "facebook", "tiktok"] as const).map((key, i) => (
               <motion.figure key={key} variants={fadeUp} className={cn("m-0 w-full min-w-0 max-w-[18rem] justify-self-center sm:max-w-none", i === 1 && "lg:-translate-y-6")}>
                 <MediaFrame

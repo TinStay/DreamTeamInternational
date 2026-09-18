@@ -467,12 +467,12 @@ function PlasicoOverlay({ t }: SceneVisualProps) {
       <Image
         src={PLASICO_LOGO}
         alt="Plasico"
-        width={497}
+        width={319}
         height={128}
         sizes="(max-width: 1024px) 60vw, 36vw"
         loading="eager"
         // From lg the logo is sized by its height - 9.5vh, never over 6.5rem nor wider than the screen allows (7vw
-        // of height ≈ 27vw of width) - so it always stays under the copy block's CTA, whose bottom sits at about
+        // of height ≈ 17.5vw of width) - so it always stays under the copy block's CTA, whose bottom sits at about
         // 83vh (36vw of width used to run up into it on a short, wide screen).
         className="absolute left-[2vw] top-[var(--pl-top)] h-auto w-[60vw] drop-shadow-[0_22px_38px_rgba(31,162,42,0.28)] sm:w-[48vw] lg:left-[max(2rem,3vw)] lg:top-auto lg:bottom-[3vh] lg:h-[clamp(3rem,min(9.5vh,7vw),6.5rem)] lg:w-auto"
       />
@@ -638,7 +638,9 @@ const SCENES: Partial<Record<ProjectKey, SceneVisual>> = {
     // logo's resting centre: the logo rides a parallax layer (depth 0.3, −35vh × depth × t) and has drifted that
     // far up by the time the scene is framed (t 0.27), the bar has not.
     className:
-      "[--pl-name:15.45vw] [--pl-block:12rem] [--pl-video:49.5vw] [--pl-top:max(6rem,calc((100svh_-_var(--pl-name)_-_var(--pl-block)_-_var(--pl-video)_-_2.5rem)/2))] [--pl-name-cy:calc(var(--pl-top)_+_var(--pl-name)/2_-_2.8vh)] sm:[--pl-name:12.36vw] sm:[--pl-block:13.5rem] sm:[--pl-video:45vw]",
+      // --pl-name = the logo's height at 60vw / 48vw wide: the file is 319 × 128 (0.4013 - it was taken for
+      // 497 × 128, and the copy block sat on the logo's foot).
+      "[--pl-name:24.08vw] [--pl-block:12rem] [--pl-video:49.5vw] [--pl-top:max(6rem,calc((100svh_-_var(--pl-name)_-_var(--pl-block)_-_var(--pl-video)_-_2.5rem)/2))] [--pl-name-cy:calc(var(--pl-top)_+_var(--pl-name)/2_-_2.8vh)] sm:[--pl-name:19.26vw] sm:[--pl-block:13.5rem] sm:[--pl-video:45vw]",
     Visual: PlasicoVisual,
     Overlay: PlasicoOverlay,
   },

@@ -130,7 +130,7 @@ export function Testimonial({
   return (
     <div
       className={cn(
-        "relative flex w-80 max-w-full flex-col items-center rounded-2xl border border-card-border bg-card/80 text-center shadow-sm backdrop-blur-sm transition-shadow duration-300 hover:shadow-lg",
+        "relative flex w-80 max-w-full flex-col items-center rounded-2xl border border-card-border bg-card/80 text-center shadow-[0_16px_40px_-14px_rgba(15,23,42,0.28)] backdrop-blur-sm transition-shadow duration-300 hover:shadow-[0_22px_50px_-14px_rgba(15,23,42,0.36)] dark:shadow-[0_18px_44px_-14px_rgba(0,0,0,0.7)] dark:hover:shadow-[0_24px_56px_-14px_rgba(0,0,0,0.8)]",
         compact ? "px-5 pb-3.5 pt-8" : "px-6 pb-6 pt-11",
         className
       )}
@@ -150,15 +150,17 @@ export function Testimonial({
       </div>
 
       <h3 className={cn("font-heading font-semibold text-foreground", compact ? "text-lg" : "text-xl")}>{name}</h3>
-      {role ? <p className={cn("text-muted-foreground", compact ? "text-xs" : "text-sm")}>{role}</p> : null}
+      {role ? <p className={cn("text-muted-foreground", compact ? "text-sm md:text-xs" : "text-sm")}>{role}</p> : null}
 
-      <div className={cn("flex gap-1", compact ? "mt-1.5" : "mt-2")} aria-label={`${rating} / 5`}>
+      {/* The stars twice their old size (the client's ask), a touch tighter between them. */}
+      <div className={cn("flex gap-0.5", compact ? "mt-2" : "mt-2.5")} aria-label={`${rating} / 5`}>
         {Array.from({ length: 5 }).map((_, i) => (
-          <StarIcon key={i} filled={i < rating} size={compact ? 19 : 22} />
+          <StarIcon key={i} filled={i < rating} size={compact ? 38 : 44} />
         ))}
       </div>
 
-      <p className={cn("text-muted-foreground", compact ? "mt-1.5 text-[13px] leading-[1.45]" : "mt-2 text-sm leading-relaxed")}>
+      {/* The review itself a size up on phones (the compact card runs 13px only from md, where two sit side by side). */}
+      <p className={cn("text-muted-foreground", compact ? "mt-2 text-[15px] leading-[1.5] md:text-[13px] md:leading-[1.45]" : "mt-2.5 text-base leading-relaxed")}>
         {text}
       </p>
     </div>

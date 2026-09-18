@@ -8,6 +8,7 @@ import { motion } from "motion/react";
 import { ContactInquiryForm } from "@/components/contact-inquiry-form";
 import { JourneyItem } from "@/components/ui/scroll-journey";
 import { SOCIAL_LINKS } from "@/lib/social-links";
+import { ClutchBadge, GoogleReviewsBadge } from "@/components/review-badges";
 import { GradientMailIcon, GradientMapPinIcon, GradientPhoneIcon } from "@/components/ui/gradient-icons";
 
 const MotionLink = motion.a;
@@ -80,7 +81,14 @@ function ContactIconChip({
 const contactIconClass =
   "h-5 w-5 [&_g]:transition-[fill] [&_g]:duration-300 group-hover:[&_g]:fill-white";
 
-export function ContactSection({ className }: { className?: string }) {
+export function ContactSection({
+  className,
+  reviews = false,
+}: {
+  className?: string;
+  /** The Google rating + the Clutch widget in a row under the social icons (the contact page). */
+  reviews?: boolean;
+}) {
   const { t } = useLanguage();
 
   const addressText = t.contact.addressVal;
@@ -223,6 +231,13 @@ export function ContactSection({ className }: { className?: string }) {
                 </MotionLink>
               ))}
             </div>
+
+            {reviews ? (
+              <motion.div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-4" {...reveal(4 + socials.length)}>
+                <GoogleReviewsBadge label={t.footer.googleReviews} />
+                <ClutchBadge />
+              </motion.div>
+            ) : null}
           </JourneyItem>
         </div>
       </div>

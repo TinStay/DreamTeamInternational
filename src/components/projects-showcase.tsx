@@ -12,7 +12,7 @@ import {
   type MotionValue,
 } from "motion/react";
 import { IconArrowDown } from "@tabler/icons-react";
-import { ProjectCard } from "@/components/projects-section";
+import { ProjectRow } from "@/components/projects-section";
 import {
   clamp,
   clamp01,
@@ -805,7 +805,7 @@ export function ProjectsShowcase({ className }: { className?: string }) {
   if (reduceMotion) {
     return (
       <section id="projects" ref={sectionRef} className={cn("relative w-full py-12 sm:py-16", className)}>
-          <div className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-4">
+          <div className="mx-auto flex w-full max-w-6xl flex-col gap-14 px-4">
             <div className="text-center">
               <h2 className="font-heading text-[2.75rem] leading-[1.06] font-extrabold sm:text-5xl md:text-6xl text-foreground">
                 {p.title1} <span className="text-section-accent">{p.title2}</span>
@@ -813,7 +813,7 @@ export function ProjectsShowcase({ className }: { className?: string }) {
               <p className="mx-auto mt-4 max-w-2xl text-lg text-muted-foreground">{p.subtitle}</p>
             </div>
             {PROJECTS.map((project, index) => (
-              <ProjectCard key={project.id} project={project} index={index} />
+              <ProjectRow key={project.id} project={project} index={index} />
             ))}
           </div>
         </section>

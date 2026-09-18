@@ -30,8 +30,9 @@ export function HomePage() {
       <div className="flex-1 w-full relative z-10 flex flex-col">
         {/* Opening journey: the hero's headline / CTAs / partners strip leave as the services + quote wizard
             arrive (its first step IS the services grid); the wizard then leaves into the projects stage below.
-            The hero keeps its own top (no header padding, no overlap above it). */}
-        <ScrollJourney overlapFirst={false} leaveLast overlap={0.5}>
+            The hero keeps its own top (no header padding, no overlap above it). That first hand-over is a page
+            (`pageFirst`): one wheel tick / swipe plays it whole, and the scroll never rests half-way. */}
+        <ScrollJourney overlapFirst={false} leaveLast overlap={0.5} pageFirst>
           {/* The hero is the landing view: pinned from the top of the page, no room of its own. */}
           <JourneyScene className="pt-0" hold={0}>
             {/* Partners marquee lives inside the hero (bottom strip over the video). */}

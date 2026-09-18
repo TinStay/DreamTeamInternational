@@ -1,22 +1,23 @@
 "use client";
 
 import type { CSSProperties } from "react";
-import { motion } from "motion/react";
+import { motion, useReducedMotion } from "motion/react";
 import { PartnerLogo } from "@/components/partner-logo";
 import { useLanguage } from "@/lib/i18n/language-context";
 import { PARTNERS } from "@/lib/partners";
 import { PROJECT_DISPLAY_FONT } from "@/lib/project-fonts";
 import type { Project } from "@/lib/projects";
 import { cn } from "@/lib/utils";
-import { EmbedCover } from "@/components/projects/showcase-primitives";
-import { bunnyBackgroundEmbedSrc } from "@/lib/bunny-stream";
+import { bunnyMp4Url, bunnyThumbnailUrl, type BunnyVideo } from "@/lib/bunny-stream";
 import { BodyXL, ClientSite, CtaBand, Eyebrow, HERO_TITLE, MediaFrame, STORY_CONTAINER, Section, StoryShell, VIEWPORT, Words, fadeUp, frameIn, stagger } from "./primitives";
 
 /*
  * Plasico's story - the store's world from the home showcase: white, the
  * Plasico green and faint diagonal pinstripes - told in big, short titles
- * (they are what gets read) over large type: the hero (the mark on top, the
- * title and the lead under it, the film on the right), the brief, the three
+ * (they are what gets read) over large type: the hero (the "Back to Work"
+ * film from the very top of the page - behind the header and the breadcrumbs
+ * - with the mark, the title and the lead on a glass panel at its bottom
+ * left), the brief, the three
  * ads (the two wide ones a title, a couple of lines and then a full-width
  * frame; the vertical one beside its copy), how the two teams work together,
  * and the CTA. Every
@@ -39,6 +40,29 @@ const ADS = [
   { key: "backToSchool", aspect: "aspect-[9/16]", beside: true },
 ] as const;
 
+/**
+ * The hero's film: the ad cover-fitting the whole section - a native video from the pull zone (any frame, no
+ * player chrome), muted and looping; the 1080p rendition from lg, 720p under it; reduced motion keeps its poster.
+ */
+function HeroFilm({ clip }: { clip: BunnyVideo }) {
+  const reduceMotion = useReducedMotion();
+  return (
+    <video
+      className="absolute inset-0 size-full object-cover"
+      poster={bunnyThumbnailUrl(clip)}
+      autoPlay={!reduceMotion}
+      muted
+      loop
+      playsInline
+      preload={reduceMotion ? "none" : "auto"}
+      aria-hidden
+    >
+      <source src={bunnyMp4Url(clip, 1080)} media="(min-width: 1024px)" type="video/mp4" />
+      <source src={bunnyMp4Url(clip, 720)} type="video/mp4" />
+    </video>
+  );
+}
+
 /** A short title, big. */
 const TITLE = cn("font-heading text-4xl font-bold tracking-tight text-balance sm:text-5xl lg:text-6xl xl:text-7xl", PROJECT_DISPLAY_FONT.plasico, "leading-[1.04]");
 
@@ -48,6 +72,7 @@ export function PlasicoStory({ project }: { project: Project }) {
   const name = t.projects.items[project.id].name;
   const partner = PARTNERS.find((p) => p.id === project.partnerId);
   const clips = project.story?.clips ?? {};
+  const heroClip = clips.backToWork && "bunny" in clips.backToWork ? clips.backToWork.bunny : null;
   const style = {
     "--story-accent": PLASICO.green,
     "--story-muted": "var(--muted-foreground)",
@@ -61,6 +86,7 @@ export function PlasicoStory({ project }: { project: Project }) {
       accent={PLASICO.green}
       display={PROJECT_DISPLAY_FONT.plasico}
       className="[--story-ground:#F3FAF1] dark:[--story-ground:#0B1810]"
+      breadcrumbsTheme="dark"
       ground={
         // White with a hint of green / a deep green, faint pinstripes + a soft green bloom, as on the showcase scene.
         <div className="absolute inset-0 overflow-hidden bg-[var(--story-ground)]" aria-hidden>
@@ -72,49 +98,51 @@ export function PlasicoStory({ project }: { project: Project }) {
         </div>
       }
     >
-      {/* ---------------- HERO: the mark on top, the title and the lead under it, the film on the right ---------------- */}
-      <Section tight className="pt-0 sm:pt-0 lg:pt-0">
+      {/* ---------------- HERO: the "Back to Work" film from the top of the page, the copy bottom left ---------------- */}
+      {/* Pulled up under the breadcrumbs block (the shell's header lane + the crumbs, about 9.5rem / 11.25rem from lg -
+          a touch more than the block, so the film never falls short of the page's top edge) and padded by the same,
+          so the film runs behind the header and the breadcrumbs (locked dark, `breadcrumbsTheme`) to the very top. */}
+      <section className="relative isolate -mt-[9.5rem] flex min-h-[min(100svh,1000px)] flex-col overflow-hidden pt-[9.5rem] lg:-mt-[11.25rem] lg:pt-[11.25rem]">
+        {/* The film behind everything, under a scrim that is darkest at the top (the header) and at the foot (the
+            copy), and a fade into the page ground along the bottom edge. */}
+        <div className="absolute inset-0 bg-[#0F2318]" aria-hidden>
+          {heroClip ? <HeroFilm clip={heroClip} /> : null}
+          <div className="absolute inset-0 bg-gradient-to-b from-black/55 via-black/20 to-black/65" />
+          <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-[var(--story-ground)] to-transparent" />
+        </div>
         <motion.div
-          className="grid items-center gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] lg:gap-14 xl:gap-20"
+          // pb-24 below lg: the panel sits at the foot of a screen-high hero, above the mobile dock.
+          className={cn("relative z-[1] flex flex-1 items-end pb-24 pt-6 lg:pb-16", STORY_CONTAINER)}
           initial="hidden"
           animate="visible"
           variants={stagger(0.08, 0.1)}
         >
-          <div>
+          {/* The copy on a glass panel across the page at the foot, so it stands out from whatever the film shows
+              behind it: the title and the lead on the left, the mark bottom right; on phones the mark on top. */}
+          <motion.div
+            variants={frameIn}
+            className="grid w-full gap-8 rounded-[2rem] border border-white/15 bg-black/35 p-7 text-white shadow-[0_30px_80px_-30px_rgba(0,0,0,0.7)] backdrop-blur-md sm:p-10 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end lg:gap-14 lg:p-12 xl:gap-20"
+          >
             {partner ? (
-              // The client's mark (the link to its site) leading the copy.
-              <motion.div variants={fadeUp} className="mb-8">
-                <ClientSite href={partner.href} name={name}>
-                  <PartnerLogo p={partner} imgClass="h-16 w-auto max-w-full md:h-20 xl:h-24" sizes="360px" />
+              // The client's mark (the link to its site): on top on phones, at the foot of the right column from lg.
+              <motion.div variants={fadeUp} className="lg:order-2 lg:self-end lg:pb-1">
+                <ClientSite href={partner.href} name={name} className="block w-full md:inline-block md:w-auto">
+                  <PartnerLogo p={partner} imgClass="h-auto w-full md:h-20 md:w-auto xl:h-24 2xl:h-28" sizes="(max-width: 767px) 100vw, 360px" />
                 </ClientSite>
               </motion.div>
             ) : null}
-            {/* A step under the short scale on desktop - the uppercase Exo 2 reads loud enough at 3.5–4rem. */}
-            <h1 className={cn("text-[clamp(2.5rem,1rem+2.4vw,4.5rem)] font-heading font-bold tracking-tight text-balance", PROJECT_DISPLAY_FONT.plasico, "leading-[0.98]")}>
-              <Words text={story.hero.title} base={0.05} step={0.04} />
-            </h1>
-            <motion.p variants={fadeUp} className="mt-8 max-w-[48ch] text-lg leading-relaxed text-[var(--story-muted)] sm:text-xl xl:text-2xl">
-              {story.hero.lead}
-            </motion.p>
-          </div>
-          <div>
-            <motion.div variants={frameIn} className="relative w-full">
-              {/* The glow behind the frame - a radial, no blur filter. */}
-              <div
-                className="pointer-events-none absolute left-1/2 top-1/2 aspect-square w-[110%] -translate-x-1/2 -translate-y-1/2 rounded-full"
-                style={{ background: "radial-gradient(closest-side, rgba(95,191,47,0.36) 0%, rgba(31,162,42,0.14) 45%, transparent 100%)" }}
-                aria-hidden
-              />
-              {/* The first ad, muted and looping, cover-fit in a rounded 16:9 frame; the full players follow below. */}
-              <div className="relative aspect-video w-full overflow-hidden rounded-[2rem] border border-[#1FA22A]/25 bg-[#0F2318] shadow-[0_40px_100px_-20px_rgba(31,162,42,0.45)] dark:border-[#5FBF2F]/25">
-                {clips.backToWork && "bunny" in clips.backToWork ? (
-                  <EmbedCover src={bunnyBackgroundEmbedSrc(clips.backToWork.bunny)} orientation="wide" boxAspect={16 / 9} />
-                ) : null}
-              </div>
-            </motion.div>
-          </div>
+            <div className="min-w-0 lg:order-1">
+              {/* A step under the short scale on desktop - the uppercase Exo 2 reads loud enough at 3.5–4rem. */}
+              <h1 className={cn("text-[clamp(2.75rem,1rem+2.4vw,4.5rem)] font-heading font-bold tracking-tight text-balance", PROJECT_DISPLAY_FONT.plasico, "leading-[0.98]")}>
+                <Words text={story.hero.title} base={0.05} step={0.04} />
+              </h1>
+              <motion.p variants={fadeUp} className="mt-3 max-w-[64ch] text-lg leading-relaxed text-white/65 sm:text-xl lg:mt-4 xl:text-2xl">
+                {story.hero.lead}
+              </motion.p>
+            </div>
+          </motion.div>
         </motion.div>
-      </Section>
+      </section>
 
       {/* ---------------- THE BRIEF ---------------- */}
       <Section tight className="pt-6 sm:pt-8 lg:pt-10">

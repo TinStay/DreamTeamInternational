@@ -21,11 +21,14 @@ export function ContactProcessLayout() {
       <div className="relative z-10 flex w-full flex-1 flex-col pb-8 pt-24 sm:pt-24 lg:pt-32">
         <div className="mx-auto w-full max-w-7xl px-4">
           <PageBreadcrumbs className="mb-6" />
-          {/* Up top: the quote pill, which scrolls down to the service cards + wizard under the form. */}
-          <ContactQuoteCta className="mb-10" />
         </div>
-        <ContactSection className="pt-0 sm:pt-0 lg:pt-0" />
-        {/* The home page's service cards + step form, under the contact form (`#quote`). */}
+        {/* The form + details, with the review badges under the social icons. */}
+        <ContactSection className="pt-0 sm:pt-0 lg:pt-0" reviews />
+        {/* Under the form: the slim quote card, whose pill scrolls on to the service cards + wizard right below. */}
+        <div className="mx-auto w-full max-w-7xl px-4">
+          <ContactQuoteCta className="mb-2" />
+        </div>
+        {/* The home page's service cards + step form (`#quote`). */}
         <QuoteFormSection />
         <ProcessSection />
       </div>

@@ -5,6 +5,7 @@ import {
   cloneElement,
   createContext,
   isValidElement,
+  useCallback,
   useContext,
   useEffect,
   useLayoutEffect,
@@ -26,6 +27,7 @@ import {
 import { cn } from "@/lib/utils";
 import { useFlowProgress, useScrollEased } from "@/lib/smooth-scroll";
 import { useHydrated } from "@/lib/use-media-query";
+import { usePagedHandover } from "@/components/ui/paged-handover";
 
 /*
  * Scroll-driven "journey" for the home sections after the projects showcase.
@@ -435,6 +437,11 @@ export type ScrollJourneyProps = {
    * position runs -1 → 0 over it) - how the journey takes a shape over from whatever precedes it.
    */
   prelude?: number;
+  /**
+   * The first hand-over (scene 1 → scene 2) played as a page: a wheel tick or a swipe from either end plays the whole
+   * stretch as one animation, and the scroll never rests inside it (`usePagedHandover`) - the hero → the wizard.
+   */
+  pageFirst?: boolean;
 };
 
 /** Stacks `JourneyScene`s: tells each one whether it is first (nothing leaves before it), last, overlapping, leaving. */
@@ -446,10 +453,27 @@ export function ScrollJourney({
   overlap = OVERLAP,
   morph,
   prelude = 0,
+  pageFirst = false,
 }: ScrollJourneyProps) {
   const scenes = Children.toArray(children).filter((child): child is ReactElement<JourneySceneProps> =>
     isValidElement(child)
   );
+  const rootRef = useRef<HTMLDivElement>(null);
+  // The two ends of the first hand-over: the first scene's flow top (its start marker) and the point where the
+  // second is fully in - its start marker less the overlap its box is pulled up by, where `scrollToElement` lands a
+  // hash inside it too. Measured when asked (the boxes are direct children of the root, each after its marker).
+  const firstHandover = useCallback((): [number, number] | null => {
+    const boxes = rootRef.current?.querySelectorAll<HTMLElement>(":scope > [data-journey-scene]");
+    const first = boxes?.[0]?.previousElementSibling;
+    const second = boxes?.[1];
+    const marker = second?.previousElementSibling;
+    if (!(first instanceof HTMLElement) || !second || !(marker instanceof HTMLElement)) return null;
+    const overlapBy = parseFloat(second.dataset.journeyOverlap ?? "0") || 0;
+    const start = first.getBoundingClientRect().top + window.scrollY;
+    const end = marker.getBoundingClientRect().top + window.scrollY - overlapBy * window.innerHeight;
+    return end > start ? [start, end] : null;
+  }, []);
+  usePagedHandover(pageFirst, firstHandover);
   // The scenes' arrivals summed (scene k fully in at k + 1) ... The sum is taken on the NEXT frame's pre-update
   // step, before anything derived from it is recomputed: an arrival changes in the pre-render step (it is derived
   // from the scroll), and a value derived from the sum that has already been recomputed in that step would not be
@@ -492,7 +516,7 @@ export function ScrollJourney({
   // z-10: level with the showcase, so a scene held over its tail paints on top.
   return (
     <JourneyRegistryContext.Provider value={registry}>
-      <div className={cn("relative z-10 flow-root", className)}>
+      <div ref={rootRef} className={cn("relative z-10 flow-root", className)}>
         <div ref={headRef} className="h-0" aria-hidden />
         {hasBackdrop ? (
           <JourneyBackdropLayer position={position} opacity={canvasOpacity} backdrops={backdrops} morph={morph} />

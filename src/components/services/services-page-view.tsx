@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { SiteHeader } from "@/components/site-header";
 import { MobileNav } from "@/components/mobile-nav";
 import { Footer } from "@/components/footer";
@@ -8,13 +8,14 @@ import { GradientBlurPageBg } from "@/components/ui/gradient-blur-bg";
 import { MAIN_WITH_FIXED_PAGE_BG_CLASS } from "@/lib/page-shell";
 import { PageBreadcrumbs } from "@/components/page-breadcrumbs";
 import { ServiceCard } from "@/components/ui/service-card";
-import { ContactInquiryForm } from "@/components/contact-inquiry-form";
+import { ContactSection } from "@/components/contact-section";
 import { useLanguage } from "@/lib/i18n/language-context";
 import { servicePath } from "@/lib/routes";
 import { getServiceCardVariant, getServiceSlug } from "@/lib/services/constants";
 
 export function ServicesPageView() {
   const { t, language } = useLanguage();
+  const router = useRouter();
 
   return (
     <main className={MAIN_WITH_FIXED_PAGE_BG_CLASS}>
@@ -24,8 +25,8 @@ export function ServicesPageView() {
 
       <SiteHeader />
 
-      <div className="relative z-10 flex w-full flex-1 px-4 pb-28 pt-24 lg:pb-32 lg:pt-32">
-        <div className="mx-auto w-full max-w-7xl xl:max-w-[86rem]">
+      <div className="relative z-10 flex w-full flex-1 flex-col pb-8 pt-24 lg:pt-32">
+        <div className="mx-auto w-full max-w-7xl px-4 xl:max-w-[86rem]">
           <PageBreadcrumbs className="mb-6" />
 
           <header className="mb-10 lg:mb-12">
@@ -40,44 +41,27 @@ export function ServicesPageView() {
             {t.services.items.map((item, index) => {
               const slug = getServiceSlug(item.imgSrc);
               if (!slug) return null;
+              const href = servicePath(language, slug);
               return (
-                <Link
+                // The whole card opens the service page (`href`); the quote pill opens the same page on its wizard,
+                // already on that service's flow (`#quote`).
+                <ServiceCard
                   key={item.imgSrc}
-                  href={servicePath(language, slug)}
-                  className="block w-full rounded-xl"
-                >
-                  <ServiceCard
-                    title={item.title}
-                    imgSrc={item.imgSrc}
-                    imgAlt={item.imgAlt}
-                    variant={getServiceCardVariant(index)}
-                    linkLabel={t.services.learnMore}
-                    className="w-full"
-                  />
-                </Link>
+                  title={item.title}
+                  imgSrc={item.imgSrc}
+                  imgAlt={item.imgAlt}
+                  variant={getServiceCardVariant(index)}
+                  linkLabel={t.services.learnMore}
+                  href={href}
+                  cta={{ label: t.services.quoteCta, onClick: () => router.push(`${href}#quote`) }}
+                  className="w-full"
+                />
               );
             })}
           </div>
-
-          <section id="contact" className="mt-14 lg:mt-16">
-            <div className="mx-auto max-w-3xl">
-              <ContactInquiryForm
-                variant="card"
-                formStateBg="Услуги (страница)"
-                heading={
-                  <>
-                    <h2 className="font-heading text-2xl font-bold tracking-tight text-foreground md:text-3xl">
-                      {t.services.ctaHeading}
-                    </h2>
-                    <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                      {t.services.ctaSubtitle}
-                    </p>
-                  </>
-                }
-              />
-            </div>
-          </section>
         </div>
+        {/* The contact section (the form + the details), as on the home page, instead of a bare form. */}
+        <ContactSection className="mt-6 lg:mt-10" />
       </div>
 
       <div className="relative z-10">

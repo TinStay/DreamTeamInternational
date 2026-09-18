@@ -17,6 +17,7 @@ import { PARTNERS, PARTNER_ICON_BASE } from "@/lib/partners";
 import { PROJECTS } from "@/lib/projects";
 import { getServiceSlug } from "@/lib/services/constants";
 import {
+  contactProcessPath,
   homePath,
   portfolioPath,
   projectPath,
@@ -264,8 +265,8 @@ export function SiteHeader() {
               <NavDropdown label={t.header.projects} href={projectsPath(language)} items={projectItems} />
               <NavDropdown label={t.header.services} href={servicesPath(language)} items={serviceItems} />
               <NavDropdown label={t.header.training} href={trainingPath(language)} items={trainingItems} />
-              {/* Scrolls to the home page's contact form (smooth on the home page itself, a jump from any other page). */}
-              <Link href={`${homeHref}#contact`} className={NAV_LINK}>
+              {/* The contact page (the form, the details, the wizard) - as the dock and the sheet link it. */}
+              <Link href={contactProcessPath(language)} className={NAV_LINK}>
                 {t.header.contact}
               </Link>
             </nav>

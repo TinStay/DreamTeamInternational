@@ -63,14 +63,18 @@ export const frameIn = {
   visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 1.1, ease: EASE } },
 };
 /**
- * The hero title, sized for the phone and the laptop alike (a fluid clamp - about 2rem on a phone, 3.5rem on a
- * 1366px laptop, 4.5rem on a full-HD monitor): `long` for a title that is a whole sentence (Boleron, OSMO),
- * `short` for three or four words (Plasico, MindGuard), `light` for Emblema's airy uppercase lines.
+ * The hero title, sized for the phone and the laptop alike (a fluid clamp - 2.5rem on a phone, 3.5rem on a 1366px
+ * laptop, 4.5rem on a full-HD monitor): `long` for a title that is a whole sentence (Boleron, OSMO), `short` for
+ * three or four words (Plasico), `light` for Emblema's airy uppercase lines (a size up everywhere - its lines are
+ * `whitespace-nowrap`, so the phone floor is 2rem, where „ТРИ КРАТКИ ФИЛМА.“ still fits a 360px screen),
+ * `boleron` a step above `long` from the laptop up (5.5rem at full HD - the client wanted that page's titles bigger;
+ * the phone floor stays 2.5rem, where „застраховател“ still fits a 390px screen - 2.75rem ran off it).
  */
 export const HERO_TITLE = {
-  long: "text-[clamp(2rem,1.25rem+2.6vw,5rem)]",
-  short: "text-[clamp(2.5rem,1.5rem+4vw,7rem)]",
-  light: "text-[clamp(1.75rem,1rem+2.9vw,5rem)]",
+  long: "text-[clamp(2.5rem,1.25rem+2.6vw,5rem)]",
+  boleron: "text-[clamp(2.5rem,1.25rem+3.1vw,5.5rem)]",
+  short: "text-[clamp(3rem,1.5rem+4vw,7rem)]",
+  light: "text-[clamp(2rem,1.1rem+3.4vw,6rem)]",
 } as const;
 
 /**
@@ -142,6 +146,7 @@ export function StoryShell({
   theme,
   font,
   wizard = true,
+  breadcrumbsTheme,
   children,
 }: {
   style: CSSProperties;
@@ -157,6 +162,8 @@ export function StoryShell({
   font?: string;
   /** The quote wizard after the story (on by default); MindGuard's page ends on its own CTA instead. */
   wizard?: boolean;
+  /** Lock the breadcrumbs alone to one theme - for a story whose film runs behind them (Plasico's, dark). */
+  breadcrumbsTheme?: "light" | "dark";
   children: ReactNode;
 }) {
   return (
@@ -169,7 +176,7 @@ export function StoryShell({
       <article className={cn("relative z-10 flex w-full flex-1 flex-col pb-20", theme === "light" && "theme-light", theme === "dark" && "theme-dark", className)}>
         {ground}
         <div className={cn("relative text-foreground", font)} style={style}>
-          <div className={cn("relative z-[1] pt-24 lg:pt-32", STORY_CONTAINER)}>
+          <div className={cn("relative z-[1] pt-24 lg:pt-32", STORY_CONTAINER, breadcrumbsTheme === "light" && "theme-light", breadcrumbsTheme === "dark" && "theme-dark")}>
             <PageBreadcrumbs className="mb-6" />
           </div>
           <StoryDisplayContext.Provider value={display}>{children}</StoryDisplayContext.Provider>
@@ -416,7 +423,12 @@ export function StatGrid({
 }) {
   return (
     <motion.dl
-      className={cn("grid grid-cols-2 gap-x-8 gap-y-12", columns === 4 ? "lg:grid-cols-4" : "lg:grid-cols-3", className)}
+      // Two columns below lg: an odd last stat (the third of three) takes the whole row there.
+      className={cn(
+        "grid grid-cols-2 gap-x-8 gap-y-12 [&>*:nth-child(odd):last-child]:col-span-2 lg:[&>*:nth-child(odd):last-child]:col-span-1",
+        columns === 4 ? "lg:grid-cols-4" : "lg:grid-cols-3",
+        className
+      )}
       initial="hidden"
       whileInView="visible"
       viewport={VIEWPORT}
@@ -518,7 +530,7 @@ export function ClipCollage({
   return (
     <>
       <motion.div
-        className="grid grid-cols-2 gap-3 md:flex md:h-[min(74vh,660px)] md:gap-0"
+        className="grid grid-cols-1 gap-4 md:flex md:h-[min(74vh,660px)] md:gap-0"
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, margin: "0px 0px -12% 0px" }}

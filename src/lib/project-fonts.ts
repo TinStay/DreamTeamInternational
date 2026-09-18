@@ -1,4 +1,4 @@
-import type { ShowcaseProjectKey } from "@/lib/projects";
+import type { ProjectKey, ShowcaseProjectKey } from "@/lib/projects";
 
 /**
  * Each brand world's display face - a `--font-*` from `layout.tsx` with its
@@ -20,3 +20,8 @@ export const PROJECT_DISPLAY_FONT: Record<ShowcaseProjectKey, string> = {
   // The face of the client's case study: Manrope, semibold, a touch tight (its h1 / h2).
   osmo: "font-[family-name:var(--font-manrope)] font-semibold tracking-[-0.02em]",
 };
+
+/** The display face of any project - `undefined` for one without a showcase scene (the site's heading face then). */
+export function projectDisplayFont(id: ProjectKey): string | undefined {
+  return (PROJECT_DISPLAY_FONT as Partial<Record<ProjectKey, string>>)[id];
+}

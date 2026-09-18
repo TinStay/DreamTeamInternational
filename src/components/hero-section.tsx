@@ -143,10 +143,11 @@ export function HeroSection() {
         </JourneyItem>
 
         <JourneyItem index={0} from="bottom" className="flex w-full flex-col items-center">
-        {/* One short line: a deep violet on the light theme's white wash, the pale violet (the brand's violet end,
-            lightened) on the dark one - the brand's hue either way, never the muted grey. */}
+        {/* One short line in white with a black outline (eight 1px shadows around the letters - no text-stroke,
+            which eats the glyphs where `paint-order` is not supported) and a black drop shadow, so it reads on
+            whatever frame of the film is behind it, in either theme. */}
         <motion.p
-          className="mx-auto mt-5 max-w-xl text-base leading-relaxed text-[#2E1F5E] [text-shadow:0_1px_10px_rgba(255,255,255,0.55)] sm:mt-6 sm:text-lg dark:text-[#E4DBFF] dark:[text-shadow:0_1px_12px_rgba(0,0,0,0.35)]"
+          className="mx-auto mt-5 max-w-xl text-base font-semibold leading-relaxed text-white [text-shadow:-1px_-1px_0_#000,1px_-1px_0_#000,-1px_1px_0_#000,1px_1px_0_#000,0_-1px_0_#000,0_1px_0_#000,-1px_0_0_#000,1px_0_0_#000,0_2px_6px_rgba(0,0,0,0.6),0_10px_28px_rgba(0,0,0,0.5)] sm:mt-6 sm:text-lg"
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4, duration: 0.55, ease: EASE }}

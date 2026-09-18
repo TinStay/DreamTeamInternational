@@ -439,9 +439,9 @@ export const en = {
         youtube: {
           eyebrow: "YouTube",
           title: "The hero on YouTube",
-          note: "Pre-roll · 16:9",
+          note: "YouTube · 16:9 · 4K",
           body: [
-            "A pre-roll ad in which the hero introduces Boleron in seconds — before the video the viewer chose to watch."
+            "A YouTube ad in which the hero introduces Boleron in seconds — short, clear and memorable, at the platform's pace."
           ]
         },
         results: {
@@ -449,7 +449,7 @@ export const en = {
           title: "From the first meeting to the airwaves",
           stats: [
             { num: "20+", suffix: "", label: "videos in 7 months" },
-            { num: "50", suffix: "M+", label: "views" },
+            { num: "75", suffix: "M+", label: "views" },
             { num: "1", suffix: "", label: "hero the whole of Bulgaria recognises" }
           ],
           closing: "Boleron now has a brand hero that lives everywhere — on the website, on social media, on TV and, above all, in the minds of people all over Bulgaria."
@@ -480,8 +480,7 @@ export const en = {
             eyebrow: "Ad 01",
             title: "Gaming details. A word to the office.",
             body: [
-              "Plasico's products are for gamers — so the first ad grabs the eye with gaming details in every frame.",
-              "It also carries a message to the people at the office. Two audiences, blended into one story."
+              "Plasico's products are for gamers — so the first ad grabs the eye with gaming details in every frame. It also carries a message to the people at the office. Two audiences, blended into one story."
             ],
             note: "16:9 · 4K"
           },
@@ -489,8 +488,7 @@ export const en = {
             eyebrow: "Ad 02",
             title: "Catchier. Sharper.",
             body: [
-              "For the second video we went for a catchier concept and catchier lines — not just entertaining, but speaking straight to the viewer's problem.",
-              "Again with top-tier AI visuals. The result is a video that is one of a kind in the industry."
+              "For the second video we went for a catchier concept and catchier lines — not just entertaining, but speaking straight to the viewer's problem. Again with top-tier AI visuals. The result is a video that is one of a kind in the industry."
             ],
             note: "16:9 · 4K"
           },
@@ -498,8 +496,7 @@ export const en = {
             eyebrow: "Ad 03",
             title: "From the beach to the gaming room",
             body: [
-              "The third video is a dynamic 15-second ad with everything we had learned so far poured into it.",
-              "In fifteen seconds the viewer travels from the beach to the gaming room — and feels both."
+              "The third video is a dynamic 15-second ad with everything we had learned so far poured into it. In fifteen seconds the viewer travels from the beach to the gaming room — and feels both."
             ],
             note: "9:16 · vertical · subtitled"
           }
@@ -508,8 +505,7 @@ export const en = {
           eyebrow: "How we work",
           title: "Together, down to the last detail",
           body: [
-            "Our work with Plasico rests on one method: we actively discuss the concepts and develop them, and their details, together.",
-            "When both sides bring ideas, the highest quality on the market is only a matter of time."
+            "Our work with Plasico rests on one method: we actively discuss the concepts and develop them, and their details, together. When both sides bring ideas, the highest quality on the market is only a matter of time."
           ],
           points: ["Concepts discussed actively", "Ideas from both sides", "Quality with no equal on the market"]
         },

@@ -122,7 +122,7 @@ export function PhoneIconLink({ className }: { className?: string }) {
         className
       )}
     >
-      <IconPhoneFilled className="size-[17px]" aria-hidden />
+      <IconPhoneFilled className="size-[22px]" aria-hidden />
     </a>
   );
 }
@@ -139,7 +139,7 @@ export function EmailIconLink({ className }: { className?: string }) {
         className
       )}
     >
-      <IconMailFilled className="size-[17px]" aria-hidden />
+      <IconMailFilled className="size-[22px]" aria-hidden />
     </a>
   );
 }

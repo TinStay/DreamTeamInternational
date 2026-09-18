@@ -128,8 +128,9 @@ export function OsmoStory({ project }: { project: Project }) {
 
       {/* ---------------- HERO ---------------- */}
       <Section tight className="pt-4 sm:pt-6 lg:pt-8">
+        {/* The columns top-aligned: centred against the taller clip, the logo sat a hand's width under the breadcrumbs. */}
         <motion.div
-          className="grid items-center gap-12 lg:grid-cols-[1.05fr_0.95fr] lg:gap-16"
+          className="grid items-start gap-12 lg:grid-cols-[1.05fr_0.95fr] lg:gap-16"
           initial="hidden"
           animate="visible"
           variants={stagger(0.08, 0.1)}
@@ -137,8 +138,8 @@ export function OsmoStory({ project }: { project: Project }) {
           <div>
             {partner ? (
               <motion.div variants={fadeUp} className="mb-10">
-                <ClientSite href={partner.href} name={name}>
-                  <PartnerLogo p={partner} imgClass="h-24 w-auto md:h-36" sizes="520px" />
+                <ClientSite href={partner.href} name={name} className="block w-full md:inline-block md:w-auto">
+                  <PartnerLogo p={partner} imgClass="h-auto w-full md:h-36 md:w-auto" sizes="(max-width: 767px) 100vw, 520px" />
                 </ClientSite>
               </motion.div>
             ) : null}

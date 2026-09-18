@@ -4,7 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Sphere } from "./iridescent-shapes";
 import { LanguageToggle } from "./language-toggle";
-import { IconMapPin } from "@tabler/icons-react";
+import { IconMail, IconMapPin, IconPhone } from "@tabler/icons-react";
 import { ClutchBadge, GoogleReviewsBadge } from "@/components/review-badges";
 import { EMAIL_PRIMARY, GOOGLE_REVIEWS, PHONE_PRIMARY, PHONE_SECONDARY } from "@/lib/contact-info";
 import { useLanguage } from "@/lib/i18n/language-context";
@@ -29,6 +29,9 @@ import { cn } from "@/lib/utils";
  */
 
 const linkClass = "text-muted-foreground transition-colors hover:text-primary";
+/** A contact line: a small brand-coloured icon (lifting a little on hover) in front of the text. */
+const contactLineClass = cn(linkClass, "group inline-flex items-center gap-2");
+const contactIconClass = "size-4 shrink-0 text-primary transition-transform duration-200 ease-out group-hover:-translate-y-0.5";
 
 export function Footer() {
   const { t, language } = useLanguage();
@@ -66,26 +69,30 @@ export function Footer() {
             </Link>
           </div>
 
-          {/* Contact column: email, both phones, the social profiles. */}
+          {/* Contact column: email, both phones, the social profiles - each line with its small icon, like the pin
+              in front of the address. */}
           <div className="flex flex-col items-center gap-3 text-sm sm:items-start">
             <h4 className="mb-2 font-heading font-semibold text-foreground">{t.header.contact}</h4>
-            <a href={EMAIL_PRIMARY.href} className={linkClass}>
-              {EMAIL_PRIMARY.label}
+            <a href={EMAIL_PRIMARY.href} className={contactLineClass}>
+              <IconMail className={contactIconClass} aria-hidden />
+              <span>{EMAIL_PRIMARY.label}</span>
             </a>
-            <a href={PHONE_PRIMARY.href} className={linkClass}>
-              {PHONE_PRIMARY.label}
+            <a href={PHONE_PRIMARY.href} className={contactLineClass}>
+              <IconPhone className={contactIconClass} aria-hidden />
+              <span>{PHONE_PRIMARY.label}</span>
             </a>
-            <a href={PHONE_SECONDARY.href} className={linkClass}>
-              {PHONE_SECONDARY.label}
+            <a href={PHONE_SECONDARY.href} className={contactLineClass}>
+              <IconPhone className={contactIconClass} aria-hidden />
+              <span>{PHONE_SECONDARY.label}</span>
             </a>
             {/* The office: the address as a link to the place on Google Maps, a pin in front. */}
             <a
               href={GOOGLE_REVIEWS.mapUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className={cn(linkClass, "group inline-flex max-w-xs items-start gap-2 text-left")}
+              className={cn(contactLineClass, "max-w-xs items-start text-left")}
             >
-              <IconMapPin className="mt-0.5 size-4 shrink-0 text-primary transition-transform duration-200 ease-out group-hover:-translate-y-0.5" aria-hidden />
+              <IconMapPin className={cn(contactIconClass, "mt-0.5")} aria-hidden />
               <span>{t.contact.addressVal}</span>
             </a>
             <div className="mt-2 flex items-center gap-3">

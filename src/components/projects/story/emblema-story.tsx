@@ -299,8 +299,8 @@ export function EmblemaStory({ project }: { project: Project }) {
         >
           {partner ? (
             <motion.div variants={fadeUp} className="lg:order-2 lg:justify-self-center">
-              <ClientSite href={partner.href} name={partner.ariaLabel}>
-                <PartnerLogo p={partner} imgClass="h-20 w-auto md:h-28 lg:h-48 xl:h-56 2xl:h-64" sizes="(max-width: 1024px) 420px, 640px" />
+              <ClientSite href={partner.href} name={partner.ariaLabel} className="block w-full md:inline-block md:w-auto">
+                <PartnerLogo p={partner} imgClass="h-auto w-full md:h-28 md:w-auto lg:h-48 xl:h-56 2xl:h-64" sizes="(max-width: 767px) 100vw, (max-width: 1024px) 420px, 640px" />
               </ClientSite>
             </motion.div>
           ) : null}

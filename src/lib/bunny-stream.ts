@@ -18,6 +18,15 @@ const BUNNY_PULL_ZONE = "https://vz-49fa6283-9c1.b-cdn.net";
 export function bunnyThumbnailUrl({ id }: BunnyVideo) {
   return `${BUNNY_PULL_ZONE}/${id}/thumbnail.jpg`;
 }
+/**
+ * A clip's MP4 rendition (the library's MP4 fallback: `<zone>/<guid>/play_<height>p.mp4`, 360 / 480 / 720 /
+ * 1080) for a native `<video>` - a cover-fit background of any shape, or a film that plays only on hover, which an
+ * embed cannot do. Referer-gated like the poster: a `<video>` sends the page's origin, so it plays on the site
+ * and on localhost (a bare fetch gets a 403).
+ */
+export function bunnyMp4Url({ id }: BunnyVideo, height: 360 | 480 | 720 | 1080 = 720) {
+  return `${BUNNY_PULL_ZONE}/${id}/play_${height}p.mp4`;
+}
 
 /** The home hero's background film (share link `player.mediadelivery.net/play/750681/d856fe05-…`). */
 export const HERO_VIDEO: BunnyVideo = { library: "750681", id: "d856fe05-54ae-4955-9043-c4eebc9208a4" };

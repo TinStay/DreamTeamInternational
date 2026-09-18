@@ -81,7 +81,9 @@ export function ClutchBadge({ className }: { className?: string }) {
     init();
   }, [init]);
   return (
-    <div ref={ref} className={cn("min-h-[45px]", className)}>
+    // The widget's iframe is `width: 100%` with its content left-aligned inside, so the container is sized to
+    // that content (about 180px) - then whatever centres the container centres the badge.
+    <div ref={ref} className={cn("min-h-[45px] w-[188px] max-w-full", className)}>
       <Script src="https://widget.clutch.co/static/js/widget.js" strategy="lazyOnload" onLoad={init} />
       <div
         className="clutch-widget dark:hidden"

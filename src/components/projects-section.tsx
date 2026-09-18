@@ -1,12 +1,10 @@
 "use client";
 
-import { useMemo, useRef, useState, type ComponentType } from "react";
+import { useEffect, useRef, useState, type ComponentType } from "react";
 import Image from "next/image";
-import Link from "next/link";
 import { motion, useInView, useReducedMotion } from "motion/react";
 import {
   IconBoxMultipleFilled,
-  IconCircleArrowRightFilled,
   IconCodeCircleFilled,
   IconHome2Filled,
   IconLayoutGridFilled,
@@ -14,20 +12,17 @@ import {
   IconSparklesFilled,
   IconTagFilled,
 } from "@tabler/icons-react";
-import { ctaPillClassName, primaryGradientInteractiveClassName } from "@/components/ui/button";
+import { ButtonWithIcon } from "@/components/ui/button-with-icon";
 import { useLanguage } from "@/lib/i18n/language-context";
-import { PARTNERS, PARTNER_ICON_BASE } from "@/lib/partners";
-import { bunnyBackgroundEmbedSrc, bunnyThumbnailUrl } from "@/lib/bunny-stream";
+import { PartnerLogo } from "@/components/partner-logo";
+import { PARTNERS } from "@/lib/partners";
+import { bunnyMp4Url, bunnyThumbnailUrl, type BunnyVideo } from "@/lib/bunny-stream";
 import { youtubeThumbnailUrl } from "@/lib/portfolio-highlights";
-import {
-  PROJECTS,
-  PROJECT_CATEGORY_KEYS,
-  type Project,
-  type ProjectCategoryKey,
-} from "@/lib/projects";
-import { homePath, projectPath } from "@/lib/routes";
+import { projectDisplayFont } from "@/lib/project-fonts";
+import { PROJECTS, type Project, type ProjectCategoryKey } from "@/lib/projects";
+import { projectPath } from "@/lib/routes";
+import { useMediaQuery } from "@/lib/use-media-query";
 import { cn } from "@/lib/utils";
-import { YOUTUBE_IFRAME_ALLOW, YOUTUBE_REFERRER_POLICY } from "@/lib/youtube-embeds";
 
 type CategoryFilter = "all" | ProjectCategoryKey;
 export type IconComponent = ComponentType<{ className?: string; "aria-hidden"?: boolean }>;
@@ -123,70 +118,10 @@ export function useProjectHighlightTags(project: Project): FactTag[] {
   }));
 }
 
-/**
- * Client logo in a white circle so the light-background variant reads over any
- * footage (several partners only ship that variant). Falls back to the initial.
- */
-export function ClientLogo({
-  project,
-  name,
-  size = "md",
-  className,
-}: {
-  project: Project;
-  name: string;
-  size?: "sm" | "md";
-  /** Override the glow/ring (e.g. a dark shadow on a light scene). */
-  className?: string;
-}) {
-  const partner = project.partnerId
-    ? PARTNERS.find((candidate) => candidate.id === project.partnerId)
-    : undefined;
-  const file = partner?.light ?? partner?.dark ?? null;
-  return (
-    <span
-      className={cn(
-        "flex shrink-0 items-center justify-center overflow-hidden rounded-full bg-white shadow-[0_10px_30px_rgba(255,255,255,0.25)] ring-1 ring-white/40",
-        size === "sm" ? "size-12 p-2 sm:size-14 sm:p-2.5" : "size-16 p-3 sm:size-20 sm:p-3.5",
-        className
-      )}
-    >
-      {partner && file ? (
-        <Image
-          src={`${PARTNER_ICON_BASE}${file}`}
-          alt={partner.ariaLabel}
-          width={400}
-          height={140}
-          sizes="80px"
-          // A white-ink-only mark is inverted so it reads on the white circle.
-          className={cn("max-h-full w-auto max-w-full object-contain", partner.invertOnLight && "invert")}
-        />
-      ) : (
-        <span
-          className={cn(
-            "font-heading font-bold text-neutral-900",
-            size === "sm" ? "text-xl sm:text-2xl" : "text-2xl sm:text-3xl"
-          )}
-          aria-label={name}
-        >
-          {name.charAt(0)}
-        </span>
-      )}
-    </span>
-  );
-}
-
 /** Background-player URL: muted autoplay loop with all in-player chrome suppressed. */
 export function backgroundEmbedSrc(videoId: string) {
   return `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${videoId}&modestbranding=1&playsinline=1&rel=0&disablekb=1&fs=0&iv_load_policy=3&cc_load_policy=0`;
 }
-
-/**
- * Cover-fit scales for a 16:9 player inside a ~16:9 box. A 9:16 clip is
- * pillar-boxed inside that player, so its visible column needs a much bigger
- * blow-up to fill the frame.
- */
-const PLAYER_COVER_SCALE = { wide: "scale-[1.25]", tall: "scale-[3.2]" } as const;
 
 /**
  * Project visual: YouTube thumbnail (centre-cropped for 9:16 clips), the
@@ -246,110 +181,132 @@ export function ProjectThumbnail({
 }
 
 /**
- * Card backdrop: the thumbnail paints immediately and the clip starts playing
- * behind the copy once the card is near the viewport (muted, looping). The
- * thumbnail stays underneath as the poster frame.
+ * The card's film: the clip's poster, and its MP4 rendition from the pull
+ * zone in a native `<video>` (cover-fit, muted, looping) that plays only
+ * while `playing` - the hovered card on a fine pointer, the card mostly on
+ * screen on a coarse one - and is paused and rewound otherwise, so one film
+ * runs at a time. Reduced motion never plays it (the poster stays).
  */
-export function ProjectBackdropMedia({
-  project,
-  alt,
-  sizes,
-  priority = false,
-}: {
-  project: Project;
-  alt: string;
-  sizes: string;
-  priority?: boolean;
-}) {
-  const ref = useRef<HTMLDivElement>(null);
-  // `once` so scrolling back up doesn't restart every player.
-  const inView = useInView(ref, { once: true, margin: "250px 0px 250px 0px" });
-  // Reduced motion: keep the poster, never autoplay.
-  const reduceMotion = useReducedMotion();
-  // The muted background player: the YouTube clip, else the Bunny one.
-  const backdrop = project.videoId ? backgroundEmbedSrc(project.videoId) : project.clip ? bunnyBackgroundEmbedSrc(project.clip) : null;
-
+function ProjectCardMedia({ clip, playing }: { clip: BunnyVideo; playing: boolean }) {
+  const ref = useRef<HTMLVideoElement>(null);
+  useEffect(() => {
+    const video = ref.current;
+    if (!video) return;
+    if (playing) {
+      void video.play().catch(() => {});
+    } else {
+      video.pause();
+      if (video.currentTime > 0) video.currentTime = 0;
+    }
+  }, [playing]);
   return (
-    <div ref={ref} className="absolute inset-0 overflow-hidden" aria-hidden>
-      <ProjectThumbnail project={project} alt={alt} sizes={sizes} priority={priority} />
-      {backdrop && inView && !reduceMotion ? (
-        <iframe
-          className={cn(
-            "pointer-events-none absolute left-1/2 top-1/2 h-full w-full -translate-x-1/2 -translate-y-1/2",
-            PLAYER_COVER_SCALE[project.orientation === "tall" ? "tall" : "wide"]
-          )}
-          src={backdrop}
-          title=""
-          tabIndex={-1}
-          allow={YOUTUBE_IFRAME_ALLOW}
-          allowFullScreen={false}
-          loading="lazy"
-          referrerPolicy={YOUTUBE_REFERRER_POLICY}
-        />
-      ) : null}
-    </div>
+    <video
+      ref={ref}
+      className="absolute inset-0 size-full object-cover"
+      src={bunnyMp4Url(clip)}
+      poster={bunnyThumbnailUrl(clip)}
+      muted
+      loop
+      playsInline
+      preload="metadata"
+      aria-hidden
+    />
   );
 }
 
 /**
- * Case-study card - same standard as the home showcase: everything lives inside
- * the video frame (logo circle + tag chips on top, headline/description and the
- * dominant "view project" pill at the bottom). Floats with a shadow, no panel.
- * Reveals on scroll.
+ * A case study as a row: the film in a rounded frame on one side (playing
+ * while the row is hovered - or, on a coarse pointer, while it is mostly on
+ * screen), and on the other, centred, the client's mark (big), the headline
+ * - clean and large, in the brand's own display face, the one its home
+ * showcase headline wears -, the description and the site's CTA pill; `flip`
+ * puts the film on the right. On phones the mark leads the stack, the full
+ * width of the screen, then the film, then the copy (the mark is rendered
+ * twice, one per layout - one of the two is always `display: none`). Reveals
+ * on scroll.
  */
-export function ProjectCard({ project, index }: { project: Project; index: number }) {
+export function ProjectRow({ project, index, flip = index % 2 === 1 }: { project: Project; index: number; flip?: boolean }) {
   const { t, language } = useLanguage();
   const p = t.projects;
   const copy = p.items[project.id];
+  const partner = PARTNERS.find((candidate) => candidate.id === project.partnerId);
   const reduceMotion = useReducedMotion();
+  const ref = useRef<HTMLElement>(null);
+  // A fine pointer plays the row it hovers (or focuses); a coarse one the row that is mostly on screen.
+  const fine = useMediaQuery("(hover: hover) and (pointer: fine)");
+  const [hover, setHover] = useState(false);
+  const onScreen = useInView(ref, { amount: 0.55 });
+  const playing = !reduceMotion && (fine ? hover : onScreen);
 
   return (
     <motion.article
-      // Tilts up out of the page with a blur; the right column trails the left. Skipped under reduced motion.
-      initial={reduceMotion ? false : { opacity: 0, y: 80, rotateX: 16, scale: 0.93, filter: "blur(10px)" }}
-      whileInView={{ opacity: 1, y: 0, rotateX: 0, scale: 1, filter: "blur(0px)" }}
-      viewport={{ once: true, amount: reduceMotion ? 0 : 0.2 }}
-      // Reduced motion also snaps the (server-rendered) initial state straight to the final one.
-      transition={reduceMotion ? { duration: 0 } : { duration: 0.85, delay: (index % 2) * 0.14, ease: EASE }}
-      style={{ transformPerspective: 1400, transformOrigin: "50% 100%" }}
-      className="group relative aspect-[16/10] w-full overflow-hidden rounded-3xl bg-card-elevated shadow-[0_32px_80px_-24px_rgba(2,6,23,0.55)] ring-1 ring-black/5 transition-shadow duration-300 will-change-transform hover:shadow-[0_40px_100px_-24px_rgba(2,6,23,0.65)] dark:ring-white/10 sm:aspect-[16/9]"
+      ref={ref}
+      // Rises into place as it scrolls in. Skipped under reduced motion (the server-rendered state is the final one).
+      initial={reduceMotion ? false : { opacity: 0, y: 56 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: reduceMotion ? 0 : 0.25 }}
+      transition={reduceMotion ? { duration: 0 } : { duration: 0.8, ease: EASE }}
+      className="grid items-center gap-7 sm:gap-9 lg:grid-cols-2 lg:gap-14 xl:gap-20"
+      onPointerEnter={(event) => {
+        if (event.pointerType !== "touch") setHover(true);
+      }}
+      onPointerLeave={() => setHover(false)}
+      onFocus={() => setHover(true)}
+      onBlur={() => setHover(false)}
     >
-      <ProjectBackdropMedia project={project} alt={copy.name} sizes="(max-width: 768px) 100vw, 50vw" />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-black/10" aria-hidden />
-
-      <div className="absolute inset-0 flex flex-col justify-between p-5 text-white sm:p-6">
-        {/* Top row: logo circle + small tag chips */}
-        <div className="flex items-start justify-between gap-3">
-          <ClientLogo project={project} name={copy.name} size="sm" />
-          <ProjectTagChips project={project} className="justify-end" />
+      {/* The mark on phones: on top, the full width of the screen (from lg it sits in the copy column instead). */}
+      {partner ? (
+        <div className="lg:hidden">
+          <PartnerLogo p={partner} imgClass="h-auto w-full" sizes="100vw" />
         </div>
+      ) : null}
 
-        {/* Bottom: headline, description, dominant CTA */}
-        <div className="max-w-2xl">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-white/70">{copy.name}</p>
-          <h3 className="mt-1 font-heading text-2xl font-bold leading-tight text-balance [text-shadow:0_2px_18px_rgba(0,0,0,0.45)] sm:text-3xl lg:text-4xl">
-            {copy.headline}
-          </h3>
-          <p className="mt-2 max-w-xl text-sm leading-relaxed text-white/80 line-clamp-2">
-            {copy.description}
-          </p>
-          <Link
-            href={projectPath(language, project.id)}
-            className="mt-4 inline-flex h-12 cursor-pointer items-center gap-2 rounded-full bg-white px-6 text-sm font-bold text-neutral-900 shadow-[0_12px_32px_rgba(255,255,255,0.2)] transition-[transform,background-color] duration-200 hover:scale-[1.03] hover:bg-white/90 active:scale-[0.98] sm:text-base"
-          >
-            {p.viewProject}
-            <IconCircleArrowRightFilled className="size-5 shrink-0" aria-hidden />
-          </Link>
-        </div>
+      {/* The film - a deep shadow around the frame. */}
+      <div
+        className={cn(
+          "group relative aspect-[16/10] w-full overflow-hidden rounded-[2rem] bg-card-elevated shadow-[0_30px_70px_-18px_rgba(2,6,23,0.5)] ring-1 ring-black/5 dark:shadow-[0_30px_80px_-14px_rgba(0,0,0,0.85)] dark:ring-white/10",
+          flip && "lg:order-2"
+        )}
+      >
+        {project.clip ? (
+          <ProjectCardMedia clip={project.clip} playing={playing} />
+        ) : (
+          <div className="absolute inset-0 overflow-hidden" aria-hidden>
+            <ProjectThumbnail project={project} alt={copy.name} sizes="(max-width: 1023px) 100vw, 50vw" />
+          </div>
+        )}
+      </div>
+
+      {/* The copy, centred: the mark (from lg), the headline in the brand's display face, the description, the CTA. */}
+      <div className={cn("flex min-w-0 flex-col items-center text-center lg:px-2", flip && "lg:order-1")}>
+        {partner ? (
+          <div className="hidden lg:block">
+            <PartnerLogo p={partner} imgClass="h-28 w-auto max-w-full object-contain xl:h-32" sizes="480px" />
+          </div>
+        ) : null}
+        <h3
+          className={cn(
+            "font-heading text-[2rem] font-bold tracking-tight text-balance text-foreground sm:text-4xl lg:mt-8 lg:text-[3.5rem] xl:text-[4rem] 2xl:text-[4.5rem]",
+            projectDisplayFont(project.id),
+            "leading-[1.04]"
+          )}
+        >
+          {copy.headline}
+        </h3>
+        <p className="mt-4 max-w-[52ch] text-base leading-relaxed text-muted-foreground sm:text-lg lg:mt-5 lg:text-xl">{copy.description}</p>
+        <ButtonWithIcon href={projectPath(language, project.id)} surface="auto" className="mt-6 lg:mt-8">
+          {p.viewProject}
+        </ButtonWithIcon>
       </div>
     </motion.article>
   );
 }
 
 /**
- * Case-study list (`/projects`): title + quote CTA on top, a category card on
- * the left, and floating project cards (two per row on desktop) on the right.
- * Filtering is client-side over `PROJECTS`.
+ * Case-study list (`/projects`): title + quote CTA on top and every project
+ * in `PROJECTS` (all of them have a case study) as a row - the film on one
+ * side, the copy on the other, the sides alternating down the page. The
+ * category menu that used to sit on the left is gone.
  */
 export function ProjectsSection({
   variant = "page",
@@ -359,17 +316,9 @@ export function ProjectsSection({
   variant?: "home" | "page";
   className?: string;
 }) {
-  const { t, language } = useLanguage();
+  const { t } = useLanguage();
   const p = t.projects;
-  const [active, setActive] = useState<CategoryFilter>("all");
-  const quoteHref = `${homePath(language)}#quote`;
   const Heading = variant === "page" ? "h1" : "h2";
-
-  const filters: CategoryFilter[] = ["all", ...PROJECT_CATEGORY_KEYS];
-  const visible = useMemo(
-    () => (active === "all" ? PROJECTS : PROJECTS.filter((project) => project.category === active)),
-    [active]
-  );
 
   return (
     <section id="projects" className={cn("relative w-full pb-4", className)}>
@@ -381,54 +330,17 @@ export function ProjectsSection({
             </Heading>
             <p className="max-w-2xl text-lg text-muted-foreground">{p.subtitle}</p>
           </div>
-          <Link href={quoteHref} className={cn(primaryGradientInteractiveClassName, ctaPillClassName, "gap-2")}>
+          {/* The site's main CTA, as everywhere else - down to the page's own service cards (the wizard, `#quote`). */}
+          <ButtonWithIcon href="#quote" surface="auto" className="shrink-0">
             {p.cta}
-            <IconCircleArrowRightFilled className="size-5" aria-hidden />
-          </Link>
+          </ButtonWithIcon>
         </header>
 
-        <div className="grid gap-6 lg:grid-cols-[15rem_minmax(0,1fr)] lg:gap-8">
-          {/* Category card - a horizontal chip row below lg. */}
-          <nav
-            aria-label={p.categoriesLabel}
-            className="rounded-3xl border border-card-border bg-card p-3 shadow-elevated-soft lg:sticky lg:top-28 lg:self-start lg:p-4"
-          >
-            <p className="mb-3 hidden px-2 text-[0.7rem] font-semibold uppercase tracking-widest text-muted-foreground/70 lg:block">
-              {p.categoriesLabel}
-            </p>
-            <div className="no-scrollbar flex gap-2 overflow-x-auto lg:flex-col lg:overflow-visible">
-              {filters.map((key) => {
-                const Icon = CATEGORY_ICONS[key];
-                const isActive = key === active;
-                return (
-                  <button
-                    key={key}
-                    type="button"
-                    onClick={() => setActive(key)}
-                    aria-pressed={isActive}
-                    className={cn(
-                      "inline-flex h-11 shrink-0 cursor-pointer items-center gap-2.5 rounded-full px-4 text-left transition-[background-color,color,box-shadow,transform] duration-200 ease-out lg:w-full lg:rounded-2xl",
-                      isActive
-                        ? "bg-gradient-to-r from-[var(--primary-gradient-start)] to-[var(--primary-gradient-end)] text-primary-foreground shadow-[0_8px_22px_var(--primary-elevated-shadow)]"
-                        : "text-muted-foreground hover:bg-muted/60 hover:text-foreground"
-                    )}
-                  >
-                    <Icon className="size-5 shrink-0" aria-hidden />
-                    <span className="text-xs font-semibold uppercase tracking-wide sm:text-[0.8rem]">
-                      {p.categories[key]}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-          </nav>
-
-          {/* Floating cards - two per row on desktop, revealed on scroll. */}
-          <div className="grid min-w-0 grid-cols-1 gap-6 md:grid-cols-2 lg:gap-8">
-            {visible.map((project, index) => (
-              <ProjectCard key={project.id} project={project} index={index} />
-            ))}
-          </div>
+        {/* The rows, the film's side alternating, well apart, revealed on scroll. */}
+        <div className="flex min-w-0 flex-col gap-24 sm:gap-28 lg:gap-40">
+          {PROJECTS.map((project, index) => (
+            <ProjectRow key={project.id} project={project} index={index} />
+          ))}
         </div>
       </div>
     </section>

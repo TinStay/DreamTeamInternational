@@ -6,6 +6,7 @@ import { Footer } from "@/components/footer";
 import { GradientBlurPageBg } from "@/components/ui/gradient-blur-bg";
 import { MAIN_WITH_FIXED_PAGE_BG_CLASS } from "@/lib/page-shell";
 import { PageBreadcrumbs } from "@/components/page-breadcrumbs";
+import { ContactSection } from "@/components/contact-section";
 import { ProjectsSection } from "@/components/projects-section";
 import { QuoteFormSection } from "@/components/quote-form/quote-form-section";
 
@@ -23,7 +24,9 @@ export function ProjectsPageView() {
           <PageBreadcrumbs className="mb-2" />
         </div>
         <ProjectsSection variant="page" />
+        {/* The service cards + step form (the header's CTA lands here, `#quote`), then the contact form. */}
         <QuoteFormSection />
+        <ContactSection />
       </div>
 
       <div className="relative z-10">

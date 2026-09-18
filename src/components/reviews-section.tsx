@@ -111,7 +111,9 @@ function ReviewConveyor({ items, heading }: { items: Review[]; heading: React.Re
             <motion.div
               ref={trackRef}
               // Odd card at the end of a two-column stack: centred across both columns.
-              className="absolute inset-x-0 mx-auto grid w-[calc(100%-2rem)] grid-cols-1 gap-3 will-change-transform md:w-[min(72rem,calc(84vw-4rem))] md:grid-cols-2 md:gap-4 md:[&>*:nth-child(odd):last-child]:col-span-2 md:[&>*:nth-child(odd):last-child]:w-[calc(50%-0.5rem)] md:[&>*:nth-child(odd):last-child]:justify-self-center"
+              // On phones the rows are 2.5rem apart: the next card's avatar hangs 1.75rem above its card, so that
+              // leaves a little air between it and the card before (from md the stack stays close-packed).
+              className="absolute inset-x-0 mx-auto grid w-[calc(100%-1.25rem)] grid-cols-1 gap-10 will-change-transform md:w-[min(84rem,calc(94vw-2rem))] md:grid-cols-2 md:gap-4 md:[&>*:nth-child(odd):last-child]:col-span-2 md:[&>*:nth-child(odd):last-child]:w-[calc(50%-0.5rem)] md:[&>*:nth-child(odd):last-child]:justify-self-center"
               style={{ top: TOP_INSET, y, gridAutoRows: rowMin > 0 ? `minmax(${Math.round(rowMin)}px, auto)` : undefined }}
             >
               {items.map((review, index) => (
