@@ -9,6 +9,11 @@ const nextConfig: NextConfig = {
   },
   async redirects() {
     return [
+      // The bare domain: the visitor's language picks the locale - a Bulgarian-first Accept-Language goes to /bg,
+      // anything else to /en (the site's x-default). Temporary on purpose, as Google asks of language redirects, so
+      // no cache ever pins one choice for everyone; the locale pages themselves are what gets indexed.
+      { source: "/", has: [{ type: "header", key: "accept-language", value: "[bB][gG].*" }], destination: "/bg", permanent: false },
+      { source: "/", destination: "/en", permanent: false },
       { source: "/privacy", destination: "/en/privacy", permanent: true },
       { source: "/terms", destination: "/en/terms", permanent: true },
       { source: "/training", destination: "/bg/training", permanent: true },

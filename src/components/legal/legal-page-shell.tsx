@@ -12,7 +12,6 @@ import { PageBreadcrumbs } from "@/components/page-breadcrumbs";
 
 type LegalPageShellProps = {
   homeHref: string;
-  homeLabel: string;
   docTitle: string;
   lastUpdatedLabel: string;
   lastUpdated: string;
@@ -22,7 +21,6 @@ type LegalPageShellProps = {
 
 export function LegalPageShell({
   homeHref,
-  homeLabel,
   docTitle,
   lastUpdatedLabel,
   lastUpdated,

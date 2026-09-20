@@ -512,7 +512,9 @@ export function PortfolioSection({
   const { ref } = useInView();
   const { t } = useLanguage();
   const [format, setFormat] = useState<"all" | "desktop" | "mobile">("all");
-  const [activeCategory, setActiveCategory] = useState<string>("all");
+  // Construction opens the page: the "All" highlight reel is off the menu (the client's ask); `embedsForAll` stays for
+  // a `?category=all` deep link.
+  const [activeCategory, setActiveCategory] = useState<string>("construction");
   const [portfolioPage, setPortfolioPage] = useState(0);
 
   useEffect(() => {
@@ -525,7 +527,7 @@ export function PortfolioSection({
 
     const handlePortfolioNavigate = (event: Event) => {
       const { category } = (event as CustomEvent<PortfolioNavigateDetail>).detail ?? {};
-      setActiveCategory(category ?? "all");
+      setActiveCategory(category ?? "construction");
       setPortfolioPage(0);
     };
 
@@ -540,7 +542,7 @@ export function PortfolioSection({
   const CATEGORIES: { key: string; label: string; icon: React.ReactNode }[] = useMemo(
     () => [
       // Desktop gets the smaller chips (a step down from the tablet's) - the bar sits right under the header there.
-      { key: "all", label: t.portfolio.categories.all, icon: <IconLayoutGrid className={CATEGORY_ICON} /> },
+      // { key: "all", label: t.portfolio.categories.all, icon: <IconLayoutGrid className={CATEGORY_ICON} /> },
       { key: "construction", label: t.portfolio.categories.construction, icon: <IconHome2Filled className={CATEGORY_ICON} /> },
       { key: "mascots", label: t.portfolio.categories.mascots, icon: <IconCookieManFilled className={CATEGORY_ICON} /> },
       { key: "tv", label: t.portfolio.categories.tv, icon: <IconDiamondFilled className={CATEGORY_ICON} /> },
@@ -803,20 +805,6 @@ export function PortfolioSection({
             ) : null}
             </div>
           </div>
-
-          {/*
-          Legacy layout: left sidebar + right content (replaced by sticky top tab bar + full-width grid).
-
-          <div className="mb-8 hidden min-h-0 gap-10 lg:grid lg:grid-cols-[240px_1fr] lg:items-stretch">
-            <div className="min-h-0 min-w-0">
-              <div className="sticky top-28 max-h-[calc(100svh-7rem)] overflow-y-auto rounded-2xl border border-border/20 bg-background/40 p-3 shadow-elevated-soft backdrop-blur-md">
-                <div className="mb-3">{FormatToggle}</div>
-                <div className="flex flex-col gap-1">…category buttons…</div>
-              </div>
-            </div>
-            <div className="min-w-0"><PortfolioTabBody … /></div>
-          </div>
-          */}
         </div>
     </section>
   );

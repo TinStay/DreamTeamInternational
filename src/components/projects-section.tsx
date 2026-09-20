@@ -187,7 +187,7 @@ export function ProjectThumbnail({
  * screen on a coarse one - and is paused and rewound otherwise, so one film
  * runs at a time. Reduced motion never plays it (the poster stays).
  */
-function ProjectCardMedia({ clip, playing }: { clip: BunnyVideo; playing: boolean }) {
+function ProjectRowMedia({ clip, playing }: { clip: BunnyVideo; playing: boolean }) {
   const ref = useRef<HTMLVideoElement>(null);
   useEffect(() => {
     const video = ref.current;
@@ -267,7 +267,7 @@ export function ProjectRow({ project, index, flip = index % 2 === 1 }: { project
         style={{ boxShadow: `0 28px 70px -16px color-mix(in srgb, ${project.glow} 62%, transparent), 0 10px 30px -10px color-mix(in srgb, ${project.glow} 45%, transparent)` }}
       >
         {project.clip ? (
-          <ProjectCardMedia clip={project.clip} playing={playing} />
+          <ProjectRowMedia clip={project.clip} playing={playing} />
         ) : (
           <div className="absolute inset-0 overflow-hidden" aria-hidden>
             <ProjectThumbnail project={project} alt={copy.name} sizes="(max-width: 1023px) 100vw, 50vw" />

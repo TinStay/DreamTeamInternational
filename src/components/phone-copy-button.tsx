@@ -56,12 +56,12 @@ function CopyIconButton({ icon: Icon, value, fallbackHref, copyLabel, copiedLabe
         aria-label={`${copyLabel}: ${value}`}
         title={value}
         className={cn(
-          "inline-flex size-9 shrink-0 cursor-pointer items-center justify-center rounded-full border border-card-border bg-foreground/[0.07] text-foreground dark:bg-card-elevated",
+          "inline-flex size-10 shrink-0 cursor-pointer items-center justify-center rounded-full border border-card-border bg-foreground/[0.07] text-foreground dark:bg-card-elevated",
           "focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50",
           copied && "text-emerald-500 dark:text-emerald-400"
         )}
       >
-        {copied ? <IconCheck className="size-4.5" aria-hidden /> : <Icon className="size-4.5" aria-hidden />}
+        {copied ? <IconCheck className="size-5" aria-hidden /> : <Icon className="size-5" aria-hidden />}
       </button>
       {/* Confirmation tag under the button (enter-only - exit gating hangs with the current motion version). */}
       {copied ? (

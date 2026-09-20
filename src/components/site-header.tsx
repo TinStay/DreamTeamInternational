@@ -37,7 +37,13 @@ const EASE = [0.22, 1, 0.36, 1] as const;
 const NAV_INK = "bg-gradient-to-r from-[var(--primary-gradient-start)] to-[var(--primary-gradient-end)] bg-clip-text transition-[color,transform] duration-200 ease-out";
 const NAV_LINK = cn(NAV_INK, "inline-block whitespace-nowrap hover:-translate-y-px hover:text-transparent");
 
-type DropdownItem = { href: string; label: string; icon: ReactNode; /** The tile behind the icon: the theme's tint, or white for a client's logo. */ tile?: "tint" | "white" };
+type DropdownItem = {
+  href: string;
+  label: string;
+  icon: ReactNode;
+  /** The tile behind the icon: a square in the theme's tint, or a wide white one for a client's logo (marks are wide). */
+  tile?: "tint" | "wide";
+};
 
 /**
  * Desktop-only nav item with a hover/focus dropdown. The label itself stays a
@@ -101,7 +107,7 @@ function NavDropdown({
           initial={{ opacity: 0, y: 8, scale: 0.98 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           transition={{ duration: 0.18, ease: EASE }}
-          className="absolute left-1/2 top-full z-50 w-72 -translate-x-1/2 pt-3"
+          className="absolute left-1/2 top-full z-50 w-80 -translate-x-1/2 pt-3"
         >
           {/* Opaque card surface (never see-through over page content), lifted with a deep shadow. */}
           <div
@@ -117,8 +123,8 @@ function NavDropdown({
               >
                 <span
                   className={cn(
-                    "flex size-14 shrink-0 items-center justify-center overflow-hidden rounded-xl ring-1 ring-card-border transition-shadow duration-200 group-hover/item:shadow-[0_10px_24px_-8px_rgba(2,6,23,0.45)]",
-                    item.tile === "white" ? "bg-white" : "bg-foreground/[0.05]"
+                    "flex shrink-0 items-center justify-center overflow-hidden rounded-xl ring-1 ring-card-border transition-shadow duration-200 group-hover/item:shadow-[0_10px_24px_-8px_rgba(2,6,23,0.45)]",
+                    item.tile === "wide" ? "h-12 w-24 bg-white px-2" : "size-14 bg-foreground/[0.05]"
                   )}
                 >
                   <span className="flex size-full items-center justify-center transition-transform duration-300 ease-out group-hover/item:scale-110">
@@ -164,7 +170,7 @@ export function SiteHeader() {
     ];
   });
 
-  // The case studies, each with the client's logo on a white tile (a white-ink-only mark is inverted for it).
+  // The case studies, each with the client's logo on a wide white tile (a white-ink-only mark is inverted for it).
   const projectItems: DropdownItem[] = PROJECTS.flatMap((project) => {
     const partner = project.partnerId ? PARTNERS.find((candidate) => candidate.id === project.partnerId) : undefined;
     const file = partner?.light ?? partner?.dark;
@@ -172,15 +178,15 @@ export function SiteHeader() {
       {
         href: projectPath(language, project.id),
         label: t.projects.items[project.id].name,
-        tile: "white" as const,
+        tile: "wide" as const,
         icon: file ? (
           <Image
             src={`${PARTNER_ICON_BASE}${file}`}
             alt=""
             width={400}
             height={140}
-            sizes="120px"
-            className={cn("h-7 w-auto max-w-[46px] object-contain", partner?.invertOnLight && !partner.light && "invert")}
+            sizes="160px"
+            className={cn("h-8 w-auto max-w-[80px] object-contain", partner?.invertOnLight && !partner.light && "invert")}
           />
         ) : (
           <span className="font-heading text-lg font-bold text-neutral-900">{t.projects.items[project.id].name.charAt(0)}</span>
@@ -235,13 +241,13 @@ export function SiteHeader() {
       >
         <div
           className={cn(
-            "liquid-glass-header rounded-full ps-6 pe-3 transition-shadow duration-300",
+            "liquid-glass-header rounded-full ps-7 pe-3.5 transition-shadow duration-300",
             isScrolled
               ? "shadow-[0_18px_50px_-12px_rgba(2,6,23,0.45)]"
               : "shadow-[0_12px_36px_-14px_rgba(2,6,23,0.3)]"
           )}
         >
-          <div className="relative flex w-full items-center justify-between gap-4 py-1.5 lg:gap-6">
+          <div className="relative flex w-full items-center justify-between gap-4 py-2.5 lg:gap-6">
             {/* Logo — breathing room via padding so it never touches the bar edges. */}
             <Link href={homeHref} className="group flex min-w-0 items-center justify-self-start py-1 pr-3">
               <Image
@@ -251,18 +257,18 @@ export function SiteHeader() {
                 height={416}
                 sizes="130px"
                 priority
-                className="h-9 w-auto grayscale transition-all group-hover:grayscale-0 dark:invert md:h-10"
+                className="h-10 w-auto grayscale transition-all group-hover:grayscale-0 dark:invert md:h-11"
               />
             </Link>
 
             {/* Absolutely centred from xl up; below that it flows from the left.
                 Never `overflow-x-auto` — that clips the dropdown panels. */}
-            <nav className="flex min-w-0 flex-1 items-center gap-5 overflow-visible whitespace-nowrap px-2 text-[0.9375rem] font-semibold text-foreground/80 xl:gap-8 xl:text-base 2xl:pointer-events-none 2xl:absolute 2xl:left-1/2 2xl:w-auto 2xl:flex-none 2xl:-translate-x-1/2 2xl:px-0 2xl:text-lg 2xl:[&>*]:pointer-events-auto">
+            <nav className="flex min-w-0 flex-1 items-center gap-6 overflow-visible whitespace-nowrap px-2 text-base font-semibold text-foreground/80 xl:gap-9 xl:text-[1.0625rem] 2xl:pointer-events-none 2xl:absolute 2xl:left-1/2 2xl:w-auto 2xl:flex-none 2xl:-translate-x-1/2 2xl:px-0 2xl:text-lg 2xl:[&>*]:pointer-events-auto">
+              {/* The case studies first: a dropdown of the clients (logo + name), the label itself the listing. */}
+              <NavDropdown label={t.header.projects} href={projectsPath(language)} items={projectItems} />
               <Link href={portfolioPath(language)} className={NAV_LINK}>
                 {t.header.portfolio}
               </Link>
-              {/* The case studies: a dropdown of the clients (logo + name), the label itself the listing. */}
-              <NavDropdown label={t.header.projects} href={projectsPath(language)} items={projectItems} />
               <NavDropdown label={t.header.services} href={servicesPath(language)} items={serviceItems} />
               <NavDropdown label={t.header.training} href={trainingPath(language)} items={trainingItems} />
               {/* The contact page (the form, the details, the wizard) - as the dock and the sheet link it. */}
@@ -281,7 +287,7 @@ export function SiteHeader() {
               {/* The site's main CTA - the projects' arrow-disc pill at the slim header size, hugging the bar's right end
                   (the bar's end padding equals its vertical one) under a faint brand-gradient glow - opens the services
                   page (its cards carry the quote pills). */}
-              <ButtonWithIcon href={servicesPath(language)} surface="auto" size="sm" glow className="shrink-0">
+              <ButtonWithIcon href={servicesPath(language)} surface="auto" size="sm" glow className="h-10 shrink-0">
                 {t.header.quoteCta}
               </ButtonWithIcon>
             </div>

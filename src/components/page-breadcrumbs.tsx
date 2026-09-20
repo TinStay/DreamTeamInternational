@@ -6,6 +6,7 @@ import { Home } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/lib/i18n/language-context";
 import { homePath } from "@/lib/routes";
+import { absoluteUrl, breadcrumbList, jsonLd } from "@/lib/seo";
 import { getServiceIconBySlug } from "@/lib/services/constants";
 import { isProjectKey } from "@/lib/projects";
 import {
@@ -82,7 +83,16 @@ export function PageBreadcrumbs({ className }: { className?: string }) {
     return { seg, href, label: segmentToLabel(seg, t) };
   });
 
+  // The same trail as structured data (rendered on the server like the rest of this component), so every inner
+  // page carries a BreadcrumbList without each page building its own.
+  const trail = breadcrumbList([
+    { name: t.legal.home, url: absoluteUrl(langPrefix) },
+    ...crumbs.map((c) => ({ name: c.label, url: absoluteUrl(c.href) })),
+  ]);
+
   return (
+    <>
+    <script type="application/ld+json" dangerouslySetInnerHTML={jsonLd(trail)} />
     <Breadcrumb className={cn("mt-2 mb-5 sm:mt-0", className)}>
       <BreadcrumbList>
         <BreadcrumbItem>
@@ -112,6 +122,7 @@ export function PageBreadcrumbs({ className }: { className?: string }) {
         })}
       </BreadcrumbList>
     </Breadcrumb>
+    </>
   );
 }
 

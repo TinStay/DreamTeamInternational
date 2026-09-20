@@ -8,7 +8,7 @@ import { PARTNERS } from "@/lib/partners";
 import { PROJECT_DISPLAY_FONT } from "@/lib/project-fonts";
 import type { Project } from "@/lib/projects";
 import { cn } from "@/lib/utils";
-import { BodyXL, ClientSite, CtaBand, Eyebrow, HERO_TITLE, MediaFrame, STORY_CONTAINER, Section, StoryShell, VIEWPORT, Words, fadeUp, frameIn, stagger } from "./primitives";
+import { BodyXL, ClientSite, CtaBand, Eyebrow, MediaFrame, STORY_CONTAINER, Section, StoryShell, VIEWPORT, Words, fadeUp, frameIn, stagger } from "./primitives";
 
 /*
  * Plasico's story - the store's world from the home showcase: white, the

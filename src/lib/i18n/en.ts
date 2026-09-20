@@ -28,6 +28,45 @@ export const en = {
     metaDescription:
       "How we work from brief to delivery, and how to reach DreamTeam for AI video production.",
   },
+  // The SEO copy: the home page's title / description / keywords (the layout's defaults too), the organization's
+  // description for the structured data and `llms.txt`, the address split for the schema, the topics it knows.
+  seo: {
+    home: {
+      title: "AI Video Production Company in Bulgaria | DreamTeam",
+      description:
+        "AI video production company in Sofia, Bulgaria: AI-generated video ads, product videos, brand mascots and AI avatars for brands in Bulgaria, Europe and the US. Delivered in 5–12 working days, with full commercial rights.",
+      keywords: [
+        "AI video production",
+        "AI video company",
+        "AI video ads",
+        "AI video production Bulgaria",
+        "AI video production company Europe",
+        "product videos",
+        "brand mascots",
+        "AI avatars",
+        "social media video",
+        "corporate video",
+        "DreamTeam",
+      ],
+    },
+    organizationDescription:
+      "DreamTeam is an AI video production company based in Sofia, Bulgaria. It creates AI-generated advertising and brand video - TV and social media ads, product videos, brand mascots, explainer videos and AI avatars - for clients in Bulgaria, across Europe and in the United States, and trains individuals and teams in AI video production.",
+    streetAddress: "27–29 Nikola Kopernik St., Floor 2, Office 17",
+    city: "Sofia",
+    country: "Bulgaria",
+    topics: [
+      "AI video production",
+      "AI-generated video advertising",
+      "AI product videos",
+      "AI brand mascots",
+      "AI avatars",
+      "explainer videos",
+      "generative AI video",
+      "AI images and graphic design",
+      "video and image automation",
+      "AI video training",
+    ],
+  },
   process: {
     title1: "Our",
     title2: "Process",
@@ -40,7 +79,7 @@ export const en = {
     ]
   },
   portfolio: {
-    metaTitle: "Portfolio | DreamTeam",
+    metaTitle: "AI Video Portfolio | DreamTeam",
     metaDescription:
       "AI-generated video productions by DreamTeam - product, cinema advertising, mascots, construction, cars, services and animation, in 16:9 and 9:16.",
     title1: "Featured",
@@ -85,7 +124,7 @@ export const en = {
     title: "Trusted By"
   },
   projects: {
-    metaTitle: "Case Studies | DreamTeam",
+    metaTitle: "AI Video Case Studies | DreamTeam",
     metaDescription:
       "Case studies of AI video campaigns DreamTeam produced for clients in software, products and construction - goals, results and where each video ran.",
     title1: "Case",
@@ -111,10 +150,8 @@ export const en = {
       scenes: {
         boleron: { tagline: "Online insurance" },
         emblema: {
-          buildings: [
-            { name: "District Living", place: "Chavdar bridge" },
-            { name: "Eria", place: "Ovcha Kupel" }
-          ]
+          // District Living is parked until its film is made: { name: "District Living", place: "Chavdar bridge" }
+          buildings: [{ name: "Eria", place: "Ovcha Kupel" }]
         },
         mindguard: {
           shownTo: {
@@ -129,13 +166,15 @@ export const en = {
       emblema: {
         hero: {
           eyebrow: "Case study · Emblema",
-          titleLines: ["Two buildings."],
-          titleAccent: "Three short films.",
-          sub: "How we sold the feeling of living in buildings that do not exist yet.",
+          // With District Living: titleLines ["Two buildings."], titleAccent "Three short films.", sub "…in buildings that
+          // do not exist yet.", Projects ["ERIA", "District Living"], Format "3 short films".
+          titleLines: ["One building."],
+          titleAccent: "Two short films.",
+          sub: "How we sold the feeling of living in a building that does not exist yet.",
           meta: [
             { label: "Client", value: "Emblema" },
-            { label: "Projects", value: ["ERIA", "District Living"] },
-            { label: "Format", value: "3 short films" },
+            { label: "Project", value: "ERIA" },
+            { label: "Format", value: "2 short films" },
             { label: "Role", value: "Full production" },
             { label: "Year", value: "2026" }
           ]
@@ -145,14 +184,17 @@ export const en = {
           title: "Emblema builds homes. We build the feeling of them.",
           lead:
             "Emblema is a Sofia-based residential developer with projects in Ovcha Kupel, Manastirski Livadi and the city centre. Italian ceramic facades, Reynaers aluminium windows and an eye for detail.",
+          // With District Living: "The two projects we worked on are at different stages and speak to different buyers.
+          // ERIA is … District Living is a mixed-use city block by the Chavdar bridge, with a retail ground floor, an
+          // aparthotel and a gated inner courtyard." / "They share one thing: both are sold before they exist."
           body: [
-            "The two projects we worked on are at different stages and speak to different buyers. ERIA is a complex of two sixteen-storey buildings in Ovcha Kupel with 217 apartments and five decares of landscaped courtyard. District Living is a mixed-use city block by the Chavdar bridge, with a retail ground floor, an aparthotel and a gated inner courtyard.",
-            "They share one thing: both are sold before they exist."
+            "ERIA is a complex of two sixteen-storey buildings in Ovcha Kupel with 217 apartments and five decares of landscaped courtyard.",
+            "And it is sold before it exists."
           ]
         },
         films: {
           eyebrow: "The work",
-          title: "Three films.",
+          title: "Two films.",
           placeholder: "Film {n} · coming soon",
           items: [
             {
@@ -166,13 +208,14 @@ export const en = {
               title: "Everything within reach",
               text: "The second film turns from the building to its location. Four minutes' walk to the metro, twelve to the centre, schools and cafés within two. Told through movement, not a map.",
               tags: ["Location", "Dynamic edit", "Social media"]
-            },
-            {
-              project: "District Living · by the Chavdar bridge",
-              title: "Sofia's new rhythm",
-              text: "A two-minute documentary about the 15-minute city. From the coffee machine in the morning, through a flight down Dondukov Blvd, to sunset on the terrace. The longest and most complex production of the three.",
-              tags: ["2 minutes", "Aerial shots", "Full voice-over", "Macro details"]
             }
+            // District Living, parked until its film is made:
+            // {
+            //   project: "District Living · by the Chavdar bridge",
+            //   title: "Sofia's new rhythm",
+            //   text: "A two-minute documentary about the 15-minute city. From the coffee machine in the morning, through a flight down Dondukov Blvd, to sunset on the terrace. The longest and most complex production of the three.",
+            //   tags: ["2 minutes", "Aerial shots", "Full voice-over", "Macro details"]
+            // }
           ]
         },
         challenge: {
@@ -182,7 +225,8 @@ export const en = {
             "3D visualisations show what there will be. They do not show what it will feel like. And that is exactly what someone buying an apartment at the shell stage is paying for.",
           body: [
             "The task was not a prettier render. The task was to take the buyer inside the building: the morning light through the windows, the quiet of the inner courtyard, the coffee on the ground floor, the evening on the terrace.",
-            "That is direction, not visualisation. And it had to happen three times in a row without the buildings looking like three different buildings."
+            // With District Living: "…three times in a row without the buildings looking like three different buildings."
+            "That is direction, not visualisation. And it had to happen twice in a row without the building looking like two different buildings."
           ]
         },
         principles: {
@@ -199,21 +243,25 @@ export const en = {
             },
             {
               title: "One building, one world",
-              text: "Time of day, season, colour grade and architectural details stay identical in every shot. That is how three films read as one project instead of three separate attempts."
+              // With District Living: "…That is how three films read as one project instead of three separate attempts."
+              text: "Time of day, season, colour grade and architectural details stay identical in every shot. That is how two films read as one project instead of two separate attempts."
             }
           ]
         },
         process: {
           eyebrow: "The process",
-          title: "How we made these three films.",
+          // With District Living: "How we made these three films." / "For District Living we wrote a two-minute narrative
+          // around the idea of the 15-minute city. For ERIA two shorter ones: …" / "…District Living alone ran to over
+          // fifty shots. …"
+          title: "How we made these two films.",
           steps: [
             {
               title: "The story",
-              text: "For District Living we wrote a two-minute narrative around the idea of the 15-minute city. For ERIA two shorter ones: one about the building itself, one about what surrounds it."
+              text: "For ERIA we wrote two short narratives: one about the building itself, one about what surrounds it."
             },
             {
               title: "Shot-by-shot storyboard",
-              text: "Every shot is described on its own: frame, light, movement and exact duration. District Living alone ran to over fifty shots. The client approves here, not at the end."
+              text: "Every shot is described on its own: frame, light, movement and exact duration. The client approves here, not at the end."
             },
             {
               title: "Images, frame by frame",
@@ -229,7 +277,7 @@ export const en = {
             },
             {
               title: "Edit, grade and formats",
-              text: "Final rhythm and a colour grade shared by all three films. Delivered in 16:9 for screens and 9:16 for social media."
+              text: "Final rhythm and a colour grade shared by both films. Delivered in 16:9 for screens and 9:16 for social media."
             }
           ]
         },
@@ -249,18 +297,20 @@ export const en = {
             },
             {
               problem: "Duration. The cost of AI video grows linearly with every second, unlike traditional production.",
-              solution: "The length of every shot is fixed at storyboard level. Nothing is generated \"just in case\". The two-minute District Living film is assembled from shots with a predetermined length."
+              // With District Living: "…The two-minute District Living film is assembled from shots with a predetermined length."
+              solution: "The length of every shot is fixed at storyboard level. Nothing is generated \"just in case\". Every film is assembled from shots with a predetermined length."
             }
           ]
         },
         results: {
           eyebrow: "The result",
-          title: "Three films that work everywhere.",
+          title: "Two films that work everywhere.",
           lead:
             "The films run on social media and on screens in fitness centres, and accompany the projects' printed materials. The same footage serves the digital campaign and the sales office.",
           stats: [
-            { num: "3", label: "Short films" },
-            { num: "2", label: "Projects" },
+            // With District Living: { num: "3", label: "Short films" }, { num: "2", label: "Projects" }
+            { num: "2", label: "Short films" },
+            { num: "2", label: "Buildings" },
             { num: "2", label: "Delivery formats" }
           ],
           body: [
@@ -695,7 +745,8 @@ export const en = {
         name: "Emblema",
         headline: "The emotion of a home, told cinematically",
         description:
-          "Two cinematic AI films for Emblema's residential projects - District Living by Chavdar bridge and Eria in Ovcha Kupel - so buyers feel the building before the first brick is laid.",
+          // With District Living: "…for Emblema's residential projects - District Living by Chavdar bridge and Eria in Ovcha Kupel - …"
+          "Two cinematic AI films for Emblema's residential project - Eria in Ovcha Kupel - so buyers feel the building before the first brick is laid.",
         highlight: "The emotion of home, told cinematically.",
         tags: ["Construction", "Cinema ad"],
         mission:
@@ -1598,7 +1649,7 @@ export const en = {
     termsTitle: "Terms and Conditions",
   },
   training: {
-    metaTitle: "Training | DreamTeam",
+    metaTitle: "AI Video Training | DreamTeam",
     // Skool training temporarily hidden. Original:
     // "Individual AI video consultations, Skool community courses, and team workshops from DreamTeam."
     metaDescription:

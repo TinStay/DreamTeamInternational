@@ -3,6 +3,8 @@ import { notFound } from "next/navigation";
 import { ServicesPageView } from "@/components/services/services-page-view";
 import { localeAlternates } from "@/lib/routes";
 import { LOCALES, isLocale, getDictionary } from "@/lib/i18n/config";
+import { jsonLd } from "@/lib/seo";
+import { servicesListGraph } from "@/lib/seo-graph";
 
 export const dynamicParams = false;
 
@@ -35,5 +37,11 @@ export default async function LocaleServicesPage({
 }) {
   const { lang } = await params;
   if (!isLocale(lang)) notFound();
-  return <ServicesPageView />;
+  return (
+    <>
+      {/* The four services as an ItemList of Service nodes (`lib/seo-graph.ts`). */}
+      <script type="application/ld+json" dangerouslySetInnerHTML={jsonLd(servicesListGraph(lang))} />
+      <ServicesPageView />
+    </>
+  );
 }

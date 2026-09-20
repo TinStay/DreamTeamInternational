@@ -3,9 +3,9 @@ import { notFound } from "next/navigation";
 import { ServiceDetailPageView } from "@/components/services/service-detail-page-view";
 import { localeAlternates } from "@/lib/routes";
 import { LOCALES, isLocale, getDictionary, type Language } from "@/lib/i18n/config";
+import { jsonLd } from "@/lib/seo";
+import { serviceNode } from "@/lib/seo-graph";
 import { SERVICE_SLUGS, getServiceIconBySlug } from "@/lib/services/constants";
-
-const BASE_URL = "https://dreamteam.video";
 
 export const dynamicParams = false;
 
@@ -51,36 +51,12 @@ export default async function LocaleServiceDetailPage({
   const service = findService(lang, slug);
   if (!service) notFound();
 
-  const t = getDictionary(lang);
-  const structuredData = {
-    "@context": "https://schema.org",
-    "@graph": [
-      {
-        "@type": "Service",
-        name: service.title,
-        serviceType: service.modal.eyebrow,
-        description: service.seoDescription,
-        url: `${BASE_URL}/${lang}/services/${slug}`,
-        provider: { "@id": `${BASE_URL}/#organization` },
-        areaServed: [{ "@type": "Country", name: "Bulgaria" }, "Worldwide"],
-      },
-      {
-        "@type": "BreadcrumbList",
-        itemListElement: [
-          { "@type": "ListItem", position: 1, name: "DreamTeam", item: `${BASE_URL}/${lang}` },
-          { "@type": "ListItem", position: 2, name: t.header.services, item: `${BASE_URL}/${lang}/services` },
-          { "@type": "ListItem", position: 3, name: service.title, item: `${BASE_URL}/${lang}/services/${slug}` },
-        ],
-      },
-    ],
-  };
+  // The service as structured data (`lib/seo-graph.ts`); the breadcrumb list comes with the breadcrumbs themselves.
+  const structuredData = { "@context": "https://schema.org", ...serviceNode(lang, slug) };
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
-      />
+      <script type="application/ld+json" dangerouslySetInnerHTML={jsonLd(structuredData)} />
       <ServiceDetailPageView slug={slug} />
     </>
   );

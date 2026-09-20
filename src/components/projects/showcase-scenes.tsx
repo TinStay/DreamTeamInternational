@@ -251,7 +251,8 @@ function EmblemaVisual({ t, framesEnabled }: SceneVisualProps) {
                 className={cn(
                   // Under each tower - desktop only; on phones the towers are small and the labels would crowd them.
                   "absolute top-[94%] hidden -translate-x-1/2 flex-col items-center gap-1.5 text-center lg:flex",
-                  i === 0 ? "left-[5%]" : "left-[91%]"
+                  // One label (ERIA alone, while District Living is parked) sits under the middle of the two towers.
+                  buildings.length === 1 ? "left-1/2" : i === 0 ? "left-[5%]" : "left-[91%]"
                 )}
                 style={{ opacity: labelK, y: labelY }}
               >

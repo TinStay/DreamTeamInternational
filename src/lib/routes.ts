@@ -50,10 +50,14 @@ export function privacyPath(language: Language) {
   return `/${language}/privacy`;
 }
 
-/** hreflang alternates for a path suffix (e.g. `/contact`, `` for home). */
+/**
+ * hreflang alternates for a path suffix (e.g. `/contact`, `` for home): both locales and `x-default` - the English
+ * page, where the bare domain sends a visitor whose browser is not Bulgarian (`next.config.ts`).
+ */
 export function localeAlternates(pathSuffix = "") {
   return {
     en: `/en${pathSuffix}`,
     bg: `/bg${pathSuffix}`,
+    "x-default": `/en${pathSuffix}`,
   };
 }

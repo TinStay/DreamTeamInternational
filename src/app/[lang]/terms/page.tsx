@@ -54,7 +54,6 @@ export default async function LocaleTermsPage({
   return (
     <LegalPageShell
       homeHref={`/${lang}`}
-      homeLabel={t.legal.home}
       docTitle={t.legal.termsTitle}
       lastUpdatedLabel={t.legal.lastUpdated}
       lastUpdated={LAST_UPDATED}

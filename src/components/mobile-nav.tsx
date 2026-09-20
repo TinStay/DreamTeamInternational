@@ -151,7 +151,8 @@ export function MobileNav() {
               </div>
 
               <div className="mt-auto pt-8">
-                <ButtonWithIcon href={`${homeHref}#quote`} onClick={() => setIsOpen(false)} surface="auto" className="h-14 w-full text-base">
+                {/* The site's main CTA, to the services page like the desktop header's. */}
+                <ButtonWithIcon href={servicesHref} onClick={() => setIsOpen(false)} surface="auto" className="h-14 w-full text-base">
                   {t.header.quoteCta}
                 </ButtonWithIcon>
               </div>

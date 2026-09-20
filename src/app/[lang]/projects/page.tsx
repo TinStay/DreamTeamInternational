@@ -3,6 +3,8 @@ import { notFound } from "next/navigation";
 import { ProjectsPageView } from "@/components/projects/projects-page-view";
 import { localeAlternates } from "@/lib/routes";
 import { LOCALES, isLocale, getDictionary } from "@/lib/i18n/config";
+import { jsonLd } from "@/lib/seo";
+import { projectsCollectionGraph } from "@/lib/seo-graph";
 
 export const dynamicParams = false;
 
@@ -35,5 +37,11 @@ export default async function LocaleProjectsPage({
 }) {
   const { lang } = await params;
   if (!isLocale(lang)) notFound();
-  return <ProjectsPageView />;
+  return (
+    <>
+      {/* The listing as a CollectionPage whose list is every case study (`lib/seo-graph.ts`). */}
+      <script type="application/ld+json" dangerouslySetInnerHTML={jsonLd(projectsCollectionGraph(lang))} />
+      <ProjectsPageView />
+    </>
+  );
 }
