@@ -5,10 +5,12 @@ import type { QuoteOption } from "@/lib/quote-form/constants";
 import { cn } from "@/lib/utils";
 import { GroupLabel } from "./shared";
 
+// One card per row on phones in every preset: two columns squeezed the longer labels (the mascot style group's
+// „Минималистичен / геометричен“) out of their cards on a 390px screen.
 const COLUMNS = {
   2: "grid-cols-1 sm:grid-cols-2",
   3: "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3",
-  4: "grid-cols-2 lg:grid-cols-4",
+  4: "grid-cols-1 sm:grid-cols-2 lg:grid-cols-4",
 } as const;
 
 export type OptionGroupProps<K extends string> = {

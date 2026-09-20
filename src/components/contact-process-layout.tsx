@@ -23,7 +23,7 @@ export function ContactProcessLayout() {
         </div>
         {/* The form + details: the quote pill under the heading's line (down to the wizard below) and the review
             badges under the social icons. */}
-        <ContactSection className="pt-0 sm:pt-0 lg:pt-0" reviews quoteCta align="left" />
+        <ContactSection className="pt-0 sm:pt-0 lg:pt-0" quoteCta align="left" />
         {/* The home page's service cards + step form (`#quote`). */}
         <QuoteFormSection />
         <ProcessSection />

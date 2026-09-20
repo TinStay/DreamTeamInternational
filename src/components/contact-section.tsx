@@ -85,7 +85,7 @@ const contactIconClass =
 
 export function ContactSection({
   className,
-  reviews = false,
+  reviews = true,
   quoteCta = false,
   align = "center",
 }: {
@@ -245,10 +245,15 @@ export function ContactSection({
               ))}
             </div>
 
+            {/* The Google rating + the Clutch widget: a row from sm; on phones two full-width matching cards (the
+                client wanted them edge to edge there - the column's padding is the side spacing). */}
             {reviews ? (
-              <motion.div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-4" {...reveal(4 + socials.length)}>
-                <GoogleReviewsBadge label={t.footer.googleReviews} />
-                <ClutchBadge />
+              <motion.div
+                className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-6 sm:gap-y-4"
+                {...reveal(4 + socials.length)}
+              >
+                <GoogleReviewsBadge label={t.footer.googleReviews} className="max-sm:w-full max-sm:justify-center" />
+                <ClutchBadge mobileCard />
               </motion.div>
             ) : null}
           </JourneyItem>

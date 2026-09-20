@@ -69,7 +69,7 @@ export function GoogleReviewsBadge({ label, className }: { label: string; classN
  * The official Clutch badge (their widget, type 2 - "Reviewed on Clutch" with the rating): one container per theme,
  * the dark one on the widget's `darkbg` variant (white type, no card), toggled with `dark:`.
  */
-export function ClutchBadge({ className }: { className?: string }) {
+export function ClutchBadge({ className, mobileCard = false }: { className?: string; mobileCard?: boolean }) {
   const ref = useRef<HTMLDivElement>(null);
   // Only once the widget script is here and while this container is still empty (Init injects the iframe; the
   // script's own readystatechange hook never fires for a lazily loaded script on a finished document).
@@ -82,30 +82,39 @@ export function ClutchBadge({ className }: { className?: string }) {
   }, [init]);
   return (
     // The widget's iframe is `width: 100%` with its content left-aligned inside, so the container is sized to
-    // that content (about 180px) - then whatever centres the container centres the badge.
-    <div ref={ref} className={cn("min-h-[45px] w-[188px] max-w-full", className)}>
-      <Script src="https://widget.clutch.co/static/js/widget.js" strategy="lazyOnload" onLoad={init} />
-      <div
-        className="clutch-widget dark:hidden"
-        data-url="https://widget.clutch.co"
-        data-widget-type="2"
-        data-height="45"
-        data-nofollow="false"
-        data-expandifr="true"
-        data-clutchcompany-id={CLUTCH.companyId}
-      />
-      {/* `color-scheme: light` on the container: the widget document is light, and Chrome paints an opaque white
-          canvas behind an iframe whose colour scheme differs from its embedder's (the site is dark here). */}
-      <div
-        className="clutch-widget hidden [color-scheme:light] dark:block"
-        data-url="https://widget.clutch.co"
-        data-widget-type="2"
-        data-height="45"
-        data-nofollow="false"
-        data-expandifr="true"
-        data-darkbg="1"
-        data-clutchcompany-id={CLUTCH.companyId}
-      />
+    // that content (about 180px) - then whatever centres the container centres the badge. `mobileCard` wraps it,
+    // below sm, in the Google badge's card, the full width of its column (the contact sections).
+    <div
+      className={cn(
+        mobileCard &&
+          "max-sm:flex max-sm:w-full max-sm:items-center max-sm:justify-center max-sm:rounded-2xl max-sm:border max-sm:border-card-border max-sm:bg-card max-sm:px-3.5 max-sm:py-3 max-sm:shadow-sm",
+        className
+      )}
+    >
+      <div ref={ref} className="min-h-[45px] w-[188px] max-w-full">
+        <Script src="https://widget.clutch.co/static/js/widget.js" strategy="lazyOnload" onLoad={init} />
+        <div
+          className="clutch-widget dark:hidden"
+          data-url="https://widget.clutch.co"
+          data-widget-type="2"
+          data-height="45"
+          data-nofollow="false"
+          data-expandifr="true"
+          data-clutchcompany-id={CLUTCH.companyId}
+        />
+        {/* `color-scheme: light` on the container: the widget document is light, and Chrome paints an opaque white
+            canvas behind an iframe whose colour scheme differs from its embedder's (the site is dark here). */}
+        <div
+          className="clutch-widget hidden [color-scheme:light] dark:block"
+          data-url="https://widget.clutch.co"
+          data-widget-type="2"
+          data-height="45"
+          data-nofollow="false"
+          data-expandifr="true"
+          data-darkbg="1"
+          data-clutchcompany-id={CLUTCH.companyId}
+        />
+      </div>
     </div>
   );
 }
