@@ -829,6 +829,9 @@ export function ProjectsShowcase({ className }: { className?: string }) {
         ref={sectionRef}
         className={cn("relative w-full", className)}
         style={{ height: `${UNITS * 100}svh` }}
+        // Off screen, every scene's particle animations pause (globals.css) - a parked scene's do through `inert`,
+        // but the last scene never parks, and a running animation costs a main-thread style tick per frame anywhere.
+        data-offstage={stageOnScreen ? undefined : ""}
       >
         {/* Mobile scene snapping (see `SnapStop`): the intro, then each scene fully framed with its copy revealed
             (`SCENE_FRAMED` - the same positions the rail jumps to, `scrollTargetFor`). */}

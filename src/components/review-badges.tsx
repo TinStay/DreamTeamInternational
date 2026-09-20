@@ -34,7 +34,16 @@ function GoogleG({ className }: { className?: string }) {
 }
 
 /** DreamTeam's Google rating: the G, the stars, the rating and the count, linking to the reviews. */
-export function GoogleReviewsBadge({ label, className }: { label: string; className?: string }) {
+/** `mobileLarge`: a size up below sm - the contact sections' full-width card (the footer keeps the compact one). */
+export function GoogleReviewsBadge({
+  label,
+  className,
+  mobileLarge = false,
+}: {
+  label: string;
+  className?: string;
+  mobileLarge?: boolean;
+}) {
   const { rating, count, reviewsUrl } = GOOGLE_REVIEWS;
   return (
     <a
@@ -43,21 +52,24 @@ export function GoogleReviewsBadge({ label, className }: { label: string; classN
       rel="noopener noreferrer"
       className={cn(
         "group inline-flex items-center gap-3 rounded-2xl border border-card-border bg-card px-3.5 py-2.5 shadow-sm transition-[transform,box-shadow] duration-200 ease-out hover:-translate-y-0.5 hover:shadow-[0_12px_30px_-12px_rgba(2,6,23,0.35)]",
+        mobileLarge && "max-sm:gap-4 max-sm:px-5 max-sm:py-4",
         className
       )}
       aria-label={`Google: ${rating} / 5 · ${count} ${label}`}
     >
-      <GoogleG className="size-8 shrink-0" />
+      <GoogleG className={cn("size-8 shrink-0", mobileLarge && "max-sm:size-11")} />
       <span className="flex flex-col gap-0.5 text-left">
-        <span className="flex items-center gap-1.5">
-          <span className="font-heading text-lg font-bold leading-none text-foreground">{rating.toFixed(1)}</span>
+        <span className={cn("flex items-center gap-1.5", mobileLarge && "max-sm:gap-2")}>
+          <span className={cn("font-heading text-lg font-bold leading-none text-foreground", mobileLarge && "max-sm:text-2xl")}>
+            {rating.toFixed(1)}
+          </span>
           <span className="flex items-center gap-px text-[#FBBC04]" aria-hidden>
             {[0, 1, 2, 3, 4].map((i) => (
-              <IconStarFilled key={i} className="size-3.5" />
+              <IconStarFilled key={i} className={cn("size-3.5", mobileLarge && "max-sm:size-5")} />
             ))}
           </span>
         </span>
-        <span className="text-xs text-muted-foreground transition-colors group-hover:text-foreground">
+        <span className={cn("text-xs text-muted-foreground transition-colors group-hover:text-foreground", mobileLarge && "max-sm:text-sm")}>
           {count} {label}
         </span>
       </span>

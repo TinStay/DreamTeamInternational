@@ -26,7 +26,7 @@ import {
 } from "motion/react";
 import { cn } from "@/lib/utils";
 import { useFlowProgress, useScrollEased } from "@/lib/smooth-scroll";
-import { useHydrated } from "@/lib/use-media-query";
+import { useHydrated, useMediaQuery } from "@/lib/use-media-query";
 import { usePagedHandover } from "@/components/ui/paged-handover";
 
 /*
@@ -68,6 +68,13 @@ import { usePagedHandover } from "@/components/ui/paged-handover";
  * scene is in, so nothing inside (forms, accordions) is affected while it is
  * in use. Scenes that are not on stage are `opacity: 0` + `inert`. Below
  * `lg` the pin sits above the mobile dock (`--journey-dock`).
+ * Phones pace differently: a swipe covers a viewport or more, so at the
+ * desktop numbers a whole section went by in one flick and its title barely
+ * showed (a hand-over of 0.3 of a viewport is ~250px on a phone, the title
+ * arriving over ~60px of it). `ScrollJourney mobile={{ overlap, hold }}`
+ * applies below `lg` on a coarse pointer: a smaller overlap = a longer
+ * hand-over, a bigger hold = more reading room, and every part's timing
+ * stretches with it (the choreography is in hand-over fractions).
  * Until the component has mounted (server HTML, no JS) the sections are plain
  * flow, no overlap; reduced motion keeps them that way and `JourneyItem`s
  * render plain (they also do outside any journey, e.g. on `/contact`).
@@ -80,6 +87,8 @@ import { usePagedHandover } from "@/components/ui/paged-handover";
 const OVERLAP = 0.35;
 /** Default reading room (viewport fraction) a scene scrolls through, fully in, before it is pinned for the next hand-over. */
 const HOLD = 0.2;
+/** Phones and tablets on touch - where `ScrollJourney mobile` pacing applies (the showcase's own compact query). */
+const MOBILE_QUERY = "(max-width: 1023px) and (pointer: coarse)";
 /** Part motion smoothing under native scrolling - stiff, so a wheel tick glides instead of stepping. */
 const SPRING = { stiffness: 210, damping: 32, mass: 0.6, restDelta: 0.001 };
 
@@ -281,11 +290,13 @@ export type JourneySceneProps = {
   /** Per-scene pacing: a smaller overlap than the journey's = a slower hand-over into this scene. */
   pace?: { overlap?: number };
   /**
-   * Reading room (viewport fraction, default `HOLD`): bottom padding the scene scrolls through, fully in, before it
-   * is pinned and starts leaving - `0` for a scene that brings its own runway (the reviews' conveyor) or is pinned
-   * from the top of the page (the hero).
+   * Reading room (viewport fraction, default the journey's - `HOLD`, or its `mobile.hold` on a phone): bottom
+   * padding the scene scrolls through, fully in, before it is pinned and starts leaving - `0` for a scene that
+   * brings its own runway (the reviews' conveyor) or is pinned from the top of the page (the hero).
    */
   hold?: number;
+  /** Filled in by `ScrollJourney`: the reading room for a scene without its own `hold`. */
+  holdDefault?: number;
 };
 
 /** Viewport box in px - the same numbers motion resolves its scroll offsets against. */
@@ -300,7 +311,8 @@ export function JourneyScene({
   leaves = !isLast,
   overlapBy = OVERLAP,
   index = 0,
-  hold = HOLD,
+  hold,
+  holdDefault = HOLD,
 }: JourneySceneProps) {
   const ref = useRef<HTMLDivElement>(null);
   const registry = useContext(JourneyRegistryContext);
@@ -383,7 +395,7 @@ export function JourneyScene({
   }
   // A viewport (content centred in it) plus the reading room - the same numbers on the server and the client. A scene
   // that never leaves (the last one before the footer) needs none.
-  const room = `${leaves ? Math.round(hold * 100) : 0}svh`;
+  const room = `${leaves ? Math.round((hold ?? holdDefault) * 100) : 0}svh`;
   return (
     <>
       <div ref={startRef} className="h-0" aria-hidden />
@@ -430,6 +442,12 @@ export type ScrollJourneyProps = {
    * the viewport, so a bigger overlap is a quicker change.
    */
   overlap?: number;
+  /**
+   * Pacing below `lg` on a coarse pointer (viewport fractions): a smaller `overlap` than the journey's for a longer
+   * hand-over, and the reading room for scenes without their own `hold`. A swipe covers a viewport or more, so the
+   * desktop pacing flicked whole sections past before their titles had formed.
+   */
+  mobile?: { overlap?: number; hold?: number };
   /** One continuous background shape for the whole journey (see `journeyMorph`). */
   morph?: JourneyMorph;
   /**
@@ -451,10 +469,15 @@ export function ScrollJourney({
   overlapFirst = true,
   leaveLast = false,
   overlap = OVERLAP,
+  mobile,
   morph,
   prelude = 0,
   pageFirst = false,
 }: ScrollJourneyProps) {
+  // Server and hydrating renders see `false` (the desktop pacing); the first client render after hydration the
+  // real value - the scenes re-measure their markers when `overlapBy` changes.
+  const isMobile = useMediaQuery(MOBILE_QUERY);
+  const pacing = isMobile && mobile ? { overlap: mobile.overlap ?? overlap, hold: mobile.hold ?? HOLD } : { overlap, hold: HOLD };
   const scenes = Children.toArray(children).filter((child): child is ReactElement<JourneySceneProps> =>
     isValidElement(child)
   );
@@ -528,7 +551,8 @@ export function ScrollJourney({
             isLast: index === scenes.length - 1,
             overlap: overlapFirst || index > 0,
             leaves: leaveLast || index < scenes.length - 1,
-            overlapBy: scene.props.pace?.overlap ?? overlap,
+            overlapBy: scene.props.pace?.overlap ?? pacing.overlap,
+            holdDefault: pacing.hold,
           })
         )}
         <div ref={tailRef} className="h-0" aria-hidden />

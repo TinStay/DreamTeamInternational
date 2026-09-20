@@ -54,7 +54,8 @@ export function useScenePager(enabled: boolean, stops: () => number[]) {
       const t0 = performance.now();
       const step = (now: number) => {
         const p = Math.min(1, (now - t0) / PAGE_MS);
-        window.scrollTo(0, from + (target - from) * easeInOutCubic(p));
+        // An instant step: the root's CSS `scroll-behavior` must never turn a frame of the tween into an animation.
+        window.scrollTo({ top: from + (target - from) * easeInOutCubic(p), behavior: "instant" });
         if (p < 1) {
           raf = requestAnimationFrame(step);
         } else {

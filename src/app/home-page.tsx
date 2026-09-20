@@ -63,7 +63,9 @@ export function HomePage() {
             atoms drifting around), then the outer signal ring behind the contact details; the FAQ gets its blob and
             smaller atoms. The reviews scene drops the header pad: its own sticky stage
             (title + card conveyor) carries it. */}
-        <ScrollJourney overlap={0.7} morph={journeyMorph} prelude={OSMO_HANDOFF_VH}>
+        {/* Phones: a hand-over of 0.7 of a viewport and 0.35 of reading room (a swipe covers a viewport or more; at
+            the desktop numbers a flick passed a whole section before its title had formed). */}
+        <ScrollJourney overlap={0.7} mobile={{ overlap: 0.3, hold: 0.35 }} morph={journeyMorph} prelude={OSMO_HANDOFF_VH}>
           <JourneyScene>
             <CompanyStatsSection />
           </JourneyScene>

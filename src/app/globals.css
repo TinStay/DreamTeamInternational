@@ -291,14 +291,12 @@
     animation: marquee-x var(--marquee-duration, 55s) linear infinite;
   }
 
-  /** Floating particle (journey backdrops): a slow drift to (--dx, --dy) and back, timing per particle. */
-  @keyframes journey-drift {
-    0%, 100% { transform: translate3d(0, 0, 0); }
-    50% { transform: translate3d(var(--dx, 0px), var(--dy, -18px), 0); }
-  }
-  .animate-journey-drift {
-    animation: journey-drift var(--drift-duration, 8s) ease-in-out infinite;
-  }
+  /*
+   * (The journey backdrops' particle drift used to be a keyframe animation here that read its offsets from custom
+   * properties - translate3d(var(--dx), var(--dy), 0). Chrome cannot run keyframes that depend on var() on the
+   * compositor, so every particle recalculated style on the main thread every frame, from page load; the drift is
+   * a Web Animation with literal values now - useDrift in ui/journey-backdrops.tsx. Keep keyframes free of var().)
+   */
 
   /**
    * Rising accent particle used by the projects showcase scenes: fades in,
@@ -371,6 +369,20 @@
   }
   .animate-showcase-breathe {
     animation: showcase-breathe 12s ease-in-out infinite;
+  }
+  /**
+   * A parked showcase scene (`inert`, see projects-showcase.tsx) keeps its particle animations paused, and so does
+   * the whole stage while it is off screen (`data-offstage` - the last scene never parks, it stays framed to the end
+   * of the timeline): a running animation costs a main-thread style tick on every frame the main thread produces,
+   * hidden or not - and the five scenes carry ~100 sparks between them.
+   */
+  [inert] .animate-showcase-rise,
+  [inert] .animate-showcase-breathe,
+  [inert] .animate-float,
+  [data-offstage] .animate-showcase-rise,
+  [data-offstage] .animate-showcase-breathe,
+  [data-offstage] .animate-float {
+    animation-play-state: paused;
   }
 
   /**
@@ -492,9 +504,17 @@
     @apply bg-background text-foreground;
     transition: background-color 200ms ease, color 200ms ease;
   }
-  /* Native smooth scrolling only while the Lenis smooth scroller is not running (it adds `.lenis` to <html>). */
-  html:not(.lenis) {
-    scroll-behavior: smooth;
+  /*
+   * Native smooth scrolling for programmatic scrolls only while the Lenis smooth scroller is not running (it adds
+   * `.lenis` to <html>) - and only on fine pointers: Lenis is not mounted on touch devices at all (see
+   * components/smooth-scroll.tsx), and a root `scroll-behavior: smooth` there would turn every plain `scrollTo`
+   * into an animation - the scene pager's per-frame steps, the route-change reset to the top. Scrolls that should
+   * glide on a phone say `behavior: "smooth"` themselves (lib/smooth-scroll.ts).
+   */
+  @media (hover: hover) and (pointer: fine) {
+    html:not(.lenis) {
+      scroll-behavior: smooth;
+    }
   }
 }
 

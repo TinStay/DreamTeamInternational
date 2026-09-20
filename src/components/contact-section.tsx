@@ -252,7 +252,7 @@ export function ContactSection({
                 className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-6 sm:gap-y-4"
                 {...reveal(4 + socials.length)}
               >
-                <GoogleReviewsBadge label={t.footer.googleReviews} className="max-sm:w-full max-sm:justify-center" />
+                <GoogleReviewsBadge label={t.footer.googleReviews} className="max-sm:w-full max-sm:justify-center" mobileLarge />
                 <ClutchBadge mobileCard />
               </motion.div>
             ) : null}

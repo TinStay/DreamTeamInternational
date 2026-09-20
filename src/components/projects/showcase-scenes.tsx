@@ -544,10 +544,15 @@ function OsmoVisual({ t, project, shouldMount }: SceneVisualProps) {
         </Reveal>
       </ParallaxLayer>
       {/* Wordmark below lg: small, centred inside the top of the green disc (white-ink file); the copy block sits
-          under it (layout `in-circle`). */}
-      <ParallaxLayer t={t} depth={0.35} className="pointer-events-none lg:hidden">
-        <Reveal t={t} delay={0.02} className="absolute left-1/2 top-[calc(max(5.75rem,10vh)+1.25rem)] -translate-x-1/2">
-          <Image src={OSMO_MARK_WHITE} alt="OSMO" width={2400} height={1340} sizes="240px" className="h-20 w-auto sm:h-24" />
+          under it (layout `in-circle`). A full-width layer with the image centred - NOT `left-1/2 -translate-x-1/2`:
+          an absolutely positioned box then has only the right half of the screen as available width, and the
+          fixed-height image was squeezed into it (the client saw it stretched). On the disc's own parallax depth
+          (0.2 - at 0.35 it outran the disc and its tree tip grazed the rim by the time the scene framed), 2rem under
+          the disc's top, h-14 / sm:h-16 (60 / 69px - 161 / 186px wide at the file's 2.69:1), so the tree at the
+          mark's top-right corner stays inside the disc's chord on a 360px phone and a tablet alike. */}
+      <ParallaxLayer t={t} depth={0.2} className="pointer-events-none lg:hidden">
+        <Reveal t={t} delay={0.02} className="absolute inset-x-0 top-[calc(max(5.75rem,10vh)+2rem)] flex justify-center">
+          <Image src={OSMO_MARK_WHITE} alt="OSMO" width={1940} height={721} sizes="240px" className="h-14 w-auto sm:h-16" />
         </Reveal>
       </ParallaxLayer>
     </>
@@ -589,11 +594,11 @@ const SCENES: Partial<Record<ProjectKey, SceneVisual>> = {
     morph: { ...NO_SHAPE, color: BOLERON.violet },
     mark: "none",
     // Below lg: the word (22vw tall), the copy block (about 11.5rem, 13.5rem from sm) a rem under it and Roni two
-    // rem under that - a stack centred on the screen; the word never higher than 8rem (its parallax layer, depth
+    // rem under that - a stack centred on the screen; the word never higher than 10rem (its parallax layer, depth
     // 0.55, lifts it about 5vh by the time the scene is framed, and it must stay under the header), and Roni as
     // tall as 36vh (44vh from sm) or whatever room is left down to the dock.
     className:
-      "[--bol-word:22vw] [--bol-block:11.5rem] [--bol-roni:min(36vh,calc(100svh_-_8rem_-_var(--bol-word)_-_var(--bol-block)_-_5rem))] [--bol-top:max(8rem,calc((100svh_-_var(--bol-word)_-_var(--bol-block)_-_var(--bol-roni)_-_2rem)/2))] sm:[--bol-block:13.5rem] sm:[--bol-roni:min(44vh,calc(100svh_-_8rem_-_var(--bol-word)_-_var(--bol-block)_-_5rem))]",
+      "[--bol-word:22vw] [--bol-block:11.5rem] [--bol-roni:min(36vh,calc(100svh_-_10rem_-_var(--bol-word)_-_var(--bol-block)_-_5rem))] [--bol-top:max(10rem,calc((100svh_-_var(--bol-word)_-_var(--bol-block)_-_var(--bol-roni)_-_2rem)/2))] sm:[--bol-block:13.5rem] sm:[--bol-roni:min(44vh,calc(100svh_-_10rem_-_var(--bol-word)_-_var(--bol-block)_-_5rem))]",
     Visual: BoleronVisual,
   },
   emblema: {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, type CSSProperties } from "react";
+import { useEffect, useRef, type CSSProperties, type RefObject } from "react";
 import { motion, useMotionTemplate, useMotionValue, useTransform, type MotionValue } from "motion/react";
 import { cn } from "@/lib/utils";
 import type { JourneyBackdrop, JourneyBackdropProps, JourneyMorph } from "@/components/ui/scroll-journey";
@@ -226,24 +226,57 @@ function noise(seed: number) {
   return x - Math.floor(x);
 }
 
+/**
+ * A slow drift about the element's own spot, as a Web Animation with literal transforms - so it runs on the
+ * compositor. It was a CSS animation whose keyframes read the drift from custom properties
+ * (`translate3d(var(--dx), var(--dy), 0)`), and Chrome cannot composite keyframes that depend on `var()`: all 138
+ * particles and atoms ticked on the main thread, a style recalc of every one of them on every frame from the moment
+ * the home page loaded, whether their backdrop was on stage or not - on a throttled phone profile that alone was
+ * most of the frame (invalidation tracking: "Animation <span animate-journey-drift>", ~100 recalcs a second at
+ * rest). `delay` may be negative (that is how the dots are desynced). The animation runs only while `presence`
+ * (the backdrop's own opacity) is above zero: even a composited animation costs a main-thread style tick on every
+ * frame the main thread produces, and at any point of the page at most one backdrop is on stage. Nothing under
+ * reduced motion.
+ */
+function useDrift(ref: RefObject<HTMLElement | null>, presence: MotionValue<number>, dx: number, dy: number, duration: number, delay: number) {
+  useEffect(() => {
+    const el = ref.current;
+    if (!el || typeof el.animate !== "function") return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const animation = el.animate(
+      [
+        { transform: "translate3d(0, 0, 0)", easing: "ease-in-out" },
+        { transform: `translate3d(${dx.toFixed(1)}px, ${dy.toFixed(1)}px, 0)`, easing: "ease-in-out" },
+        { transform: "translate3d(0, 0, 0)" },
+      ],
+      { duration: duration * 1000, delay: delay * 1000, iterations: Infinity }
+    );
+    let running = true;
+    const sync = () => {
+      const on = presence.get() > 0.001;
+      if (on === running) return;
+      running = on;
+      if (on) animation.play();
+      else animation.pause();
+    };
+    sync();
+    const unsubscribe = presence.on("change", sync);
+    return () => {
+      unsubscribe();
+      animation.cancel();
+    };
+  }, [ref, presence, dx, dy, duration, delay]);
+}
+
 /** A glowing dot that drifts slowly about its spot (all numbers rounded so the server string matches the browser's). */
-function Particle({ seed, x, y, size, alpha }: { seed: number; x: string; y: string; size: number; alpha: number }) {
+function Particle({ seed, x, y, size, alpha, presence }: { seed: number; x: string; y: string; size: number; alpha: number; presence: MotionValue<number> }) {
+  const ref = useRef<HTMLSpanElement>(null);
+  useDrift(ref, presence, -12 + noise(seed + 5) * 24, -8 - noise(seed + 6) * 22, 5 + noise(seed + 3) * 7, -noise(seed + 4) * 12);
   return (
     <span
-      className="animate-journey-drift absolute rounded-full bg-primary-gradient shadow-[0_0_12px_3px_var(--primary-soft-glow)]"
-      style={
-        {
-          left: x,
-          top: y,
-          width: `${size.toFixed(1)}px`,
-          height: `${size.toFixed(1)}px`,
-          opacity: alpha.toFixed(2),
-          "--dx": `${(-12 + noise(seed + 5) * 24).toFixed(1)}px`,
-          "--dy": `${(-8 - noise(seed + 6) * 22).toFixed(1)}px`,
-          "--drift-duration": `${(5 + noise(seed + 3) * 7).toFixed(1)}s`,
-          animationDelay: `${(-noise(seed + 4) * 12).toFixed(1)}s`,
-        } as CSSProperties
-      }
+      ref={ref}
+      className="absolute rounded-full bg-primary-gradient shadow-[0_0_12px_3px_var(--primary-soft-glow)]"
+      style={{ left: x, top: y, width: `${size.toFixed(1)}px`, height: `${size.toFixed(1)}px`, opacity: alpha.toFixed(2) }}
     />
   );
 }
@@ -266,6 +299,7 @@ function Lines({ arrive, depart }: JourneyBackdropProps) {
         return (
           <Particle
             key={i}
+            presence={opacity}
             seed={seed}
             x={`${(6 + noise(seed) * 88).toFixed(1)}%`}
             y={`${(4 + noise(seed + 1) * 92).toFixed(1)}%`}
@@ -287,6 +321,7 @@ function Lines({ arrive, depart }: JourneyBackdropProps) {
             return (
               <Particle
                 key={i}
+                presence={opacity}
                 seed={seed}
                 x={`${(-44 + noise(seed) * 88).toFixed(1)}px`}
                 y={`${(3 + noise(seed + 1) * 94).toFixed(1)}%`}
@@ -340,48 +375,46 @@ function Waves({ arrive, depart }: JourneyBackdropProps) {
  * (FAQ: a tilted elliptical orbit, smaller) - fading in once the scene is
  * most of the way in and out as soon as the next one starts.
  */
+function Atom({ seed, look, presence }: { seed: number; look: "ring" | "orbit"; presence: MotionValue<number> }) {
+  const ref = useRef<HTMLSpanElement>(null);
+  const size = look === "ring" ? 12 + noise(seed + 2) * 12 : 9 + noise(seed + 2) * 8;
+  const dot = look === "ring" ? 3 + noise(seed + 8) * 2.5 : 2.5 + noise(seed + 8) * 1.5;
+  useDrift(ref, presence, -14 + noise(seed + 5) * 28, -8 - noise(seed + 6) * 24, 6 + noise(seed + 3) * 8, -noise(seed + 4) * 12);
+  return (
+    <span
+      ref={ref}
+      className="absolute"
+      style={{
+        left: `${(4 + noise(seed) * 92).toFixed(1)}%`,
+        top: `${(6 + noise(seed + 1) * 88).toFixed(1)}%`,
+        width: `${size.toFixed(1)}px`,
+        height: `${size.toFixed(1)}px`,
+        opacity: (0.5 + noise(seed + 7) * 0.45).toFixed(2),
+      }}
+    >
+      {/* The orbit: a hairline circle, or a tilted ellipse. */}
+      <span
+        className={cn(
+          "absolute inset-0 border border-[color:color-mix(in_srgb,var(--primary-gradient-end)_75%,transparent)]",
+          look === "ring" ? "rounded-full" : "rounded-[50%] scale-y-[0.42]"
+        )}
+        style={look === "orbit" ? { rotate: `${(-40 + noise(seed + 9) * 80).toFixed(0)}deg` } : undefined}
+      />
+      {/* The nucleus. */}
+      <span
+        className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary-gradient shadow-[0_0_10px_3px_var(--primary-soft-glow)]"
+        style={{ width: `${dot.toFixed(1)}px`, height: `${dot.toFixed(1)}px` }}
+      />
+    </span>
+  );
+}
 function Atoms({ arrive, depart, look, count, seedBase }: JourneyBackdropProps & { look: "ring" | "orbit"; count: number; seedBase: number }) {
   const opacity = useTransform([arrive, depart], ([a, d]: number[]) => across(a, 0.5, 1) * (1 - across(d, 0, 0.5)));
   return (
     <motion.div className="absolute inset-0" style={{ opacity }}>
-      {Array.from({ length: count }, (_, i) => {
-        const seed = seedBase + i;
-        const size = look === "ring" ? 12 + noise(seed + 2) * 12 : 9 + noise(seed + 2) * 8;
-        const dot = look === "ring" ? 3 + noise(seed + 8) * 2.5 : 2.5 + noise(seed + 8) * 1.5;
-        return (
-          <span
-            key={i}
-            className="animate-journey-drift absolute"
-            style={
-              {
-                left: `${(4 + noise(seed) * 92).toFixed(1)}%`,
-                top: `${(6 + noise(seed + 1) * 88).toFixed(1)}%`,
-                width: `${size.toFixed(1)}px`,
-                height: `${size.toFixed(1)}px`,
-                opacity: (0.5 + noise(seed + 7) * 0.45).toFixed(2),
-                "--dx": `${(-14 + noise(seed + 5) * 28).toFixed(1)}px`,
-                "--dy": `${(-8 - noise(seed + 6) * 24).toFixed(1)}px`,
-                "--drift-duration": `${(6 + noise(seed + 3) * 8).toFixed(1)}s`,
-                animationDelay: `${(-noise(seed + 4) * 12).toFixed(1)}s`,
-              } as CSSProperties
-            }
-          >
-            {/* The orbit: a hairline circle, or a tilted ellipse. */}
-            <span
-              className={cn(
-                "absolute inset-0 border border-[color:color-mix(in_srgb,var(--primary-gradient-end)_75%,transparent)]",
-                look === "ring" ? "rounded-full" : "rounded-[50%] scale-y-[0.42]"
-              )}
-              style={look === "orbit" ? { rotate: `${(-40 + noise(seed + 9) * 80).toFixed(0)}deg` } : undefined}
-            />
-            {/* The nucleus. */}
-            <span
-              className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary-gradient shadow-[0_0_10px_3px_var(--primary-soft-glow)]"
-              style={{ width: `${dot.toFixed(1)}px`, height: `${dot.toFixed(1)}px` }}
-            />
-          </span>
-        );
-      })}
+      {Array.from({ length: count }, (_, i) => (
+        <Atom key={i} seed={seedBase + i} look={look} presence={opacity} />
+      ))}
     </motion.div>
   );
 }
@@ -432,6 +465,7 @@ function ServicesField({ presence }: JourneyBackdropProps) {
           return (
             <Particle
               key={i}
+              presence={opacity}
               seed={seed}
               x={`${(4 + noise(seed) * 92).toFixed(1)}%`}
               y={`${(6 + noise(seed + 1) * 88).toFixed(1)}%`}
