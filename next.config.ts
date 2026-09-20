@@ -9,11 +9,18 @@ const nextConfig: NextConfig = {
   },
   async redirects() {
     return [
-      // The bare domain: the visitor's language picks the locale - a Bulgarian-first Accept-Language goes to /bg,
-      // anything else to /en (the site's x-default). Temporary on purpose, as Google asks of language redirects, so
-      // no cache ever pins one choice for everyone; the locale pages themselves are what gets indexed.
+      // The bare domain: where the visitor is picks the locale. A Bulgarian-first Accept-Language goes to /bg wherever
+      // they are; otherwise Vercel's geolocation header decides (`x-vercel-ip-country`, the two-letter code the CDN sets
+      // on every deployed request - never in `next dev`, where a curl with the header exercises the branches): Bulgaria
+      // → /bg, any other country → /en; and with no geolocation at all (local dev, a proxy that strips it, a code the CDN
+      // could not resolve) the default is /bg, the primary locale - the client sits in Bulgaria behind an English-first
+      // browser and landed on /en while the language alone decided. Temporary on purpose, as Google asks of language
+      // redirects, so no cache ever pins one choice for everyone; the locale pages themselves are what gets indexed
+      // (x-default stays /en: a searcher in neither language is better served in English).
       { source: "/", has: [{ type: "header", key: "accept-language", value: "[bB][gG].*" }], destination: "/bg", permanent: false },
-      { source: "/", destination: "/en", permanent: false },
+      { source: "/", has: [{ type: "header", key: "x-vercel-ip-country", value: "[bB][gG]" }], destination: "/bg", permanent: false },
+      { source: "/", has: [{ type: "header", key: "x-vercel-ip-country", value: "[A-Za-z]{2}" }], destination: "/en", permanent: false },
+      { source: "/", destination: "/bg", permanent: false },
       { source: "/privacy", destination: "/en/privacy", permanent: true },
       { source: "/terms", destination: "/en/terms", permanent: true },
       { source: "/training", destination: "/bg/training", permanent: true },

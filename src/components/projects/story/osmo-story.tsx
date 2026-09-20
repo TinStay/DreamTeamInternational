@@ -54,6 +54,12 @@ const BASE = "/projects/osmo/story";
 const HERO_CLIP = { src: `${BASE}/hero-samples.mp4`, poster: `${BASE}/hero-samples-poster.webp` };
 const COLLAGE = [1, 2, 3, 4].map((n) => `${BASE}/collage-${n}.webp`);
 /**
+ * The challenge / solution titles sit in the sticky third of a `Split` from lg, and they are whole sentences - so
+ * they run on a fluid ramp sized to that column (38px on a 1366px laptop, 48px at full HD, 52px at most) instead
+ * of the section ramp's 48 / 60px, which folded the nine-word challenge title into eight lines on a laptop.
+ */
+const SPLIT_TITLE = "text-3xl sm:text-4xl lg:text-[clamp(1.875rem,0.75rem+1.9vw,3.25rem)]";
+/**
  * The four product films, in the order of `stories.osmo.products` - keys into `Project.story.clips` and each
  * one's real frame (4:5, 9:16, 4:5, 4:5 - the player letterboxes anything else).
  */
@@ -180,7 +186,7 @@ export function OsmoStory({ project }: { project: Project }) {
           left={
             <>
               <Eyebrow>{story.challenge.eyebrow}</Eyebrow>
-              <Display text={story.challenge.title} className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl" />
+              <Display text={story.challenge.title} className={SPLIT_TITLE} />
             </>
           }
           right={<BodyXL paragraphs={story.challenge.body} />}
@@ -192,7 +198,7 @@ export function OsmoStory({ project }: { project: Project }) {
           left={
             <>
               <Eyebrow>{story.solution.eyebrow}</Eyebrow>
-              <Display text={story.solution.title} className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl" />
+              <Display text={story.solution.title} className={SPLIT_TITLE} />
             </>
           }
           right={<BodyXL paragraphs={story.solution.body} />}

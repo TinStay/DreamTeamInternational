@@ -1393,7 +1393,6 @@ export const bg = {
     title2: "Оферта",
     /** Eyebrow above the wizard once a service is picked: "{service} · стъпка 2 от 5". */
     stepOf: "стъпка {current} от {total}",
-    changeService: "Изберете друга услуга",
     serviceNames: {
       video: "AI видео",
       images: "AI изображения",

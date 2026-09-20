@@ -1394,7 +1394,6 @@ export const en = {
     title2: "Quote",
     /** Eyebrow above the wizard once a service is picked: "{service} · step 2 of 5". */
     stepOf: "step {current} of {total}",
-    changeService: "Choose another service",
     serviceNames: {
       video: "AI video",
       images: "AI images",

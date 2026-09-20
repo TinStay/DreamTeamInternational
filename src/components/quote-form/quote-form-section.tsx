@@ -459,7 +459,7 @@ export function QuoteFormSection({
                     disabled={currentStep === 0 || isSubmitting}
                     className="h-10 rounded-full px-5"
                   >
-                    <IconChevronLeft className="size-4" /> {currentStep === 1 ? q.changeService : q.back}
+                    <IconChevronLeft className="size-4" /> {q.back}
                   </Button>
 
                   {isLastStep ? (

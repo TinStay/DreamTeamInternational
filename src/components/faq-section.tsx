@@ -8,7 +8,9 @@ import { JourneyItem } from "@/components/ui/scroll-journey";
 import { ButtonWithIcon, sideTabClass, sideTabDiscClass } from "@/components/ui/button-with-icon";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { contactProcessPath } from "@/lib/routes";
+import Link from "next/link";
+import { ctaPillClassName } from "@/components/ui/button";
+import { contactProcessPath, servicesPath } from "@/lib/routes";
 import { cn } from "@/lib/utils";
 
 /*
@@ -18,8 +20,9 @@ import { cn } from "@/lib/utils";
  * one open; a switch slides the new list in, an answer opens and closes with
  * the accordion's own height animation. The menu wears the side-tab dress
  * (`sideTabClass`: the active topic as the site's CTA pill with its icon in
- * the gradient disc on the left). Under the list the contact pill. On the
- * home journey the heading, the menu and the list are the parts that travel.
+ * the gradient disc on the left). Under the list the site's quote pill (the
+ * services page) and an outline pill to the contact page. On the home journey
+ * the heading, the menu and the list are the parts that travel.
  * FAQPage structured data covers every question, whatever topic is open.
  */
 
@@ -110,9 +113,21 @@ export function FaqSection({ className }: { className?: string }) {
                 </motion.div>
               </TabsContent>
             ))}
-            <ButtonWithIcon href={contactProcessPath(language)} surface="auto" className="mt-8">
-              {faq.cta}
-            </ButtonWithIcon>
+            <div className="mt-8 flex flex-wrap items-center gap-3.5">
+              <ButtonWithIcon href={servicesPath(language)} surface="auto">
+                {t.services.quoteCta}
+              </ButtonWithIcon>
+              <Link
+                href={contactProcessPath(language)}
+                className={cn(
+                  ctaPillClassName,
+                  // The quote pill's height and type ramp (`md`), so the two read as a pair.
+                  "h-12 border border-card-border bg-card-elevated text-foreground transition-[transform,background-color,box-shadow] duration-200 ease-out hover:-translate-y-[1px] hover:bg-muted/60 hover:shadow-sm lg:text-base"
+                )}
+              >
+                {faq.cta}
+              </Link>
+            </div>
           </JourneyItem>
         </Tabs>
       </div>

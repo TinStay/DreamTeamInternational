@@ -150,8 +150,8 @@ describe("QuoteFormSection wizard", () => {
       screen.getByRole("radio", { name: /Не, искам вие да го напишете/ })
     ).toHaveProperty("ariaChecked", "true");
 
-    // Back from the first flow step returns to the service cards.
-    await user.click(screen.getByRole("button", { name: "Изберете друга услуга" }));
+    // Back from the first flow step returns to the service cards (the same „Назад“ - no long label on phones).
+    await user.click(screen.getByRole("button", { name: "Назад" }));
     expect(screen.getAllByRole("button", { name: "Поискай оферта" })).toHaveLength(4);
   });
 
