@@ -14,6 +14,11 @@ import { cn } from "@/lib/utils";
 export const QUOTE_FIELD_CLASS =
   "border-border/40 bg-card-elevated shadow-input-soft dark:bg-card-elevated placeholder:text-xs";
 
+/** A field's `Label` in the wizard: semibold, and a size up on phones (15px), like the group labels and the option cards. */
+export const FIELD_LABEL_CLASS = "mb-2.5 font-semibold max-sm:text-[15px]";
+/** A checkbox row's `Label` (the details / timing / video asides): muted, a size up on phones. */
+export const CHECK_LABEL_CLASS = "mt-3 cursor-pointer items-start gap-2.5 text-sm font-normal text-muted-foreground max-sm:text-[15px]";
+
 /**
  * Enter-only reveal for conditionally shown inputs. Exit animations are
  * deliberately avoided: AnimatePresence exit-gated unmounts hang with the
@@ -65,11 +70,12 @@ export function GroupLabel({
     <div className={cn("mb-2.5", className)}>
       {/* block-level flex — inline-flex would add line-box space above and break
           cross-column label alignment */}
-      <p className="flex items-baseline gap-0.5 text-sm leading-none font-semibold text-foreground">
+      {/* 15px on phones - the labels read small next to the 16px fields there (the client's ask). */}
+      <p className="flex items-baseline gap-0.5 text-sm leading-none font-semibold text-foreground max-sm:text-[15px]">
         <span>{children}</span>
         {required ? <RequiredMark /> : null}
       </p>
-      {hint ? <p className="mt-1 text-xs text-muted-foreground">{hint}</p> : null}
+      {hint ? <p className="mt-1 text-xs text-muted-foreground max-sm:text-[13px]">{hint}</p> : null}
     </div>
   );
 }

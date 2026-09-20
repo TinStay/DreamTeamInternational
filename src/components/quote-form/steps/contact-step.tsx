@@ -17,7 +17,7 @@ import { cn } from "@/lib/utils";
 import { useLanguage } from "@/lib/i18n/language-context";
 import { FOUND_US_KEYS } from "@/lib/found-us";
 import { termsPath } from "@/lib/routes";
-import { QUOTE_FIELD_CLASS, RequiredMark, StepHeading, type QuoteStepProps } from "./shared";
+import { FIELD_LABEL_CLASS, QUOTE_FIELD_CLASS, RequiredMark, StepHeading, type QuoteStepProps } from "./shared";
 
 export function ContactStep({ data, update }: QuoteStepProps) {
   const { t, language } = useLanguage();
@@ -39,7 +39,7 @@ export function ContactStep({ data, update }: QuoteStepProps) {
       {/* Row 1: name / email / phone. */}
       <div className="grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-3">
         <div>
-          <Label htmlFor="quote-name" className="mb-2.5 gap-0.5 font-semibold">
+          <Label htmlFor="quote-name" className={cn(FIELD_LABEL_CLASS, "gap-0.5")}>
             {t.contact.name} <RequiredMark />
           </Label>
           <Input
@@ -55,7 +55,7 @@ export function ContactStep({ data, update }: QuoteStepProps) {
         </div>
 
         <div>
-          <Label htmlFor="quote-email" className="mb-2.5 gap-0.5 font-semibold">
+          <Label htmlFor="quote-email" className={cn(FIELD_LABEL_CLASS, "gap-0.5")}>
             {t.contact.emailLbl} <RequiredMark />
           </Label>
           <Input
@@ -72,7 +72,7 @@ export function ContactStep({ data, update }: QuoteStepProps) {
         </div>
 
         <div>
-          <Label htmlFor="quote-phone" className="mb-2.5 font-semibold">
+          <Label htmlFor="quote-phone" className={FIELD_LABEL_CLASS}>
             {t.contact.phoneLbl}
           </Label>
           <Input
@@ -90,7 +90,7 @@ export function ContactStep({ data, update }: QuoteStepProps) {
       {/* Row 2: company / how did you find us. */}
       <div className="mt-4 grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-2">
         <div>
-          <Label htmlFor="quote-company" className="mb-2.5 font-semibold">
+          <Label htmlFor="quote-company" className={FIELD_LABEL_CLASS}>
             {c.company}
           </Label>
           <Input
@@ -104,7 +104,7 @@ export function ContactStep({ data, update }: QuoteStepProps) {
         </div>
 
         <div>
-          <Label className="mb-2.5 font-semibold">{t.contact.foundUs}</Label>
+          <Label className={FIELD_LABEL_CLASS}>{t.contact.foundUs}</Label>
           <Select
             value={data.foundUs}
             onValueChange={(value) => update("foundUs", value ?? "")}

@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 import { useLanguage } from "@/lib/i18n/language-context";
 import { PLATFORM_OPTIONS, type PlatformOptionKey, toggleInArray } from "@/lib/quote-form/constants";
 import { OptionCard } from "@/components/quote-form/option-card";
-import { QUOTE_FIELD_CLASS, GroupLabel, StepHeading, type QuoteStepProps } from "./shared";
+import { CHECK_LABEL_CLASS, QUOTE_FIELD_CLASS, GroupLabel, StepHeading, type QuoteStepProps } from "./shared";
 
 export function DetailsStep({ data, update }: QuoteStepProps) {
   const { t, language } = useLanguage();
@@ -38,7 +38,7 @@ export function DetailsStep({ data, update }: QuoteStepProps) {
               data.deadlineFlexible && "pointer-events-none opacity-50"
             )}
           />
-          <Label className="mt-3 cursor-pointer items-start gap-2.5 text-sm font-normal text-muted-foreground">
+          <Label className={CHECK_LABEL_CLASS}>
             <Checkbox
               checked={data.deadlineFlexible}
               onCheckedChange={(checked) => {

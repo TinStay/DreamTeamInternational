@@ -81,7 +81,8 @@ function OptionCardImpl({
         <span
           className={cn(
             "block font-semibold text-foreground",
-            compact ? "text-sm" : "text-sm sm:text-base"
+            // 15px on phones either way (the client found the card text small there); the desktop sizes stay.
+            compact ? "text-[15px] sm:text-sm" : "text-[15px] sm:text-base"
           )}
         >
           {label}
@@ -90,7 +91,7 @@ function OptionCardImpl({
           <span
             className={cn(
               "block leading-snug text-muted-foreground",
-              compact ? "mt-0.5 text-xs" : "mt-0.5 text-xs sm:mt-1 sm:text-sm"
+              compact ? "mt-0.5 text-[13px] sm:text-xs" : "mt-0.5 text-[13px] sm:mt-1 sm:text-sm"
             )}
           >
             {hint}

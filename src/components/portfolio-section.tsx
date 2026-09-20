@@ -614,7 +614,7 @@ export function PortfolioSection({
               menu on the left and the format tabs sit on top of the grid; below lg the category chip row sticks
               under the mobile bar and the format tabs stay in flow above the grid. */}
           <div className="flex flex-col gap-6 pb-12 lg:grid lg:grid-cols-[15rem_minmax(0,1fr)] lg:items-start lg:gap-10">
-            <div className="sticky top-[calc(max(0.5rem,env(safe-area-inset-top))_+_4.25rem)] z-40 -mx-4 px-4 lg:top-[6rem] lg:mx-0 lg:px-0">
+            <div className="sticky top-[calc(max(0.5rem,env(safe-area-inset-top))_+_5.5rem)] z-40 -mx-4 px-4 lg:top-[6rem] lg:mx-0 lg:px-0">
               {/* Categories below lg: the chip row */}
               <div className="w-fit max-w-full rounded-full border border-border/25 bg-background/95 p-1 shadow-[0_12px_40px_rgba(15,23,42,0.15)] backdrop-blur-lg supports-[backdrop-filter]:bg-background/85 dark:border-border/30 dark:shadow-[0_12px_48px_rgba(0,0,0,0.45)] lg:hidden">
                 <div className="relative rounded-full bg-muted/10 px-2 py-1 sm:px-2.5">

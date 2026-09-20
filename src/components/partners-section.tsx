@@ -1,7 +1,7 @@
 "use client";
 
 import { useLanguage } from "@/lib/i18n/language-context";
-import { PARTNERS, type Partner } from "@/lib/partners";
+import { PARTNERS, heroPartnerRows, type Partner } from "@/lib/partners";
 import { PartnerLogo } from "@/components/partner-logo";
 import { cn } from "@/lib/utils";
 import type { CSSProperties } from "react";
@@ -10,9 +10,10 @@ import type { CSSProperties } from "react";
 const imgClass =
   "h-[2.75rem] w-auto min-h-[2.75rem] min-w-[84px] max-w-[min(140px,30vw)] object-contain transition-transform duration-300 ease-out group-hover:scale-125 sm:h-[3rem] sm:min-h-[3rem] sm:min-w-[88px] sm:max-w-[min(150px,20vw)] md:h-[3.25rem] md:min-h-[3.25rem] md:min-w-[96px] md:max-w-[160px]";
 
-// Static rows (lg+): a touch smaller, so eight logos sit on ONE line from a 1024px laptop up, growing with the viewport.
+// Static rows (lg+): a step smaller than the marquee's (the client wanted the desktop logos smaller still), so eight
+// logos sit on ONE line with air around them from a 1024px laptop up, growing a little with the viewport.
 const staticImgClass =
-  "h-10 w-auto min-h-10 min-w-[72px] max-w-[116px] object-contain transition-transform duration-300 ease-out group-hover:scale-125 xl:h-12 xl:min-h-12 xl:max-w-[140px] 2xl:h-[3.25rem] 2xl:min-h-[3.25rem] 2xl:max-w-[160px]";
+  "h-9 w-auto min-h-9 min-w-[72px] max-w-[104px] object-contain transition-transform duration-300 ease-out group-hover:scale-125 xl:h-11 xl:min-h-11 xl:max-w-[128px] 2xl:h-12 2xl:min-h-12 2xl:max-w-[144px]";
 
 const innerClass =
   "group mx-2.5 flex shrink-0 items-center justify-center md:mx-3.5 cursor-pointer opacity-80 hover:opacity-100 transition-opacity py-1.5";
@@ -100,9 +101,8 @@ export function PartnersSection({
   layout?: "marquee" | "static";
 }) {
   const { t } = useLanguage();
-  const mid = rows === 1 ? PARTNERS.length : Math.ceil(PARTNERS.length / 2);
-  const rowPartners = PARTNERS.slice(0, mid);
-  const rowPartnersB = PARTNERS.slice(mid);
+  // Two rows laid out by hand (`heroPartnerRows`: the key clients in the middle of each), or everyone in one.
+  const [rowPartners, rowPartnersB] = rows === 1 ? [PARTNERS, []] : heroPartnerRows();
   const isStatic = layout === "static";
 
   return (

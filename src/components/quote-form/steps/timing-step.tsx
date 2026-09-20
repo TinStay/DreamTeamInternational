@@ -8,7 +8,7 @@ import { MiniCalendar } from "@/components/ui/mini-calendar";
 import { Textarea } from "@/components/ui/textarea";
 import { useLanguage } from "@/lib/i18n/language-context";
 import { cn } from "@/lib/utils";
-import { QUOTE_FIELD_CLASS, GroupLabel, StepHeading, type QuoteStepProps } from "./shared";
+import { CHECK_LABEL_CLASS, QUOTE_FIELD_CLASS, GroupLabel, StepHeading, type QuoteStepProps } from "./shared";
 
 export type TimingStepProps = QuoteStepProps & {
   title: string;
@@ -42,7 +42,7 @@ export function TimingStep({ data, update, title, deadlineLabel, aside }: Timing
             nextLabel={d.nextWeek}
             className={cn("transition-opacity", data.deadlineFlexible && "pointer-events-none opacity-50")}
           />
-          <Label className="mt-3 cursor-pointer items-start gap-2.5 text-sm font-normal text-muted-foreground">
+          <Label className={CHECK_LABEL_CLASS}>
             <Checkbox
               checked={data.deadlineFlexible}
               onCheckedChange={(checked) => {

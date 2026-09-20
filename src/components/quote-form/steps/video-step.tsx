@@ -16,7 +16,7 @@ import {
 import { cn } from "@/lib/utils";
 import { OptionCard } from "@/components/quote-form/option-card";
 import { FileUploadField } from "@/components/quote-form/file-upload";
-import { QUOTE_FIELD_CLASS, GroupLabel, StepHeading, type QuoteStepProps } from "./shared";
+import { CHECK_LABEL_CLASS, QUOTE_FIELD_CLASS, GroupLabel, StepHeading, type QuoteStepProps } from "./shared";
 
 export type VideoStepProps = QuoteStepProps & {
   refFiles: File[];
@@ -75,7 +75,7 @@ export function VideoStep({
               disabled={data.lengthFlexible}
               aria-label={v.lengthLabel}
             />
-            <Label className="mt-3 cursor-pointer items-start gap-2.5 text-sm font-normal text-muted-foreground">
+            <Label className={CHECK_LABEL_CLASS}>
               <Checkbox
                 checked={data.lengthFlexible}
                 onCheckedChange={(checked) => update("lengthFlexible", Boolean(checked))}
