@@ -6,14 +6,20 @@ import { PartnerLogo } from "@/components/partner-logo";
 import { cn } from "@/lib/utils";
 import type { CSSProperties } from "react";
 
-// The hovered logo grows a good step, smoothly (the row itself pauses - see the track below).
+/*
+ * Every logo renders at ONE fixed height - no width cap, no min-width: a cap shrank the wide wordmarks (Palltex, RSG,
+ * Smart Pharmacy) to two thirds of the others' height, and the client wants the marks the same height. The width
+ * then follows each file's aspect ratio, so the files in `public/company_icons/` are trimmed to their ink (no
+ * transparent margins - `sharp` on the alpha bounding box; a padded file would render visibly shorter).
+ */
+// The marquee rows (below lg): the hovered logo grows a good step, smoothly (the row itself pauses - see the track).
 const imgClass =
-  "h-[2.75rem] w-auto min-h-[2.75rem] min-w-[84px] max-w-[min(140px,30vw)] object-contain transition-transform duration-300 ease-out group-hover:scale-125 sm:h-[3rem] sm:min-h-[3rem] sm:min-w-[88px] sm:max-w-[min(150px,20vw)] md:h-[3.25rem] md:min-h-[3.25rem] md:min-w-[96px] md:max-w-[160px]";
+  "h-8 w-auto object-contain transition-transform duration-300 ease-out group-hover:scale-125 sm:h-9 md:h-10";
 
-// Static rows (lg+): a step smaller than the marquee's (the client wanted the desktop logos smaller still), so eight
-// logos sit on ONE line with air around them from a 1024px laptop up, growing a little with the viewport.
+// Static rows (lg+): a step smaller again (the client's ask) - 28px on a 1024px laptop, where the wider row (the dark
+// theme's files are the wide ones) measures ~880px with its margins, 32px from xl and 36px from 2xl.
 const staticImgClass =
-  "h-9 w-auto min-h-9 min-w-[72px] max-w-[104px] object-contain transition-transform duration-300 ease-out group-hover:scale-125 xl:h-11 xl:min-h-11 xl:max-w-[128px] 2xl:h-12 2xl:min-h-12 2xl:max-w-[144px]";
+  "h-7 w-auto object-contain transition-transform duration-300 ease-out group-hover:scale-125 xl:h-8 2xl:h-9";
 
 const innerClass =
   "group mx-2.5 flex shrink-0 items-center justify-center md:mx-3.5 cursor-pointer opacity-80 hover:opacity-100 transition-opacity py-1.5";

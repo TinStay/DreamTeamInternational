@@ -152,12 +152,15 @@ export const PARTNERS: Partner[] = [
 /**
  * The hero's two rows, left to right. The key clients - the case studies and the other big names (Plasico, Palltex,
  * Boleron, iSupport / Mindguard, Hus Estate, Emblema, Oikia, OSMO) - take the middle of each row and the rest the
- * sides (the client's ask); the phone marquees run the same two rows. An active partner left out of the plan is
- * appended to the second row, so nothing in `PARTNERS` can silently disappear.
+ * sides (the client's ask); the phone marquees run the same two rows. The sides are dealt so the rows come out
+ * about as wide as each other at one logo height: the wide wordmarks (RSG, Smart Pharmacy) flank the second row,
+ * the compact marks the first (in the dark theme Infinity is a wide wordmark too - it sits at the first row's end).
+ * An active partner left out of the plan is appended to the second row, so nothing in `PARTNERS` can silently
+ * disappear.
  */
 const HERO_ROW_PLAN: readonly (readonly string[])[] = [
-  ["imotalert", "infinity", "plasico", "palltex", "boleron", "isupport", "rsg", "smartpharmacy"],
-  ["stroy-alliance", "mindguard", "hus-estate", "emblema", "oikia", "osmo", "vidos"],
+  ["stroy-alliance", "imotalert", "plasico", "palltex", "boleron", "isupport", "vidos", "infinity"],
+  ["rsg", "mindguard", "hus-estate", "emblema", "oikia", "osmo", "smartpharmacy"],
 ];
 
 export function heroPartnerRows(): [Partner[], Partner[]] {
