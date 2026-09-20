@@ -75,6 +75,7 @@ export const PARTNERS: Partner[] = [
     id: "isupport",
     light: "isupport_logo_light.png",
     dark: "isupport_logo_dark.png",
+    href: "https://isupport.lu/",
     ariaLabel: "iSupport",
   },
   {
