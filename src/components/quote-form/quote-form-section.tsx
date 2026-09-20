@@ -384,7 +384,8 @@ export function QuoteFormSection({
                           alt={social.alt}
                           width={256}
                           height={256}
-                          sizes="40px"
+                          // The lossless PNG at its native size (see the footer): the optimizer's small WebP read blurry.
+                          unoptimized
                           className="size-10 shrink-0 object-contain opacity-90 transition-opacity hover:opacity-100"
                         />
                       </a>

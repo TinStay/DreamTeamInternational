@@ -50,7 +50,8 @@ function SocialIcon({
       alt={alt}
       width={256}
       height={256}
-      sizes="48px"
+      // The lossless 256px PNG, downsampled once by the browser: the optimizer's small lossy WebP read blurry.
+      unoptimized
       // `shrink-0` + `object-contain`: never let the flex row squash the square.
       className="h-10 w-10 shrink-0 object-contain opacity-90 transition-all group-hover:opacity-100 sm:h-12 sm:w-12"
     />

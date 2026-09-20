@@ -20,4 +20,11 @@ export const SOCIAL_LINKS = [
     src: "/social_media_icons/youtube.png",
     alt: "YouTube",
   },
+  {
+    // The profile URL without the share dialog's tracking query (`is_from_webapp`, `sender_device`) - it is
+    // also the organization's `sameAs` and the llms.txt profile line, where the clean address is what counts.
+    href: "https://www.tiktok.com/@dreamteam.video.a",
+    src: "/social_media_icons/tiktok.png",
+    alt: "TikTok",
+  },
 ] as const;

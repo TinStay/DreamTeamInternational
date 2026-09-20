@@ -105,7 +105,8 @@ export function Footer() {
                   aria-label={s.alt}
                   className="inline-flex shrink-0 transition-transform duration-200 ease-out hover:-translate-y-0.5 hover:scale-110"
                 >
-                  <Image src={s.src} alt="" width={256} height={256} sizes="32px" className="size-8 object-contain opacity-90 transition-opacity hover:opacity-100" />
+                  {/* `unoptimized`: the icons are tiny hard-edged shapes - the optimizer's 32px lossy WebP, resampled again for the screen, read blurry; the 256px lossless PNG downsampled once by the browser is crisp at any pixel ratio. */}
+                  <Image src={s.src} alt="" width={256} height={256} unoptimized className="size-8 object-contain opacity-90 transition-opacity hover:opacity-100" />
                 </a>
               ))}
             </div>
