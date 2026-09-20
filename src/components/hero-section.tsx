@@ -71,9 +71,13 @@ export function HeroSection() {
         <div className="hero-wash pointer-events-none absolute inset-0 z-[2]" aria-hidden />
       </div>
 
-      {/* Copy block - centred, bottom of the viewport, above the partners strip. Journey parts (home): the headline
-          is the "title" (leaves first as the page scrolls on), subtitle + CTAs and the partners strip follow. */}
-      <div className="relative z-20 mx-auto flex w-full max-w-7xl flex-1 flex-col items-center justify-end px-4 pt-28 pb-1 text-center sm:pt-32 sm:pb-2 lg:pb-3">
+      {/* Copy block - centred in the hero, vertically too: the column takes the room between the header and the
+          partners strip and centres the headline, the line and the CTAs in it (`justify-center`; they used to sit
+          `justify-end`, right on top of the logos - the client wanted them in the middle and the logos alone at the
+          bottom). The top padding is the header's lane, so the optical centre lands a little under the header.
+          Journey parts (home): the headline is the "title" (leaves first as the page scrolls on), subtitle + CTAs
+          and the partners strip follow. */}
+      <div className="relative z-20 mx-auto flex w-full max-w-7xl flex-1 flex-col items-center justify-center px-4 pt-28 pb-4 text-center sm:pt-32 sm:pb-6">
         <JourneyItem kind="title" className="flex w-full flex-col items-center">
         {/* The Plasico display style (Exo 2 bold, uppercase) - the client's pick for the page's big letters. */}
         <motion.p

@@ -7,25 +7,28 @@ import { cn } from "@/lib/utils";
 import type { CSSProperties } from "react";
 
 /*
- * Every logo renders at ONE fixed height - no width cap, no min-width: a cap shrank the wide wordmarks (Palltex, RSG,
- * Smart Pharmacy) to two thirds of the others' height, and the client wants the marks the same height. The width
- * then follows each file's aspect ratio, so the files in `public/company_icons/` are trimmed to their ink (no
- * transparent margins - `sharp` on the alpha bounding box; a padded file would render visibly shorter).
+ * Every logo renders at ONE fixed height (the client wants the marks the same height), the width following each
+ * file's aspect ratio - which is why the files in `public/company_icons/` are trimmed to their ink (no transparent
+ * margins - `sharp` on the alpha bounding box; a padded file would render visibly shorter). One exception: a width cap
+ * of ~4.2x the height, so the widest wordmarks (Palltex 5.4:1, RSG 5.9:1, the dark Infinity, Oikia, Smart Pharmacy)
+ * do not dominate the row - those few render a little shorter, everything else at the full height. No min-width.
  */
 // The marquee rows (below lg): the hovered logo grows a good step, smoothly (the row itself pauses - see the track).
 const imgClass =
-  "h-8 w-auto object-contain transition-transform duration-300 ease-out group-hover:scale-125 sm:h-9 md:h-10";
+  "h-8 max-w-[145px] w-auto object-contain transition-transform duration-300 ease-out group-hover:scale-125 sm:h-9 sm:max-w-[163px] md:h-10 md:max-w-[181px]";
 
-// Static rows (lg+): a step smaller again (the client's ask) - 28px on a 1024px laptop, where the wider row (the dark
-// theme's files are the wide ones) measures ~880px with its margins, 32px from xl and 36px from 2xl.
+// Static rows (lg+): a step smaller again (the client's ask) - 30px on a 1024px laptop (`--spacing` is 0.27rem here,
+// so h-7 is 30px), 35px from xl and 39px from 2xl; the caps are 4.2x those.
 const staticImgClass =
-  "h-7 w-auto object-contain transition-transform duration-300 ease-out group-hover:scale-125 xl:h-8 2xl:h-9";
+  "h-7 max-w-[126px] w-auto object-contain transition-transform duration-300 ease-out group-hover:scale-125 xl:h-8 xl:max-w-[144px] 2xl:h-9 2xl:max-w-[162px]";
 
 const innerClass =
-  "group mx-2.5 flex shrink-0 items-center justify-center md:mx-3.5 cursor-pointer opacity-80 hover:opacity-100 transition-opacity py-1.5";
+  "group mx-3.5 flex shrink-0 items-center justify-center md:mx-5 cursor-pointer opacity-80 hover:opacity-100 transition-opacity py-1.5";
 
+// The gap scales with the viewport (1.7vw a side, 12-36px) so the rows spread across the desktop width: with the caps
+// the wider row is ~960px at 1024, ~1130px at 1366 and ~1370px at 1920 - one line everywhere, with air between.
 const staticInnerClass =
-  "group mx-2.5 flex shrink-0 items-center justify-center xl:mx-3 2xl:mx-3.5 cursor-pointer opacity-80 hover:opacity-100 transition-opacity py-1.5";
+  "group mx-[clamp(0.75rem,1.7vw,2.25rem)] flex shrink-0 items-center justify-center cursor-pointer opacity-80 hover:opacity-100 transition-opacity py-1.5";
 
 /** One full loop of the row (the logo list is rendered twice, so this is the time for one set to pass). */
 const MARQUEE_DURATION_SEC = 70;
