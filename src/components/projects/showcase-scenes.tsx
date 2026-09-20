@@ -245,14 +245,16 @@ function EmblemaVisual({ t, framesEnabled }: SceneVisualProps) {
               split
               className="absolute inset-0 [--split-gap:-10%] lg:drop-shadow-[0_12px_22px_rgba(30,27,23,0.18)] lg:[--split-gap:18%]"
             />
-            {buildings.map((building, i) => (
+            {/* The towers' names, one under each - only while both are named: with District Living parked the lone
+                ERIA label sat centred under the copy's CTA and read as a caption for the whole scene (the client
+                asked for it gone); the pair returns with the second `buildings` entry. */}
+            {(buildings.length === 2 ? buildings : []).map((building, i) => (
               <motion.div
                 key={building.name}
                 className={cn(
                   // Under each tower - desktop only; on phones the towers are small and the labels would crowd them.
                   "absolute top-[94%] hidden -translate-x-1/2 flex-col items-center gap-1.5 text-center lg:flex",
-                  // One label (ERIA alone, while District Living is parked) sits under the middle of the two towers.
-                  buildings.length === 1 ? "left-1/2" : i === 0 ? "left-[5%]" : "left-[91%]"
+                  i === 0 ? "left-[5%]" : "left-[91%]"
                 )}
                 style={{ opacity: labelK, y: labelY }}
               >
