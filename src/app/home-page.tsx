@@ -48,8 +48,9 @@ export function HomePage() {
             showcase below (sticky stage, full-screen clip per project); the
             filterable list lives on /projects. It overlaps the wizard's tail like
             a journey scene, so its cinema headline is already rising while the
-            wizard's parts leave (plain flow under reduced motion). */}
-        <div className="relative -mt-[45svh] motion-reduce:mt-0">
+            wizard's parts leave (plain flow under reduced motion, and on phones -
+            the wizard is a plain section there, so nothing may cover its tail). */}
+        <div className="relative -mt-[45svh] max-md:mt-0 motion-reduce:mt-0">
           <ProjectsShowcase />
         </div>
 

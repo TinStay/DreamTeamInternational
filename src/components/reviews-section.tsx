@@ -8,6 +8,7 @@ import { InfiniteSlider } from "@/components/ui/infinite-slider";
 import { AVATAR_SHAPES, Testimonial } from "@/components/ui/testimonial";
 import { JourneyItem, useJourney, type JourneySide } from "@/components/ui/scroll-journey";
 import { useScrollEased } from "@/lib/smooth-scroll";
+import { PHONE_QUERY, useMediaQuery } from "@/lib/use-media-query";
 import { cn } from "@/lib/utils";
 
 const COLUMN_DURATIONS = [55, 75, 62];
@@ -143,6 +144,8 @@ export function ReviewsSection({ className }: { className?: string }) {
   const { t } = useLanguage();
   const r = t.reviews;
   const journey = useJourney();
+  // Phones (plain flow, no journey): every card stacked - readable, nothing moving.
+  const phone = useMediaQuery(PHONE_QUERY);
 
   // Split across however many columns are actually visible, so every review
   // is shown at every breakpoint (a fixed 3-way split would hide two thirds
@@ -178,10 +181,32 @@ export function ReviewsSection({ className }: { className?: string }) {
     >
       {journey ? (
         <ReviewConveyor items={items} heading={heading} />
+      ) : phone ? (
+        <>
+          {heading}
+          {/* The same compact cards as the conveyor's phone grid, the same 2.5rem apart (the next card's avatar hangs
+              1.75rem above its card), in plain flow. */}
+          <div className="mx-auto grid w-[calc(100%-1.25rem)] max-w-7xl grid-cols-1 gap-10 pt-4">
+            {items.map((review, index) => (
+              <Testimonial
+                key={review.name}
+                name={review.name}
+                role={review.role}
+                text={review.text}
+                rating={review.rating}
+                initials={review.initials}
+                color={review.color}
+                shape={AVATAR_SHAPES[index % AVATAR_SHAPES.length]}
+                compact
+                className="w-full max-w-none"
+              />
+            ))}
+          </div>
+        </>
       ) : (
         <>
           {heading}
-          {/* Elsewhere (reduced motion): vertically scrolling review columns (paused on hover). */}
+          {/* Elsewhere (reduced motion, tablets and up outside the journey): vertically scrolling review columns (paused on hover). */}
           <div className="mx-auto flex max-h-[44rem] w-full max-w-7xl justify-center gap-6 overflow-hidden px-4 [mask-image:linear-gradient(to_bottom,transparent,black_15%,black_85%,transparent)]">
             {columns.map((column, columnIndex) => (
               <JourneyItem

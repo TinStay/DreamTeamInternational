@@ -22,7 +22,7 @@ import {
   Reveal,
   ParallaxLayer,
 } from "@/components/projects/showcase-primitives";
-import { useScenePager } from "@/components/projects/scene-pager";
+import { cutTo, useScenePager } from "@/components/projects/scene-pager";
 import { sceneVisualFor, type MorphTarget } from "@/components/projects/showcase-scenes";
 import {
   OSMO_COPY_FADE,
@@ -36,7 +36,7 @@ import {
 } from "@/components/projects/showcase-timeline";
 import { ButtonWithIcon } from "@/components/ui/button-with-icon";
 import { useLanguage } from "@/lib/i18n/language-context";
-import { useMediaQuery } from "@/lib/use-media-query";
+import { PHONE_QUERY, useMediaQuery } from "@/lib/use-media-query";
 import { PARTNERS, PARTNER_ICON_BASE } from "@/lib/partners";
 import { SHOWCASE_PROJECTS, type Project } from "@/lib/projects";
 import { projectPath } from "@/lib/routes";
@@ -723,6 +723,8 @@ export function ProjectsShowcase({ className }: { className?: string }) {
   // Phones page scene by scene (`useScenePager`) and hand over early, so a page is mostly the hand-over itself.
   const phone = useMediaQuery("(max-width: 1023px) and (pointer: coarse)");
   const hold = phone ? SHOWCASE_HOLD_MOBILE : HOLD;
+  // Below md a page is a cut, not a tween: the client wants the reels feel without the animation on phones.
+  const instant = useMediaQuery(PHONE_QUERY);
   const sectionRef = useRef<HTMLElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
   // The stage's stops for the phone pager: the intro, then each scene framed - the same positions as the snap stops.
@@ -733,7 +735,7 @@ export function ProjectsShowcase({ className }: { className?: string }) {
     const top = section.getBoundingClientRect().top + window.scrollY;
     return [top, ...PROJECTS.map((_, index) => scrollTargetFor(section, stage, index))];
   }, []);
-  useScenePager(phone && !reduceMotion, stops);
+  useScenePager(phone && !reduceMotion, stops, { instant });
   const [active, setActive] = useState(0);
   /** Scenes that keep a player mounted: the framed one, the previous one while it is still leaving, and the next one from 10% into the hold. */
   const [mounted, setMounted] = useState<number[]>([0, 1]);
@@ -795,12 +797,18 @@ export function ProjectsShowcase({ className }: { className?: string }) {
   });
   const furnitureVisibility = useTransform(furnitureOpacity, (v) => (v <= 0.001 ? "hidden" : "visible"));
 
-  const jumpTo = useCallback((index: number) => {
-    const section = sectionRef.current;
-    const stage = stageRef.current;
-    if (!section || !stage) return;
-    scrollToY(scrollTargetFor(section, stage, index));
-  }, []);
+  const jumpTo = useCallback(
+    (index: number) => {
+      const section = sectionRef.current;
+      const stage = stageRef.current;
+      if (!section || !stage) return;
+      const target = scrollTargetFor(section, stage, index);
+      // Phones: the rail jumps the way a swipe pages - one swap, not a scroll through every hand-over between.
+      if (phone && instant) cutTo(target);
+      else scrollToY(target);
+    },
+    [phone, instant]
+  );
 
   if (reduceMotion) {
     return (
@@ -843,8 +851,9 @@ export function ProjectsShowcase({ className }: { className?: string }) {
             style={{ top: `${((((INTRO + (index + SCENE_FRAMED) * SPAN) / UNITS) * (UNITS - 1)) * 100).toFixed(3)}svh` }}
           />
         ))}
-        {/* Transparent stage: the page background shows through the intro and between scenes. */}
-        <div ref={stageRef} className="ph-no-capture sticky top-0 h-[100svh] overflow-clip">
+        {/* Transparent stage: the page background shows through the intro and between scenes. Named for the phone
+            pager's swap (`cutTo`, the `::view-transition-*` rules in globals.css). */}
+        <div ref={stageRef} className="ph-no-capture sticky top-0 h-[100svh] overflow-clip [view-transition-name:projects-stage]">
           {/* The cinema (under the headline and the scenes): the pool of light, the letterbox band widening a little
               as the intro plays, and the streak along its centre line - theme tokens, so it is as quiet on the
               off-white ground as on the dark one. */}

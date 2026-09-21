@@ -26,7 +26,7 @@ import {
 } from "motion/react";
 import { cn } from "@/lib/utils";
 import { useFlowProgress, useScrollEased } from "@/lib/smooth-scroll";
-import { useHydrated, useMediaQuery } from "@/lib/use-media-query";
+import { PHONE_QUERY, useHydrated, useMediaQuery } from "@/lib/use-media-query";
 import { usePagedHandover } from "@/components/ui/paged-handover";
 
 /*
@@ -78,6 +78,10 @@ import { usePagedHandover } from "@/components/ui/paged-handover";
  * Until the component has mounted (server HTML, no JS) the sections are plain
  * flow, no overlap; reduced motion keeps them that way and `JourneyItem`s
  * render plain (they also do outside any journey, e.g. on `/contact`).
+ * Phones (`PHONE_QUERY`, below `md`) stay plain too - no scenes, no canvas,
+ * no paged opening: the client wants the sections one under the other there
+ * (the projects stage keeps its own instant paging). One render path serves
+ * both modes, so the switch after hydration never remounts a section.
  */
 
 /**
@@ -297,6 +301,8 @@ export type JourneySceneProps = {
   hold?: number;
   /** Filled in by `ScrollJourney`: the reading room for a scene without its own `hold`. */
   holdDefault?: number;
+  /** Filled in by `ScrollJourney`: plain flow (phones) - the section as it is, no pin, no choreography. */
+  plain?: boolean;
 };
 
 /** Viewport box in px - the same numbers motion resolves its scroll offsets against. */
@@ -313,6 +319,7 @@ export function JourneyScene({
   index = 0,
   hold,
   holdDefault = HOLD,
+  plain = false,
 }: JourneySceneProps) {
   const ref = useRef<HTMLDivElement>(null);
   const registry = useContext(JourneyRegistryContext);
@@ -326,6 +333,8 @@ export function JourneyScene({
   const [height, setHeight] = useState(0);
   const [parked, setParked] = useState(false);
   const reduceMotion = useReducedMotion();
+  // Plain flow: reduced motion, and phones (`plain`, from `ScrollJourney`).
+  const isPlain = reduceMotion || plain;
 
   // `travel`: the box's top going from the viewport bottom (its marker meets the bottom - the previous scene has
   // just pinned) up to the top of the viewport - the whole of it is the hand-over. (The markers' positions are
@@ -349,7 +358,7 @@ export function JourneyScene({
   // viewport is fully read before it stays behind; measured with a ResizeObserver (accordions, wrapping).
   useLayoutEffect(() => {
     const el = ref.current;
-    if (!el || reduceMotion) return;
+    if (!el || isPlain) return;
     const measure = () => {
       viewport.current = { w: document.documentElement.clientWidth, h: document.documentElement.clientHeight };
       setHeight(el.offsetHeight);
@@ -362,7 +371,7 @@ export function JourneyScene({
       observer.disconnect();
       window.removeEventListener("resize", measure);
     };
-  }, [reduceMotion]);
+  }, [isPlain]);
 
   // Eased up into place over the overlap stretch (exact - no spring - it must meet normal flow at the end).
   const y = useTransform(travel, (tr) =>
@@ -381,54 +390,59 @@ export function JourneyScene({
   // reaches the box only once its content shows.
   const pointerEvents = useTransform(opacity, (o) => (o < 0.5 ? "none" : "auto"));
 
-  // The marker refs must stay attached: `useFlowProgress` measures them.
-  if (reduceMotion) {
-    return (
-      <>
-        <div ref={startRef} className="h-0" aria-hidden />
-        <div ref={ref} className={className}>
-          {children}
-        </div>
-        <div ref={endRef} className="h-0" aria-hidden />
-      </>
-    );
-  }
   // A viewport (content centred in it) plus the reading room - the same numbers on the server and the client. A scene
   // that never leaves (the last one before the footer) needs none.
   const room = `${leaves ? Math.round((hold ?? holdDefault) * 100) : 0}svh`;
+  // One render path for the plain and the choreographed mode (the same element, the same provider), so a switch after
+  // hydration - the phone query resolves on the first client render - never remounts the section inside. In plain
+  // flow the box is the section as it is: no pin, no overlap, no transforms, a null context (`JourneyItem`s render
+  // plain), and no `data-journey-scene` - the box is where it is, so `scrollToElement` takes its plain path. The
+  // marker refs stay attached either way: `useFlowProgress` measures them.
   return (
     <>
       <div ref={startRef} className="h-0" aria-hidden />
       <motion.div
         ref={ref}
         className={cn(
-          // pt-24 keeps an arriving scene's title clear of the floating header. Its own compositor layer, so the
-          // scroll-linked rise / fade never repaints the whole section.
-          "relative flex flex-col justify-center pt-24 will-change-[transform,opacity] [--journey-dock:5rem] lg:[--journey-dock:0px]",
-          height > 0 && "sticky",
+          !isPlain && [
+            // pt-24 keeps an arriving scene's title clear of the floating header. Its own compositor layer, so the
+            // scroll-linked rise / fade never repaints the whole section.
+            "relative flex flex-col justify-center pt-24 will-change-[transform,opacity] [--journey-dock:5rem] lg:[--journey-dock:0px]",
+            height > 0 && "sticky",
+          ],
           className
         )}
-        style={{
-          minHeight: `calc(100svh + ${room})`,
-          paddingBottom: room,
-          top: `calc(100svh - var(--journey-dock) - ${height}px)`,
-          marginTop: mounted && overlap ? `${-overlapBy * 100}svh` : 0,
-          y,
-          opacity,
-          pointerEvents,
-        }}
-        inert={parked ? true : undefined}
+        style={
+          isPlain
+            ? // Explicit resets, not an absent `style`: motion does not unset a value that merely disappears.
+              PLAIN_STYLE
+            : {
+                minHeight: `calc(100svh + ${room})`,
+                paddingBottom: room,
+                top: `calc(100svh - var(--journey-dock) - ${height}px)`,
+                marginTop: mounted && overlap ? `${-overlapBy * 100}svh` : 0,
+                y,
+                opacity,
+                pointerEvents,
+              }
+        }
+        inert={!isPlain && parked ? true : undefined}
         // For `scrollToElement`: a scene's flow position is its start marker's (the previous sibling) less this
         // overlap (a viewport fraction) - the box's own rect is wherever it is pinned.
-        data-journey-scene=""
-        data-journey-overlap={mounted && overlap ? overlapBy : 0}
+        data-journey-scene={isPlain ? undefined : ""}
+        data-journey-overlap={!isPlain && mounted && overlap ? overlapBy : 0}
       >
-        <JourneyContext.Provider value={{ enter, leave, travel, within, lead: isFirst }}>{children}</JourneyContext.Provider>
+        <JourneyContext.Provider value={isPlain ? null : { enter, leave, travel, within, lead: isFirst }}>
+          {children}
+        </JourneyContext.Provider>
       </motion.div>
       <div ref={endRef} className="h-0" aria-hidden />
     </>
   );
 }
+
+/** The scene box in plain flow - every choreographed value explicitly at rest. */
+const PLAIN_STYLE = { minHeight: 0, paddingBottom: 0, top: "auto", marginTop: 0, y: 0, opacity: 1, pointerEvents: "auto" } as const;
 
 export type ScrollJourneyProps = {
   children: ReactNode;
@@ -478,6 +492,8 @@ export function ScrollJourney({
   // real value - the scenes re-measure their markers when `overlapBy` changes.
   const isMobile = useMediaQuery(MOBILE_QUERY);
   const pacing = isMobile && mobile ? { overlap: mobile.overlap ?? overlap, hold: mobile.hold ?? HOLD } : { overlap, hold: HOLD };
+  // Phones: plain flow - the scenes as plain sections, no canvas, no paged opening (see the note above).
+  const phone = useMediaQuery(PHONE_QUERY);
   const scenes = Children.toArray(children).filter((child): child is ReactElement<JourneySceneProps> =>
     isValidElement(child)
   );
@@ -496,7 +512,7 @@ export function ScrollJourney({
     const end = marker.getBoundingClientRect().top + window.scrollY - overlapBy * window.innerHeight;
     return end > start ? [start, end] : null;
   }, []);
-  usePagedHandover(pageFirst, firstHandover);
+  usePagedHandover(pageFirst && !phone, firstHandover);
   // The scenes' arrivals summed (scene k fully in at k + 1) ... The sum is taken on the NEXT frame's pre-update
   // step, before anything derived from it is recomputed: an arrival changes in the pre-render step (it is derived
   // from the scroll), and a value derived from the sum that has already been recomputed in that step would not be
@@ -534,7 +550,7 @@ export function ScrollJourney({
   // The canvas is up as soon as the prelude has begun and gone once the tail has cleared the fold.
   const canvasOpacity = useTransform([approach, exit], ([q, e]: number[]) => clamp01(q / 0.3) * (1 - e));
   const backdrops = scenes.map((scene) => scene.props.backdrop);
-  const hasBackdrop = backdrops.some(Boolean) || Boolean(morph);
+  const hasBackdrop = !phone && (backdrops.some(Boolean) || Boolean(morph));
   // flow-root: a scene's negative margin must not collapse through to the container (it would move the markers).
   // z-10: level with the showcase, so a scene held over its tail paints on top.
   return (
@@ -553,6 +569,7 @@ export function ScrollJourney({
             leaves: leaveLast || index < scenes.length - 1,
             overlapBy: scene.props.pace?.overlap ?? pacing.overlap,
             holdDefault: pacing.hold,
+            plain: phone,
           })
         )}
         <div ref={tailRef} className="h-0" aria-hidden />
