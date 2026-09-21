@@ -381,8 +381,17 @@
   [inert] .animate-float,
   [data-offstage] .animate-showcase-rise,
   [data-offstage] .animate-showcase-breathe,
-  [data-offstage] .animate-float {
+  [data-offstage] .animate-float,
+  [data-offstage] .animate-marquee-x {
     animation-play-state: paused;
+  }
+  /**
+   * A still world (the phones' stacked projects, `data-still` on the block) has no motion at all: the glows and the
+   * ghost mark stand where they are (the particles are not rendered there in the first place).
+   */
+  [data-still] .animate-showcase-breathe,
+  [data-still] .animate-float {
+    animation: none;
   }
 
   /**
@@ -824,5 +833,6 @@ body.service-modal-open .service-mobile-dock {
     -ms-transform: translateY(-50%);
     transform: translateY(-50%);
   }
+
 
 

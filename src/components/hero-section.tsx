@@ -1,6 +1,7 @@
 "use client";
 
-import { motion } from "motion/react";
+import { useRef } from "react";
+import { motion, useInView } from "motion/react";
 import Link from "next/link";
 import { IconArrowRight } from "@tabler/icons-react";
 import { buttonVariants } from "@/components/ui/button";
@@ -25,6 +26,12 @@ const HERO_GLOW_LAYERS = [
 
 export function HeroSection() {
   const { t, language } = useLanguage();
+  const ref = useRef<HTMLElement>(null);
+  // The film is only mounted while the hero is within 1.5 viewports (`initial` true: it is in the server HTML and
+  // starts at once) - a player scrolled far off screen keeps decoding under the whole page otherwise; and off screen
+  // the partners' marquees pause (`data-offstage`, globals.css).
+  const near = useInView(ref, { margin: "150% 0px 150% 0px", initial: true });
+  const onScreen = useInView(ref, { initial: true });
   // The primary CTA jumps to the service cards (the quote wizard's first step), the second to the projects stage.
   const quoteHref = `${homePath(language)}#quote`;
   const projectsHref = `${homePath(language)}#projects`;
@@ -40,7 +47,9 @@ export function HeroSection() {
         the page colour of each theme (white / the dark slate #020617), so the hero's solid bottom melts into the page. */}
     <section
       id="hero"
+      ref={ref}
       className="relative z-10 flex min-h-[100svh] flex-col overflow-hidden shadow-[0_28px_60px_-18px_rgba(255,255,255,0.6)] dark:shadow-[0_34px_80px_-20px_rgba(2,6,23,0.9)]"
+      data-offstage={onScreen ? undefined : ""}
     >
       {/* Keyword-rich H1 for search engines / AI answer engines; the visual
           headline below is decorative and demoted to a paragraph. */}
@@ -50,15 +59,17 @@ export function HeroSection() {
           and cover-fit to it (no extra zoom or crop: unlike the old YouTube embed there is no player chrome to hide). */}
       <div className="absolute inset-0 z-0 overflow-hidden">
         <div className="pointer-events-none absolute inset-0 overflow-hidden">
-          <iframe
-            className="absolute left-1/2 top-1/2 h-[100svh] w-[177.78svh] min-h-[56.25vw] min-w-[100vw] -translate-x-1/2 -translate-y-1/2"
-            src={bunnyBackgroundEmbedSrc(HERO_VIDEO)}
-            title="DreamTeam hero video"
-            tabIndex={-1}
-            allow={YOUTUBE_IFRAME_ALLOW}
-            allowFullScreen={false}
-            referrerPolicy={YOUTUBE_REFERRER_POLICY}
-          />
+          {near ? (
+            <iframe
+              className="absolute left-1/2 top-1/2 h-[100svh] w-[177.78svh] min-h-[56.25vw] min-w-[100vw] -translate-x-1/2 -translate-y-1/2"
+              src={bunnyBackgroundEmbedSrc(HERO_VIDEO)}
+              title="DreamTeam hero video"
+              tabIndex={-1}
+              allow={YOUTUBE_IFRAME_ALLOW}
+              allowFullScreen={false}
+              referrerPolicy={YOUTUBE_REFERRER_POLICY}
+            />
+          ) : null}
           {/* A soft vignette toward the edges, so the copy and the partners strip sit on calmer footage. */}
           <div
             className="pointer-events-none absolute inset-0 z-[0.5] bg-[radial-gradient(ellipse_52%_50%_at_50%_50%,transparent_22%,rgba(0,0,0,0.16)_50%,rgba(0,0,0,0.38)_100%)]"

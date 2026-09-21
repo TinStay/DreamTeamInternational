@@ -339,15 +339,17 @@ export function JourneyScene({
   // `travel`: the box's top going from the viewport bottom (its marker meets the bottom - the previous scene has
   // just pinned) up to the top of the viewport - the whole of it is the hand-over. (The markers' positions are
   // measured once, not per frame - `useFlowProgress`.)
-  const travel = useFlowProgress(startRef, (top, _h, vh) => [top - vh, top - overlapBy * vh], [overlapBy]);
+  // Inert in plain flow (`enabled` false): nothing below is read there, and the springs it would feed must not run
+  // on every scrolled frame for nothing.
+  const travel = useFlowProgress(startRef, (top, _h, vh) => [top - vh, top - overlapBy * vh], [overlapBy], !isPlain);
   // The box's bottom doing the same - which is exactly the next scene's hand-over.
-  const leaving = useFlowProgress(endRef, (top, _h, vh) => [top - vh, top - overlapBy * vh], [overlapBy]);
+  const leaving = useFlowProgress(endRef, (top, _h, vh) => [top - vh, top - overlapBy * vh], [overlapBy], !isPlain);
   const never = useMotionValue(0);
   // Raw scroll values straight into the easing (both progresses are already clamped 0 → 1): a derived value in
   // between would be recomputed in the same frame step as the easing and could leave it a frame behind.
   const cover = leaves ? leaving : never;
   // The scene's own scroll: its box top at the viewport top (end marker at `height`) → its bottom pinned.
-  const within = useFlowProgress(endRef, (top, _h, vh) => [top - Math.max(height, 1), top - vh], [height]);
+  const within = useFlowProgress(endRef, (top, _h, vh) => [top - Math.max(height, 1), top - vh], [height], !isPlain);
   const enter = useScrollEased(travel, useSpring(travel, SPRING));
   const leave = useScrollEased(cover, useSpring(cover, SPRING));
 
@@ -543,8 +545,8 @@ export function ScrollJourney({
   // `exit` 0 → 1 as the tail marker rises from the fold to mid-viewport (the footer coming up under the last scene).
   const headRef = useRef<HTMLDivElement>(null);
   const tailRef = useRef<HTMLDivElement>(null);
-  const approach = useFlowProgress(headRef, (top, _h, vh) => [top - (1 + Math.max(prelude, 0.01)) * vh, top - vh], [prelude]);
-  const exit = useFlowProgress(tailRef, (top, _h, vh) => [top - vh, top - 0.5 * vh]);
+  const approach = useFlowProgress(headRef, (top, _h, vh) => [top - (1 + Math.max(prelude, 0.01)) * vh, top - vh], [prelude], !phone);
+  const exit = useFlowProgress(tailRef, (top, _h, vh) => [top - vh, top - 0.5 * vh], [], !phone);
   // Continuous journey position: -1 → 0 over the prelude, then the arrivals.
   const position = useTransform([arrived, approach], ([sum, q]: number[]) => sum + q - 1);
   // The canvas is up as soon as the prelude has begun and gone once the tail has cleared the fold.

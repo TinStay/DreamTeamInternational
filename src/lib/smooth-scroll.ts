@@ -1,5 +1,5 @@
 import { useEffect, useRef, type RefObject } from "react";
-import { useMotionValue, useScroll, useTransform, type MotionValue } from "motion/react";
+import { motionValue, scrollInfo, useMotionValue, useTransform, type MotionValue } from "motion/react";
 import type Lenis from "lenis";
 
 /*
@@ -103,14 +103,17 @@ function useSmoothScrollDriven(): MotionValue<number> {
  * two scroll positions (px) the progress runs between; motion's `["start end", "start 0.7"]` reads
  * `[top - vh, top - 0.7 * vh]`, `["start start", "end end"]` `[top, top + height - vh]`. `deps` re-measure when the
  * range's inputs change. Only for elements in flow: a pinned box's own position moves with the pin - read its flow
- * markers instead.
+ * markers instead. `enabled` false makes it inert - a constant 0 that never notifies, so nothing derived from it
+ * (transforms, springs) runs on a scroll: the journey's plain mode on phones, where the choreography it would feed
+ * is never read.
  */
 export function useFlowProgress(
   ref: RefObject<HTMLElement | null>,
   range: (top: number, height: number, vh: number) => [number, number],
-  deps: readonly unknown[] = []
+  deps: readonly unknown[] = [],
+  enabled = true
 ): MotionValue<number> {
-  const { scrollY } = useScroll();
+  const scrollY = useWindowScrollY();
   const ends = useRef<[number, number]>([0, 0]);
   const tick = useMotionValue(0);
   const rangeRef = useRef(range);
@@ -118,6 +121,7 @@ export function useFlowProgress(
     rangeRef.current = range;
   });
   useEffect(() => {
+    if (!enabled) return;
     const measure = () => {
       const el = ref.current;
       if (!el) return;
@@ -134,12 +138,29 @@ export function useFlowProgress(
       observer?.disconnect();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps -- `deps` are the range's inputs, re-measured on change.
-  }, [ref, tick, ...deps]);
+  }, [ref, tick, enabled, ...deps]);
   return useTransform([scrollY, tick], ([y]: number[]) => {
+    if (!enabled) return 0;
     const [a, b] = ends.current;
     if (a === b) return 0;
     return Math.min(1, Math.max(0, (y - a) / (b - a)));
   });
+}
+
+/**
+ * The page's scroll offset as one MotionValue for everyone. motion's `useScroll()` registers a handler of its own
+ * per call - six DOM reads, an update and four notifications on every scrolled frame - and the home page had two
+ * dozen of them through `useFlowProgress` alone. One `scrollInfo` subscription feeds them all: created on first
+ * use in the browser (a constant 0 on the server), never torn down - it is the document's.
+ */
+let windowScrollY: MotionValue<number> | null = null;
+function useWindowScrollY(): MotionValue<number> {
+  if (!windowScrollY) {
+    const value = motionValue(typeof window === "undefined" ? 0 : window.scrollY);
+    if (typeof window !== "undefined") scrollInfo((info) => value.set(info.y.current));
+    windowScrollY = value;
+  }
+  return windowScrollY;
 }
 
 /**

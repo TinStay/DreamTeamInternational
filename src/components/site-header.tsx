@@ -148,10 +148,15 @@ export function SiteHeader() {
   const trainingCards = useTrainingCards();
 
   useEffect(() => {
+    // State only when the flag flips - a set on every scroll event scheduled React work per event for nothing.
+    let scrolled = false; // mirrors the state
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
+      const next = window.scrollY > 20;
+      if (next === scrolled) return;
+      scrolled = next;
+      setIsScrolled(next);
     };
-    window.addEventListener("scroll", handleScroll);
+    window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { type ComponentType } from "react";
+import { createContext, useContext, type ComponentType } from "react";
 import Image from "next/image";
 import { motion, useTransform, type MotionValue } from "motion/react";
 import { ProjectThumbnail } from "@/components/projects-section";
@@ -11,6 +11,7 @@ import {
   FrameSequence,
   ParallaxLayer,
   ProjectEmbedCover,
+  ProjectVideoCover,
   Reveal,
   Sparks,
 } from "@/components/projects/showcase-primitives";
@@ -38,9 +39,33 @@ export type SceneVisualProps = {
   shouldMount: boolean;
   /** Frame sequences start downloading once the section is near the viewport. */
   framesEnabled: boolean;
-  /** The world stands at `t` for good (the phones' stacked sections): a frame sequence loads its one frame only. */
+  /**
+   * The world stands at `t` for good (the phones' stacked sections): a frame sequence loads its one frame only, no
+   * particles, the film a native video that mounts and plays by `StillFilmContext`.
+   */
   still?: boolean;
 };
+
+/**
+ * What a still world's film needs from its block - mounted while the block is on stage, playing while it is mostly
+ * on screen - handed down as context rather than props, so the flips re-render the film alone and never the world
+ * around it (a world is a few hundred elements, and the stack's worlds are memoised on their stable props).
+ */
+export const StillFilmContext = createContext<{ mount: boolean; playing: boolean }>({ mount: true, playing: true });
+
+/**
+ * A world's film in its frame: on the stage the embed, mounted per `shouldMount`; in a still world a native video
+ * (one playing at a time), mounted and played per `StillFilmContext`.
+ */
+function Film({ project, boxAspect, still, shouldMount, className }: Pick<SceneVisualProps, "project" | "still" | "shouldMount"> & { boxAspect: number; className?: string }) {
+  const block = useContext(StillFilmContext);
+  if (still ? !block.mount : !shouldMount) return null;
+  return still ? (
+    <ProjectVideoCover project={project} playing={block.playing} boxAspect={boxAspect} className={className} />
+  ) : (
+    <ProjectEmbedCover project={project} boxAspect={boxAspect} className={className} />
+  );
+}
 
 /**
  * Target of the shared morph overlay while this scene is framed - one shape
@@ -232,6 +257,7 @@ function EmblemaVisual({ t, framesEnabled, still }: SceneVisualProps) {
             <div className="absolute left-[6%] top-[58%] h-[90%] w-[60%] -translate-x-1/2 -translate-y-1/2 rounded-full" style={{ background: goldGlow }} />
             <div className="absolute left-[89%] top-[58%] h-[90%] w-[60%] -translate-x-1/2 -translate-y-1/2 rounded-full" style={{ background: goldGlow }} />
             <Sparks
+              still={still}
               colors={["#F0D89A", "#C9A45C"]}
               count={22}
               region={{ left: [-12, 112], top: [40, 90] }}
@@ -321,7 +347,7 @@ function MindguardShownTo() {
  * (its width capped by the viewport height, so it never meets the compact
  * copy block anchored at the bottom) and the glow / wave move up with it.
  */
-function MindguardVisual({ t, project, shouldMount }: SceneVisualProps) {
+function MindguardVisual({ t, project, shouldMount, still }: SceneVisualProps) {
   const { t: dict } = useLanguage();
   const ringK = useTransform(t, (v) => easeOut(clamp01((v + 0.45) / 0.35)));
   const ringScale = useTransform(ringK, (v) => 0.6 + 0.4 * v);
@@ -395,7 +421,7 @@ function MindguardVisual({ t, project, shouldMount }: SceneVisualProps) {
         style={{ backgroundColor: MINDGUARD.teal, boxShadow: "0 0 10px rgba(125,222,210,.9)", left: dotLeft, opacity: dotOpacity }}
         aria-hidden
       />
-      <Sparks colors={["#F4F7FB", MINDGUARD.teal]} count={26} region={{ left: [8, 92], top: [30, 95] }} size={1.5} />
+      <Sparks colors={["#F4F7FB", MINDGUARD.teal]} count={26} region={{ left: [8, 92], top: [30, 95] }} size={1.5} still={still} />
       {/* Right column (60%): the Mindguard mark above the tablet frame, both pinned bottom-right on desktop. */}
       <ParallaxLayer t={t} depth={-0.12} rotate={-2} className="pointer-events-none">
         <motion.div
@@ -409,7 +435,7 @@ function MindguardVisual({ t, project, shouldMount }: SceneVisualProps) {
             <div className="absolute inset-[2.6%] overflow-hidden rounded-2xl" style={{ backgroundColor: "#070F22" }}>
               <ProjectThumbnail project={project} alt={dict.projects.items[project.id].name} sizes="(max-width: 1024px) 84vw, 680px" />
               {/* The stage's clip (MindGuard's UI/UX film on Bunny - `showcaseClip`). */}
-              {shouldMount ? <ProjectEmbedCover project={project} boxAspect={16 / 10.4} /> : null}
+              <Film project={project} boxAspect={16 / 10.4} still={still} shouldMount={shouldMount} />
             </div>
             <span className="absolute left-1/2 top-[1.1%] size-1.5 -translate-x-1/2 rounded-full" style={{ backgroundColor: "#1B2E52" }} />
           </motion.div>
@@ -429,7 +455,7 @@ const PLASICO = { green: "#1FA22A", lime: "#5FBF2F", soft: "#D3ECC7" };
 // const PLASICO_WIDE_VIDEO: BunnyVideo | null = { library: "750681", id: "481d2093-0dc0-44db-bda4-4d562c20d8fe" };
 
 /** Desktop: copy (left, drawn by the showcase) · the wide film filling the rest of the row out to the right edge. */
-function PlasicoVisual({ t, project, shouldMount }: SceneVisualProps) {
+function PlasicoVisual({ t, project, shouldMount, still }: SceneVisualProps) {
   return (
     <>
       <div className="absolute inset-0 bg-white" />
@@ -448,7 +474,7 @@ function PlasicoVisual({ t, project, shouldMount }: SceneVisualProps) {
           style={{ background: "radial-gradient(closest-side, rgba(95,191,47,.38) 0%, rgba(95,191,47,.16) 45%, rgba(95,191,47,.04) 80%, transparent 100%)" }}
         />
       </ParallaxLayer>
-      <Sparks colors={[PLASICO.green, PLASICO.lime]} count={28} region={{ left: [4, 96], top: [10, 90] }} glow={8} />
+      <Sparks colors={[PLASICO.green, PLASICO.lime]} count={28} region={{ left: [4, 96], top: [10, 90] }} glow={8} still={still} />
       {/* Wide film ("Back to Work") - right of the copy, vertically centred and reaching the right margin on desktop
           (clear of the giant name along the bottom); under the copy on mobile. */}
       <ParallaxLayer t={t} depth={-0.12} rotate={-1.5} className="pointer-events-none">
@@ -457,7 +483,7 @@ function PlasicoVisual({ t, project, shouldMount }: SceneVisualProps) {
           style={{ backgroundColor: "#EAF6E6", boxShadow: "0 40px 100px rgba(31,162,42,.25)" }}
         >
           <ProjectThumbnail project={project} alt="" sizes="(max-width: 1024px) 88vw, 56vw" />
-          {shouldMount ? <ProjectEmbedCover project={project} boxAspect={16 / 9} /> : null}
+          <Film project={project} boxAspect={16 / 9} still={still} shouldMount={shouldMount} />
         </div>
       </ParallaxLayer>
     </>
@@ -469,7 +495,7 @@ function PlasicoVisual({ t, project, shouldMount }: SceneVisualProps) {
  * it leads the stack (logo, copy, video - `--pl-top`, its height `--pl-name`), the bar behind it there too
  * (`--pl-name-cy`).
  */
-function PlasicoOverlay({ t }: SceneVisualProps) {
+function PlasicoOverlay({ t, still }: SceneVisualProps) {
   return (
     <ParallaxLayer t={t} depth={0.3} dx={-0.12} className="pointer-events-none">
       <Image
@@ -478,7 +504,9 @@ function PlasicoOverlay({ t }: SceneVisualProps) {
         width={319}
         height={128}
         sizes="(max-width: 1024px) 60vw, 36vw"
-        loading="eager"
+        // Eager on the stage (a parked scene is hidden, and a lazy image in it would only start once it shows); in the
+        // phones' stack the world is in flow, so the browser can fetch it as it nears.
+        loading={still ? "lazy" : "eager"}
         // From lg the logo is sized by its height - 9.5vh, never over 6.5rem nor wider than the screen allows (7vw
         // of height ≈ 17.5vw of width) - so it always stays under the copy block's CTA, whose bottom sits at about
         // 83vh (36vw of width used to run up into it on a short, wide screen).
@@ -503,7 +531,7 @@ const OSMO_MARK_WHITE = "/company_icons/osmo_logo_dark.png";
  * itself over (`journeyMorph`, the same spot and size), then the white world
  * dissolves under it and the circle slides on into the stats' ring.
  */
-function OsmoVisual({ t, project, shouldMount }: SceneVisualProps) {
+function OsmoVisual({ t, project, shouldMount, still }: SceneVisualProps) {
   const { t: dict } = useLanguage();
   return (
     <>
@@ -512,7 +540,7 @@ function OsmoVisual({ t, project, shouldMount }: SceneVisualProps) {
         className="pointer-events-none absolute inset-0 opacity-[0.05] [background-image:linear-gradient(#111_1px,transparent_1px),linear-gradient(90deg,#111_1px,transparent_1px)] [background-size:56px_56px]"
         aria-hidden
       />
-      <Sparks colors={[OSMO.deep, OSMO.green]} count={18} region={{ left: [34, 92], top: [10, 92] }} />
+      <Sparks colors={[OSMO.deep, OSMO.green]} count={18} region={{ left: [34, 92], top: [10, 92] }} still={still} />
       {/* The copy circle: layered radial highlight, a fine dot pattern, a concentric hairline and a deep soft shadow.
           Below lg: centred, its top edge just under the header, 88vw / 52vh - the same numbers as
           `osmoCircleMobile` (showcase-timeline.ts), which the journey's morph takes it over with. Drawn before the
@@ -542,7 +570,7 @@ function OsmoVisual({ t, project, shouldMount }: SceneVisualProps) {
           style={{ backgroundColor: "#111111", boxShadow: "0 50px 120px rgba(17,17,17,.3)" }}
         >
           <ProjectThumbnail project={project} alt={dict.projects.items[project.id].name} sizes="(max-width: 1024px) 92vw, 40vw" />
-          {shouldMount ? <ProjectEmbedCover project={project} boxAspect={4 / 5} /> : null}
+          <Film project={project} boxAspect={4 / 5} still={still} shouldMount={shouldMount} />
         </div>
         <Reveal t={t} delay={0.02} className="absolute left-[var(--osmo-left)] bottom-[calc(6vh+var(--osmo-frame-h)+1.5rem)] hidden lg:block">
           <Image src={OSMO_MARK} alt="OSMO" width={1064} height={505} sizes="480px" className="h-[clamp(6rem,calc(94vh-var(--osmo-frame-h)-8rem),11rem)] w-auto" />

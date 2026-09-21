@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, type ReactNode } from "react";
 import { motion, useMotionValueEvent, useTransform, type MotionValue } from "motion/react";
 import { backgroundEmbedSrc } from "@/components/projects-section";
-import { bunnyBackgroundEmbedSrc } from "@/lib/bunny-stream";
+import { bunnyBackgroundEmbedSrc, bunnyMp4Url, bunnyThumbnailUrl } from "@/lib/bunny-stream";
 import type { Project } from "@/lib/projects";
 import { cn } from "@/lib/utils";
 import { YOUTUBE_IFRAME_ALLOW, YOUTUBE_REFERRER_POLICY } from "@/lib/youtube-embeds";
@@ -92,6 +92,7 @@ export function Sparks({
   region = { left: [44, 98], top: [12, 92] },
   size = 2,
   glow = 8,
+  still = false,
   className,
 }: {
   colors: [string, string];
@@ -99,8 +100,11 @@ export function Sparks({
   region?: { left: [number, number]; top: [number, number] };
   size?: number;
   glow?: number;
+  /** A still world (the phones' stack) has no particles: each one is a running animation and a compositor layer. */
+  still?: boolean;
   className?: string;
 }) {
+  if (still) return null;
   return (
     <div className={cn("pointer-events-none absolute inset-0", className)} aria-hidden>
       {Array.from({ length: count }, (_, i) => {
@@ -360,6 +364,50 @@ export function EmbedCover({
       allow={YOUTUBE_IFRAME_ALLOW}
       allowFullScreen={false}
       referrerPolicy={YOUTUBE_REFERRER_POLICY}
+    />
+  );
+}
+
+/**
+ * A world's film in the phones' still stack: a **native `<video>`** - the Bunny MP4 rendition with the clip's poster
+ * (`bunnyMp4Url` / `bunnyThumbnailUrl`, as the `/projects` rows play theirs) instead of an embed. No player page,
+ * no player script, a hardware-decoded stream, and it plays only while `playing` (its world mostly on screen);
+ * the stage's three autoplaying embeds - two Bunny players and the YouTube player - were mounted at once around a
+ * block boundary and were a good part of the phones' lag. The stage-only clip first (`showcaseClip`), else the
+ * project's own Bunny `clip` (OSMO's 4:5 decking film fits its 4:5 frame - the YouTube stand-in is 9:16); a
+ * project with neither keeps the embed.
+ */
+export function ProjectVideoCover({
+  project,
+  playing,
+  boxAspect,
+  className,
+}: {
+  project: Pick<Project, "videoId" | "orientation" | "clip" | "showcaseClip" | "showcaseVideoId">;
+  playing: boolean;
+  boxAspect: number;
+  className?: string;
+}) {
+  const clip = project.showcaseClip ?? project.clip;
+  const ref = useRef<HTMLVideoElement>(null);
+  useEffect(() => {
+    const video = ref.current;
+    if (!video) return;
+    if (playing) void video.play().catch(() => {});
+    else video.pause();
+  }, [playing]);
+  if (!clip) return <ProjectEmbedCover project={project} boxAspect={boxAspect} className={className} />;
+  return (
+    <video
+      ref={ref}
+      className={cn("pointer-events-none absolute inset-0 size-full object-cover", className)}
+      src={bunnyMp4Url(clip)}
+      poster={bunnyThumbnailUrl(clip)}
+      muted
+      loop
+      playsInline
+      preload="metadata"
+      aria-hidden
     />
   );
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import {
   motion,
@@ -24,7 +24,7 @@ import {
   ParallaxLayer,
 } from "@/components/projects/showcase-primitives";
 import { useScenePager } from "@/components/projects/scene-pager";
-import { sceneVisualFor, type MorphTarget } from "@/components/projects/showcase-scenes";
+import { StillFilmContext, sceneVisualFor, type MorphTarget } from "@/components/projects/showcase-scenes";
 import {
   OSMO_COPY_FADE,
   OSMO_OUTRO_START,
@@ -335,12 +335,15 @@ function BrandMark({
   tone,
   size = "md",
   mark = "logo",
+  still = false,
   className,
 }: {
   project: Project;
   tone: "dark" | "light";
   size?: "md" | "lg" | "xl";
   mark?: "logo" | "logo-large" | "wordmark" | "custom" | "none";
+  /** In a still world (the phones' stack) the mark loads lazily - the world is in flow, the browser fetches it as it nears. */
+  still?: boolean;
   className?: string;
 }) {
   const { t } = useLanguage();
@@ -389,7 +392,7 @@ function BrandMark({
         alt={partner.ariaLabel}
         width={400}
         height={140}
-        loading="eager"
+        loading={still ? "lazy" : "eager"}
         sizes={size === "xl" ? "(max-width: 1024px) 380px, 640px" : size === "lg" ? "(max-width: 1024px) 260px, 480px" : "200px"}
         className={cn(
           "w-auto object-contain",
@@ -413,7 +416,9 @@ function BrandMark({
  * highlight, result tags and CTA where the scene's `layout` puts them - on
  * its own parallax depth and revealed in a stagger as the scene frames.
  */
-function ProjectScene({
+// Memoised: a world is a few hundred elements, and its props are stable MotionValues and flags - the stage flips
+// `shouldMount` now and then, the stack never anything (its film's flags travel by context).
+const ProjectScene = memo(function ProjectScene({
   project,
   index,
   u,
@@ -493,6 +498,7 @@ function ProjectScene({
                 project={project}
                 tone={tone}
                 mark={mark}
+                still={still}
                 size={
                   layout === "center" || layout === "center-bottom"
                     ? "xl"
@@ -533,14 +539,14 @@ function ProjectScene({
       </ParallaxLayer>
     </motion.div>
   );
-}
+});
 
 /**
  * A scene's `Overlay` (the giant PLASICO name), drawn *above* the morph shape
  * but moving exactly with its scene - same frame transform, z lifted over the
  * morph's layer.
  */
-function SceneOverlay({
+const SceneOverlay = memo(function SceneOverlay({
   project,
   index,
   u,
@@ -578,7 +584,7 @@ function SceneOverlay({
       <Overlay project={project} t={t} shouldMount={shouldMount} framesEnabled={framesEnabled} still={still} />
     </motion.div>
   );
-}
+});
 
 /* ------------------------------------------------------------------------ */
 /* Stage furniture                                                            */
@@ -615,7 +621,7 @@ function useIsLg() {
   return isLg;
 }
 
-function MorphOverlay({ u, hold }: { u: MotionValue<number>; hold: number }) {
+const MorphOverlay = memo(function MorphOverlay({ u, hold }: { u: MotionValue<number>; hold: number }) {
   const isLg = useIsLg();
   const state = useTransform(u, (v) => {
     const uc = (v - INTRO) / SPAN;
@@ -666,7 +672,7 @@ function MorphOverlay({ u, hold }: { u: MotionValue<number>; hold: number }) {
       aria-hidden
     />
   );
-}
+});
 
 /** One rail bar: fills top → bottom as its project approaches; click jumps to it. */
 function RailBar({
@@ -763,9 +769,13 @@ function ProjectsList({ className }: { className?: string }) {
  * Phones: the five worlds as plain sections, one under the other - the cinema headline as an ordinary section
  * heading, then each world a viewport tall, standing at its framed moment (`SCENE_FRAMED` - the picture the paged
  * stage used to stop on: copy revealed, Roni in his last pose, the towers built) for good. Nothing here is
- * scroll-driven: every world gets one constant timeline position, so no style is ever recomputed, and a frame
- * sequence downloads and draws its one frame (`still`). A world's player mounts, and its particle animations run,
- * only while it is on stage (within a third of a viewport - `data-offstage` pauses them, globals.css).
+ * scroll-driven: every world gets one constant timeline position, so no style is ever recomputed; a frame sequence
+ * downloads and draws its one frame, there are no particles and the glows / the ghost mark do not breathe or float
+ * (`still`, `data-still` in globals.css - a running animation costs every main-thread frame a style recalc, and
+ * the worlds carried ~100 between them; the marks load lazily), and the film is a native video that mounts while
+ * its block is on stage (within a third of a viewport) and plays only while the block is mostly on screen - one at
+ * a time. A block off screen is not rendered at all (`content-visibility: auto` - no layers, no paint, no style
+ * work for it until it nears; the browser renders it about half a viewport ahead).
  */
 function StackedStage({ className }: { className?: string }) {
   const { t } = useLanguage();
@@ -796,35 +806,46 @@ function StackedStage({ className }: { className?: string }) {
 function StackedScene({ project, index, framesEnabled }: { project: Project; index: number; framesEnabled: boolean }) {
   const ref = useRef<HTMLDivElement>(null);
   const onStage = useInView(ref, { margin: "33% 0px 33% 0px" });
+  const visible = useInView(ref, { amount: 0.5 });
+  // The film's flags go down by context (see `StillFilmContext`): the world's own props stay stable, so the flips
+  // re-render the film alone - never the few hundred elements of the world.
+  const film = useMemo(() => ({ mount: onStage, playing: visible }), [onStage, visible]);
   // The world at its framed moment, for good.
   const u = useMotionValue(INTRO + (index + SCENE_FRAMED) * SPAN);
   const whole = useMotionValue(1);
   const { Overlay } = sceneVisualFor(project);
   return (
-    <div ref={ref} className="relative isolate h-[100svh] overflow-clip" data-offstage={onStage ? undefined : ""}>
-      <ProjectScene
-        project={project}
-        index={index}
-        u={u}
-        hold={SHOWCASE_HOLD_MOBILE}
-        shouldMount={onStage}
-        framesEnabled={framesEnabled}
-        endFade={whole}
-        still
-      />
-      <MorphOverlay u={u} hold={SHOWCASE_HOLD_MOBILE} />
-      {Overlay ? (
-        <SceneOverlay
+    <div
+      ref={ref}
+      className="relative isolate h-[100svh] overflow-clip [content-visibility:auto]"
+      data-still=""
+      data-offstage={onStage ? undefined : ""}
+    >
+      <StillFilmContext.Provider value={film}>
+        <ProjectScene
           project={project}
           index={index}
           u={u}
           hold={SHOWCASE_HOLD_MOBILE}
-          shouldMount={onStage}
+          shouldMount
           framesEnabled={framesEnabled}
           endFade={whole}
           still
         />
-      ) : null}
+        <MorphOverlay u={u} hold={SHOWCASE_HOLD_MOBILE} />
+        {Overlay ? (
+          <SceneOverlay
+            project={project}
+            index={index}
+            u={u}
+            hold={SHOWCASE_HOLD_MOBILE}
+            shouldMount
+            framesEnabled={framesEnabled}
+            endFade={whole}
+            still
+          />
+        ) : null}
+      </StillFilmContext.Provider>
     </div>
   );
 }

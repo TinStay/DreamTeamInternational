@@ -208,9 +208,10 @@ export function ProcessSection() {
                       fill
                       sizes="160px"
                       // Small static WebPs straight from /public: the optimizer route stalled on one badge now and then
-                      // (the img then waits forever on the coalesced request), so these skip it.
+                      // (the img then waits forever on the coalesced request), so these skip it - and, off the
+                      // optimizer, load lazily like any image far below the fold.
                       unoptimized
-                      loading="eager"
+                      loading="lazy"
                       className="object-contain drop-shadow-[0_16px_30px_rgba(2,6,23,0.35)]"
                     />
                   </div>
