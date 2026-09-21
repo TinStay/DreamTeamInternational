@@ -19,17 +19,8 @@ import { useEffect } from "react";
  * stop already pages onto it. The root's CSS snapping (globals.css) stays
  * for what a gesture cannot cover - a fling that began outside the stage
  * ending inside it - and is switched off for the duration of a tween, or the
- * browser would re-snap every frame of it.
- * `instant` (phones, `PHONE_QUERY`): a cut instead of the tween - the page
- * jumps to the next stop the moment the swipe commits, and since the stage is
- * scroll-driven the next scene stands framed in the very next frame, none of
- * the hand-over rendered. The cut is dressed as a **view transition** where
- * the browser has one (`cutTo`): the outgoing frame is kept as a snapshot and
- * the live new one comes in over it (the rules in globals.css - opacity and
- * transform only, so the swap's frames are the compositor's alone; the tween
- * re-ran every scene style and redrew the canvases per frame, and a phone
- * dropped frames). The lock lasts the swap's few hundred ms; without the API
- * there is none, the next swipe counts at once.
+ * browser would re-snap every frame of it. Tablets only in practice: below
+ * `md` the showcase stacks its worlds as plain sections and mounts no pager.
  */
 
 /** How long a page takes. */
@@ -44,45 +35,10 @@ const easeInOutCubic = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2
 type Gesture = { startY: number; startX: number; captured: boolean | null; consumed: boolean };
 
 /**
- * The cut (phones): a jump to `target` wrapped in a view transition where the browser has one - the outgoing frame
- * kept as a GPU snapshot, the page jumped, and the snapshot animated away over the live new frame by the
- * `::view-transition-*` rules in globals.css (`<html data-stage-page>` is the direction they read). Nothing of the
- * stage is recomputed or repainted while the swap plays. Without the API (or should it refuse) it is the plain
- * cut. Returns the swap's end, `null` when there was none.
- */
-export function cutTo(target: number): Promise<void> | null {
-  const html = document.documentElement;
-  const jump = () => {
-    // No re-snap on the landing: the target is a stop, but never trusted to the pixel.
-    html.style.scrollSnapType = "none";
-    window.scrollTo({ top: target, behavior: "instant" });
-    requestAnimationFrame(() => {
-      html.style.scrollSnapType = "";
-    });
-  };
-  if (typeof document.startViewTransition !== "function") {
-    jump();
-    return null;
-  }
-  html.dataset.stagePage = target > window.scrollY ? "forward" : "back";
-  const done = () => {
-    delete html.dataset.stagePage;
-  };
-  try {
-    return document.startViewTransition(jump).finished.then(done, done);
-  } catch {
-    done();
-    jump();
-    return null;
-  }
-}
-
-/**
  * `stops` returns the stage's stop positions (scroll px, ascending: the intro,
  * then each scene framed), measured when a gesture starts.
  */
-export function useScenePager(enabled: boolean, stops: () => number[], options: { instant?: boolean } = {}) {
-  const { instant = false } = options;
+export function useScenePager(enabled: boolean, stops: () => number[]) {
   useEffect(() => {
     if (!enabled) return;
     let animating = false;
@@ -93,17 +49,6 @@ export function useScenePager(enabled: boolean, stops: () => number[], options: 
     const animateTo = (target: number) => {
       const from = window.scrollY;
       if (Math.abs(target - from) < 1) return;
-      if (instant) {
-        const swap = cutTo(target);
-        if (swap) {
-          // Locked while the swap plays (a few hundred ms), as for the tween: a gesture begun meanwhile is swallowed.
-          animating = true;
-          swap.then(() => {
-            animating = false;
-          });
-        }
-        return;
-      }
       // The browser must not re-snap on every frame of the tween; the tween ends exactly on a stop anyway.
       html.style.scrollSnapType = "none";
       animating = true;
@@ -173,5 +118,5 @@ export function useScenePager(enabled: boolean, stops: () => number[], options: 
       cancelAnimationFrame(raf);
       html.style.scrollSnapType = "";
     };
-  }, [enabled, stops, instant]);
+  }, [enabled, stops]);
 }

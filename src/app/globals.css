@@ -534,67 +534,6 @@
   }
 }
 
-/*
- * The phone pager's swap (`cutTo` in projects/scene-pager.ts): on a phone a swipe in the projects stage is a cut to
- * the next stop, and the cut is wrapped in a view transition - the browser keeps the outgoing frame as a snapshot
- * and these rules animate it away as the live new frame comes in. Opacity and transform only, so every frame of the
- * swap is the compositor's: nothing of the stage is recomputed or repainted while it plays. The stage carries
- * `view-transition-name: projects-stage`; the two glass bars over it carry names of their own, or the stage's
- * snapshot - painted above the root's - would cover them for the duration; named, they paint on top as they always
- * do (`z-index`, whatever the capture order), the browser applies their backdrop blur to the swap under them (the
- * radius keeps that blur in the pills' shape), and they show live, no cross-fade of their own - nor does the root:
- * the page background under the stage is the same in both frames. `<html data-stage-page>` is the direction:
- * forward, the next scene rises in over the previous one fading in place; back, it comes down from above. Only the
- * pager ever starts a transition, so none of this runs on a tablet or a desktop.
- */
-::view-transition-group(root),
-::view-transition-group(projects-stage),
-::view-transition-group(site-bar),
-::view-transition-group(site-dock) {
-  animation: none;
-}
-::view-transition-group(site-bar),
-::view-transition-group(site-dock) {
-  z-index: 1;
-  border-radius: 2.25rem;
-}
-::view-transition-old(root),
-::view-transition-old(site-bar),
-::view-transition-old(site-dock) {
-  display: none;
-}
-::view-transition-new(root),
-::view-transition-new(site-bar),
-::view-transition-new(site-dock) {
-  animation: none;
-}
-::view-transition-old(projects-stage) {
-  animation: stage-page-out 400ms ease-out both;
-}
-::view-transition-new(projects-stage) {
-  animation: stage-page-in 400ms cubic-bezier(0.22, 1, 0.36, 1) both;
-}
-html[data-stage-page="back"]::view-transition-new(projects-stage) {
-  animation-name: stage-page-in-back;
-}
-@keyframes stage-page-out {
-  to {
-    opacity: 0;
-  }
-}
-@keyframes stage-page-in {
-  from {
-    opacity: 0;
-    transform: translate3d(0, 8%, 0);
-  }
-}
-@keyframes stage-page-in-back {
-  from {
-    opacity: 0;
-    transform: translate3d(0, -8%, 0);
-  }
-}
-
 /* Lenis (site-wide smooth scrolling, `components/smooth-scroll.tsx`) - its own stylesheet, inlined. */
 html.lenis,
 html.lenis body {

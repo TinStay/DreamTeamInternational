@@ -146,7 +146,9 @@ export function Sparks({
  * keeps the plain decoded `<img>`s (all 72 - the desktop cache holds them). `split` draws the same frame onto
  * two canvases showing the left / right halves, pulled apart by
  * `--split-gap` (a percentage, set by the caller's class so it can differ
- * per breakpoint; 15% if unset - the Emblema buildings).
+ * per breakpoint; 15% if unset - the Emblema buildings). `still`: the
+ * sequence stands at `progress` for good (the phones' stacked worlds) - the
+ * one frame it shows is downloaded and drawn, nothing else.
  */
 const COARSE_BITMAP_MAX = 560;
 export function FrameSequence({
@@ -157,6 +159,7 @@ export function FrameSequence({
   height,
   enabled,
   split = false,
+  still = false,
   className,
 }: {
   progress: MotionValue<number>;
@@ -167,6 +170,7 @@ export function FrameSequence({
   height: number;
   enabled: boolean;
   split?: boolean;
+  still?: boolean;
   className?: string;
 }) {
   const canvases = useRef<(HTMLCanvasElement | null)[]>([]);
@@ -204,8 +208,12 @@ export function FrameSequence({
     [count]
   );
 
+  const index = useTransform(progress, (v) => Math.min(count - 1, Math.floor(clamp01(v) * count)));
+
   useEffect(() => {
     if (!enabled || ready.current.size > 0) return;
+    // The frame wanted now - a `change` only fires once `progress` moves, and a still sequence's never does.
+    wanted.current = index.get();
     const coarse = window.matchMedia("(pointer: coarse)").matches;
     // Coarse: every frame, as a bitmap at 1.5 × the CSS size (never above the canvas or the cap).
     const stride = 1;
@@ -215,8 +223,8 @@ export function FrameSequence({
     // Coarse-to-fine: the held pose (last frame) and every 8th frame first, so
     // scrubbing has stand-ins almost immediately, then the gaps - six requests
     // in flight at a time rather than all `count` at once.
-    const order: number[] = [count - 1];
-    for (const step of [8, 4, 2, 1]) {
+    const order: number[] = still ? [wanted.current] : [count - 1];
+    for (const step of still ? [] : [8, 4, 2, 1]) {
       if (step < stride) break;
       for (let i = 0; i < count; i += step) if (!order.includes(i)) order.push(i);
     }
@@ -268,9 +276,8 @@ export function FrameSequence({
       drawn.current = -1;
       painted.current = -1;
     };
-  }, [enabled, base, count, width, height, draw]);
+  }, [enabled, still, base, count, width, height, draw, index]);
 
-  const index = useTransform(progress, (v) => Math.min(count - 1, Math.floor(clamp01(v) * count)));
   useMotionValueEvent(index, "change", (i) => {
     wanted.current = i;
     draw(i);

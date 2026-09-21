@@ -38,6 +38,8 @@ export type SceneVisualProps = {
   shouldMount: boolean;
   /** Frame sequences start downloading once the section is near the viewport. */
   framesEnabled: boolean;
+  /** The world stands at `t` for good (the phones' stacked sections): a frame sequence loads its one frame only. */
+  still?: boolean;
 };
 
 /**
@@ -118,7 +120,7 @@ const DEEP = "#070b1a";
 /** Boleron brand gradient (cyan → blue → violet) with soft organic blobs, from the client's key visual. */
 const BOLERON = { cyan: "#25C7EA", blue: "#2B7BE6", violet: "#8A3BD6", deep: "#1E3FB5" };
 const RONI_FRAMES = 72;
-function BoleronVisual({ t, framesEnabled }: SceneVisualProps) {
+function BoleronVisual({ t, framesEnabled, still }: SceneVisualProps) {
   // Roni raises the phone while the scene frames (done by t≈0.15, so the final
   // pose holds for most of the stay); then sinks away as the wipe passes.
   const roniProgress = useTransform(t, (v) => (v + 0.6) / 0.75);
@@ -182,6 +184,7 @@ function BoleronVisual({ t, framesEnabled }: SceneVisualProps) {
             width={804}
             height={703}
             enabled={framesEnabled}
+            still={still}
             className="h-full w-full"
           />
         </motion.div>
@@ -195,12 +198,13 @@ function BoleronVisual({ t, framesEnabled }: SceneVisualProps) {
 const EMBLEMA = { bg: "#F3EFE8", ink: "#1E1B17", gold: "#B8965A" };
 const EMBLEMA_FRAMES = 72;
 
-function EmblemaVisual({ t, framesEnabled }: SceneVisualProps) {
+function EmblemaVisual({ t, framesEnabled, still }: SceneVisualProps) {
   const { t: dict } = useLanguage();
   const buildings = dict.projects.showcase.scenes.emblema.buildings;
   // Buildings rise from the ground once the scene is framed and finish during the hold - on phones by the
-  // stop (t 0.27, `SCENE_FRAMED`), so they stand complete when the page settles.
-  const compact = useMediaQuery("(max-width: 1023px) and (pointer: coarse)");
+  // stop (t 0.27, `SCENE_FRAMED`), so they stand complete when the page settles (and in a still world, which
+  // stands at that very moment, whatever the pointer).
+  const compact = useMediaQuery("(max-width: 1023px) and (pointer: coarse)") || still;
   const buildProgress = useTransform(t, (v) => clamp01((v + 0.3) / (compact ? 0.57 : 0.75)));
   const labelK = useTransform(buildProgress, (v) => easeOut(clamp01((v - 0.35) / 0.25)));
   const labelY = useTransform(labelK, (v) => (1 - v) * 14);
@@ -242,6 +246,7 @@ function EmblemaVisual({ t, framesEnabled }: SceneVisualProps) {
               width={963}
               height={537}
               enabled={framesEnabled}
+              still={still}
               split
               className="absolute inset-0 [--split-gap:-10%] lg:drop-shadow-[0_12px_22px_rgba(30,27,23,0.18)] lg:[--split-gap:18%]"
             />

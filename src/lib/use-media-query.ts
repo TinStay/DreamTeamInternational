@@ -9,8 +9,8 @@ import { useCallback, useSyncExternalStore } from "react";
 /** `matchMedia(query).matches`, kept in sync with the query. */
 /**
  * Phones: below `md`. The client wants the phone experience plain - no scroll journey (the sections one under the
- * other) and the projects stage paged instantly, a cut per swipe - while tablets (md–lg on touch) keep the animated
- * journey at its mobile pacing. Width alone, like every other breakpoint, so a narrowed desktop window gets the phone
+ * other) and the projects as their worlds stacked still, no stage - while tablets (md–lg on touch) keep the animated
+ * journey at its mobile pacing and the paged stage. Width alone, like every other breakpoint, so a narrowed desktop window gets the phone
  * layout too.
  */
 export const PHONE_QUERY = "(max-width: 767px)";

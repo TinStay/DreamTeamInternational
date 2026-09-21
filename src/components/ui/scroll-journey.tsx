@@ -80,7 +80,7 @@ import { usePagedHandover } from "@/components/ui/paged-handover";
  * render plain (they also do outside any journey, e.g. on `/contact`).
  * Phones (`PHONE_QUERY`, below `md`) stay plain too - no scenes, no canvas,
  * no paged opening: the client wants the sections one under the other there
- * (the projects stage keeps its own instant paging). One render path serves
+ * (the projects stack as plain sections too, projects-showcase.tsx). One render path serves
  * both modes, so the switch after hydration never remounts a section.
  */
 

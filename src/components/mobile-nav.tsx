@@ -44,8 +44,7 @@ export function MobileNav() {
     <>
       {/* Dock: Projects first; Portfolio lives in the sheet menu. Tight to the bottom edge (the home indicator's
           inset on iPhones), as wide as the top bar. */}
-      {/* `view-transition-name`: the dock keeps painting over the projects stage's phone swap (globals.css). */}
-      <GlassShell className="service-mobile-dock lg:hidden fixed bottom-[max(0.375rem,env(safe-area-inset-bottom))] left-1/2 z-50 flex w-[96%] max-w-lg -translate-x-1/2 items-center gap-1.5 px-3 py-2 [view-transition-name:site-dock]">
+      <GlassShell className="service-mobile-dock lg:hidden fixed bottom-[max(0.375rem,env(safe-area-inset-bottom))] left-1/2 z-50 flex w-[96%] max-w-lg -translate-x-1/2 items-center gap-1.5 px-3 py-2">
         <Link
           href={projectsHref}
           className="group flex flex-1 select-none flex-col items-center justify-center gap-1 text-muted-foreground transition-colors hover:text-foreground"

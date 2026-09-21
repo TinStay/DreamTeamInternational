@@ -213,8 +213,7 @@ export function SiteHeader() {
           isScrolled ? "scale-[0.98]" : "scale-100"
         }`}
       >
-        {/* Named for the projects stage's phone swap (globals.css): the bar keeps painting over it, blur and all. */}
-        <GlassShell className="flex items-center justify-between gap-3 px-5 py-2.5 [view-transition-name:site-bar]">
+        <GlassShell className="flex items-center justify-between gap-3 px-5 py-2.5">
           <Link href={homeHref} className="group flex min-w-0 shrink items-center py-1 pr-2">
             <Image
               src="/logo-1.png"

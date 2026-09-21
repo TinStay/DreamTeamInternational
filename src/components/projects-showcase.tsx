@@ -5,6 +5,7 @@ import Image from "next/image";
 import {
   motion,
   useInView,
+  useMotionValue,
   useMotionValueEvent,
   useReducedMotion,
   useSpring,
@@ -22,7 +23,7 @@ import {
   Reveal,
   ParallaxLayer,
 } from "@/components/projects/showcase-primitives";
-import { cutTo, useScenePager } from "@/components/projects/scene-pager";
+import { useScenePager } from "@/components/projects/scene-pager";
 import { sceneVisualFor, type MorphTarget } from "@/components/projects/showcase-scenes";
 import {
   OSMO_COPY_FADE,
@@ -420,6 +421,7 @@ function ProjectScene({
   shouldMount,
   framesEnabled,
   endFade,
+  still = false,
 }: {
   project: Project;
   index: number;
@@ -432,6 +434,8 @@ function ProjectScene({
   framesEnabled: boolean;
   /** Unsmoothed end-of-timeline fade (1 → 0 over the last stretch of real scroll), so the stage is transparent before it unpins. */
   endFade: MotionValue<number>;
+  /** The world stands at `u` for good (the phones' stack): never parked, its frame sequences load one frame. */
+  still?: boolean;
 }) {
   const { t: dict, language } = useLanguage();
   const p = dict.projects;
@@ -446,7 +450,7 @@ function ProjectScene({
   const last = index === COUNT - 1;
   // Parked scenes (not yet arriving / mostly gone) are inert: out of the tab order and the a11y tree. Driven by the
   // scene's own time so the outgoing scene stays interactive while it is still visually framed.
-  const [parked, setParked] = useState(index !== 0);
+  const [parked, setParked] = useState(still ? false : index !== 0);
   const parkedAfter = hold + 0.4 * (1 - hold);
   useMotionValueEvent(t, "change", (v) => {
     const next = v < -0.1 || v > parkedAfter;
@@ -469,7 +473,7 @@ function ProjectScene({
       style={{ ...frameStyle, opacity, visibility, backgroundColor: background }}
       inert={parked ? true : undefined}
     >
-      <Visual project={project} t={t} shouldMount={shouldMount} framesEnabled={framesEnabled} />
+      <Visual project={project} t={t} shouldMount={shouldMount} framesEnabled={framesEnabled} still={still} />
 
       {/* Name, headline, highlight, tags, CTA - placed per scene layout. */}
       <ParallaxLayer t={t} depth={0.25} dx={-0.05} className="pointer-events-none">
@@ -544,6 +548,7 @@ function SceneOverlay({
   shouldMount,
   framesEnabled,
   endFade,
+  still = false,
 }: {
   project: Project;
   index: number;
@@ -552,6 +557,7 @@ function SceneOverlay({
   shouldMount: boolean;
   framesEnabled: boolean;
   endFade: MotionValue<number>;
+  still?: boolean;
 }) {
   const { Overlay } = sceneVisualFor(project);
   const t = useTransform(u, (v) => (v - INTRO) / SPAN - index);
@@ -569,7 +575,7 @@ function SceneOverlay({
   if (!Overlay) return null;
   return (
     <motion.div className="pointer-events-none absolute inset-0 overflow-clip" style={{ ...frameStyle, zIndex, opacity, visibility }}>
-      <Overlay project={project} t={t} shouldMount={shouldMount} framesEnabled={framesEnabled} />
+      <Overlay project={project} t={t} shouldMount={shouldMount} framesEnabled={framesEnabled} still={still} />
     </motion.div>
   );
 }
@@ -716,15 +722,121 @@ function scrollTargetFor(section: HTMLElement, stage: HTMLElement, index: number
  * depth. Right-hand rail = counter + per-project progress bars (also jump
  * buttons). Reduced-motion users get the plain card list.
  */
+/**
+ * The projects on the home page. Three renders of the same worlds: the scroll-driven stage (`ScrollStage`, the
+ * case-studies journey), on phones (`PHONE_QUERY`, below md) the worlds as plain sections one under the other
+ * (`StackedStage` - the client wants nothing scroll-driven there, the projects arranged like the rest of the phone
+ * page), and under reduced motion the case-study rows (`ProjectsList`). The server and the hydrating render show
+ * the stage; a phone switches on its first client render - the section is far below the fold then, so the swap
+ * costs nothing visible.
+ */
 export function ProjectsShowcase({ className }: { className?: string }) {
+  const reduceMotion = useReducedMotion();
+  const phone = useMediaQuery(PHONE_QUERY);
+  if (reduceMotion) return <ProjectsList className={className} />;
+  if (phone) return <StackedStage className={className} />;
+  return <ScrollStage className={className} />;
+}
+
+/** Reduced motion: the case-study rows under the section heading. */
+function ProjectsList({ className }: { className?: string }) {
   const { t } = useLanguage();
   const p = t.projects;
-  const reduceMotion = useReducedMotion();
-  // Phones page scene by scene (`useScenePager`) and hand over early, so a page is mostly the hand-over itself.
+  return (
+    <section id="projects" className={cn("relative w-full py-12 sm:py-16", className)}>
+      <div className="mx-auto flex w-full max-w-6xl flex-col gap-14 px-4">
+        <div className="text-center">
+          <h2 className="font-heading text-[2.75rem] leading-[1.06] font-extrabold sm:text-5xl md:text-6xl text-foreground">
+            {p.title1} <span className="text-section-accent">{p.title2}</span>
+          </h2>
+          <p className="mx-auto mt-4 max-w-2xl text-lg text-muted-foreground">{p.subtitle}</p>
+        </div>
+        {PROJECTS.map((project, index) => (
+          <ProjectRow key={project.id} project={project} index={index} />
+        ))}
+      </div>
+    </section>
+  );
+}
+
+/**
+ * Phones: the five worlds as plain sections, one under the other - the cinema headline as an ordinary section
+ * heading, then each world a viewport tall, standing at its framed moment (`SCENE_FRAMED` - the picture the paged
+ * stage used to stop on: copy revealed, Roni in his last pose, the towers built) for good. Nothing here is
+ * scroll-driven: every world gets one constant timeline position, so no style is ever recomputed, and a frame
+ * sequence downloads and draws its one frame (`still`). A world's player mounts, and its particle animations run,
+ * only while it is on stage (within a third of a viewport - `data-offstage` pauses them, globals.css).
+ */
+function StackedStage({ className }: { className?: string }) {
+  const { t } = useLanguage();
+  const p = t.projects;
+  const sectionRef = useRef<HTMLElement>(null);
+  // The frames (two files, one per sequence) only load once the section is close.
+  const framesEnabled = useInView(sectionRef, { once: true, margin: "800px 0px 800px 0px" });
+  return (
+    <section id="projects" ref={sectionRef} className={cn("relative w-full", className)}>
+      <div className="mx-auto flex w-full max-w-7xl flex-col items-center gap-4 px-4 pt-16 pb-10 text-center">
+        <p className="text-sm font-semibold uppercase tracking-[0.24em] text-muted-foreground">{p.showcase.eyebrow}</p>
+        <h2 className="font-heading text-[2.75rem] leading-[1.06] font-extrabold tracking-tight text-balance text-foreground">
+          {p.showcase.title1} <span className="text-section-accent">{p.showcase.title2}</span>
+        </h2>
+        <p className="max-w-xl text-lg text-muted-foreground">{p.showcase.subtitle}</p>
+      </div>
+      {/* The worlds' geometry variables (`SceneVisual.className`) on the stack, as on the stage's scenes wrapper. */}
+      <div className={cn("flex flex-col", SCENE_VARS)}>
+        {PROJECTS.map((project, index) => (
+          <StackedScene key={project.id} project={project} index={index} framesEnabled={framesEnabled} />
+        ))}
+      </div>
+    </section>
+  );
+}
+
+/** One world of the stack: the scene, the morph shape at that world's target and the scene's overlay, all still. */
+function StackedScene({ project, index, framesEnabled }: { project: Project; index: number; framesEnabled: boolean }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const onStage = useInView(ref, { margin: "33% 0px 33% 0px" });
+  // The world at its framed moment, for good.
+  const u = useMotionValue(INTRO + (index + SCENE_FRAMED) * SPAN);
+  const whole = useMotionValue(1);
+  const { Overlay } = sceneVisualFor(project);
+  return (
+    <div ref={ref} className="relative isolate h-[100svh] overflow-clip" data-offstage={onStage ? undefined : ""}>
+      <ProjectScene
+        project={project}
+        index={index}
+        u={u}
+        hold={SHOWCASE_HOLD_MOBILE}
+        shouldMount={onStage}
+        framesEnabled={framesEnabled}
+        endFade={whole}
+        still
+      />
+      <MorphOverlay u={u} hold={SHOWCASE_HOLD_MOBILE} />
+      {Overlay ? (
+        <SceneOverlay
+          project={project}
+          index={index}
+          u={u}
+          hold={SHOWCASE_HOLD_MOBILE}
+          shouldMount={onStage}
+          framesEnabled={framesEnabled}
+          endFade={whole}
+          still
+        />
+      ) : null}
+    </div>
+  );
+}
+
+/** The scroll-driven stage: the case-studies journey (see the file's header comment). */
+function ScrollStage({ className }: { className?: string }) {
+  const { t } = useLanguage();
+  const p = t.projects;
+  // Touch below lg - tablets, since phones get `StackedStage` - pages scene by scene (`useScenePager`) and hands
+  // over early, so a page is mostly the hand-over itself.
   const phone = useMediaQuery("(max-width: 1023px) and (pointer: coarse)");
   const hold = phone ? SHOWCASE_HOLD_MOBILE : HOLD;
-  // Below md a page is a cut, not a tween: the client wants the reels feel without the animation on phones.
-  const instant = useMediaQuery(PHONE_QUERY);
   const sectionRef = useRef<HTMLElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
   // The stage's stops for the phone pager: the intro, then each scene framed - the same positions as the snap stops.
@@ -735,7 +847,7 @@ export function ProjectsShowcase({ className }: { className?: string }) {
     const top = section.getBoundingClientRect().top + window.scrollY;
     return [top, ...PROJECTS.map((_, index) => scrollTargetFor(section, stage, index))];
   }, []);
-  useScenePager(phone && !reduceMotion, stops, { instant });
+  useScenePager(phone, stops);
   const [active, setActive] = useState(0);
   /** Scenes that keep a player mounted: the framed one, the previous one while it is still leaving, and the next one from 10% into the hold. */
   const [mounted, setMounted] = useState<number[]>([0, 1]);
@@ -797,36 +909,12 @@ export function ProjectsShowcase({ className }: { className?: string }) {
   });
   const furnitureVisibility = useTransform(furnitureOpacity, (v) => (v <= 0.001 ? "hidden" : "visible"));
 
-  const jumpTo = useCallback(
-    (index: number) => {
-      const section = sectionRef.current;
-      const stage = stageRef.current;
-      if (!section || !stage) return;
-      const target = scrollTargetFor(section, stage, index);
-      // Phones: the rail jumps the way a swipe pages - one swap, not a scroll through every hand-over between.
-      if (phone && instant) cutTo(target);
-      else scrollToY(target);
-    },
-    [phone, instant]
-  );
-
-  if (reduceMotion) {
-    return (
-      <section id="projects" ref={sectionRef} className={cn("relative w-full py-12 sm:py-16", className)}>
-          <div className="mx-auto flex w-full max-w-6xl flex-col gap-14 px-4">
-            <div className="text-center">
-              <h2 className="font-heading text-[2.75rem] leading-[1.06] font-extrabold sm:text-5xl md:text-6xl text-foreground">
-                {p.title1} <span className="text-section-accent">{p.title2}</span>
-              </h2>
-              <p className="mx-auto mt-4 max-w-2xl text-lg text-muted-foreground">{p.subtitle}</p>
-            </div>
-            {PROJECTS.map((project, index) => (
-              <ProjectRow key={project.id} project={project} index={index} />
-            ))}
-          </div>
-        </section>
-    );
-  }
+  const jumpTo = useCallback((index: number) => {
+    const section = sectionRef.current;
+    const stage = stageRef.current;
+    if (!section || !stage) return;
+    scrollToY(scrollTargetFor(section, stage, index));
+  }, []);
 
   const counter = `${String(active + 1).padStart(2, "0")} / ${String(COUNT).padStart(2, "0")}`;
 
@@ -851,9 +939,8 @@ export function ProjectsShowcase({ className }: { className?: string }) {
             style={{ top: `${((((INTRO + (index + SCENE_FRAMED) * SPAN) / UNITS) * (UNITS - 1)) * 100).toFixed(3)}svh` }}
           />
         ))}
-        {/* Transparent stage: the page background shows through the intro and between scenes. Named for the phone
-            pager's swap (`cutTo`, the `::view-transition-*` rules in globals.css). */}
-        <div ref={stageRef} className="ph-no-capture sticky top-0 h-[100svh] overflow-clip [view-transition-name:projects-stage]">
+        {/* Transparent stage: the page background shows through the intro and between scenes. */}
+        <div ref={stageRef} className="ph-no-capture sticky top-0 h-[100svh] overflow-clip">
           {/* The cinema (under the headline and the scenes): the pool of light, the letterbox band widening a little
               as the intro plays, and the streak along its centre line - theme tokens, so it is as quiet on the
               off-white ground as on the dark one. */}
