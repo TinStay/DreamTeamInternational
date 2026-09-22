@@ -1,11 +1,13 @@
 /**
  * OpenAI conversion pixel (`oaiq`) — the loader snippet lives in
- * `src/app/layout.tsx` and stubs `window.oaiq` with a command queue, so events
- * fired before the SDK finishes downloading are replayed once it lands.
+ * `components/consent/tracking-scripts.tsx`, mounted only with marketing
+ * consent; it stubs `window.oaiq` with a command queue, so events fired before
+ * the SDK finishes downloading are replayed once it lands.
  *
  * Every call is best-effort: the pixel is third-party and may be missing
- * entirely (ad blockers, SSR, tests), so a failure here must never take a form
- * submission down with it.
+ * entirely (no consent, ad blockers, SSR, tests), so a failure here must never
+ * take a form submission down with it - without consent `window.oaiq` is simply
+ * absent and the conversion is not reported.
  */
 
 declare global {

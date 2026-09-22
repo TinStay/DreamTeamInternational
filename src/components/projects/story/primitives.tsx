@@ -21,7 +21,7 @@ import { MAIN_WITH_FIXED_PAGE_BG_CLASS } from "@/lib/page-shell";
 import type { StoryClip } from "@/lib/projects";
 import { contactProcessPath } from "@/lib/routes";
 import { cn } from "@/lib/utils";
-import { YOUTUBE_IFRAME_ALLOW, YOUTUBE_REFERRER_POLICY } from "@/lib/youtube-embeds";
+import { YOUTUBE_EMBED_BASE, YOUTUBE_IFRAME_ALLOW, YOUTUBE_REFERRER_POLICY } from "@/lib/youtube-embeds";
 
 /*
  * The shared kit behind the long-form case studies ("stories") - every story
@@ -693,7 +693,7 @@ export function MediaFrame({
       <div className={frame}>
         <iframe
           className="absolute inset-0 h-full w-full"
-          src={`https://www.youtube.com/embed/${clip.youtube}?rel=0`}
+          src={`${YOUTUBE_EMBED_BASE}/${clip.youtube}?rel=0`}
           title={title}
           allow={YOUTUBE_IFRAME_ALLOW}
           allowFullScreen

@@ -1636,6 +1636,7 @@ export const bg = {
     legal: "Правна ИНФО",
     terms: "Общи условия",
     privacy: "Политика за поверителност",
+    cookies: "Настройки на бисквитките",
     copy: "DreamTeam. Всички права запазени.",
     made: "Направено с ♥ и AI."
   },
@@ -1645,6 +1646,41 @@ export const bg = {
     lastUpdated: "Последна актуализация:",
     privacyTitle: "Политика за поверителност",
     termsTitle: "Общи условия",
+  },
+  // The cookie banner (`components/consent/consent-banner.tsx`). The `cookies` lines name what each category
+  // stores and for how long - keep them in step with the vendors in `tracking-scripts.tsx` / `posthog-provider.tsx`
+  // and with the privacy policy.
+  consent: {
+    title: "Бисквитки",
+    // Short on purpose: it sits right under the „Бисквитки“ heading and carries the settings / policy links, so the
+    // whole block stays two lines (a longer line wrapped to three and the card grew by 16px).
+    text: "Анализ и реклама – само с ваше съгласие.",
+    privacy: "Политика за поверителност",
+    acceptAll: "Приемам всички",
+    necessaryOnly: "Само необходимите",
+    save: "Запази избора",
+    settings: "Настройки",
+    close: "Затвори",
+    embeds:
+      "Видеата се пускат от Bunny Stream и YouTube (в режим с повишена поверителност – YouTube поставя бисквитки само ако пуснете видео). Значката с отзиви на Clutch се зарежда от clutch.co.",
+    categories: {
+      necessary: {
+        name: "Необходими",
+        status: "Винаги включени",
+        desc: "Запомнят езика, темата и този ваш избор. Без тях сайтът не работи както трябва.",
+        cookies: "dt_consent (6 месеца) · app-lang, theme (в браузъра)",
+      },
+      analytics: {
+        name: "Аналитични",
+        desc: "PostHog, на сървъри в ЕС: как се ползва сайтът – страници, кликове и записи на сесии – за да го подобряваме.",
+        cookies: "ph_* (1 година)",
+      },
+      marketing: {
+        name: "Маркетингови",
+        desc: "Google Ads и OpenAI: дали рекламите ни водят до запитвания, и аудитории за ремаркетинг.",
+        cookies: "_gcl_au (90 дни) · __obref (1 година)",
+      },
+    },
   },
   training: {
     metaTitle: "Обучения по AI видео | DreamTeam",

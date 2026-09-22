@@ -47,7 +47,7 @@ import { projectsPath } from "@/lib/routes";
 import { cn } from "@/lib/utils";
 import { PROJECT_STORIES } from "./project-story";
 import { ClientSite, CtaBand, STORY_CONTAINER } from "./story/primitives";
-import { YOUTUBE_IFRAME_ALLOW, YOUTUBE_REFERRER_POLICY } from "@/lib/youtube-embeds";
+import { YOUTUBE_EMBED_BASE, YOUTUBE_IFRAME_ALLOW, YOUTUBE_REFERRER_POLICY } from "@/lib/youtube-embeds";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
@@ -328,7 +328,7 @@ function ProjectCaseStudyDefault({ project }: { project: Project }) {
                   >
                     <iframe
                       className="absolute inset-0 h-full w-full"
-                      src={`https://www.youtube.com/embed/${project.videoId}`}
+                      src={`${YOUTUBE_EMBED_BASE}/${project.videoId}`}
                       title={copy.headline}
                       allow={YOUTUBE_IFRAME_ALLOW}
                       allowFullScreen

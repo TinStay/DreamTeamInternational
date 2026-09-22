@@ -6,6 +6,7 @@ import { Sphere } from "./iridescent-shapes";
 import { LanguageToggle } from "./language-toggle";
 import { IconMail, IconMapPin, IconPhone } from "@tabler/icons-react";
 import { ClutchBadge, GoogleReviewsBadge } from "@/components/review-badges";
+import { openConsentSettings } from "@/lib/consent";
 import { EMAIL_PRIMARY, GOOGLE_REVIEWS, PHONE_PRIMARY, PHONE_SECONDARY } from "@/lib/contact-info";
 import { useLanguage } from "@/lib/i18n/language-context";
 import {
@@ -131,6 +132,10 @@ export function Footer() {
             <Link href={privacyPath(language)} className={linkClass}>
               {t.footer.privacy}
             </Link>
+            {/* Reopens the cookie banner on its settings - consent must be as easy to change as it was to give. */}
+            <button type="button" onClick={openConsentSettings} className={cn(linkClass, "cursor-pointer")}>
+              {t.footer.cookies}
+            </button>
           </div>
         </div>
       </div>

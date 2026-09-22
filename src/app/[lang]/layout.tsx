@@ -11,8 +11,9 @@ import { organizationGraph } from "@/lib/seo-graph";
 import { Analytics } from "@vercel/analytics/next";
 import { PostHogProvider } from "@/components/posthog-provider";
 import { PostHogPageView } from "@/components/posthog-pageview";
+import { ConsentBanner } from "@/components/consent/consent-banner";
+import { TrackingScripts } from "@/components/consent/tracking-scripts";
 import { Suspense } from "react";
-import Script from "next/script";
 
 /*
  * The root layout lives under the locale segment, so `<html lang>` is the
@@ -150,27 +151,12 @@ export default async function RootLayout({
         {/* Organization + website structured data (`lib/seo-graph.ts`), in the page's language. */}
         <script type="application/ld+json" dangerouslySetInnerHTML={jsonLd(organizationGraph(locale))} />
         {/*
-          OpenAI conversion pixel (oaiq). Vendor snippet kept verbatim: it stubs
-          `window.oaiq` with a command queue, then injects the real SDK, so calls
-          fired before the SDK lands are replayed. `afterInteractive` matches the
-          vendor's plain <script> placement without blocking hydration.
+          The marketing tags - the Google tag (Ads) and the OpenAI conversion pixel -
+          mount only with the visitor's marketing consent (`lib/consent.ts`); PostHog
+          likewise waits for analytics consent inside its provider. Vercel Analytics
+          is cookieless and stays ungated.
         */}
-        <Script id="openai-pixel" strategy="afterInteractive">
-          {`!function(w,d,s,u){if(w.oaiq)return;var q=function(){q.q.push(arguments)};q.q=[];w.oaiq=q;var j=d.createElement(s);j.async=1;j.src=u;var f=d.getElementsByTagName(s)[0];f.parentNode.insertBefore(j,f)}(window,document,"script","https://bzrcdn.openai.com/sdk/oaiq.min.js");oaiq("init",{pixelId:"9vxEQCFdaKzy9yXADo8cMC",debug:true});`}
-        </Script>
-        {/*
-          Google tag (gtag.js) for the Google Ads account AW-18108686547 - the base
-          tag: page views for Ads measurement and audiences. The snippet queues
-          into `dataLayer` before gtag.js lands, so the two scripts' order is
-          free; `afterInteractive` matches the vendor's async <script> without
-          blocking hydration. A conversion (e.g. a submitted form) needs its
-          conversion label from Ads - `gtag('event', 'conversion', { send_to:
-          'AW-18108686547/<label>' })` beside `trackLeadCreated` once there is one.
-        */}
-        <Script src="https://www.googletagmanager.com/gtag/js?id=AW-18108686547" strategy="afterInteractive" />
-        <Script id="google-tag" strategy="afterInteractive">
-          {`window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','AW-18108686547');`}
-        </Script>
+        <TrackingScripts />
         <PostHogProvider>
           <ThemeProvider
               attribute="class"
@@ -186,6 +172,7 @@ export default async function RootLayout({
                 <div className="relative z-10">
                   {children}
                 </div>
+                <ConsentBanner />
               </LanguageProvider>
             </ThemeProvider>
           <Analytics />

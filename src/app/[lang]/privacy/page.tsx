@@ -12,7 +12,7 @@ export function generateStaticParams() {
   return LOCALES.map((lang) => ({ lang }));
 }
 
-const LAST_UPDATED = "February 20, 2026";
+const LAST_UPDATED = "September 22, 2026";
 
 const META: Record<Language, { title: string; description: string }> = {
   en: {

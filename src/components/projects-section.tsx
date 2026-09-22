@@ -1,5 +1,6 @@
 "use client";
 
+import { YOUTUBE_EMBED_BASE } from "@/lib/youtube-embeds";
 import { useEffect, useRef, useState, type ComponentType } from "react";
 import Image from "next/image";
 import { motion, useInView, useReducedMotion } from "motion/react";
@@ -120,7 +121,7 @@ export function useProjectHighlightTags(project: Project): FactTag[] {
 
 /** Background-player URL: muted autoplay loop with all in-player chrome suppressed. */
 export function backgroundEmbedSrc(videoId: string) {
-  return `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${videoId}&modestbranding=1&playsinline=1&rel=0&disablekb=1&fs=0&iv_load_policy=3&cc_load_policy=0`;
+  return `${YOUTUBE_EMBED_BASE}/${videoId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${videoId}&modestbranding=1&playsinline=1&rel=0&disablekb=1&fs=0&iv_load_policy=3&cc_load_policy=0`;
 }
 
 /**

@@ -3,8 +3,8 @@ export function PrivacyEnglishContent() {
     <>
       <p className="not-prose text-[0.9375rem] leading-relaxed text-muted-foreground">
         We at &ldquo;DreamTeam&rdquo;, accessible at{" "}
-        <a href="https://dreamteam.video" className="text-primary underline-offset-4 hover:underline">
-          https://dreamteam.video
+        <a href="https://www.dreamteamvideo.com" className="text-primary underline-offset-4 hover:underline">
+          https://www.dreamteamvideo.com
         </a>
         , respect your privacy and are committed to protecting your personal data. This policy
         describes how we process information collected through our website.
@@ -26,27 +26,40 @@ export function PrivacyEnglishContent() {
       </ul>
 
       <h2>2. Data We Collect</h2>
+      <p>Our website is informational in nature; the data we process through it is:</p>
       <p>
-        Currently, our website is informational in nature, but in order to be prepared for future
-        communication with you, we plan to process the following categories of data:
+        <strong>Contact Data:</strong> When you send us an inquiry through a contact or quote form,
+        we collect your name, email address, phone number and what you write to us (including any
+        files you attach), and we receive it by email in order to reply.
       </p>
       <p>
-        <strong>Contact Data:</strong> When you fill out a contact form (currently under
-        development), we may collect your name, email address, and phone number.
-      </p>
-      <p>
-        <strong>Technical Data (Cookies):</strong> We use analytics and marketing tools that
-        automatically collect data:
+        <strong>Cookies and similar technologies:</strong> By itself the website stores only what it
+        needs to work: your language and theme and your cookie choice (the <code>dt_consent</code>{" "}
+        cookie, kept for six months). Everything else runs only after you agree in the cookie banner,
+        and you can change or withdraw your choice at any time from &ldquo;Cookie settings&rdquo; in
+        the footer:
       </p>
       <ul>
         <li>
-          <strong>Google Analytics:</strong> To track website traffic and user behavior.
+          <strong>Analytics (PostHog, servers in the EU):</strong> How the site is used &mdash; pages
+          visited, clicks and session recordings &mdash; so we can improve it. Cookie{" "}
+          <code>ph_*</code>, 1 year.
         </li>
         <li>
-          <strong>Meta Pixel (Facebook Pixel):</strong> To measure the effectiveness of our
-          advertisements and create custom audiences.
+          <strong>Marketing (Google Ads, OpenAI):</strong> Whether our advertisements lead to
+          inquiries, and audiences for remarketing. Cookies <code>_gcl_au</code> (90 days) and{" "}
+          <code>__obref</code> (1 year).
+        </li>
+        <li>
+          <strong>Embedded videos:</strong> YouTube videos load in privacy-enhanced mode and set
+          YouTube&rsquo;s cookies only when you play them; videos hosted on Bunny Stream set no
+          advertising cookies.
         </li>
       </ul>
+      <p>
+        We also use Vercel Analytics, which counts visits without cookies or personal identifiers, and
+        the Clutch review badge, which loads from clutch.co.
+      </p>
 
       <h2>3. Purposes of Processing</h2>
       <p>We use your data solely for:</p>
@@ -63,8 +76,10 @@ export function PrivacyEnglishContent() {
       </p>
       <ul>
         <li>
-          <strong>Service Providers:</strong> Such as Google and Meta (through their analytics
-          tools).
+          <strong>Service Providers:</strong> Vercel (hosting and cookieless analytics), Resend
+          (delivery of your inquiries to our email), PostHog (analytics, EU), Google and OpenAI
+          (advertising measurement &mdash; only with your consent), Bunny Stream and YouTube (video
+          hosting).
         </li>
         <li>
           <strong>Partners:</strong> Our website may contain links to our clients or partners in the
@@ -90,7 +105,10 @@ export function PrivacyEnglishContent() {
         <li>Access your personal data.</li>
         <li>Correction or deletion (&ldquo;right to be forgotten&rdquo;).</li>
         <li>Restriction of processing.</li>
-        <li>Opt out of cookies (through your browser settings).</li>
+        <li>
+          Change or withdraw your cookie consent at any time (&ldquo;Cookie settings&rdquo; in the
+          footer, or your browser settings).
+        </li>
       </ul>
 
       <h2>7. Data Retention Period</h2>

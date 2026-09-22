@@ -1637,6 +1637,7 @@ export const en = {
     legal: "Legal",
     terms: "Terms and Conditions",
     privacy: "Privacy Policy",
+    cookies: "Cookie settings",
     copy: "DreamTeam. All rights reserved.",
     made: "Made with ♥ and AI."
   },
@@ -1646,6 +1647,41 @@ export const en = {
     lastUpdated: "Last updated:",
     privacyTitle: "Privacy Policy",
     termsTitle: "Terms and Conditions",
+  },
+  // The cookie banner (`components/consent/consent-banner.tsx`). The `cookies` lines name what each category
+  // stores and for how long - keep them in step with the vendors in `tracking-scripts.tsx` / `posthog-provider.tsx`
+  // and with the privacy policy.
+  consent: {
+    title: "Cookies",
+    // Short on purpose: it sits right under the "Cookies" heading and carries the settings / policy links, so the
+    // whole block stays two lines (a longer line wrapped to three and the card grew by 16px).
+    text: "Analytics and ads — only with your consent.",
+    privacy: "Privacy policy",
+    acceptAll: "Accept all",
+    necessaryOnly: "Necessary only",
+    save: "Save choices",
+    settings: "Settings",
+    close: "Close",
+    embeds:
+      "Videos play from Bunny Stream and YouTube (privacy-enhanced mode: YouTube sets its cookies only when you press play). The Clutch review badge loads from clutch.co.",
+    categories: {
+      necessary: {
+        name: "Necessary",
+        status: "Always on",
+        desc: "Remember your language, theme and this cookie choice. The site does not work properly without them.",
+        cookies: "dt_consent (6 months) · app-lang, theme (browser storage)",
+      },
+      analytics: {
+        name: "Analytics",
+        desc: "PostHog, on servers in the EU: how the site is used - pages, clicks and session recordings - so we can improve it.",
+        cookies: "ph_* (1 year)",
+      },
+      marketing: {
+        name: "Marketing",
+        desc: "Google Ads and OpenAI: whether our ads lead to inquiries, and audiences for remarketing.",
+        cookies: "_gcl_au (90 days) · __obref (1 year)",
+      },
+    },
   },
   training: {
     metaTitle: "AI Video Training | DreamTeam",

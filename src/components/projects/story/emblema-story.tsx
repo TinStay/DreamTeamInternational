@@ -8,7 +8,7 @@ import { PARTNERS } from "@/lib/partners";
 import { bunnyPlayerEmbedSrc } from "@/lib/bunny-stream";
 import type { Project, StoryClip } from "@/lib/projects";
 import { cn } from "@/lib/utils";
-import { YOUTUBE_IFRAME_ALLOW, YOUTUBE_REFERRER_POLICY } from "@/lib/youtube-embeds";
+import { YOUTUBE_EMBED_BASE, YOUTUBE_IFRAME_ALLOW, YOUTUBE_REFERRER_POLICY } from "@/lib/youtube-embeds";
 import { Body, COPY_DELAY, ClientSite, CtaBand, EASE, Eyebrow, HERO_TITLE, Lead, PlayRing, Section, Split, StoryShell, VIEWPORT, fadeUp, fadeUpAfter, frameIn, stagger } from "./primitives";
 
 /*
@@ -113,7 +113,7 @@ function FilmMedia({ clip, orientation, title, placeholder }: { clip: StoryClip 
       <div className={frame}>
         <iframe
           className="absolute inset-0 h-full w-full"
-          src={`https://www.youtube.com/embed/${clip.youtube}?rel=0`}
+          src={`${YOUTUBE_EMBED_BASE}/${clip.youtube}?rel=0`}
           title={title}
           allow={YOUTUBE_IFRAME_ALLOW}
           allowFullScreen
