@@ -158,6 +158,19 @@ export default async function RootLayout({
         <Script id="openai-pixel" strategy="afterInteractive">
           {`!function(w,d,s,u){if(w.oaiq)return;var q=function(){q.q.push(arguments)};q.q=[];w.oaiq=q;var j=d.createElement(s);j.async=1;j.src=u;var f=d.getElementsByTagName(s)[0];f.parentNode.insertBefore(j,f)}(window,document,"script","https://bzrcdn.openai.com/sdk/oaiq.min.js");oaiq("init",{pixelId:"9vxEQCFdaKzy9yXADo8cMC",debug:true});`}
         </Script>
+        {/*
+          Google tag (gtag.js) for the Google Ads account AW-18108686547 - the base
+          tag: page views for Ads measurement and audiences. The snippet queues
+          into `dataLayer` before gtag.js lands, so the two scripts' order is
+          free; `afterInteractive` matches the vendor's async <script> without
+          blocking hydration. A conversion (e.g. a submitted form) needs its
+          conversion label from Ads - `gtag('event', 'conversion', { send_to:
+          'AW-18108686547/<label>' })` beside `trackLeadCreated` once there is one.
+        */}
+        <Script src="https://www.googletagmanager.com/gtag/js?id=AW-18108686547" strategy="afterInteractive" />
+        <Script id="google-tag" strategy="afterInteractive">
+          {`window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','AW-18108686547');`}
+        </Script>
         <PostHogProvider>
           <ThemeProvider
               attribute="class"
