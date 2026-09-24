@@ -40,7 +40,8 @@ function MegaLink({ href, className, children }: { href: string; className?: str
 }
 
 /**
- * The English site's desktop header (the client's "FMI" reference): the site's floating glass pill at rest; hovering
+ * The English site's desktop header (the client's "FMI" reference): a glass bar across the whole width of the screen,
+ * sliding away as the page scrolls down and back as soon as it scrolls up; hovering
  * (or tabbing into) the nav opens the whole bar into one panel with **every** section's links listed in a column under
  * its title - no per-item dropdowns - and it folds back up as the pointer leaves. The logo and the right-hand controls
  * stay on the top row. `/bg` keeps `SiteHeader`'s own desktop header.
@@ -58,7 +59,27 @@ export function MegaHeader({
   isScrolled: boolean;
 }) {
   const [open, setOpen] = useState(false);
+  const [hidden, setHidden] = useState(false);
   const closeTimer = useRef<number | null>(null);
+
+  // Slides away while the page scrolls down and comes back the moment it scrolls up (always shown near the top).
+  // State only when the flag flips, like the scrolled flag in `SiteHeader`.
+  useEffect(() => {
+    let lastY = window.scrollY;
+    let isHidden = false;
+    const onScroll = () => {
+      const y = window.scrollY;
+      const delta = y - lastY;
+      if (Math.abs(delta) < 6) return; // ignore jitter (and Lenis's sub-pixel steps)
+      lastY = y;
+      const next = y > 120 && delta > 0;
+      if (next === isHidden) return;
+      isHidden = next;
+      setHidden(next);
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   const show = () => {
     if (closeTimer.current) window.clearTimeout(closeTimer.current);
@@ -80,9 +101,11 @@ export function MegaHeader({
   return (
     <header
       className={cn(
-        "fixed inset-x-0 top-4 z-50 mx-auto hidden w-[96%] transition-transform duration-300 lg:block",
-        isScrolled && !open ? "scale-[0.985]" : "scale-100"
+        "fixed inset-x-0 top-0 z-50 hidden w-full transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] lg:block",
+        hidden && !open ? "-translate-y-full" : "translate-y-0"
       )}
+      // Hidden off screen: out of the tab order and the accessibility tree until it comes back.
+      inert={hidden && !open}
       onMouseLeave={hide}
       onKeyDown={(event) => {
         if (event.key === "Escape") setOpen(false);
@@ -91,16 +114,15 @@ export function MegaHeader({
         if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setOpen(false);
       }}
     >
+      {/* The whole width of the screen, edge to edge, with a hairline along the bottom. */}
       <div
         className={cn(
-          "overflow-hidden ps-7 pe-3.5 transition-[border-radius,background-color,box-shadow] duration-300 ease-out",
+          "overflow-hidden border-b px-[clamp(1.5rem,3vw,3.5rem)] transition-[background-color,box-shadow,border-color] duration-300 ease-out",
           open
-            ? "rounded-[2rem] border border-card-border bg-card shadow-[0_34px_80px_-20px_rgba(2,6,23,0.6)]"
+            ? "border-card-border bg-card shadow-[0_34px_80px_-20px_rgba(2,6,23,0.6)]"
             : cn(
-                "liquid-glass-header rounded-[2rem]",
-                isScrolled
-                  ? "shadow-[0_18px_50px_-12px_rgba(2,6,23,0.45)]"
-                  : "shadow-[0_12px_36px_-14px_rgba(2,6,23,0.3)]"
+                "liquid-glass-header border-transparent",
+                isScrolled ? "shadow-[0_18px_50px_-12px_rgba(2,6,23,0.45)]" : "shadow-none"
               )
         )}
       >
