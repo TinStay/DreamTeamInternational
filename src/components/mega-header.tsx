@@ -15,7 +15,8 @@ export type MegaNavGroup = {
   items: { label: string; href: string }[];
 };
 
-/** A link's ink: the brand's red → violet gradient under the letters, showing as the colour fades out on hover. */
+/** A link's ink: the brand's red → violet gradient under the letters, showing as the colour fades out on hover. The
+ * resting colour must be opaque, or the gradient shows through it. */
 const INK =
   "bg-gradient-to-r from-[var(--primary-gradient-start)] to-[var(--primary-gradient-end)] bg-clip-text transition-colors duration-200 ease-out group-hover/link:text-transparent group-focus-visible/link:text-transparent";
 
@@ -50,13 +51,11 @@ export function MegaHeader({
   logoHref,
   groups,
   controls,
-  isScrolled,
 }: {
   logoHref: string;
   groups: MegaNavGroup[];
   /** The right-hand controls (theme toggle, copy buttons, quote pill). */
   controls: ReactNode;
-  isScrolled: boolean;
 }) {
   const [open, setOpen] = useState(false);
   const [hidden, setHidden] = useState(false);
@@ -117,13 +116,8 @@ export function MegaHeader({
       {/* The whole width of the screen, edge to edge, with a hairline along the bottom. */}
       <div
         className={cn(
-          "overflow-hidden border-b px-[clamp(1.5rem,3vw,3.5rem)] transition-[background-color,box-shadow,border-color] duration-300 ease-out",
-          open
-            ? "border-card-border bg-card shadow-[0_34px_80px_-20px_rgba(2,6,23,0.6)]"
-            : cn(
-                "liquid-glass-header border-transparent",
-                isScrolled ? "shadow-[0_18px_50px_-12px_rgba(2,6,23,0.45)]" : "shadow-none"
-              )
+          "alu-bar overflow-hidden px-[clamp(1.5rem,3vw,3.5rem)] text-white transition-shadow duration-300 ease-out",
+          open && "shadow-[0_34px_80px_-20px_rgba(0,0,0,0.75)]"
         )}
       >
         <div className="flex w-full items-start justify-between gap-6">
@@ -140,11 +134,11 @@ export function MegaHeader({
           </Link>
 
           {/* Each column: the section's title on the bar's row and, while open, its links right under it. */}
-          {/* Equal columns across the bar (a section without links only as wide as its title), so the titles are
-              evenly spread whatever their lists hold; a long link wraps inside its column rather than widening it. */}
+          {/* Left-aligned beside the logo, in equal columns (`--col`; a section without links only as wide as its title),
+              so the titles sit evenly whatever their lists hold; a long link wraps inside its column. */}
           <nav
-            className="grid min-w-0 flex-1 items-start gap-x-4 px-2 text-base font-semibold text-foreground/85 xl:gap-x-8 xl:px-6 xl:text-[1.0625rem] 2xl:gap-x-10 2xl:px-10 2xl:text-lg"
-            style={{ gridTemplateColumns: groups.map((g) => (g.items.length ? "minmax(0,1fr)" : "auto")).join(" ") }}
+            className="grid min-w-0 flex-1 items-start justify-start gap-x-4 ps-6 text-base font-semibold text-[#ececee] [--col:6.5rem] xl:gap-x-5 xl:ps-10 xl:text-[1.0625rem] xl:[--col:7.5rem] 2xl:gap-x-7 2xl:ps-14 2xl:text-lg 2xl:[--col:9rem]"
+            style={{ gridTemplateColumns: groups.map((g) => (g.items.length ? "minmax(0,var(--col))" : "auto")).join(" ") }}
             onMouseEnter={show}
             onFocus={show}
           >
@@ -162,7 +156,7 @@ export function MegaHeader({
                   >
                     <ul
                       aria-label={group.label}
-                      className="flex flex-col gap-2.5 pb-7 text-sm font-medium text-foreground/70 xl:text-[0.9375rem]"
+                      className="flex flex-col gap-2.5 pb-7 text-sm font-medium text-[#a7abb2] xl:text-[0.9375rem]"
                     >
                       {group.items.map((item, i) => (
                         <motion.li
@@ -171,7 +165,7 @@ export function MegaHeader({
                           animate={open ? { opacity: 1, y: 0 } : { opacity: 0, y: -4 }}
                           transition={{ duration: 0.25, delay: open ? 0.05 + i * 0.025 : 0, ease: EASE }}
                         >
-                          <MegaLink href={item.href} className="whitespace-normal leading-snug hover:text-foreground">
+                          <MegaLink href={item.href} className="whitespace-normal leading-snug hover:text-white">
                             {item.label}
                           </MegaLink>
                         </motion.li>

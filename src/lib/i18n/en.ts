@@ -9,6 +9,14 @@ export const en = {
     contactCta: "Contact us",
     training: "Training",
     projects: "Case Studies",
+    // The English mega menu's first column (`mega-header.tsx`) - the home page's sections, until there is an About page.
+    about: "About Us",
+    aboutItems: {
+      stats: "Our numbers",
+      reviews: "Reviews",
+      process: "How we work",
+      faq: "FAQ"
+    },
     phoneCopy: "Copy phone number",
     emailCopy: "Copy email",
     phoneCopied: "Copied!"

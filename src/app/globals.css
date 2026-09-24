@@ -898,6 +898,12 @@ body.service-modal-open .service-mobile-dock {
     display: block;
     height: 1.25em;
   }
+  /* The header's size (the English mega menu). */
+  .tiger-cta--sm {
+    --h: 44px;
+    padding: 0 26px;
+    font-size: 15px;
+  }
   .tiger-cta:is(:hover, :focus-visible) {
     color: #1a1105;
     box-shadow: inset 0 0 0 1px rgba(255, 205, 74, 0.5), 0 0 0 1px rgba(255, 190, 70, 0.15),
@@ -979,3 +985,15 @@ body.service-modal-open .service-mobile-dock {
     transform: translateX(-100%);
   }
 }
+
+/* The English mega menu's bar (`mega-header.tsx`): brushed graphite aluminium - a cool grey that brightens toward the
+   middle, a soft gloss from the top, fine horizontal grain, a bright hairline along the top edge and a dark one along
+   the bottom. Opaque enough to read over any page; it grows with the open panel. */
+.alu-bar {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.07) 0%, rgba(255, 255, 255, 0) 38%, rgba(0, 0, 0, 0.16) 100%),
+    repeating-linear-gradient(180deg, rgba(255, 255, 255, 0.018) 0 1px, rgba(0, 0, 0, 0.018) 1px 2px),
+    linear-gradient(90deg, #26282c 0%, #34373c 22%, #44484e 50%, #34373c 78%, #26282c 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14), inset 0 -1px 0 rgba(0, 0, 0, 0.5), 0 10px 30px -12px rgba(0, 0, 0, 0.6);
+}
+

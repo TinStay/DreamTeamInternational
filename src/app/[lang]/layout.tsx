@@ -161,6 +161,8 @@ export default async function RootLayout({
           <ThemeProvider
               attribute="class"
               defaultTheme="dark"
+              // The English site is dark only (its header has no theme toggle); /bg keeps the visitor's choice.
+              forcedTheme={locale === "en" ? "dark" : undefined}
               enableSystem={false}
               disableTransitionOnChange={false}
             >

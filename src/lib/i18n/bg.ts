@@ -9,6 +9,14 @@ export const bg = {
     contactCta: "Свържи се с нас",
     training: "Обучения",
     projects: "Проекти",
+    // Първата колона на английското мега меню (`mega-header.tsx`) - засега не се показва на /bg.
+    about: "За нас",
+    aboutItems: {
+      stats: "Нашите резултати",
+      reviews: "Отзиви",
+      process: "Как работим",
+      faq: "Въпроси"
+    },
     phoneCopy: "Копирай телефонния номер",
     emailCopy: "Копирай имейла",
     phoneCopied: "Копирано!"

@@ -11,6 +11,7 @@ import { ThemeToggle } from "./theme-toggle";
 import { ButtonWithIcon } from "@/components/ui/button-with-icon";
 import { GlassShell } from "@/components/ui/glass-shell";
 import { MegaHeader, type MegaNavGroup } from "@/components/mega-header";
+import { TigerCta } from "@/components/hero-tiger/tiger-cta";
 import { useTrainingCards } from "@/components/training/use-training-cards";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/lib/i18n/language-context";
@@ -215,6 +216,14 @@ export function SiteHeader() {
 
   // The English mega menu's columns: each section and the pages under it (Contact has none).
   const megaGroups: MegaNavGroup[] = [
+    {
+      label: t.header.about,
+      href: `${homeHref}#stats`,
+      items: (["stats", "reviews", "process", "faq"] as const).map((key) => ({
+        label: t.header.aboutItems[key],
+        href: `${homeHref}#${key}`,
+      })),
+    },
     { label: t.header.projects, href: projectsPath(language), items: projectItems },
     {
       label: t.header.portfolio,
@@ -266,7 +275,8 @@ export function SiteHeader() {
             />
           </Link>
           <div className="flex shrink-0 items-center gap-2.5">
-            <ThemeToggle className="shrink-0" />
+            {/* English is dark only (`forcedTheme` in the layout), so no toggle there. */}
+            {language === "en" ? null : <ThemeToggle className="shrink-0" />}
             <EmailIconLink className="size-10" />
             <PhoneIconLink className="size-10" />
           </div>
@@ -275,7 +285,13 @@ export function SiteHeader() {
 
       {/* Desktop, English: the mega menu - every section's links in one panel (`mega-header.tsx`). */}
       {language === "en" ? (
-        <MegaHeader logoHref={homeHref} groups={megaGroups} controls={desktopControls} isScrolled={isScrolled} />
+        <MegaHeader
+          logoHref={homeHref}
+          groups={megaGroups}
+          // English: dark only (no theme toggle, `forcedTheme` in the layout), no copy buttons - just the hero's
+          // amber "Let's talk" pill.
+          controls={<TigerCta href={contactProcessPath(language)} label={t.hero.tiger.cta} className="tiger-cta--sm" />}
+        />
       ) : (
       /* Desktop: floating pill (like the mobile bar) - 96% wide, detached from the top and the corners. */
       <header
