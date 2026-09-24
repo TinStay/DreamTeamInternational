@@ -1,6 +1,6 @@
 import { SiteHeader } from "@/components/site-header";
 import { MobileNav } from "@/components/mobile-nav";
-import { HeroSection } from "@/components/hero-section";
+import { EnHeroSection } from "@/components/en-hero-section";
 import { QuoteFormSection } from "@/components/quote-form/quote-form-section";
 import { ProjectsShowcase } from "@/components/projects-showcase";
 import { ContactSection } from "@/components/contact-section";
@@ -38,7 +38,7 @@ export function EnHomePage() {
           {/* The hero is the landing view: pinned from the top of the page, no room of its own. */}
           <JourneyScene className="pt-0" hold={0}>
             {/* Partners marquee lives inside the hero (bottom strip over the video). */}
-            <HeroSection />
+            <EnHeroSection />
           </JourneyScene>
           {/* Extra room so the wizard never starts leaving while someone is still on a short step. */}
           <JourneyScene hold={0.45} backdrop={servicesBackdrop}>

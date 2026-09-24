@@ -21,7 +21,13 @@ export const en = {
       "DreamTeam - AI video production and AI-powered video ads for brands in Bulgaria and worldwide",
     subtitle: "If you can imagine it, we can deliver it - AI video and media production for your brand.",
     cta1: "Request a quote",
-    cta2: "View Our Work"
+    cta2: "View Our Work",
+    // The English home page's tiger hero (`en-hero-section.tsx`).
+    tiger: {
+      cta: "Let’s talk",
+      hint: "Move to wake it",
+      trustedBy: "Trusted by"
+    }
   },
   contactPage: {
     metaTitle: "Contact & Process | DreamTeam",
