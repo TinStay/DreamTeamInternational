@@ -10,6 +10,7 @@ import { ThemeToggle } from "./theme-toggle";
 // import { LanguageDropdown } from "./language-dropdown";
 import { ButtonWithIcon } from "@/components/ui/button-with-icon";
 import { GlassShell } from "@/components/ui/glass-shell";
+import { MegaHeader, type MegaNavGroup } from "@/components/mega-header";
 import { useTrainingCards } from "@/components/training/use-training-cards";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/lib/i18n/language-context";
@@ -28,6 +29,9 @@ import {
 } from "@/lib/routes";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
+
+/** The portfolio's categories in its menu's order (`portfolio-section.tsx` - "All" is off the menu). */
+const PORTFOLIO_CATEGORY_KEYS = ["construction", "mascots", "tv", "cars", "product", "services", "animated"] as const;
 
 /**
  * The nav links' ink: the brand's red → violet gradient sits under the letters, clipped to them, and shows as the
@@ -209,6 +213,38 @@ export function SiteHeader() {
     ),
   }));
 
+  // The English mega menu's columns: each section and the pages under it (Contact has none).
+  const megaGroups: MegaNavGroup[] = [
+    { label: t.header.projects, href: projectsPath(language), items: projectItems },
+    {
+      label: t.header.portfolio,
+      href: portfolioPath(language),
+      items: PORTFOLIO_CATEGORY_KEYS.map((key) => ({
+        label: t.portfolio.categories[key],
+        href: `${portfolioPath(language)}?category=${key}`,
+      })),
+    },
+    { label: t.header.services, href: servicesPath(language), items: serviceItems },
+    { label: t.header.training, href: trainingPath(language), items: trainingItems },
+    { label: t.header.contact, href: contactProcessPath(language), items: [] },
+  ];
+
+  const desktopControls = (
+    <>
+      {/* <LanguageDropdown /> */}
+      <ThemeToggle className="shrink-0" />
+      {/* Plain round icon buttons: copy the email / phone with a "copied" tag as the only feedback. */}
+      <EmailCopyButton />
+      <PhoneCopyButton />
+      {/* The site's main CTA - the projects' arrow-disc pill at the slim header size, hugging the bar's right end
+          (the bar's end padding equals its vertical one) under a faint brand-gradient glow - opens the services
+          page (its cards carry the quote pills). */}
+      <ButtonWithIcon href={servicesPath(language)} surface="auto" size="sm" glow className="h-10 shrink-0">
+        {t.header.quoteCta}
+      </ButtonWithIcon>
+    </>
+  );
+
   return (
     <>
       {/* Mobile: glass bar — DT logo left, theme toggle right. Wider and taller than the bottom dock (96%, a 2.5rem
@@ -237,7 +273,11 @@ export function SiteHeader() {
         </GlassShell>
       </header>
 
-      {/* Desktop: floating pill (like the mobile bar) - 96% wide, detached from the top and the corners. */}
+      {/* Desktop, English: the mega menu - every section's links in one panel (`mega-header.tsx`). */}
+      {language === "en" ? (
+        <MegaHeader logoHref={homeHref} groups={megaGroups} controls={desktopControls} isScrolled={isScrolled} />
+      ) : (
+      /* Desktop: floating pill (like the mobile bar) - 96% wide, detached from the top and the corners. */
       <header
         className={cn(
           "fixed inset-x-0 top-4 z-50 mx-auto hidden w-[96%] transition-all duration-300 lg:block",
@@ -283,22 +323,11 @@ export function SiteHeader() {
             </nav>
 
             {/* Right controls */}
-            <div className="flex flex-shrink-0 items-center justify-end gap-3">
-              {/* <LanguageDropdown /> */}
-              <ThemeToggle className="shrink-0" />
-              {/* Plain round icon buttons: copy the email / phone with a "copied" tag as the only feedback. */}
-              <EmailCopyButton />
-              <PhoneCopyButton />
-              {/* The site's main CTA - the projects' arrow-disc pill at the slim header size, hugging the bar's right end
-                  (the bar's end padding equals its vertical one) under a faint brand-gradient glow - opens the services
-                  page (its cards carry the quote pills). */}
-              <ButtonWithIcon href={servicesPath(language)} surface="auto" size="sm" glow className="h-10 shrink-0">
-                {t.header.quoteCta}
-              </ButtonWithIcon>
-            </div>
+            <div className="flex flex-shrink-0 items-center justify-end gap-3">{desktopControls}</div>
           </div>
         </div>
       </header>
+      )}
     </>
   );
 }
