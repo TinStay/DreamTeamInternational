@@ -997,3 +997,13 @@ body.service-modal-open .service-mobile-dock {
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14), inset 0 -1px 0 rgba(0, 0, 0, 0.5), 0 10px 30px -12px rgba(0, 0, 0, 0.6);
 }
 
+/* The English site (`html.site-cream`, set in `[lang]/layout.tsx` with the light theme forced): one warm cream ground
+   everywhere - the page token, the fixed page background and a card surface warmed to match. */
+html.site-cream {
+  --background: #f8f6ed;
+  --card: #fdfcf6;
+}
+html.site-cream .bloom-field-gradient {
+  /* Solid cream - no brand tints, no grain. */
+  background: #f8f6ed;
+}

@@ -134,6 +134,8 @@ export default async function RootLayout({
 }>) {
   const { lang } = await params;
   const locale = isLocale(lang) ? lang : "bg";
+  // The English site is one light look on a cream ground (`html.site-cream` in globals.css); /bg starts dark.
+  const cream = locale === "en";
   return (
     // `class="dark"` is rendered server-side so the FIRST paint is already dark —
     // without it the light `:root` palette flashes until next-themes' script runs.
@@ -143,8 +145,8 @@ export default async function RootLayout({
     // resolved on `:root`, so the families must be defined there too.
     <html
       lang={locale}
-      className={`dark ${exo.variable} ${montserrat.variable} ${playfair.variable} ${manrope.variable} ${spaceGrotesk.variable} ${dmSans.variable}`}
-      style={{ colorScheme: "dark" }}
+      className={`${cream ? "site-cream" : "dark"} ${exo.variable} ${montserrat.variable} ${playfair.variable} ${manrope.variable} ${spaceGrotesk.variable} ${dmSans.variable}`}
+      style={{ colorScheme: cream ? "light" : "dark" }}
       suppressHydrationWarning
     >
       <body className="font-sans antialiased relative min-h-screen" suppressHydrationWarning>
@@ -161,8 +163,9 @@ export default async function RootLayout({
           <ThemeProvider
               attribute="class"
               defaultTheme="dark"
-              // The English site is dark only (its header has no theme toggle); /bg keeps the visitor's choice.
-              forcedTheme={locale === "en" ? "dark" : undefined}
+              // The English site has one theme - light, on the cream ground (its header has no theme toggle); /bg keeps
+              // the visitor's choice.
+              forcedTheme={cream ? "light" : undefined}
               enableSystem={false}
               disableTransitionOnChange={false}
             >

@@ -121,6 +121,7 @@ export function MegaHeader({
         )}
       >
         <div className="flex w-full items-start justify-between gap-6">
+          {/* The white logo on the graphite bar whatever the theme (the file is dark ink, so always inverted). */}
           <Link href={logoHref} className="group flex h-[4.25rem] min-w-0 shrink-0 items-center pr-3">
             <Image
               src="/logo-1.png"
@@ -129,7 +130,7 @@ export function MegaHeader({
               height={416}
               sizes="130px"
               priority
-              className="h-10 w-auto grayscale transition-all group-hover:grayscale-0 dark:invert md:h-11"
+              className="h-10 w-auto grayscale invert transition-all group-hover:grayscale-0 md:h-11"
             />
           </Link>
 
@@ -137,7 +138,7 @@ export function MegaHeader({
           {/* Left-aligned beside the logo, in equal columns (`--col`; a section without links only as wide as its title),
               so the titles sit evenly whatever their lists hold; a long link wraps inside its column. */}
           <nav
-            className="grid min-w-0 flex-1 items-start justify-start gap-x-4 ps-6 text-base font-semibold text-[#ececee] [--col:6.5rem] xl:gap-x-5 xl:ps-10 xl:text-[1.0625rem] xl:[--col:7.5rem] 2xl:gap-x-7 2xl:ps-14 2xl:text-lg 2xl:[--col:9rem]"
+            className="grid min-w-0 flex-1 items-start justify-start gap-x-3 ps-4 text-base font-semibold text-[#ececee] [--col:5.75rem] xl:gap-x-4 xl:ps-6 xl:text-[1.0625rem] xl:[--col:6.5rem] 2xl:gap-x-5 2xl:ps-8 2xl:text-lg 2xl:[--col:7.75rem]"
             style={{ gridTemplateColumns: groups.map((g) => (g.items.length ? "minmax(0,var(--col))" : "auto")).join(" ") }}
             onMouseEnter={show}
             onFocus={show}

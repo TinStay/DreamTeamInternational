@@ -275,7 +275,7 @@ export function SiteHeader() {
             />
           </Link>
           <div className="flex shrink-0 items-center gap-2.5">
-            {/* English is dark only (`forcedTheme` in the layout), so no toggle there. */}
+            {/* English has one theme (`forcedTheme` in the layout), so no toggle there. */}
             {language === "en" ? null : <ThemeToggle className="shrink-0" />}
             <EmailIconLink className="size-10" />
             <PhoneIconLink className="size-10" />
@@ -288,7 +288,7 @@ export function SiteHeader() {
         <MegaHeader
           logoHref={homeHref}
           groups={megaGroups}
-          // English: dark only (no theme toggle, `forcedTheme` in the layout), no copy buttons - just the hero's
+          // English: one theme (no theme toggle, `forcedTheme` in the layout), no copy buttons - just the hero's
           // amber "Let's talk" pill.
           controls={<TigerCta href={contactProcessPath(language)} label={t.hero.tiger.cta} className="tiger-cta--sm" />}
         />

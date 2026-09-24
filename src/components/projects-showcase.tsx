@@ -736,10 +736,17 @@ function scrollTargetFor(section: HTMLElement, stage: HTMLElement, index: number
  * the stage; a phone switches on its first client render - the section is far below the fold then, so the swap
  * costs nothing visible.
  */
-export function ProjectsShowcase({ className }: { className?: string }) {
+export function ProjectsShowcase({
+  className,
+  layout = "stage",
+}: {
+  className?: string;
+  /** `list`: always the case-study rows - no sticky stage (the English home page's plain, continuous scroll). */
+  layout?: "stage" | "list";
+}) {
   const reduceMotion = useReducedMotion();
   const phone = useMediaQuery(PHONE_QUERY);
-  if (reduceMotion) return <ProjectsList className={className} />;
+  if (reduceMotion || layout === "list") return <ProjectsList className={className} />;
   if (phone) return <StackedStage className={className} />;
   return <ScrollStage className={className} />;
 }
