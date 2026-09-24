@@ -113,11 +113,11 @@ export function MegaHeader({
         if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setOpen(false);
       }}
     >
-      {/* The whole width of the screen, edge to edge, with a hairline along the bottom. */}
+      {/* The whole width of the screen, edge to edge, in smoked glass (`.smoke-bar`, globals.css). */}
       <div
         className={cn(
-          "alu-bar overflow-hidden px-[clamp(1.5rem,3vw,3.5rem)] text-white transition-shadow duration-300 ease-out",
-          open && "shadow-[0_34px_80px_-20px_rgba(0,0,0,0.75)]"
+          "smoke-bar overflow-hidden px-[clamp(1.5rem,3vw,3.5rem)] text-white",
+          open && "is-open"
         )}
       >
         <div className="flex w-full items-start justify-between gap-6">

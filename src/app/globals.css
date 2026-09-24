@@ -986,15 +986,30 @@ body.service-modal-open .service-mobile-dock {
   }
 }
 
-/* The English mega menu's bar (`mega-header.tsx`): brushed graphite aluminium - a cool grey that brightens toward the
-   middle, a soft gloss from the top, fine horizontal grain, a bright hairline along the top edge and a dark one along
-   the bottom. Opaque enough to read over any page; it grows with the open panel. */
-.alu-bar {
+/* The English mega menu's bar (`mega-header.tsx`): deep smoked glass - a blackish, see-through gradient over a strong
+   backdrop blur, lit like a 3D object (a soft light pooled at the top centre, a bright hairline along the top edge, a
+   dark one along the bottom, a long shadow under it). More solid while the panel is open (`.is-open`), so its links
+   read over any page. */
+.smoke-bar {
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.07) 0%, rgba(255, 255, 255, 0) 38%, rgba(0, 0, 0, 0.16) 100%),
-    repeating-linear-gradient(180deg, rgba(255, 255, 255, 0.018) 0 1px, rgba(0, 0, 0, 0.018) 1px 2px),
-    linear-gradient(90deg, #26282c 0%, #34373c 22%, #44484e 50%, #34373c 78%, #26282c 100%);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14), inset 0 -1px 0 rgba(0, 0, 0, 0.5), 0 10px 30px -12px rgba(0, 0, 0, 0.6);
+    radial-gradient(120% 140% at 50% -30%, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0) 55%),
+    linear-gradient(180deg, rgba(22, 22, 26, 0.62) 0%, rgba(6, 6, 8, 0.5) 100%);
+  -webkit-backdrop-filter: blur(22px) saturate(150%);
+  backdrop-filter: blur(22px) saturate(150%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.14),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.45),
+    0 18px 40px -18px rgba(0, 0, 0, 0.55);
+  transition: background-color 0.3s ease;
+}
+.smoke-bar.is-open {
+  background:
+    radial-gradient(120% 60% at 50% -10%, rgba(255, 255, 255, 0.09) 0%, rgba(255, 255, 255, 0) 60%),
+    linear-gradient(180deg, rgba(18, 18, 22, 0.86) 0%, rgba(6, 6, 8, 0.8) 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.14),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.5),
+    0 40px 90px -30px rgba(0, 0, 0, 0.75);
 }
 
 /* The English site (`html.site-cream`, set in `[lang]/layout.tsx` with the light theme forced): one warm cream ground
