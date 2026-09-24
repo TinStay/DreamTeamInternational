@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { HomePage } from "@/app/home-page";
+import { EnHomePage } from "@/app/en-home-page";
 import { localeAlternates } from "@/lib/routes";
 import { LOCALES, getDictionary, isLocale } from "@/lib/i18n/config";
 
@@ -35,5 +36,6 @@ export default async function LocaleHomePage({
 }) {
   const { lang } = await params;
   if (!isLocale(lang)) notFound();
-  return <HomePage />;
+  // English gets its own home page file, so its layout can differ from the Bulgarian one.
+  return lang === "en" ? <EnHomePage /> : <HomePage />;
 }
