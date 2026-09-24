@@ -1012,13 +1012,49 @@ body.service-modal-open .service-mobile-dock {
     0 40px 90px -30px rgba(0, 0, 0, 0.75);
 }
 
-/* The English site (`html.site-cream`, set in `[lang]/layout.tsx` with the light theme forced): one warm cream ground
-   everywhere - the page token, the fixed page background and a card surface warmed to match. */
-html.site-cream {
-  --background: #f8f6ed;
-  --card: #fdfcf6;
+/* The English site (`html.site-deep`, set in `[lang]/layout.tsx` with the dark theme forced): a deep, dark 3D space
+   behind every page - a near-black room lit faintly from the horizon, a perspective grid floor running away into the
+   distance and fading into fog, and a vignette closing the edges in - with neutral, see-through black surfaces for the
+   cards (the site's dark ones are bluish). Static on purpose: nothing here repaints while the page scrolls. */
+html.site-deep {
+  --background: #050506;
+  --card: color-mix(in srgb, #121317 82%, transparent);
+  --popover: #101115;
+  --muted: #1c1d22;
 }
-html.site-cream .bloom-field-gradient {
-  /* Solid cream - no brand tints, no grain. */
-  background: #f8f6ed;
+html.site-deep .page-dark-grid-layer {
+  display: none;
+}
+html.site-deep .deep-space {
+  display: block;
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background:
+    radial-gradient(90% 55% at 50% 62%, rgba(120, 124, 140, 0.16) 0%, rgba(40, 42, 50, 0.08) 38%, rgba(0, 0, 0, 0) 70%),
+    radial-gradient(140% 90% at 50% 0%, #121318 0%, #08090b 45%, #030304 100%);
+}
+/* The floor: a grid laid flat and tipped away in perspective, its far edge on the horizon (62% down). */
+html.site-deep .deep-space__floor {
+  position: absolute;
+  left: -50%;
+  right: -50%;
+  top: 62%;
+  height: 120%;
+  background-image:
+    linear-gradient(to right, rgba(255, 255, 255, 0.07) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.07) 1px, transparent 1px);
+  background-size: 80px 80px;
+  transform: perspective(700px) rotateX(72deg);
+  transform-origin: 50% 0;
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 22%, #000 70%, transparent 100%);
+  mask-image: linear-gradient(to bottom, transparent 0%, #000 22%, #000 70%, transparent 100%);
+}
+/* Fog along the horizon, and the vignette. */
+html.site-deep .deep-space__fog {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(to bottom, rgba(3, 3, 4, 0) 48%, rgba(18, 19, 24, 0.55) 62%, rgba(3, 3, 4, 0) 80%),
+    radial-gradient(120% 100% at 50% 50%, rgba(0, 0, 0, 0) 55%, rgba(0, 0, 0, 0.7) 100%);
 }

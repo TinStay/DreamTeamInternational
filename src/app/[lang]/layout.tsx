@@ -134,8 +134,9 @@ export default async function RootLayout({
 }>) {
   const { lang } = await params;
   const locale = isLocale(lang) ? lang : "bg";
-  // The English site is one light look on a cream ground (`html.site-cream` in globals.css); /bg starts dark.
-  const cream = locale === "en";
+  // The English site is dark only, over a deep 3D space (`html.site-deep` in globals.css); /bg starts dark and keeps the
+  // visitor's choice.
+  const deep = locale === "en";
   return (
     // `class="dark"` is rendered server-side so the FIRST paint is already dark —
     // without it the light `:root` palette flashes until next-themes' script runs.
@@ -145,8 +146,8 @@ export default async function RootLayout({
     // resolved on `:root`, so the families must be defined there too.
     <html
       lang={locale}
-      className={`${cream ? "site-cream" : "dark"} ${exo.variable} ${montserrat.variable} ${playfair.variable} ${manrope.variable} ${spaceGrotesk.variable} ${dmSans.variable}`}
-      style={{ colorScheme: cream ? "light" : "dark" }}
+      className={`dark${deep ? " site-deep" : ""} ${exo.variable} ${montserrat.variable} ${playfair.variable} ${manrope.variable} ${spaceGrotesk.variable} ${dmSans.variable}`}
+      style={{ colorScheme: "dark" }}
       suppressHydrationWarning
     >
       <body className="font-sans antialiased relative min-h-screen" suppressHydrationWarning>
@@ -163,9 +164,9 @@ export default async function RootLayout({
           <ThemeProvider
               attribute="class"
               defaultTheme="dark"
-              // The English site has one theme - light, on the cream ground (its header has no theme toggle); /bg keeps
+              // The English site has one theme - dark, over the deep space (its header has no theme toggle); /bg keeps
               // the visitor's choice.
-              forcedTheme={cream ? "light" : undefined}
+              forcedTheme={deep ? "dark" : undefined}
               enableSystem={false}
               disableTransitionOnChange={false}
             >
