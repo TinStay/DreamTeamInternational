@@ -14,6 +14,7 @@ import { MegaHeader, type MegaNavGroup } from "@/components/mega-header";
 import { TigerCta } from "@/components/hero-tiger/tiger-cta";
 import { useTrainingCards } from "@/components/training/use-training-cards";
 import { cn } from "@/lib/utils";
+import { brandLogo } from "@/lib/brand-logo";
 import { useLanguage } from "@/lib/i18n/language-context";
 import { PARTNERS, PARTNER_ICON_BASE } from "@/lib/partners";
 import { PROJECTS } from "@/lib/projects";
@@ -151,6 +152,7 @@ export function SiteHeader() {
   const { t, language } = useLanguage();
   const homeHref = homePath(language);
   const trainingCards = useTrainingCards();
+  const logo = brandLogo(language);
 
   useEffect(() => {
     // State only when the flag flips - a set on every scroll event scheduled React work per event for nothing.
@@ -266,12 +268,15 @@ export function SiteHeader() {
         <GlassShell className="flex items-center justify-between gap-3 px-5 py-2.5">
           <Link href={homeHref} className="group flex min-w-0 shrink items-center py-1 pr-2">
             <Image
-              src="/logo-1.png"
-              alt="DreamTeam"
-              width={1024}
-              height={416}
-              sizes="128px"
-              className="h-10 w-auto grayscale transition-all group-hover:grayscale-0 dark:invert"
+              src={logo.src}
+              alt={logo.alt}
+              width={logo.width}
+              height={logo.height}
+              sizes="160px"
+              className={cn(
+                "w-auto grayscale transition-all group-hover:grayscale-0 dark:invert",
+                language === "en" ? "h-7" : "h-10"
+              )}
             />
           </Link>
           <div className="flex shrink-0 items-center gap-2.5">

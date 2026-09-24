@@ -6,6 +6,7 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import { motion } from "motion/react";
 import { IconArrowUpRight } from "@tabler/icons-react";
 import { cn } from "@/lib/utils";
+import { brandLogo } from "@/lib/brand-logo";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
@@ -57,6 +58,7 @@ export function MegaHeader({
   /** The right-hand controls (theme toggle, copy buttons, quote pill). */
   controls: ReactNode;
 }) {
+  const logo = brandLogo("en");
   const [open, setOpen] = useState(false);
   const [hidden, setHidden] = useState(false);
   const closeTimer = useRef<number | null>(null);
@@ -121,16 +123,16 @@ export function MegaHeader({
         )}
       >
         <div className="flex w-full items-start justify-between gap-6">
-          {/* The white logo on the graphite bar whatever the theme (the file is dark ink, so always inverted). */}
+          {/* The IzI Video logo in white on the smoked bar (the file is dark ink, so always inverted). */}
           <Link href={logoHref} className="group flex h-[4.25rem] min-w-0 shrink-0 items-center pr-3">
             <Image
-              src="/logo-1.png"
-              alt="DreamTeam"
-              width={1024}
-              height={416}
-              sizes="130px"
+              src={logo.src}
+              alt={logo.alt}
+              width={logo.width}
+              height={logo.height}
+              sizes="160px"
               priority
-              className="h-10 w-auto grayscale invert transition-all group-hover:grayscale-0 md:h-11"
+              className="h-7 w-auto invert xl:h-8"
             />
           </Link>
 

@@ -14,6 +14,7 @@ import {
 } from "@tabler/icons-react";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
 import { useLanguage } from "@/lib/i18n/language-context";
+import { brandLogo } from "@/lib/brand-logo";
 import { primaryGradientInteractiveClassName } from "@/components/ui/button";
 import { ButtonWithIcon } from "@/components/ui/button-with-icon";
 import { GlassShell } from "@/components/ui/glass-shell";
@@ -32,6 +33,7 @@ import { ThemeToggle } from "./theme-toggle";
 export function MobileNav() {
   const [isOpen, setIsOpen] = useState(false);
   const { t, language } = useLanguage();
+  const logo = brandLogo(language);
   const homeHref = homePath(language);
   const trainingHref = trainingPath(language);
   const contactHref = contactProcessPath(language);
@@ -92,10 +94,18 @@ export function MobileNav() {
             <div className="absolute top-4 left-1/2 -translate-x-1/2 w-12 h-1.5 bg-border/40 rounded-full" />
             <div className="flex flex-col h-full pt-16 pb-8 px-6 overflow-y-auto">
               <div className="flex flex-col items-center mb-8 pb-8 border-b border-border/20">
-                <Image src="/logo-1.png" alt="DreamTeam" width={1024} height={416} sizes="180px" className="h-18 w-auto mb-6 grayscale dark:invert" />
+                <Image
+                  src={logo.src}
+                  alt={logo.alt}
+                  width={logo.width}
+                  height={logo.height}
+                  sizes="240px"
+                  className={cn("mb-6 w-auto grayscale dark:invert", language === "en" ? "h-10" : "h-18")}
+                />
                 <div className="flex items-center gap-4">
                   <LanguageToggle />
-                  <ThemeToggle className="shrink-0" />
+                  {/* English has one theme (`forcedTheme` in the layout), so no toggle there. */}
+                  {language === "en" ? null : <ThemeToggle className="shrink-0" />}
                 </div>
               </div>
 

@@ -9,6 +9,7 @@ import { ClutchBadge, GoogleReviewsBadge } from "@/components/review-badges";
 import { openConsentSettings } from "@/lib/consent";
 import { EMAIL_PRIMARY, GOOGLE_REVIEWS, PHONE_PRIMARY, PHONE_SECONDARY } from "@/lib/contact-info";
 import { useLanguage } from "@/lib/i18n/language-context";
+import { brandLogo } from "@/lib/brand-logo";
 import {
   contactProcessPath,
   homePath,
@@ -36,6 +37,7 @@ const contactIconClass = "size-4 shrink-0 text-primary transition-transform dura
 
 export function Footer() {
   const { t, language } = useLanguage();
+  const logo = brandLogo(language);
   const homeHref = homePath(language);
 
   return (
@@ -45,7 +47,14 @@ export function Footer() {
           {/* Brand column */}
           <div className="flex flex-col items-center gap-4 sm:items-start">
             <Link href={homeHref} className="font-heading text-2xl font-bold tracking-tight">
-              <Image src="/logo-1.png" alt="DreamTeam" width={1024} height={416} sizes="80px" className="h-8 w-auto grayscale transition-all dark:invert" />
+              <Image
+                src={logo.src}
+                alt={logo.alt}
+                width={logo.width}
+                height={logo.height}
+                sizes="140px"
+                className={cn("w-auto grayscale transition-all dark:invert", language === "en" ? "h-6" : "h-8")}
+              />
             </Link>
             <p className="max-w-xs text-sm text-muted-foreground">{t.footer.desc}</p>
             <div className="mt-1 flex items-center gap-3">
