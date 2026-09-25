@@ -10,9 +10,21 @@ export const en = {
     training: "Training",
     projects: "Case Studies",
     pricingPage: "Pricing",
+    // The mega menu's tabs (`site-header.tsx`): Explore (home), the video services, Pricing, and "Other" for the rest.
+    nav: {
+      explore: "Explore",
+      socialAds: "Social Media Ads",
+      corporate: "Corporate Videos",
+      tvAds: "TV Ads",
+      productVideos: "Product Videos",
+      brandMascots: "Brand Mascots",
+      other: "Other"
+    },
+    login: "Log in",
+    signup: "Sign up",
     pricingItems: {
-      individual: "Individual plans",
-      business: "Business plans"
+      individual: "Individual",
+      business: "Business"
     },
     // The English mega menu's first column (`mega-header.tsx`) - the home page's sections, until there is an About page.
     about: "About Us",

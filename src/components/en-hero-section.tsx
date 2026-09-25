@@ -5,18 +5,17 @@ import { motion, useInView } from "motion/react";
 import Link from "next/link";
 import { JourneyItem } from "@/components/ui/scroll-journey";
 import { TigerReveal } from "@/components/hero-tiger/tiger-reveal";
-import { TigerCta } from "@/components/hero-tiger/tiger-cta";
 import { TigerLogos } from "@/components/hero-tiger/tiger-logos";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/lib/i18n/language-context";
-import { contactProcessPath, homePath } from "@/lib/routes";
+import { homePath } from "@/lib/routes";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
 /**
  * The English home page's hero (`en-home-page.tsx`; `/bg` keeps `hero-section.tsx`): the tiger reveal in place of the
- * film (`hero-tiger/tiger-reveal.tsx`), the headline and line low in the frame under the eyes, the amber "Let's talk"
- * pill (the contact page) beside "View our work" (the projects stage), and the client's "Trusted by" logo marquee along
+ * film (`hero-tiger/tiger-reveal.tsx`), the headline and line low in the frame under the eyes, a "View our work" pill
+ * (the case studies), and the client's "Trusted by" logo marquee along
  * the bottom. The site header floats over it as everywhere. Always dark - it is a night scene in either theme.
  * Journey parts (home): the headline leaves first as the page scrolls on, the line + CTAs and the logos follow.
  */
@@ -82,10 +81,11 @@ export function EnHeroSection() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.5, duration: 0.55, ease: EASE }}
             >
-              <TigerCta href={contactProcessPath(language)} label={t.hero.tiger.cta} />
               <Link
                 href={`${homePath(language)}#projects`}
-                className="cursor-pointer text-base font-medium text-white underline-offset-4 transition-transform duration-200 ease-out hover:-translate-y-px hover:underline focus-visible:rounded focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#f2b33d]"
+                // The hero's one button now (the "Let's talk" pill moved out - Sign up lives in the header): a glass
+                // outline pill that lifts and brightens on hover.
+                className="inline-flex h-[54px] cursor-pointer items-center rounded-full border border-white/35 bg-white/[0.06] px-8 text-base font-semibold text-white backdrop-blur-sm transition-[transform,background-color,border-color] duration-200 ease-out hover:-translate-y-0.5 hover:border-white/70 hover:bg-white/[0.14] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#ff6a14]"
               >
                 {t.hero.cta2}
               </Link>
