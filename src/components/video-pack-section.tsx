@@ -56,13 +56,13 @@ export function VideoPackSection() {
 
   return (
     // `--pack-w` - one window's width - is sized by the screen's height as well as its width, so the heading, the rail
-    // and the actions fit one screen without scrolling (the rest of the section is about 24rem tall).
+    // and the actions fit one screen without scrolling (the rest of the section is about 21rem tall); it starts right under the header.
     <section
       id="video-pack"
-      className="relative flex min-h-[100svh] flex-col justify-center overflow-x-clip pt-24 pb-10 text-white [--pack-w:min(90vw,70rem,calc((100svh-24rem)*16/9))] max-md:[--pack-w:88vw]"
+      className="relative flex min-h-[100svh] flex-col justify-start overflow-x-clip pt-[5.25rem] pb-6 text-white [--pack-w:min(92vw,76rem,calc((100svh-21rem)*16/9))] max-md:[--pack-w:88vw]"
     >
       {/* The heading on the left (centred on phones), its edge on the first window's - the same side margin as the rail. */}
-      <div className="flex w-full flex-col items-center px-[max(1.5rem,calc((100vw-80rem)/2+1.5rem))] text-center sm:items-start sm:text-left">
+      <div className="flex w-full flex-col items-center px-[max(1.25rem,3vw)] text-center sm:items-start sm:text-left">
         <h2
           className={cn(
             "font-heading text-[clamp(30px,3.8vw,60px)] font-black uppercase leading-[0.95] tracking-[-0.01em] text-balance",
@@ -78,7 +78,7 @@ export function VideoPackSection() {
         <div
           ref={railRef}
           onScroll={measure}
-          className="flex snap-x snap-mandatory scroll-px-[max(1.5rem,calc((100vw-80rem)/2+1.5rem))] gap-5 overflow-x-auto scroll-smooth px-[max(1.5rem,calc((100vw-80rem)/2+1.5rem))] pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          className="flex snap-x snap-mandatory scroll-px-[max(1.25rem,3vw)] gap-5 overflow-x-auto scroll-smooth px-[max(1.25rem,3vw)] pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         >
           {VIDEO_PACK.map((item) => (
             <PackWindow
@@ -97,7 +97,7 @@ export function VideoPackSection() {
       </div>
 
       {/* The two ways in, on the right under the rail: one video (the one-time Personal order), or a subscription. */}
-      <div className="mx-auto mt-5 flex w-full max-w-7xl flex-wrap items-center justify-center gap-x-6 gap-y-3 px-6 sm:justify-end">
+      <div className="mt-5 flex w-full flex-wrap items-center justify-center gap-x-6 gap-y-3 px-[max(1.25rem,3vw)] sm:justify-end">
         <TigerCta href={`${pricingPath(language)}?for=individual`} label={p.startOne} className="tiger-cta--orange" />
         <Link
           href={`${pricingPath(language)}?for=business`}

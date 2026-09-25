@@ -60,7 +60,7 @@ export function EnHeroSection() {
 
         {/* The copy low in the frame, under the eyes: left-aligned on the page's side margin (the video pack's) and spread
             across the hero's width - centred on phones. */}
-        <div className="mt-auto flex flex-col items-center px-[max(1.5rem,calc((100vw-80rem)/2+1.5rem))] pt-32 pb-[clamp(28px,5vh,56px)] text-center sm:items-start sm:text-left">
+        <div className="mt-auto flex flex-col items-center px-[max(1.25rem,3vw)] pt-32 pb-[clamp(28px,5vh,56px)] text-center sm:items-start sm:text-left">
           <JourneyItem kind="title" className="flex w-full flex-col items-center sm:items-start">
             <motion.p
               // Archivo expanded, black - the English site's heading face (`html.site-deep .font-heading`).
