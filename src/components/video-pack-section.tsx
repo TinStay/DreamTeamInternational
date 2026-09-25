@@ -56,24 +56,25 @@ export function VideoPackSection() {
 
   return (
     // `--pack-w` - one window's width - is sized by the screen's height as well as its width, so the heading, the rail
-    // and the actions fit one screen without scrolling (the rest of the section is about 26rem tall).
+    // and the actions fit one screen without scrolling (the rest of the section is about 24rem tall).
     <section
       id="video-pack"
-      className="relative flex min-h-[100svh] flex-col justify-center overflow-x-clip pt-24 pb-10 text-white [--pack-w:min(86vw,64rem,calc((100svh-26rem)*16/9))] max-md:[--pack-w:88vw]"
+      className="relative flex min-h-[100svh] flex-col justify-center overflow-x-clip pt-24 pb-10 text-white [--pack-w:min(90vw,70rem,calc((100svh-24rem)*16/9))] max-md:[--pack-w:88vw]"
     >
-      <div className="mx-auto w-full max-w-7xl px-6 text-center">
+      {/* The heading on the left (centred on phones), its edge on the first window's - the same side margin as the rail. */}
+      <div className="flex w-full flex-col items-center px-[max(1.5rem,calc((100vw-80rem)/2+1.5rem))] text-center sm:items-start sm:text-left">
         <h2
           className={cn(
-            "mx-auto font-heading text-[clamp(30px,3.8vw,60px)] font-black uppercase leading-[0.95] tracking-[-0.01em] text-balance",
+            "font-heading text-[clamp(30px,3.8vw,60px)] font-black uppercase leading-[0.95] tracking-[-0.01em] text-balance",
             PEARL_INK
           )}
         >
           {p.title}
         </h2>
-        <p className="mx-auto mt-4 max-w-[62ch] text-[clamp(15px,1.15vw,18px)] leading-normal text-white/70">{p.subtitle}</p>
+        <p className="mt-3 max-w-[80ch] text-[clamp(13px,0.95vw,15px)] leading-normal text-white/65">{p.subtitle}</p>
       </div>
 
-      <div className="relative mt-8 lg:mt-10">
+      <div className="relative mt-6 lg:mt-8">
         <div
           ref={railRef}
           onScroll={measure}
@@ -96,7 +97,7 @@ export function VideoPackSection() {
       </div>
 
       {/* The two ways in, on the right under the rail: one video (the one-time Personal order), or a subscription. */}
-      <div className="mx-auto mt-6 flex w-full max-w-7xl flex-wrap items-center justify-center gap-x-6 gap-y-3 px-6 sm:justify-end">
+      <div className="mx-auto mt-5 flex w-full max-w-7xl flex-wrap items-center justify-center gap-x-6 gap-y-3 px-6 sm:justify-end">
         <TigerCta href={`${pricingPath(language)}?for=individual`} label={p.startOne} className="tiger-cta--orange" />
         <Link
           href={`${pricingPath(language)}?for=business`}
