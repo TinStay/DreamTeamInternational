@@ -27,6 +27,7 @@ const PATHS: readonly string[] = [
   // Skool training temporarily hidden.
   // "/training/skool",
   "/training/team",
+  "/pricing",
   "/contact",
   "/privacy",
   "/terms",

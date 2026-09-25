@@ -23,6 +23,7 @@ import {
   contactProcessPath,
   homePath,
   portfolioPath,
+  pricingPath,
   projectPath,
   projectsPath,
   servicePath,
@@ -237,6 +238,7 @@ export function SiteHeader() {
     },
     { label: t.header.services, href: servicesPath(language), items: serviceItems },
     { label: t.header.training, href: trainingPath(language), items: trainingItems },
+    { label: t.header.pricingPage, href: pricingPath(language), items: [] },
     { label: t.header.contact, href: contactProcessPath(language), items: [] },
   ];
 

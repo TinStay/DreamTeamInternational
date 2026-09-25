@@ -9,6 +9,7 @@ export const en = {
     contactCta: "Contact us",
     training: "Training",
     projects: "Case Studies",
+    pricingPage: "Pricing",
     // The English mega menu's first column (`mega-header.tsx`) - the home page's sections, until there is an About page.
     about: "About Us",
     aboutItems: {
@@ -36,6 +37,62 @@ export const en = {
       hint: "Move to wake it",
       trustedBy: "Trusted by"
     }
+  },
+  // The monthly plans page (`/pricing`, `components/pricing/`); the numbers are in `lib/pricing.ts`.
+  plans: {
+    metaTitle: "AI Video Production Pricing - Monthly Plans | DreamTeam",
+    metaDescription:
+      "Monthly AI video production plans from €500 a month: 2.5 to 4 minutes of finished video, scripts, voiceover and revisions included.",
+    title1: "Monthly",
+    title2: "plans",
+    subtitle: "A steady flow of finished AI video for your brand every month - scripted, voiced and edited by us.",
+    mostPopular: "Most popular",
+    perMonth: "per month",
+    videoPerMonth: "min of video / mo.",
+    clipsApprox: "≈ {n} videos of 30 seconds",
+    choose: "Choose",
+    included: "What's included",
+    rows: {
+      quality: "Quality",
+      script: "Scriptwriting",
+      voiceover: "Voiceover",
+      revisions: "Revisions"
+    },
+    checklist: [
+      "Finished videos delivered every month",
+      "Voiceover included",
+      "Full commercial rights",
+      "Effects on every video",
+      "Dedicated producer"
+    ],
+    tiers: {
+      local: {
+        name: "Local",
+        tagline: "For local businesses starting with video",
+        quality: "Social-media ready",
+        script: "AI script from your brief",
+        voiceover: "Any language",
+        revisions: "4 scenes + free edits"
+      },
+      brand: {
+        name: "Brand",
+        tagline: "For brands that post every week",
+        quality: "Enhanced + effects",
+        script: "AI script + refinement",
+        voiceover: "Up to 2 languages",
+        revisions: "8 scenes + free edits"
+      },
+      premium: {
+        name: "Premium",
+        tagline: "For cinematic, multi-market campaigns",
+        quality: "Cinematic + premium effects",
+        script: "Full concept + script",
+        voiceover: "Multi-language",
+        revisions: "15 scenes + free edits"
+      }
+    },
+    oneOff: "Need a single video instead?",
+    oneOffCta: "Ask for a quote"
   },
   contactPage: {
     metaTitle: "Contact & Process | DreamTeam",

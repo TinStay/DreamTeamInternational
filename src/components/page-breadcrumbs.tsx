@@ -37,6 +37,8 @@ function segmentToLabel(
       return t.header.training;
     case "services":
       return t.header.services;
+    case "pricing":
+      return t.header.pricingPage;
     case "individual":
       return t.training.cards.individual.title;
     case "skool":
