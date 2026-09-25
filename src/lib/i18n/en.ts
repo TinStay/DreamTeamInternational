@@ -38,58 +38,73 @@ export const en = {
       trustedBy: "Trusted by"
     }
   },
-  // The monthly plans page (`/pricing`, `components/pricing/`); the numbers are in `lib/pricing.ts`.
+  // The plans page (`/pricing`, `components/pricing/`); the numbers are in `lib/pricing.ts`.
   plans: {
     metaTitle: "AI Video Production Pricing - Monthly Plans | DreamTeam",
     metaDescription:
-      "Monthly AI video production plans from €500 a month: 2.5 to 4 minutes of finished video, scripts, voiceover and revisions included.",
+      "Monthly AI video production plans from $590 a month: 1 to 3 minutes of finished video, scripts, voiceover and unlimited edits included.",
     title1: "Monthly",
     title2: "plans",
     subtitle: "A steady flow of finished AI video for your brand every month - scripted, voiced and edited by us.",
-    mostPopular: "Most popular",
-    perMonth: "per month",
-    videoPerMonth: "min of video / mo.",
-    clipsApprox: "≈ {n} videos of 30 seconds",
-    choose: "Choose",
-    included: "What's included",
-    rows: {
-      quality: "Quality",
-      script: "Scriptwriting",
-      voiceover: "Voiceover",
-      revisions: "Revisions"
+    audience: {
+      individual: "Individual plans",
+      business: "Business plans"
     },
-    checklist: [
-      "Finished videos delivered every month",
-      "Voiceover included",
-      "Full commercial rights",
-      "Effects on every video",
-      "Dedicated producer"
-    ],
+    billing: {
+      monthly: "Monthly",
+      annual: "Annual"
+    },
+    mostPopular: "Most popular",
+    perMonth: "/month",
+    billedAnnually: "billed annually",
+    cta: "Get started",
+    included: "What's included",
     tiers: {
       local: {
         name: "Local",
-        tagline: "For local businesses starting with video",
-        quality: "Social-media ready",
-        script: "AI script from your brief",
-        voiceover: "Any language",
-        revisions: "4 scenes + free edits"
+        headline: "Simple, effective videos",
+        audience: "For solo traders, consultants & small businesses",
+        volume: "1 min of video / month",
+        volumeNote: "≈ four 15-second videos",
+        features: [
+          "Social-media ready quality",
+          "AI script from your brief",
+          "Voiceover included",
+          "4 scene regenerations + unlimited edits"
+        ]
       },
       brand: {
         name: "Brand",
-        tagline: "For brands that post every week",
-        quality: "Enhanced + effects",
-        script: "AI script + refinement",
-        voiceover: "Up to 2 languages",
-        revisions: "8 scenes + free edits"
+        headline: "Stronger concepts & ad campaigns",
+        audience: "For growing mid-sized businesses",
+        volume: "2 min of video / month",
+        volumeNote: "≈ six 20-second videos",
+        features: [
+          "Enhanced quality + advanced effects",
+          "AI script + creative refinement",
+          "Voiceover in up to 2 languages",
+          "8 scene regenerations + unlimited edits"
+        ]
       },
       premium: {
         name: "Premium",
-        tagline: "For cinematic, multi-market campaigns",
-        quality: "Cinematic + premium effects",
-        script: "Full concept + script",
-        voiceover: "Multi-language",
-        revisions: "15 scenes + free edits"
+        headline: "Cinematic productions",
+        audience: "For established companies & brands",
+        volume: "3 min of video / month",
+        volumeNote: "≈ one 60-second hero film + cutdowns",
+        features: [
+          "Cinematic quality + premium effects",
+          "Full creative concept + script",
+          "Multi-language voiceover",
+          "15 scene regenerations + unlimited edits",
+          "Dedicated producer"
+        ]
       }
+    },
+    individualSoon: {
+      title: "Individual plans are coming soon",
+      text: "Creating for yourself rather than a company? Tell us what you need and we'll put together a quote.",
+      cta: "Ask for a quote"
     },
     oneOff: "Need a single video instead?",
     oneOffCta: "Ask for a quote"
