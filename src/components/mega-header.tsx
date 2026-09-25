@@ -17,6 +17,9 @@ export type MegaNavGroup = {
   /** Hide the tab below this width - `xl` (1280px) or `wide` (1400px) - where the bar has no room for it; keep what it
    * opens reachable another way. */
   showFrom?: "xl" | "wide";
+  /** A thin vertical line before this tab, starting a new group - `"xl"`: only from 1280px (when the tab before it only
+   * shows from there, so the line never opens the bar). */
+  divideBefore?: boolean | "xl";
 };
 
 /** A link's ink: the brand's red → violet gradient under the letters, showing as the colour fades out on hover. The
@@ -139,16 +142,31 @@ export function MegaHeader({
             />
           </Link>
 
-          {/* Each column: the section's title on the bar's row and, while open, its links right under it. */}
-          {/* Left-aligned beside the logo, one row of tabs at an even gap. */}
-          <nav
-            className="flex min-w-0 flex-1 items-start justify-start gap-x-3 ps-4 text-[15px] font-semibold text-[#ececee] xl:gap-x-4 2xl:gap-x-7 2xl:ps-8 2xl:text-base"
-            onMouseEnter={show}
-            onFocus={show}
-          >
+          {/* Left-aligned beside the logo, one row of tabs at an even gap, the groups split by thin vertical lines. Only a
+              tab with a list (Custom Services) opens the panel - hovering or tabbing into it; the other tabs are plain
+              links and close it. */}
+          <nav className="flex min-w-0 flex-1 items-start justify-start gap-x-3 ps-4 text-[15px] font-semibold text-[#ececee] xl:gap-x-4 2xl:gap-x-6 2xl:ps-8 2xl:text-base">
             {groups.map((group, groupIndex) => (
               // Each tab as wide as its title (or its list, if wider) - never narrower, so titles never overlap.
-              <div key={group.href} className={cn("shrink-0 flex-col", group.showFrom === "wide" ? "hidden min-[1400px]:flex" : group.showFrom === "xl" ? "hidden xl:flex" : "flex")}>
+              <div
+                key={group.href}
+                className={cn(
+                  "shrink-0 flex-row",
+                  group.showFrom === "wide" ? "hidden min-[1400px]:flex" : group.showFrom === "xl" ? "hidden xl:flex" : "flex"
+                )}
+                onMouseEnter={group.items.length ? show : hide}
+                onFocus={group.items.length ? show : () => setOpen(false)}
+              >
+                {group.divideBefore ? (
+                  <span
+                    aria-hidden
+                    className={cn(
+                      "me-3 mt-[1.625rem] h-4 w-px bg-white/20 xl:me-4 2xl:me-6",
+                      group.divideBefore === "xl" && "hidden xl:block"
+                    )}
+                  />
+                ) : null}
+                <div className="flex flex-col">
                 <div className="flex h-[4.25rem] items-center">
                   <MegaLink href={group.href}>{group.label}</MegaLink>
                 </div>
@@ -184,6 +202,7 @@ export function MegaHeader({
                     </ul>
                   </motion.div>
                 ) : null}
+                </div>
               </div>
             ))}
           </nav>

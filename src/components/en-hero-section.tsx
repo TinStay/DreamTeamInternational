@@ -94,7 +94,7 @@ export function EnHeroSection() {
         </div>
 
         <JourneyItem index={1} from="bottom" className="relative">
-          <TigerLogos label={t.hero.tiger.trustedBy} />
+          <TigerLogos label={t.hero.tiger.trustedBy} regions={t.hero.tiger.regions} />
         </JourneyItem>
       </section>
 

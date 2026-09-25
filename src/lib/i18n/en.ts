@@ -18,7 +18,7 @@ export const en = {
       tvAds: "TV Ads",
       productVideos: "Product Videos",
       brandMascots: "Brand Mascots",
-      other: "Other"
+      other: "Custom Services"
     },
     login: "Log in",
     signup: "Sign up",
@@ -51,7 +51,12 @@ export const en = {
     tiger: {
       cta: "Let’s talk",
       hint: "Move to wake it",
-      trustedBy: "Trusted by"
+      trustedBy: "Trusted by partners in the USA, Europe and Worldwide",
+      regions: {
+        usa: "USA",
+        europe: "Europe",
+        worldwide: "Worldwide"
+      }
     }
   },
   // The plans page (`/pricing`, `components/pricing/`) - the client's "AI Video Subscription Plans" file; the numbers are

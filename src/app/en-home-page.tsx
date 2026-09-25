@@ -28,9 +28,9 @@ export function EnHomePage() {
       <SiteHeader />
 
       <div className="relative z-10 flex w-full flex-1 flex-col">
-        <EnHeroSection />
-        {/* The second screen: "Get your AI video pack now" and the rail of video categories. */}
+        {/* The first screen: "Get your AI video pack now" and the rail of video categories; the tiger hero follows. */}
         <VideoPackSection />
+        <EnHeroSection />
         <div className="pt-16 sm:pt-20">
           <QuoteFormSection />
         </div>

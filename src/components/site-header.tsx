@@ -214,33 +214,27 @@ export function SiteHeader() {
     ),
   }));
 
-  // The English mega menu's tabs, in the client's order: Explore (the home page), the video services - each on the
-  // closest page there is today (a service page or a portfolio category) until it has its own -, Pricing, and "Other"
-  // holding the rest of the site. Only Pricing and Other open a list. Where the bar is short of room, Product Videos and
-  // Brand Mascots hide below 1400px (Other -> Services / Portfolio still reach them) and Explore below 1280px (the logo is
-  // the home link too).
+  // The English mega menu's tabs, in the client's order and groups (split by thin lines): Explore (the home page) |
+  // the video services - each on the closest page there is today (a service page or a portfolio category) until it has
+  // its own | Pricing | Custom Services, the one tab that drops down, holding the rest of the site. Below 1280px the bar
+  // is short of room: Explore (the logo is the home link too) and Corporate Videos hide there, and Product Videos below
+  // 1400px.
   const portfolioCategory = (key: string) => `${portfolioPath(language)}?category=${key}`;
   const megaGroups: MegaNavGroup[] = [
     { label: t.header.nav.explore, href: homeHref, items: [], showFrom: "xl" },
-    { label: t.header.nav.socialAds, href: servicePath(language, "ai-video"), items: [] },
-    { label: t.header.nav.corporate, href: portfolioCategory("services"), items: [] },
+    { label: t.header.nav.socialAds, href: servicePath(language, "ai-video"), items: [], divideBefore: "xl" },
+    { label: t.header.nav.corporate, href: portfolioCategory("services"), items: [], showFrom: "xl" },
     { label: t.header.nav.tvAds, href: portfolioCategory("tv"), items: [] },
     { label: t.header.nav.productVideos, href: portfolioCategory("product"), items: [], showFrom: "wide" },
-    { label: t.header.nav.brandMascots, href: servicePath(language, "brand-mascots"), items: [], showFrom: "wide" },
-    {
-      label: t.header.pricingPage,
-      href: pricingPath(language),
-      items: (["individual", "business"] as const).map((key) => ({
-        label: t.header.pricingItems[key],
-        href: `${pricingPath(language)}?for=${key}`,
-      })),
-    },
+    { label: t.header.pricingPage, href: pricingPath(language), items: [], divideBefore: true },
     {
       label: t.header.nav.other,
-      href: portfolioPath(language),
+      href: servicesPath(language),
+      divideBefore: true,
       items: [
         { label: t.header.portfolio, href: portfolioPath(language) },
         { label: t.header.services, href: servicesPath(language) },
+        { label: t.header.nav.brandMascots, href: servicePath(language, "brand-mascots") },
         { label: t.header.training, href: trainingPath(language) },
         { label: t.header.projects, href: projectsPath(language) },
         { label: t.header.about, href: `${homeHref}#stats` },

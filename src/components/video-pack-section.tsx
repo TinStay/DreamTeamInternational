@@ -12,11 +12,11 @@ const PEARL_INK =
   "bg-[linear-gradient(115deg,#ff5e00_0%,#ff8a1f_30%,#ffd2a1_48%,#ff9a3c_62%,#ff5e00_100%)] bg-clip-text text-transparent";
 
 /**
- * The English home page's second screen, right after the hero and about as tall: the "Get your AI video pack now"
- * headline in the orange pearl (Archivo, like the hero's), its line, and a rail of wide 16:9 windows - one per kind of
+ * The English home page's first screen, above the tiger hero and about as tall: a rail of wide 16:9 windows - one per kind of
  * video (`lib/video-pack.ts`) - that scrolls sideways, by swipe / trackpad or the round arrows at its ends (after the
  * client's Higgsfield reference). Each window's film plays muted and looping only while the window is mostly on
- * screen (`PackWindow`) and pauses as soon as it leaves, so one or two play at a time.
+ * screen (`PackWindow`) and pauses as soon as it leaves, so one or two play at a time. Under the rail, the "Get your
+ * AI video pack now" headline in the orange pearl (Archivo, like the hero's) and its line.
  */
 export function VideoPackSection() {
   const { t } = useLanguage();
@@ -51,20 +51,8 @@ export function VideoPackSection() {
   };
 
   return (
-    <section id="video-pack" className="relative flex min-h-[100svh] flex-col justify-center overflow-x-clip py-20 text-white">
-      <div className="mx-auto w-full max-w-7xl px-6 text-center">
-        <h2
-          className={cn(
-            "mx-auto max-w-[18ch] font-heading text-[clamp(34px,5vw,84px)] font-black uppercase leading-[0.95] tracking-[-0.01em] text-balance",
-            PEARL_INK
-          )}
-        >
-          {p.title}
-        </h2>
-        <p className="mx-auto mt-6 max-w-[52ch] text-[clamp(16px,1.35vw,20px)] leading-normal text-white/70">{p.subtitle}</p>
-      </div>
-
-      <div className="relative mt-12 lg:mt-16">
+    <section id="video-pack" className="relative flex min-h-[100svh] flex-col justify-center overflow-x-clip pt-28 pb-16 text-white">
+      <div className="relative">
         <div
           ref={railRef}
           onScroll={measure}
@@ -83,6 +71,18 @@ export function VideoPackSection() {
         {/* The arrows sit over the rail's ends, on the windows' middle (16:9 of the window's width). */}
         <RailArrow side="left" hidden={edges.start} label={p.previous} onClick={() => step(-1)} />
         <RailArrow side="right" hidden={edges.end} label={p.next} onClick={() => step(1)} />
+      </div>
+
+      <div className="mx-auto mt-14 w-full max-w-7xl px-6 text-center lg:mt-20">
+        <h2
+          className={cn(
+            "mx-auto max-w-[18ch] font-heading text-[clamp(34px,5vw,84px)] font-black uppercase leading-[0.95] tracking-[-0.01em] text-balance",
+            PEARL_INK
+          )}
+        >
+          {p.title}
+        </h2>
+        <p className="mx-auto mt-6 max-w-[52ch] text-[clamp(16px,1.35vw,20px)] leading-normal text-white/70">{p.subtitle}</p>
       </div>
     </section>
   );
@@ -147,7 +147,15 @@ function PackWindow({ clip, title, line }: { clip: BunnyVideo | null; title: str
       { threshold: 0.6 }
     );
     io.observe(frame);
-    return () => io.disconnect();
+    // The browser pauses a video on a hidden page (another tab): pick it up again when the page comes back.
+    const onVisible = () => {
+      if (document.visibilityState === "visible" && onScreen.current) void videoRef.current?.play().catch(() => {});
+    };
+    document.addEventListener("visibilitychange", onVisible);
+    return () => {
+      io.disconnect();
+      document.removeEventListener("visibilitychange", onVisible);
+    };
   }, [clip]);
 
   // The film was just attached (the window came on screen): start it - `play()` is what makes a `preload="none"` video
@@ -171,6 +179,11 @@ function PackWindow({ clip, title, line }: { clip: BunnyVideo | null; title: str
             loop
             playsInline
             preload="none"
+            // Whichever comes last - coming on screen or the film being ready - starts it (a play() fired while the
+            // file was still attaching could be lost on the first load).
+            onLoadedData={(event) => {
+              if (onScreen.current) void event.currentTarget.play().catch(() => {});
+            }}
             className="absolute inset-0 size-full object-cover"
           />
         ) : (
