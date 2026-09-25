@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { DM_Sans, Exo_2, Manrope, Montserrat, Playfair_Display, Space_Grotesk } from "next/font/google";
+import { Archivo, DM_Sans, Exo_2, Inter, Manrope, Montserrat, Playfair_Display, Space_Grotesk } from "next/font/google";
 import "../globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { SmoothScroll } from "@/components/smooth-scroll";
@@ -83,6 +83,21 @@ const dmSans = DM_Sans({
   display: "swap",
 });
 
+// The English site's faces (the client's pricing file): Archivo, expanded (the `wdth` axis - set at 112%), black, for
+// the headings, and Inter for everything else. Latin only - the Bulgarian site keeps Exo 2. `html.site-deep` in
+// globals.css switches them on.
+const archivo = Archivo({
+  subsets: ["latin", "latin-ext"],
+  axes: ["wdth"],
+  variable: "--font-archivo",
+  display: "swap",
+});
+const inter = Inter({
+  subsets: ["latin", "latin-ext"],
+  variable: "--font-inter",
+  display: "swap",
+});
+
 // Unknown locales 404 here, before any page.
 export const dynamicParams = false;
 
@@ -146,7 +161,7 @@ export default async function RootLayout({
     // resolved on `:root`, so the families must be defined there too.
     <html
       lang={locale}
-      className={`dark${deep ? " site-deep" : ""} ${exo.variable} ${montserrat.variable} ${playfair.variable} ${manrope.variable} ${spaceGrotesk.variable} ${dmSans.variable}`}
+      className={`dark${deep ? " site-deep" : ""} ${exo.variable} ${montserrat.variable} ${playfair.variable} ${manrope.variable} ${spaceGrotesk.variable} ${dmSans.variable}${deep ? ` ${archivo.variable} ${inter.variable}` : ""}`}
       style={{ colorScheme: "dark" }}
       suppressHydrationWarning
     >

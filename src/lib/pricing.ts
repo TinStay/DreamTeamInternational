@@ -1,34 +1,69 @@
 /**
- * The plans on `/pricing`. Numbers live here, every word in the dictionaries under `plans.tiers[key]`; the card look
- * per plan is its `tone` (`pricing-card.tsx`). Prices are in US dollars per month; `annual` is the per-month price
- * when billed yearly (the same as monthly for now - the client sets the discount later).
+ * The plans on `/pricing` (the client's "AI Video Subscription Plans" file). Numbers live here, every word in the
+ * dictionaries under `plans.tiers[key]`; a card's colour is its `tint` (`pricing-card.tsx`). Prices are in US dollars.
  *
- * Two audiences, switched by the page's toggle: the business plans below, and individual plans still to come (the
- * Individual tab shows a "coming soon - ask for a quote" card until `INDIVIDUAL_PLANS` has entries).
+ * Two audiences, switched by the page's toggle - individual and business - and two billings: monthly, or annual,
+ * where a year costs ten months (two free - 17% off). A `oneTime` plan is a single order, a `custom` one is priced on a
+ * call; neither changes with the billing. A plan with `secs` (its monthly seconds of video) also shows how much it
+ * saves against ordering the same seconds one-time (`ONE_TIME`).
  */
-export const PLAN_KEYS = ["local", "brand", "premium"] as const;
-export type PlanKey = (typeof PLAN_KEYS)[number];
-
 export type Billing = "monthly" | "annual";
 export type Audience = "individual" | "business";
+export type PlanKey = "personal" | "creator" | "pro" | "local" | "brand" | "enterprise";
+export type PlanTint = "gray" | "olive" | "maroon" | "navy";
 
 export type Plan = {
   key: PlanKey;
-  /** US dollars per month, billed monthly / billed annually. */
-  price: Record<Billing, number>;
-  /** The highlighted plan ("Most popular"). */
+  tint: PlanTint;
+  /** US dollars per month (or the one-time price); absent for a custom plan. */
+  price?: number;
+  oneTime?: boolean;
+  custom?: boolean;
   popular?: boolean;
+  /** Seconds of video a month, for the "save vs one-time orders" tag. */
+  secs?: number;
 };
 
-export const BUSINESS_PLANS: Plan[] = [
-  { key: "local", price: { monthly: 590, annual: 590 } },
-  { key: "brand", price: { monthly: 1990, annual: 1990 }, popular: true },
-  { key: "premium", price: { monthly: 3990, annual: 3990 } },
-];
+export const PLANS: Record<Audience, Plan[]> = {
+  individual: [
+    { key: "personal", tint: "gray", price: 299, oneTime: true },
+    { key: "creator", tint: "olive", price: 389, secs: 40, popular: true },
+    { key: "pro", tint: "maroon", price: 629, secs: 60 },
+  ],
+  business: [
+    { key: "local", tint: "gray", price: 990 },
+    { key: "brand", tint: "navy", price: 3490, popular: true },
+    { key: "enterprise", tint: "maroon", custom: true },
+  ],
+};
 
-export const INDIVIDUAL_PLANS: Plan[] = [];
+/** A one-time order: $299 for up to 20 seconds, $119 for every 10 seconds more. */
+export const ONE_TIME = { base: 299, baseSecs: 20, extra: 119 };
 
-/** "$1,990" - the same in both languages (the price is in dollars). */
+/** Annual billing: pay for this many months, get twelve. */
+export const ANNUAL_PAID_MONTHS = 10;
+
+export function oneTimeCost(secs: number) {
+  return ONE_TIME.base + (Math.max(0, secs - ONE_TIME.baseSecs) / 10) * ONE_TIME.extra;
+}
+
+/** The numbers a subscription card shows for a billing. */
+export function planPricing(price: number, billing: Billing) {
+  const yearly = price * 12;
+  const annualTotal = price * ANNUAL_PAID_MONTHS;
+  const saved = yearly - annualTotal;
+  return {
+    perMonth: billing === "annual" ? annualTotal / 12 : price,
+    annualTotal,
+    saved,
+    percent: Math.round((saved / yearly) * 100),
+  };
+}
+
+/** The annual discount, for the toggle's tag ("17% off"). */
+export const ANNUAL_PERCENT = Math.round(((12 - ANNUAL_PAID_MONTHS) / 12) * 100);
+
+/** "$1,990" - the same in both languages (the prices are in dollars). */
 export function formatPrice(amount: number) {
-  return `$${amount.toLocaleString("en-US")}`;
+  return `$${Math.round(amount).toLocaleString("en-US")}`;
 }

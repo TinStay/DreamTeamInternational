@@ -140,7 +140,7 @@ export function MegaHeader({
           {/* Left-aligned beside the logo, in equal columns (`--col`; a section without links only as wide as its title),
               so the titles sit evenly whatever their lists hold; a long link wraps inside its column. */}
           <nav
-            className="grid min-w-0 flex-1 items-start justify-start gap-x-3 ps-4 text-base font-semibold text-[#ececee] [--col:5.75rem] xl:gap-x-4 xl:ps-6 xl:text-[1.0625rem] xl:[--col:6.5rem] 2xl:gap-x-5 2xl:ps-8 2xl:text-lg 2xl:[--col:7.75rem]"
+            className="grid min-w-0 flex-1 items-start justify-start gap-x-3 ps-4 text-base font-semibold text-[#ececee] [--col:6.25rem] xl:gap-x-4 xl:ps-6 xl:text-[1.0625rem] xl:[--col:7.25rem] 2xl:gap-x-5 2xl:ps-8 2xl:text-lg 2xl:[--col:8.5rem]"
             style={{ gridTemplateColumns: groups.map((g) => (g.items.length ? "minmax(0,var(--col))" : "auto")).join(" ") }}
             onMouseEnter={show}
             onFocus={show}

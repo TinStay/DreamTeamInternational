@@ -8,7 +8,6 @@ import { TigerReveal } from "@/components/hero-tiger/tiger-reveal";
 import { TigerCta } from "@/components/hero-tiger/tiger-cta";
 import { TigerLogos } from "@/components/hero-tiger/tiger-logos";
 import { cn } from "@/lib/utils";
-import { PROJECT_DISPLAY_FONT } from "@/lib/project-fonts";
 import { useLanguage } from "@/lib/i18n/language-context";
 import { contactProcessPath, homePath } from "@/lib/routes";
 
@@ -58,10 +57,8 @@ export function EnHeroSection() {
         <div className="mt-auto flex flex-col items-center px-6 pt-32 pb-[clamp(28px,5vh,56px)] text-center">
           <JourneyItem kind="title" className="flex w-full flex-col items-center">
             <motion.p
-              className={cn(
-                "max-w-[20ch] font-heading text-[clamp(36px,5.6vw,92px)] font-extrabold uppercase leading-[0.95] tracking-[-0.01em] text-balance",
-                PROJECT_DISPLAY_FONT.plasico
-              )}
+              // Archivo expanded, black - the English site's heading face (`html.site-deep .font-heading`).
+              className="max-w-[20ch] font-heading text-[clamp(34px,5vw,84px)] font-black uppercase leading-[0.95] tracking-[-0.01em] text-balance"
               initial={{ opacity: 0, y: 28 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1, duration: 0.7, ease: EASE }}

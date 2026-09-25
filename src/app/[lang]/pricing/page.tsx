@@ -30,10 +30,15 @@ export async function generateMetadata({
 
 export default async function LocalePricingPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ lang: string }>;
+  searchParams: Promise<{ for?: string | string[] }>;
 }) {
   const { lang } = await params;
   if (!isLocale(lang)) notFound();
-  return <PricingPageView />;
+  // `?for=individual` (the header's "Individual plans" link) opens that tab; anything else opens Business. Keyed, so a
+  // link to the other audience switches the tab even while the page is open.
+  const audience = (await searchParams).for === "individual" ? "individual" : "business";
+  return <PricingPageView key={audience} initialAudience={audience} />;
 }

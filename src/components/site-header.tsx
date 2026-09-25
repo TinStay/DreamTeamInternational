@@ -238,7 +238,14 @@ export function SiteHeader() {
     },
     { label: t.header.services, href: servicesPath(language), items: serviceItems },
     { label: t.header.training, href: trainingPath(language), items: trainingItems },
-    { label: t.header.pricingPage, href: pricingPath(language), items: [] },
+    {
+      label: t.header.pricingPage,
+      href: pricingPath(language),
+      items: (["individual", "business"] as const).map((key) => ({
+        label: t.header.pricingItems[key],
+        href: `${pricingPath(language)}?for=${key}`,
+      })),
+    },
     { label: t.header.contact, href: contactProcessPath(language), items: [] },
   ];
 
