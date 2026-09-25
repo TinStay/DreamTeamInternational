@@ -48,6 +48,13 @@ export const en = {
     cta1: "Request a quote",
     cta2: "View Our Work",
     // The English home page's tiger hero (`en-hero-section.tsx`).
+    // The tiger hero's copy on the English home page (`en-hero-section.tsx`).
+    mission: {
+      title: "On a mission",
+      text:
+        "Our mission is to bring great AI video to everyone - without pricey subscriptions, a learning curve, endless prompting or budgets burned on credits and platforms. You give us the direction; we deliver the best video for your personal project, your business, or whatever you need. Our team has delivered hundreds of videos for clients around the world.",
+      nudge: "Still not convinced? See for yourself."
+    },
     tiger: {
       cta: "Let’s talk",
       hint: "Move to wake it",
