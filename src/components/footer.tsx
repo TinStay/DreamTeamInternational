@@ -3,7 +3,6 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Sphere } from "./iridescent-shapes";
-import { LanguageToggle } from "./language-toggle";
 import { IconMail, IconMapPin, IconPhone } from "@tabler/icons-react";
 import { ClutchBadge, GoogleReviewsBadge } from "@/components/review-badges";
 import { openConsentSettings } from "@/lib/consent";
@@ -58,7 +57,6 @@ export function Footer() {
             </Link>
             <p className="max-w-xs text-sm text-muted-foreground">{t.footer.desc}</p>
             <div className="mt-1 flex items-center gap-3">
-              <LanguageToggle />
             </div>
           </div>
 

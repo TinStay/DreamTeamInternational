@@ -7,7 +7,6 @@ import { motion } from "motion/react";
 import { IconChevronDown } from "@tabler/icons-react";
 import { EmailCopyButton, EmailIconLink, PhoneCopyButton, PhoneIconLink } from "@/components/phone-copy-button";
 import { ThemeToggle } from "./theme-toggle";
-// import { LanguageDropdown } from "./language-dropdown";
 import { ButtonWithIcon } from "@/components/ui/button-with-icon";
 import { GlassShell } from "@/components/ui/glass-shell";
 import { MegaHeader, type MegaNavGroup } from "@/components/mega-header";
@@ -251,7 +250,6 @@ export function SiteHeader() {
 
   const desktopControls = (
     <>
-      {/* <LanguageDropdown /> */}
       <ThemeToggle className="shrink-0" />
       {/* Plain round icon buttons: copy the email / phone with a "copied" tag as the only feedback. */}
       <EmailCopyButton />
