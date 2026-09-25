@@ -232,6 +232,40 @@ export const en = {
       business: "Prices in USD. Business plans include full commercial use."
     }
   },
+  // The English home page's rail of video categories, right after the hero (`video-pack-section.tsx`, `lib/video-pack.ts`).
+  videoPack: {
+    title: "Get your AI video pack now",
+    subtitle:
+      "Professional AI videos made by our experienced team - in one click. No credits, no prompting, no learning curve: tell us what you need, and we deliver.",
+    previous: "Previous videos",
+    next: "Next videos",
+    items: {
+      socialAds: {
+        title: "Social Media Ads",
+        line: "Scroll-stopping Reels, TikToks and Shorts built to convert"
+      },
+      tvAds: {
+        title: "TV Ads",
+        line: "Broadcast-ready commercials with cinematic quality"
+      },
+      corporate: {
+        title: "Corporate Videos",
+        line: "Brand films, explainers and presentations that build trust"
+      },
+      brandCampaigns: {
+        title: "Brand Video Campaigns",
+        line: "A full series of on-brand videos for every channel"
+      },
+      avatar: {
+        title: "Avatar Videos",
+        line: "Your AI presenter - any language, on camera around the clock"
+      },
+      ugc: {
+        title: "UGC",
+        line: "Authentic creator-style ads, without hiring creators"
+      }
+    }
+  },
   contactPage: {
     metaTitle: "Contact & Process | DreamTeam",
     metaDescription:

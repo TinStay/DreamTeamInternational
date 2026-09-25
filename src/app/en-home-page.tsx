@@ -1,6 +1,7 @@
 import { SiteHeader } from "@/components/site-header";
 import { MobileNav } from "@/components/mobile-nav";
 import { EnHeroSection } from "@/components/en-hero-section";
+import { VideoPackSection } from "@/components/video-pack-section";
 import { QuoteFormSection } from "@/components/quote-form/quote-form-section";
 import { ProjectsShowcase } from "@/components/projects-showcase";
 import { ContactSection } from "@/components/contact-section";
@@ -28,6 +29,8 @@ export function EnHomePage() {
 
       <div className="relative z-10 flex w-full flex-1 flex-col">
         <EnHeroSection />
+        {/* The second screen: "Get your AI video pack now" and the rail of video categories. */}
+        <VideoPackSection />
         <div className="pt-16 sm:pt-20">
           <QuoteFormSection />
         </div>
