@@ -898,6 +898,12 @@ body.service-modal-open .service-mobile-dock {
     display: block;
     height: 1.25em;
   }
+  /* The header's size (the English mega menu). */
+  .tiger-cta--sm {
+    --h: 44px;
+    padding: 0 26px;
+    font-size: 15px;
+  }
   .tiger-cta:is(:hover, :focus-visible) {
     color: #1a1105;
     box-shadow: inset 0 0 0 1px rgba(255, 205, 74, 0.5), 0 0 0 1px rgba(255, 190, 70, 0.15),
@@ -979,3 +985,99 @@ body.service-modal-open .service-mobile-dock {
     transform: translateX(-100%);
   }
 }
+
+/* The English mega menu's bar (`mega-header.tsx`): deep smoked glass - a blackish, see-through gradient over a strong
+   backdrop blur, lit like a 3D object (a soft light pooled at the top centre, a bright hairline along the top edge, a
+   dark one along the bottom, a long shadow under it). More solid while the panel is open (`.is-open`), so its links
+   read over any page. */
+.smoke-bar {
+  background:
+    radial-gradient(120% 140% at 50% -30%, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0) 55%),
+    linear-gradient(180deg, rgba(22, 22, 26, 0.62) 0%, rgba(6, 6, 8, 0.5) 100%);
+  -webkit-backdrop-filter: blur(22px) saturate(150%);
+  backdrop-filter: blur(22px) saturate(150%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.14),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.45),
+    0 18px 40px -18px rgba(0, 0, 0, 0.55);
+  transition: background-color 0.3s ease;
+}
+.smoke-bar.is-open {
+  background:
+    radial-gradient(120% 60% at 50% -10%, rgba(255, 255, 255, 0.09) 0%, rgba(255, 255, 255, 0) 60%),
+    linear-gradient(180deg, rgba(18, 18, 22, 0.86) 0%, rgba(6, 6, 8, 0.8) 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.14),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.5),
+    0 40px 90px -30px rgba(0, 0, 0, 0.75);
+}
+
+/* The English site (`html.site-deep`, set in `[lang]/layout.tsx` with the dark theme forced): a deep, dark 3D space
+   behind every page - a near-black room lit faintly from the horizon, a perspective grid floor running away into the
+   distance and fading into fog, and a vignette closing the edges in - with neutral, see-through black surfaces for the
+   cards (the site's dark ones are bluish). Static on purpose: nothing here repaints while the page scrolls. */
+html.site-deep {
+  /* The client's pricing file: a black ground and one accent - an "electric" orange pearl (orange with a pale pearl
+     sheen through the middle) in place of the brand red -> violet. */
+  --primary: #ff6a14;
+  --primary-gradient-start: #ff5e00;
+  --primary-gradient-end: #ffb066;
+  --primary-soft-glow: rgba(255, 110, 20, 0.35);
+  --orange-pearl: linear-gradient(115deg, #ff5e00 0%, #ff8a1f 30%, #ffd2a1 48%, #ff9a3c 62%, #ff5e00 100%);
+  --background: #050506;
+  --card: color-mix(in srgb, #121317 82%, transparent);
+  --popover: #101115;
+  --muted: #1c1d22;
+}
+html.site-deep .page-dark-grid-layer {
+  display: none;
+}
+html.site-deep .deep-space {
+  display: block;
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background:
+    radial-gradient(90% 55% at 50% 62%, rgba(120, 124, 140, 0.16) 0%, rgba(40, 42, 50, 0.08) 38%, rgba(0, 0, 0, 0) 70%),
+    radial-gradient(140% 90% at 50% 0%, #121318 0%, #08090b 45%, #030304 100%);
+}
+/* The floor: a grid laid flat and tipped away in perspective, its far edge on the horizon (62% down). */
+html.site-deep .deep-space__floor {
+  position: absolute;
+  left: -50%;
+  right: -50%;
+  top: 62%;
+  height: 120%;
+  background-image:
+    linear-gradient(to right, rgba(255, 255, 255, 0.07) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.07) 1px, transparent 1px);
+  background-size: 80px 80px;
+  transform: perspective(700px) rotateX(72deg);
+  transform-origin: 50% 0;
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 22%, #000 70%, transparent 100%);
+  mask-image: linear-gradient(to bottom, transparent 0%, #000 22%, #000 70%, transparent 100%);
+}
+/* Fog along the horizon, and the vignette. */
+html.site-deep .deep-space__fog {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(to bottom, rgba(3, 3, 4, 0) 48%, rgba(18, 19, 24, 0.55) 62%, rgba(3, 3, 4, 0) 80%),
+    radial-gradient(120% 100% at 50% 50%, rgba(0, 0, 0, 0) 55%, rgba(0, 0, 0, 0.7) 100%);
+}
+
+/* The English site's type (the client's pricing file): Inter for text and UI, Archivo expanded and black for the
+   headings. Unlayered, so they win over the `font-sans` / `font-heading` utilities (which carry Exo 2 inlined). */
+html.site-deep body,
+html.site-deep .font-sans {
+  font-family: var(--font-inter), Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+}
+html.site-deep .font-heading {
+  font-family: var(--font-archivo), Archivo, "Arial Black", "Helvetica Neue", Arial, sans-serif;
+  font-stretch: 112%;
+}
+/* The accent word in section headings: the orange pearl, the sheen at its middle. */
+html.site-deep .text-section-accent {
+  background-image: var(--orange-pearl);
+}
+

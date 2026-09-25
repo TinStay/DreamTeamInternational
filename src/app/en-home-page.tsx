@@ -11,84 +11,33 @@ import { ReviewsSection } from "@/components/reviews-section";
 import { FaqSection } from "@/components/faq-section";
 import { Footer } from "@/components/footer";
 import { GradientBlurPageBg } from "@/components/ui/gradient-blur-bg";
-import { JourneyScene, ScrollJourney } from "@/components/ui/scroll-journey";
-import { atomsBackdrop, blobRightBackdrop, journeyMorph, linesBackdrop, servicesBackdrop, wavesBackdrop } from "@/components/ui/journey-backdrops";
-import { OSMO_HANDOFF_VH } from "@/components/projects/showcase-timeline";
 import { MAIN_WITH_FIXED_PAGE_BG_CLASS } from "@/lib/page-shell";
 
-// The English home page (/en). A copy of `home-page.tsx` so /en can take its own layout without
-// touching the Bulgarian one (/bg) — change this file for English-only layout changes.
+// The English home page (/en) — its own file so /en can take its own layout without touching the Bulgarian one (/bg,
+// `home-page.tsx`). One continuous scroll: the sections simply follow each other in normal flow on the cream ground
+// (the site's smooth scrolling still glides the wheel) — no scroll journeys, no pinned scenes, no paged opening, and
+// the case studies as plain rows instead of the sticky stage.
 export function EnHomePage() {
   return (
-    <main className={MAIN_WITH_FIXED_PAGE_BG_CLASS} data-snap-sections>
-      {/* data-snap-sections: on phones the projects stage snaps to its scenes (`SnapStop`, globals.css). */}
-      {/* Site-wide animated grid (replaces dot pattern) */}
+    <main className={MAIN_WITH_FIXED_PAGE_BG_CLASS}>
       <div className="fixed inset-0 z-[-1]">
         <GradientBlurPageBg className="h-full w-full" />
       </div>
 
       <SiteHeader />
 
-      <div className="flex-1 w-full relative z-10 flex flex-col">
-        {/* Opening journey: the hero's headline / CTAs / partners strip leave as the services + quote wizard
-            arrive (its first step IS the services grid); the wizard then leaves into the projects stage below.
-            The hero keeps its own top (no header padding, no overlap above it). That first hand-over is a page
-            (`pageFirst`): one wheel tick / swipe plays it whole, and the scroll never rests half-way. */}
-        <ScrollJourney overlapFirst={false} leaveLast overlap={0.5} pageFirst>
-          {/* The hero is the landing view: pinned from the top of the page, no room of its own. */}
-          <JourneyScene className="pt-0" hold={0}>
-            {/* Partners marquee lives inside the hero (bottom strip over the video). */}
-            <EnHeroSection />
-          </JourneyScene>
-          {/* Extra room so the wizard never starts leaving while someone is still on a short step. */}
-          <JourneyScene hold={0.45} backdrop={servicesBackdrop}>
-            <QuoteFormSection />
-          </JourneyScene>
-        </ScrollJourney>
-
-        {/* Full portfolio lives on /portfolio (hero CTA + nav). Scroll-driven
-            showcase below (sticky stage, full-screen clip per project); the
-            filterable list lives on /projects. It overlaps the wizard's tail like
-            a journey scene, so its cinema headline is already rising while the
-            wizard's parts leave (plain flow under reduced motion, and on phones -
-            the wizard is a plain section there, so nothing may cover its tail). */}
-        <div className="relative -mt-[45svh] max-md:mt-0 motion-reduce:mt-0">
-          <ProjectsShowcase />
+      <div className="relative z-10 flex w-full flex-1 flex-col">
+        <EnHeroSection />
+        <div className="pt-16 sm:pt-20">
+          <QuoteFormSection />
         </div>
-
-        {/* The journey keeps going after the stage: each section is a sticky scene
-            whose title and components fly in from different sides and leave again
-            (`JourneyItem`s inside the sections) before the next one arrives. */}
-        {/* Quick pacing: a section changes within about three wheel ticks. One shape travels the whole journey
-            (journey-backdrops.tsx, `journeyMorph`): the canvas comes up `OSMO_HANDOFF_VH` before the stats arrive and
-            takes the OSMO copy circle over from the showcase and slides it into the ring behind the stats, splits into
-            the two particle lines the review cards travel between, closes into the frame behind the trainings (with
-            atoms drifting around), then the outer signal ring behind the contact details; the FAQ gets its blob and
-            smaller atoms. The reviews scene drops the header pad: its own sticky stage
-            (title + card conveyor) carries it. */}
-        {/* Phones: a hand-over of 0.7 of a viewport and 0.35 of reading room (a swipe covers a viewport or more; at
-            the desktop numbers a flick passed a whole section before its title had formed). */}
-        <ScrollJourney overlap={0.7} mobile={{ overlap: 0.3, hold: 0.35 }} morph={journeyMorph} prelude={OSMO_HANDOFF_VH}>
-          <JourneyScene>
-            <CompanyStatsSection />
-          </JourneyScene>
-          {/* The reviews bring their own runway (the card conveyor), so no extra room. */}
-          <JourneyScene className="pt-0" hold={0} backdrop={linesBackdrop}>
-            <ReviewsSection />
-          </JourneyScene>
-          <JourneyScene backdrop={atomsBackdrop}>
-            <TrainingSection />
-          </JourneyScene>
-          <JourneyScene backdrop={wavesBackdrop}>
-            <ContactSection />
-          </JourneyScene>
-          <JourneyScene>
-            <ProcessSection />
-          </JourneyScene>
-          <JourneyScene backdrop={blobRightBackdrop}>
-            <FaqSection />
-          </JourneyScene>
-        </ScrollJourney>
+        <ProjectsShowcase layout="list" className="pt-20 sm:pt-28" />
+        <CompanyStatsSection className="pt-16 sm:pt-24" />
+        <ReviewsSection />
+        <TrainingSection />
+        <ContactSection />
+        <ProcessSection />
+        <FaqSection />
       </div>
 
       <div className="relative z-10">
@@ -98,4 +47,3 @@ export function EnHomePage() {
     </main>
   );
 }
-

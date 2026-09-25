@@ -9,6 +9,19 @@ export const en = {
     contactCta: "Contact us",
     training: "Training",
     projects: "Case Studies",
+    pricingPage: "Pricing",
+    pricingItems: {
+      individual: "Individual plans",
+      business: "Business plans"
+    },
+    // The English mega menu's first column (`mega-header.tsx`) - the home page's sections, until there is an About page.
+    about: "About Us",
+    aboutItems: {
+      stats: "Our numbers",
+      reviews: "Reviews",
+      process: "How we work",
+      faq: "FAQ"
+    },
     phoneCopy: "Copy phone number",
     emailCopy: "Copy email",
     phoneCopied: "Copied!"
@@ -27,6 +40,184 @@ export const en = {
       cta: "Let’s talk",
       hint: "Move to wake it",
       trustedBy: "Trusted by"
+    }
+  },
+  // The plans page (`/pricing`, `components/pricing/`) - the client's "AI Video Subscription Plans" file; the numbers are
+  // in `lib/pricing.ts`. `{x}` placeholders are filled in by the cards.
+  plans: {
+    metaTitle: "AI Video Subscription Plans & Pricing | DreamTeam",
+    metaDescription:
+      "AI video subscription plans for creators and businesses - from a one-time $299 video to monthly plans with voiceover, subtitles, sound design and revisions included. No filming needed.",
+    eyebrow: "AI video subscription",
+    title: "Next-generation video, every month",
+    subtitle: {
+      individual: "AI-produced videos for creators and personal projects. No filming, no crew - just share your idea.",
+      business: "Professional AI-produced video ads for your business. No filming, no crew - just send a brief."
+    },
+    audience: {
+      label: "Plan type",
+      individual: "Individual",
+      business: "Business"
+    },
+    billing: {
+      label: "Billing period",
+      monthly: "Monthly",
+      annual: "Annual"
+    },
+    off: "{n}% off",
+    mostPopular: "Most popular",
+    oneTimeTag: "One-time",
+    perMonth: "per month",
+    perMonthAnnual: "per mo · annual",
+    oneTimePer: "one-time · no subscription",
+    customPrice: "Let's talk",
+    customPer: "custom volume & terms",
+    saveAnnual: "Save {amount}/yr ({n}%) with annual billing",
+    savedAnnual: "You save {amount} a year · billed {total}/yr",
+    vsOneTime: "Save {n}% vs one-time orders",
+    notIncluded: "Not included:",
+    cta: {
+      subscribe: "Get started",
+      oneTime: "Order now",
+      custom: "Contact us"
+    },
+    scriptAddon: "Scriptwriting - available as add-on",
+    scriptTip: {
+      title: "$100 per 30 sec of video",
+      text: "Without it, you provide the script or voiceover text.",
+      label: "Scriptwriting add-on price"
+    },
+    tiers: {
+      personal: {
+        name: "Personal",
+        for: "One video, one payment - for personal projects, gifts & occasions",
+        volume: "1 video",
+        volumeUnit: "up to 20 seconds",
+        volumeNote: "Longer? +$119 per extra 10 seconds",
+        features: [
+          "No subscription - order once",
+          "720p HD resolution",
+          "Any aspect ratio - 1 per video (9:16 · 16:9 · 1:1 · 4:5)",
+          "Social-media ready quality",
+          "Voiceover included - 1 language per video",
+          "1 free revision"
+        ],
+        missing: ["Subtitles", "Sound design", "Color grading", "Scriptwriting - available as add-on"]
+      },
+      creator: {
+        name: "Creator",
+        for: "Consistent content for creators & influencers",
+        volume: "40 sec",
+        volumeUnit: "of video / month",
+        volumeNote: "≈ two 20-second videos",
+        features: [
+          "1080p Full HD resolution",
+          "Any aspect ratio - 1 per video (9:16 · 16:9 · 1:1 · 4:5)",
+          "Social-media ready quality",
+          "Voiceover included - 1 language per video",
+          "Subtitles included",
+          "1 free revision per video"
+        ],
+        missing: ["Sound design", "Color grading", "Scriptwriting - available as add-on"]
+      },
+      pro: {
+        name: "Pro",
+        for: "More content for serious creators & personal brands",
+        volume: "1 min",
+        volumeUnit: "of video / month",
+        volumeNote: "≈ four 15-second videos",
+        features: [
+          "1080p Full HD resolution",
+          "Any aspect ratio - 1 per video (9:16 · 16:9 · 1:1 · 4:5)",
+          "Social-media ready quality",
+          "Voiceover included - 1 language per video",
+          "Subtitles included",
+          "Sound design",
+          "Color grading",
+          "2 free revisions per video"
+        ],
+        missing: ["Scriptwriting - available as add-on"]
+      },
+      local: {
+        name: "Local",
+        for: "Simple, effective videos for solo traders, consultants & small businesses",
+        volume: "1.5 min",
+        volumeUnit: "of video / month",
+        volumeNote: "≈ six 15-second or three 30-second videos",
+        features: [
+          "1080p Full HD resolution",
+          "Any aspect ratio - 1 per video (9:16 · 16:9 · 1:1 · 4:5)",
+          "Social-media ready quality",
+          "Voiceover included - 1 language per video",
+          "Subtitles included",
+          "Sound design",
+          "Color grading",
+          "2 free revisions per video"
+        ],
+        missing: ["Enhanced quality + advanced effects", "Scriptwriting - available as add-on", "Dedicated producer"]
+      },
+      brand: {
+        name: "Brand",
+        for: "Stronger concepts & ad campaigns for growing mid-sized businesses",
+        volume: "3 min",
+        volumeUnit: "of video / month",
+        volumeNote: "≈ six 30-second videos",
+        features: [
+          "Up to 4K resolution",
+          "Any aspect ratio - 1 per video (9:16 · 16:9 · 1:1 · 4:5)",
+          "Enhanced quality + advanced effects",
+          "Scriptwriting included",
+          "Voiceover included - 1 language per video",
+          "Subtitles included",
+          "Sound design",
+          "Color grading",
+          "3 free revisions per video"
+        ],
+        missing: ["Cinematic quality + premium effects", "Dedicated producer"]
+      },
+      enterprise: {
+        name: "Enterprise",
+        for: "Cinematic productions at scale for established companies, brands & agencies",
+        volume: "Custom",
+        volumeUnit: "monthly volume",
+        volumeNote: "Built around your campaigns",
+        features: [
+          "Up to 4K resolution",
+          "Any aspect ratio - 1 per video (9:16 · 16:9 · 1:1 · 4:5)",
+          "Cinematic quality + premium effects",
+          "Full creative concept + campaign strategy",
+          "Voiceover included - 1 language per video",
+          "Subtitles included",
+          "Sound design",
+          "Color grading",
+          "4+ free revisions per video",
+          "Dedicated producer",
+          "Priority delivery",
+          "Custom terms & invoicing"
+        ],
+        missing: []
+      }
+    },
+    everyPlan: {
+      title: "Every plan includes",
+      items: [
+        "No filming or footage needed",
+        "One aspect ratio per video, your choice",
+        "Delivered in 3-10 days, by complexity",
+        "Unlimited requests, one in production at a time",
+        "You own all videos & source files",
+        "Pause or cancel anytime"
+      ],
+      revisionTerm: "1 revision",
+      revisionText:
+        "= one round of changes per video, covering up to 30% of the video's length (e.g. up to 9 seconds of a 30-second video). Fixes for errors on our side are always free and don't count as a revision.",
+      scriptTerm: "Scriptwriting add-on",
+      scriptText: "= $100 per 30 seconds of video (included in Brand). Without it, you provide the script or voiceover text."
+    },
+    note: {
+      individual:
+        "Prices in USD. Individual plans are for personal and creator use - advertising a business requires a Business plan.",
+      business: "Prices in USD. Business plans include full commercial use."
     }
   },
   contactPage: {

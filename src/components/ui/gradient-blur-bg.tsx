@@ -15,6 +15,11 @@ export function GradientBlurPageBg({ className }: GradientBlurPageBgProps) {
     <div className={cn("pointer-events-none absolute inset-0 z-0 overflow-hidden", className)} aria-hidden>
       <div className="bloom-field-gradient absolute inset-0 dark:hidden" />
       <DarkMagentaOrbGridBackground className="hidden dark:block" />
+      {/* The English site's deep 3D space (`html.site-deep` shows it and hides the grid above; globals.css). */}
+      <div className="deep-space hidden">
+        <div className="deep-space__floor" />
+        <div className="deep-space__fog" />
+      </div>
     </div>
   );
 }

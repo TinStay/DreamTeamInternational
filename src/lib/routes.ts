@@ -15,6 +15,11 @@ export function trainingPath(language: Language) {
   return `/${language}/training`;
 }
 
+/** Localized monthly plans page. */
+export function pricingPath(language: Language) {
+  return `/${language}/pricing`;
+}
+
 /** Localized services hub path. */
 export function servicesPath(language: Language) {
   return `/${language}/services`;
