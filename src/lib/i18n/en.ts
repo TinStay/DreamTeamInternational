@@ -242,6 +242,9 @@ export const en = {
     title: "Get your AI video pack now",
     subtitle:
       "Professional AI videos made by our experienced team - in one click. No credits, no prompting, no learning curve: tell us what you need, and we deliver.",
+    startOne: "Start with one video",
+    orSubscribe: "or get a subscription",
+    pauseAnytime: "pause or cancel anytime",
     previous: "Previous videos",
     next: "Next videos",
     items: {
