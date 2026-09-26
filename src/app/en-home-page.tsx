@@ -2,7 +2,7 @@ import { SiteHeader } from "@/components/site-header";
 import { MobileNav } from "@/components/mobile-nav";
 import { EnHeroSection } from "@/components/en-hero-section";
 import { VideoPackSection } from "@/components/video-pack-section";
-import { QuoteFormSection } from "@/components/quote-form/quote-form-section";
+import { PackagesSection } from "@/components/packages-section";
 import { ProjectsShowcase } from "@/components/projects-showcase";
 import { ContactSection } from "@/components/contact-section";
 import { ProcessSection } from "@/components/process-section";
@@ -31,9 +31,9 @@ export function EnHomePage() {
         {/* The first screen: "Get your AI video pack now" and the rail of video categories; the tiger hero follows. */}
         <VideoPackSection />
         <EnHeroSection />
-        <div className="pt-16 sm:pt-20">
-          <QuoteFormSection />
-        </div>
+        {/* "Find the package that fits your needs" - the kinds of video we make (was the services + quote wizard; the
+            wizard lives on /services and /contact). */}
+        <PackagesSection />
         <ProjectsShowcase layout="list" className="pt-20 sm:pt-28" />
         <CompanyStatsSection className="pt-16 sm:pt-24" />
         <ReviewsSection />

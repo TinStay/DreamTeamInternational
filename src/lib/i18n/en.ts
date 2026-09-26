@@ -282,6 +282,30 @@ export const en = {
       }
     }
   },
+  // The English home page's "find the package" grid (`packages-section.tsx`), in place of the services + quote wizard.
+  packages: {
+    eyebrow: "What we make",
+    title1: "Find the package that",
+    title2: "fits your needs",
+    subtitle: "Every kind of video your brand needs - scripted, produced and delivered by our team. Pick a format, then the plan that fits.",
+    seePlans: "See packages",
+    compare: "Compare all packages",
+    custom: "Need something else? Tell us about it",
+    items: {
+      socialAds: { title: "Social Media Ads", line: "Reels, TikToks and Shorts that stop the scroll" },
+      corporate: { title: "Corporate Videos", line: "Brand films, presentations and internal comms" },
+      tvAds: { title: "TV Ads", line: "Broadcast-ready commercials with cinematic polish" },
+      productVideos: { title: "Product Videos", line: "Your product in any setting, from any angle" },
+      brandMascots: { title: "Brand Mascots", line: "A character that becomes the face of your brand" },
+      motionGraphics: { title: "Motion Graphics", line: "Type, logos and data that move with purpose" },
+      launchVideos: { title: "Launch Videos", line: "Make your product or feature launch land" },
+      explainerVideos: { title: "Explainer Videos", line: "Complex ideas made simple in under a minute" },
+      avatarVideos: { title: "Avatar Videos", line: "AI presenters that speak any language" },
+      ugcAds: { title: "UGC Ads", line: "Creator-style ads, without hiring creators" },
+      realEstate: { title: "Real Estate Videos", line: "Homes and developments shown before they're built" },
+      musicVideos: { title: "Music Videos", line: "Cinematic visuals for artists and labels" }
+    }
+  },
   contactPage: {
     metaTitle: "Contact & Process | DreamTeam",
     metaDescription:
