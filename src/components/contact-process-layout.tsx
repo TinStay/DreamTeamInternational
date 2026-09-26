@@ -1,7 +1,7 @@
 import { SiteHeader } from "@/components/site-header";
 import { MobileNav } from "@/components/mobile-nav";
 import { Footer } from "@/components/footer";
-import { ProcessSection } from "@/components/process-section";
+import { HowItWorksSection } from "@/components/how-it-works-section";
 import { ContactSection } from "@/components/contact-section";
 import { QuoteFormSection } from "@/components/quote-form/quote-form-section";
 import { GradientBlurPageBg } from "@/components/ui/gradient-blur-bg";
@@ -26,7 +26,7 @@ export function ContactProcessLayout() {
         <ContactSection className="pt-0 sm:pt-0 lg:pt-0" quoteCta align="left" />
         {/* The home page's service cards + step form (`#quote`). */}
         <QuoteFormSection />
-        <ProcessSection />
+        <HowItWorksSection />
       </div>
 
       <div className="relative z-10">

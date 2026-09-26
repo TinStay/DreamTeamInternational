@@ -5,7 +5,7 @@ import { VideoPackSection } from "@/components/video-pack-section";
 import { PackagesSection } from "@/components/packages-section";
 import { ProjectsShowcase } from "@/components/projects-showcase";
 import { ContactSection } from "@/components/contact-section";
-import { ProcessSection } from "@/components/process-section";
+import { HowItWorksSection } from "@/components/how-it-works-section";
 import { CompanyStatsSection } from "@/components/company-stats-section";
 import { TrainingSection } from "@/components/training/training-section";
 import { ReviewsSection } from "@/components/reviews-section";
@@ -35,7 +35,7 @@ export function EnHomePage() {
             wizard lives on /services and /contact). */}
         <PackagesSection />
         {/* How it works - right after the packages. */}
-        <ProcessSection />
+        <HowItWorksSection />
         <ProjectsShowcase layout="list" className="pt-20 sm:pt-28" />
         <CompanyStatsSection className="pt-16 sm:pt-24" />
         <ReviewsSection />

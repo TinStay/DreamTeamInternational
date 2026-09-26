@@ -352,6 +352,8 @@ export const en = {
   },
   // The process, for the package way of working (home, right after the packages; the contact page too).
   process: {
+    eyebrow: "The process",
+    stepLabel: "Step",
     title1: "How it",
     title2: "works",
     subtitle: "No prompting, no credits, no learning curve. Four simple steps from idea to finished video - we do the heavy lifting.",
