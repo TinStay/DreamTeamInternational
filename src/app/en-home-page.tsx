@@ -34,12 +34,13 @@ export function EnHomePage() {
         {/* "Find the package that fits your needs" - the kinds of video we make (was the services + quote wizard; the
             wizard lives on /services and /contact). */}
         <PackagesSection />
+        {/* How it works - right after the packages. */}
+        <ProcessSection />
         <ProjectsShowcase layout="list" className="pt-20 sm:pt-28" />
         <CompanyStatsSection className="pt-16 sm:pt-24" />
         <ReviewsSection />
         <TrainingSection />
         <ContactSection />
-        <ProcessSection />
         <FaqSection />
       </div>
 

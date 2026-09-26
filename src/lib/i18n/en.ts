@@ -350,15 +350,16 @@ export const en = {
       "AI video training",
     ],
   },
+  // The process, for the package way of working (home, right after the packages; the contact page too).
   process: {
-    title1: "Our",
-    title2: "Process",
-    subtitle: "A seamless, transparent workflow designed to turn your ideas into stunning AI-generated videos in record time.",
+    title1: "How it",
+    title2: "works",
+    subtitle: "No prompting, no credits, no learning curve. Four simple steps from idea to finished video - we do the heavy lifting.",
     steps: [
-      { title: "Send an Inquiry", description: "Submit your project details and we evaluate the scope, timeline, and all important requirements together." },
-      { title: "Receive Your Quote", description: "We send you a tailored quote for you to review and decide on the best path forward." },
-      { title: "Production", description: "We create the scenes for your video with continuous feedback from you to match your expectations." },
-      { title: "Editing & Delivery", description: "We edit the footage, add appropriate effects and transitions, and deliver the final video to you." }
+      { title: "Choose Your Package", description: "Pick a one-off video or a monthly plan that matches how much content you need. Pause or cancel anytime." },
+      { title: "Send Your Brief", description: "Tell us what you want in a few lines - your goal, your audience, any references. No scripts or prompts needed from you." },
+      { title: "We Create", description: "Our team writes, directs and produces your video with the best AI tools, adds voiceover, music and subtitles." },
+      { title: "Review & Receive", description: "You watch, request changes within your revisions, and get the final files in 3-10 days - yours to use anywhere." }
     ]
   },
   portfolio: {
