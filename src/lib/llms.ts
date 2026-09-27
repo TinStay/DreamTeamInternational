@@ -41,21 +41,9 @@ const HEADINGS: Record<Language, Record<string, string>> = {
     contact: "Contact",
     pages: "Key pages",
   },
-  bg: {
-    summary: "Резюме",
-    facts: "Основни факти",
-    services: "Услуги",
-    cases: "Казуси на клиенти",
-    numbers: "DreamTeam в числа",
-    process: "Как работим",
-    faq: "Често задавани въпроси",
-    training: "Обучения",
-    contact: "Контакти",
-    pages: "Основни страници",
-  },
 };
 
-const LANGUAGE_NAME: Record<Language, string> = { en: "English", bg: "Български (Bulgarian)" };
+const LANGUAGE_NAME: Record<Language, string> = { en: "English" };
 
 function services(lang: Language) {
   return getDictionary(lang).services.items.flatMap((item) => {
@@ -136,32 +124,20 @@ function head() {
     "",
     `> ${getDictionary("en").seo.organizationDescription}`,
     "",
-    `- Website: ${absoluteUrl("/en")} (English) · ${absoluteUrl("/bg")} (Bulgarian)`,
+    `- Website: ${absoluteUrl("/en")}`,
     `- Email: ${EMAIL_PRIMARY.label}`,
     `- Profiles: ${SOCIAL_LINKS.map((social) => social.href).join(", ")}`,
-    `- Full brief with every service, case study and FAQ in both languages: ${absoluteUrl("/llms-full.txt")}`,
+    `- Full brief with every service, case study and FAQ: ${absoluteUrl("/llms-full.txt")}`,
     "",
   ].join("\n");
 }
 
-/** `/llms.txt`: the index - the English brief and a Bulgarian summary. */
+/** `/llms.txt`: the index - the English brief. */
 export function llmsIndex() {
-  const bg = getDictionary("bg");
-  return [
-    head(),
-    section("en", false),
-    `## ${LANGUAGE_NAME.bg}`,
-    "",
-    `> ${bg.seo.organizationDescription}`,
-    "",
-    bg.hero.seoHeading,
-    "",
-    ...services("bg").map((service) => `- **${service.title}** - ${service.seoDescription} ${service.url}`),
-    "",
-  ].join("\n");
+  return [head(), section("en", false)].join("\n");
 }
 
-/** `/llms-full.txt`: everything, in both languages. */
+/** `/llms-full.txt`: everything. */
 export function llmsFull() {
-  return [head(), section("en", true), section("bg", true)].join("\n");
+  return [head(), section("en", true)].join("\n");
 }

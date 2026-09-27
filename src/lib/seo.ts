@@ -24,7 +24,7 @@ export function absoluteUrl(path = "") {
 }
 
 /** Open Graph locale per site language. */
-export const OG_LOCALE: Record<Language, string> = { bg: "bg_BG", en: "en_US" };
+export const OG_LOCALE: Record<Language, string> = { en: "en_US" };
 
 /**
  * The `dangerouslySetInnerHTML` value for a JSON-LD `<script>`: `<` is escaped so no content (a client's name, a
@@ -60,7 +60,6 @@ export function openGraphFor(
     type: "website" as const,
     siteName: "DreamTeam",
     locale: OG_LOCALE[lang],
-    alternateLocale: [OG_LOCALE[lang === "bg" ? "en" : "bg"]],
     title: page.title,
     description: page.description,
     url: absoluteUrl(page.path),

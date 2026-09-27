@@ -10,9 +10,21 @@ export const en = {
     training: "Training",
     projects: "Case Studies",
     pricingPage: "Pricing",
+    // The mega menu's tabs (`site-header.tsx`): Explore (home), the video services, Pricing, and "Other" for the rest.
+    nav: {
+      explore: "Explore",
+      socialAds: "Social Media Ads",
+      corporate: "Corporate Videos",
+      tvAds: "TV Ads",
+      productVideos: "Product Videos",
+      brandMascots: "Brand Mascots",
+      other: "Custom Services"
+    },
+    login: "Log in",
+    signup: "Sign up",
     pricingItems: {
-      individual: "Individual plans",
-      business: "Business plans"
+      individual: "Individual",
+      business: "Business"
     },
     // The English mega menu's first column (`mega-header.tsx`) - the home page's sections, until there is an About page.
     about: "About Us",
@@ -36,10 +48,22 @@ export const en = {
     cta1: "Request a quote",
     cta2: "View Our Work",
     // The English home page's tiger hero (`en-hero-section.tsx`).
+    // The tiger hero's copy on the English home page (`en-hero-section.tsx`).
+    mission: {
+      title: "On a mission",
+      text:
+        "Our mission is to bring great AI video to everyone - without pricey subscriptions, a learning curve, endless prompting or budgets burned on credits and platforms. You give us the direction; we deliver the best video for your personal project, your business, or whatever you need. Our team has delivered hundreds of videos for clients around the world.",
+      nudge: "Still not convinced? See for yourself."
+    },
     tiger: {
       cta: "Let’s talk",
       hint: "Move to wake it",
-      trustedBy: "Trusted by"
+      trustedBy: "Trusted by partners in the USA, Europe and Worldwide",
+      regions: {
+        usa: "USA",
+        europe: "Europe",
+        worldwide: "Worldwide"
+      }
     }
   },
   // The plans page (`/pricing`, `components/pricing/`) - the client's "AI Video Subscription Plans" file; the numbers are
@@ -220,6 +244,68 @@ export const en = {
       business: "Prices in USD. Business plans include full commercial use."
     }
   },
+  // The English home page's rail of video categories, right after the hero (`video-pack-section.tsx`, `lib/video-pack.ts`).
+  videoPack: {
+    title: "Get your AI video pack now",
+    subtitle:
+      "Professional AI videos made by our experienced team - in one click. No credits, no prompting, no learning curve: tell us what you need, and we deliver.",
+    preview: "Preview",
+    startOne: "Start with one video",
+    orSubscribe: "or get a subscription",
+    pauseAnytime: "pause or cancel anytime",
+    previous: "Previous videos",
+    next: "Next videos",
+    items: {
+      socialAds: {
+        title: "Social Media Ads",
+        line: "Scroll-stopping Reels, TikToks and Shorts built to convert"
+      },
+      tvAds: {
+        title: "TV Ads",
+        line: "Broadcast-ready commercials with cinematic quality"
+      },
+      corporate: {
+        title: "Corporate Videos",
+        line: "Brand films, explainers and presentations that build trust"
+      },
+      brandCampaigns: {
+        title: "Brand Video Campaigns",
+        line: "A full series of on-brand videos for every channel"
+      },
+      avatar: {
+        title: "Avatar Videos",
+        line: "Your AI presenter - any language, on camera around the clock"
+      },
+      ugc: {
+        title: "UGC",
+        line: "Authentic creator-style ads, without hiring creators"
+      }
+    }
+  },
+  // The English home page's "find the package" grid (`packages-section.tsx`), in place of the services + quote wizard.
+  packages: {
+    eyebrow: "What we make",
+    title1: "Find the package that",
+    title2: "fits your needs",
+    subtitle: "Every kind of video your brand needs - scripted, produced and delivered by our team. Pick a format, then the plan that fits.",
+    seePlans: "See packages",
+    compare: "Compare all packages",
+    custom: "Need something else? Tell us about it",
+    items: {
+      socialAds: { title: "Social Media Ads", line: "Reels, TikToks and Shorts that stop the scroll" },
+      corporate: { title: "Corporate Videos", line: "Brand films, presentations and internal comms" },
+      tvAds: { title: "TV Ads", line: "Broadcast-ready commercials with cinematic polish" },
+      productVideos: { title: "Product Videos", line: "Your product in any setting, from any angle" },
+      brandMascots: { title: "Brand Mascots", line: "A character that becomes the face of your brand" },
+      motionGraphics: { title: "Motion Graphics", line: "Type, logos and data that move with purpose" },
+      launchVideos: { title: "Launch Videos", line: "Make your product or feature launch land" },
+      explainerVideos: { title: "Explainer Videos", line: "Complex ideas made simple in under a minute" },
+      avatarVideos: { title: "Avatar Videos", line: "AI presenters that speak any language" },
+      ugcAds: { title: "UGC Ads", line: "Creator-style ads, without hiring creators" },
+      realEstate: { title: "Real Estate Videos", line: "Homes and developments shown before they're built" },
+      musicVideos: { title: "Music Videos", line: "Cinematic visuals for artists and labels" }
+    }
+  },
   contactPage: {
     metaTitle: "Contact & Process | DreamTeam",
     metaDescription:
@@ -264,15 +350,18 @@ export const en = {
       "AI video training",
     ],
   },
+  // The process, for the package way of working (home, right after the packages; the contact page too).
   process: {
-    title1: "Our",
-    title2: "Process",
-    subtitle: "A seamless, transparent workflow designed to turn your ideas into stunning AI-generated videos in record time.",
+    eyebrow: "The process",
+    stepLabel: "Step",
+    title1: "How it",
+    title2: "works",
+    subtitle: "No prompting, no credits, no learning curve. Four simple steps from idea to finished video - we do the heavy lifting.",
     steps: [
-      { title: "Send an Inquiry", description: "Submit your project details and we evaluate the scope, timeline, and all important requirements together." },
-      { title: "Receive Your Quote", description: "We send you a tailored quote for you to review and decide on the best path forward." },
-      { title: "Production", description: "We create the scenes for your video with continuous feedback from you to match your expectations." },
-      { title: "Editing & Delivery", description: "We edit the footage, add appropriate effects and transitions, and deliver the final video to you." }
+      { title: "Choose Your Package", description: "Pick a one-off video or a monthly plan that matches how much content you need. Pause or cancel anytime." },
+      { title: "Send Your Brief", description: "Tell us what you want in a few lines - your goal, your audience, any references. No scripts or prompts needed from you." },
+      { title: "We Create", description: "Our team writes, directs and produces your video with the best AI tools, adds voiceover, music and subtitles." },
+      { title: "Review & Receive", description: "You watch, request changes within your revisions, and get the final files in 3-10 days - yours to use anywhere." }
     ]
   },
   portfolio: {

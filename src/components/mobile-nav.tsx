@@ -27,7 +27,6 @@ import {
   trainingPath,
 } from "@/lib/routes";
 import { cn } from "@/lib/utils";
-import { LanguageToggle } from "./language-toggle";
 import { ThemeToggle } from "./theme-toggle";
 
 export function MobileNav() {
@@ -103,7 +102,6 @@ export function MobileNav() {
                   className={cn("mb-6 w-auto grayscale dark:invert", language === "en" ? "h-10" : "h-18")}
                 />
                 <div className="flex items-center gap-4">
-                  <LanguageToggle />
                   {/* English has one theme (`forcedTheme` in the layout), so no toggle there. */}
                   {language === "en" ? null : <ThemeToggle className="shrink-0" />}
                 </div>

@@ -73,13 +73,13 @@ export function PageBreadcrumbs({ className }: { className?: string }) {
 
   const parts = pathname.split("/").filter(Boolean);
   const isLocalizedHome =
-    pathname === "/en" || pathname === "/bg" || pathname === "/";
+    pathname === "/en" || pathname === "/";
 
   if (isLocalizedHome) return null;
 
   const langPrefix = homePath(language);
   const trimmed =
-    parts[0] === "en" || parts[0] === "bg" ? parts.slice(1) : parts;
+    parts[0] === "en" ? parts.slice(1) : parts;
   const crumbs = trimmed.map((seg, idx) => {
     const href = `${langPrefix}/${trimmed.slice(0, idx + 1).join("/")}`;
     return { seg, href, label: segmentToLabel(seg, t) };
