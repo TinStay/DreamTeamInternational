@@ -1,10 +1,11 @@
 import { SiteHeader } from "@/components/site-header";
 import { MobileNav } from "@/components/mobile-nav";
 import { EnHeroSection } from "@/components/en-hero-section";
-import { QuoteFormSection } from "@/components/quote-form/quote-form-section";
+import { VideoPackSection } from "@/components/video-pack-section";
+import { PackagesSection } from "@/components/packages-section";
 import { ProjectsShowcase } from "@/components/projects-showcase";
 import { ContactSection } from "@/components/contact-section";
-import { ProcessSection } from "@/components/process-section";
+import { HowItWorksSection } from "@/components/how-it-works-section";
 import { CompanyStatsSection } from "@/components/company-stats-section";
 import { TrainingSection } from "@/components/training/training-section";
 import { ReviewsSection } from "@/components/reviews-section";
@@ -27,16 +28,19 @@ export function EnHomePage() {
       <SiteHeader />
 
       <div className="relative z-10 flex w-full flex-1 flex-col">
+        {/* The first screen: "Get your AI video pack now" and the rail of video categories; the tiger hero follows. */}
+        <VideoPackSection />
         <EnHeroSection />
-        <div className="pt-16 sm:pt-20">
-          <QuoteFormSection />
-        </div>
+        {/* "Find the package that fits your needs" - the kinds of video we make (was the services + quote wizard; the
+            wizard lives on /services and /contact). */}
+        <PackagesSection />
+        {/* How it works - right after the packages. */}
+        <HowItWorksSection />
         <ProjectsShowcase layout="list" className="pt-20 sm:pt-28" />
         <CompanyStatsSection className="pt-16 sm:pt-24" />
         <ReviewsSection />
         <TrainingSection />
         <ContactSection />
-        <ProcessSection />
         <FaqSection />
       </div>
 

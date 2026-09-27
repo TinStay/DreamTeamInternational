@@ -113,7 +113,7 @@ export function generateStaticParams() {
  */
 export async function generateMetadata({ params }: { params: Promise<{ lang: string }> }): Promise<Metadata> {
   const { lang } = await params;
-  const locale = isLocale(lang) ? lang : "bg";
+  const locale = isLocale(lang) ? lang : "en";
   const t = getDictionary(locale);
   return {
     metadataBase: new URL(SITE_URL),
@@ -125,7 +125,6 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
       type: "website",
       siteName: "DreamTeam",
       locale: OG_LOCALE[locale],
-      alternateLocale: [OG_LOCALE[locale === "bg" ? "en" : "bg"]],
       images: [{ url: OG_IMAGE_PATH, width: 1200, height: 630, alt: "DreamTeam — AI Video Production" }],
     },
     twitter: { card: "summary_large_image" },
@@ -148,7 +147,7 @@ export default async function RootLayout({
   params: Promise<{ lang: string }>;
 }>) {
   const { lang } = await params;
-  const locale = isLocale(lang) ? lang : "bg";
+  const locale = isLocale(lang) ? lang : "en";
   // The English site is dark only, over a deep 3D space (`html.site-deep` in globals.css); /bg starts dark and keeps the
   // visitor's choice.
   const deep = locale === "en";
