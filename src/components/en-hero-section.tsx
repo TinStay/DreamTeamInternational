@@ -8,7 +8,7 @@ import { TigerReveal } from "@/components/hero-tiger/tiger-reveal";
 import { TigerLogos } from "@/components/hero-tiger/tiger-logos";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/lib/i18n/language-context";
-import { homePath } from "@/lib/routes";
+import { portfolioPath } from "@/lib/routes";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
@@ -31,7 +31,7 @@ export function EnHeroSection() {
       <section
         id="hero"
         ref={ref}
-        className="relative isolate z-10 flex min-h-[100svh] flex-col overflow-hidden text-white"
+        className="relative isolate z-10 flex min-h-[78svh] flex-col overflow-hidden text-white"
         data-offstage={onScreen ? undefined : ""}
       >
         {/* Keyword-rich H1 for search engines / AI answer engines; the visual headline below is a paragraph. */}
@@ -51,7 +51,7 @@ export function EnHeroSection() {
 
         <p
           className={cn(
-            "pointer-events-none absolute top-[clamp(90px,14vh,140px)] left-1/2 -translate-x-1/2 text-[13px] tracking-[0.02em] text-white/45 transition-opacity duration-700 max-lg:top-[clamp(110px,16vh,150px)]",
+            "pointer-events-none absolute top-[clamp(40px,7vh,72px)] left-1/2 -translate-x-1/2 text-[13px] tracking-[0.02em] text-white/45 transition-opacity duration-700",
             awake && "opacity-0"
           )}
         >
@@ -60,7 +60,7 @@ export function EnHeroSection() {
 
         {/* The copy low in the frame, under the eyes: left-aligned on the page's side margin (the video pack's) and spread
             across the hero's width - centred on phones. */}
-        <div className="mt-auto flex flex-col items-center px-[max(1.25rem,3vw)] pt-32 pb-[clamp(28px,5vh,56px)] text-center sm:items-start sm:text-left">
+        <div className="mt-auto flex flex-col items-center px-[max(1.25rem,3vw)] pt-24 pb-[clamp(28px,5vh,56px)] text-center sm:items-start sm:text-left">
           <JourneyItem kind="title" className="flex w-full flex-col items-center sm:items-start">
             <motion.p
               // Archivo expanded, black - the English site's heading face (`html.site-deep .font-heading`).
@@ -98,7 +98,7 @@ export function EnHeroSection() {
               transition={{ delay: 0.5, duration: 0.55, ease: EASE }}
             >
               <Link
-                href={`${homePath(language)}#projects`}
+                href={portfolioPath(language)}
                 // The hero's one button now (the "Let's talk" pill moved out - Sign up lives in the header): a glass
                 // outline pill that lifts and brightens on hover.
                 className="inline-flex h-[54px] cursor-pointer items-center rounded-full border border-white/35 bg-white/[0.06] px-8 text-base font-semibold text-white backdrop-blur-sm transition-[transform,background-color,border-color] duration-200 ease-out hover:-translate-y-0.5 hover:border-white/70 hover:bg-white/[0.14] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#ff6a14]"

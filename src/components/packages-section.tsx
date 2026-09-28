@@ -1,48 +1,35 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
-import type { ComponentType } from "react";
-import {
-  IconArrowRight,
-  IconArrowUpRight,
-  IconBuildingSkyscraper,
-  IconBulb,
-  IconDeviceMobile,
-  IconDeviceTv,
-  IconHome,
-  IconMoodSmile,
-  IconMusic,
-  IconPackage,
-  IconRocket,
-  IconShape,
-  IconUserSquareRounded,
-  IconUsers,
-} from "@tabler/icons-react";
+import { IconArrowRight, IconArrowUpRight } from "@tabler/icons-react";
 import { TigerCta } from "@/components/hero-tiger/tiger-cta";
 import { useLanguage } from "@/lib/i18n/language-context";
-import { contactProcessPath, pricingPath } from "@/lib/routes";
+import { contactProcessPath, portfolioPath, pricingPath } from "@/lib/routes";
 
-/** The kinds of video in the grid, in order: the header's tabs first, then the rest. Words in `packages.items`. */
-const PACKAGES: { key: string; Icon: ComponentType<{ className?: string; stroke?: number }> }[] = [
-  { key: "socialAds", Icon: IconDeviceMobile },
-  { key: "corporate", Icon: IconBuildingSkyscraper },
-  { key: "tvAds", Icon: IconDeviceTv },
-  { key: "productVideos", Icon: IconPackage },
-  { key: "brandMascots", Icon: IconMoodSmile },
-  { key: "motionGraphics", Icon: IconShape },
-  { key: "launchVideos", Icon: IconRocket },
-  { key: "explainerVideos", Icon: IconBulb },
-  { key: "avatarVideos", Icon: IconUserSquareRounded },
-  { key: "ugcAds", Icon: IconUsers },
-  { key: "realEstate", Icon: IconHome },
-  { key: "musicVideos", Icon: IconMusic },
-];
+/** The kinds of video in the grid, in order: the header's tabs first, then the rest. Words in `packages.items`, the
+ *  picture at `public/packages/<key>.webp` (1200 x 675). */
+const PACKAGES = [
+  "socialAds",
+  "corporate",
+  "tvAds",
+  "productVideos",
+  "brandMascots",
+  "motionGraphics",
+  "launchVideos",
+  "explainerVideos",
+  "ugcAds",
+  "realEstate",
+  "musicVideos",
+] as const;
 
 /**
  * The English home page's "Find the package that fits your needs" (in place of the services + quote wizard): a
- * left-aligned heading on the page margin, a grid of the kinds of video we make - dark cards, an icon in an orange
- * pearl ring, the name in Archivo, a line, and a "See packages" hint that slides in on hover (the whole card opens the
- * plans) - then the two ways on: compare the packages (the orange pill) or ask for something custom.
+ * left-aligned heading on the page margin, then a grid of the kinds of video we make. Each card is its picture with only
+ * the name on it (Archivo, on a soft black gradient); on hover - or keyboard focus - the picture dims to half black, the
+ * name rises and its line and two buttons slide in under it: get the package (the plans) or see examples (the
+ * portfolio). On a touch screen, which has no hover, the details are always shown. Under the grid, the two ways on:
+ * compare the packages (the orange pill) or ask for something custom.
  */
 export function PackagesSection() {
   const { t, language } = useLanguage();
@@ -61,31 +48,59 @@ export function PackagesSection() {
       </header>
 
       <ul className="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:mt-14 lg:grid-cols-3 xl:grid-cols-4">
-        {PACKAGES.map(({ key, Icon }) => (
-          <li key={key}>
-            <Link
-              href={plansHref}
-              className="group relative flex h-full cursor-pointer flex-col overflow-hidden rounded-2xl border border-white/10 bg-[linear-gradient(160deg,#1c1d22_0%,#121316_60%)] p-6 shadow-[0_24px_50px_-30px_rgba(0,0,0,0.9)] transition-[transform,border-color,box-shadow] duration-300 ease-out hover:-translate-y-1 hover:border-[#ff7a1a]/45 hover:shadow-[0_30px_60px_-28px_rgba(255,106,20,0.35)]"
-            >
-              {/* A warm glow that wakes in the card's corner on hover. */}
-              <span
-                aria-hidden
-                className="pointer-events-none absolute -top-16 -right-16 size-48 rounded-full bg-[radial-gradient(circle,rgba(255,122,26,0.28),transparent_70%)] opacity-0 transition-opacity duration-300 group-hover:opacity-100"
-              />
-              <span className="relative flex size-12 items-center justify-center rounded-xl bg-[linear-gradient(115deg,#ff5e00_0%,#ff8a1f_30%,#ffd2a1_48%,#ff9a3c_62%,#ff5e00_100%)] p-px shadow-[0_0_18px_rgba(255,110,20,0.25)]">
-                <span className="flex size-full items-center justify-center rounded-[11px] bg-[#141518]">
-                  <Icon className="size-6 text-[#ffb066]" stroke={1.6} />
-                </span>
-              </span>
-              <h3 className="relative mt-5 font-heading text-lg font-black uppercase leading-tight tracking-tight transition-colors duration-200 group-hover:text-[#ff8a1f] xl:text-xl">
+        {PACKAGES.map((key) => (
+          <li
+            key={key}
+            // Hover / focus-within drive everything inside through `group`; on a device without hover
+            // (`[@media(hover:none)]`) the open state is simply the resting one.
+            className="group @container relative aspect-video overflow-hidden rounded-2xl border border-white/10 bg-[#141518] shadow-[0_24px_50px_-30px_rgba(0,0,0,0.9)] transition-[transform,border-color,box-shadow] duration-500 ease-out hover:-translate-y-1 hover:border-[#ff7a1a]/45 hover:shadow-[0_30px_60px_-28px_rgba(255,106,20,0.35)] focus-within:border-[#ff7a1a]/45"
+          >
+            <Image
+              src={`/packages/${key}.webp`}
+              alt=""
+              fill
+              sizes="(min-width: 1280px) 25vw, (min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+              className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+            />
+            {/* Resting: a soft black gradient under the name. Open: the whole picture at half black. */}
+            <span
+              aria-hidden
+              className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_top,rgba(0,0,0,0.85)_0%,rgba(0,0,0,0.35)_35%,rgba(0,0,0,0)_60%)]"
+            />
+            <span
+              aria-hidden
+              className="pointer-events-none absolute inset-0 bg-black/50 opacity-0 transition-opacity duration-500 ease-out group-focus-within:opacity-100 group-hover:opacity-100 [@media(hover:none)]:opacity-100"
+            />
+
+            <div className="absolute inset-x-0 bottom-0 p-4 @[20rem]:p-5">
+              <h3 className="font-heading text-lg font-black uppercase leading-tight tracking-tight xl:text-xl">
                 {items[key].title}
               </h3>
-              <p className="relative mt-2 flex-1 text-sm leading-relaxed text-white/60">{items[key].line}</p>
-              <span className="relative mt-5 inline-flex items-center gap-1 text-sm font-semibold text-white/45 transition-[color,transform] duration-200 group-hover:translate-x-1 group-hover:text-[#ff8a1f]">
-                {p.seePlans}
-                <IconArrowUpRight className="size-4" aria-hidden />
-              </span>
-            </Link>
+              {/* The details: collapsed to nothing at rest (a grid row from 0fr to 1fr, so the height animates),
+                  sliding up and fading in on hover. */}
+              <div className="grid grid-rows-[0fr] transition-[grid-template-rows] duration-500 ease-out group-focus-within:grid-rows-[1fr] group-hover:grid-rows-[1fr] [@media(hover:none)]:grid-rows-[1fr]">
+                <div className="min-h-0 overflow-hidden">
+                  <div className="translate-y-3 opacity-0 transition-[opacity,transform] duration-500 ease-out group-focus-within:translate-y-0 group-focus-within:opacity-100 group-hover:translate-y-0 group-hover:opacity-100 group-hover:delay-100 [@media(hover:none)]:translate-y-0 [@media(hover:none)]:opacity-100">
+                    <p className="mt-1.5 line-clamp-2 text-[13px] leading-snug text-white/80">{items[key].line}</p>
+                    <div className="mt-3 flex flex-nowrap items-center gap-1.5 @[20rem]:gap-2">
+                      <Link
+                        href={plansHref}
+                        className="inline-flex h-9 shrink-0 cursor-pointer items-center gap-1 rounded-full bg-[linear-gradient(115deg,#ff5e00_0%,#ff8a1f_40%,#ffb066_100%)] px-3 text-xs font-semibold @[20rem]:px-3.5 @[20rem]:text-[13px] whitespace-nowrap text-white shadow-[0_8px_24px_-8px_rgba(255,106,20,0.7)] transition-[transform,box-shadow] duration-200 ease-out hover:-translate-y-0.5 hover:shadow-[0_12px_30px_-8px_rgba(255,106,20,0.9)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+                      >
+                        {p.getPackage}
+                        <IconArrowUpRight className="hidden size-3.5 @[20rem]:block" aria-hidden />
+                      </Link>
+                      <Link
+                        href={portfolioPath(language)}
+                        className="inline-flex h-9 shrink-0 cursor-pointer items-center rounded-full border border-white/40 bg-white/10 px-3 text-xs font-semibold @[20rem]:px-3.5 @[20rem]:text-[13px] whitespace-nowrap text-white backdrop-blur-sm transition-[transform,background-color,border-color] duration-200 ease-out hover:-translate-y-0.5 hover:border-white/80 hover:bg-white/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+                      >
+                        {p.seeExamples}
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </li>
         ))}
       </ul>

@@ -272,10 +272,6 @@ export const en = {
         title: "Brand Video Campaigns",
         line: "A full series of on-brand videos for every channel"
       },
-      avatar: {
-        title: "Avatar Videos",
-        line: "Your AI presenter - any language, on camera around the clock"
-      },
       ugc: {
         title: "UGC",
         line: "Authentic creator-style ads, without hiring creators"
@@ -288,7 +284,8 @@ export const en = {
     title1: "Find the package that",
     title2: "fits your needs",
     subtitle: "Every kind of video your brand needs - scripted, produced and delivered by our team. Pick a format, then the plan that fits.",
-    seePlans: "See packages",
+    getPackage: "Get your package",
+    seeExamples: "See examples",
     compare: "Compare all packages",
     custom: "Need something else? Tell us about it",
     items: {
@@ -300,7 +297,6 @@ export const en = {
       motionGraphics: { title: "Motion Graphics", line: "Type, logos and data that move with purpose" },
       launchVideos: { title: "Launch Videos", line: "Make your product or feature launch land" },
       explainerVideos: { title: "Explainer Videos", line: "Complex ideas made simple in under a minute" },
-      avatarVideos: { title: "Avatar Videos", line: "AI presenters that speak any language" },
       ugcAds: { title: "UGC Ads", line: "Creator-style ads, without hiring creators" },
       realEstate: { title: "Real Estate Videos", line: "Homes and developments shown before they're built" },
       musicVideos: { title: "Music Videos", line: "Cinematic visuals for artists and labels" }

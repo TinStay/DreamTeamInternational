@@ -3,7 +3,6 @@ import { MobileNav } from "@/components/mobile-nav";
 import { EnHeroSection } from "@/components/en-hero-section";
 import { VideoPackSection } from "@/components/video-pack-section";
 import { PackagesSection } from "@/components/packages-section";
-import { ProjectsShowcase } from "@/components/projects-showcase";
 import { ContactSection } from "@/components/contact-section";
 import { HowItWorksSection } from "@/components/how-it-works-section";
 import { CompanyStatsSection } from "@/components/company-stats-section";
@@ -17,7 +16,7 @@ import { MAIN_WITH_FIXED_PAGE_BG_CLASS } from "@/lib/page-shell";
 // The English home page (/en) — its own file so /en can take its own layout without touching the Bulgarian one (/bg,
 // `home-page.tsx`). One continuous scroll: the sections simply follow each other in normal flow on the cream ground
 // (the site's smooth scrolling still glides the wheel) — no scroll journeys, no pinned scenes, no paged opening, and
-// the case studies as plain rows instead of the sticky stage.
+// no case studies (the hero's "View Our Work" opens /portfolio).
 export function EnHomePage() {
   return (
     <main className={MAIN_WITH_FIXED_PAGE_BG_CLASS}>
@@ -36,7 +35,6 @@ export function EnHomePage() {
         <PackagesSection />
         {/* How it works - right after the packages. */}
         <HowItWorksSection />
-        <ProjectsShowcase layout="list" className="pt-20 sm:pt-28" />
         <CompanyStatsSection className="pt-16 sm:pt-24" />
         <ReviewsSection />
         <TrainingSection />
