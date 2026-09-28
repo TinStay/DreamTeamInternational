@@ -55,11 +55,11 @@ export function VideoPackSection() {
   };
 
   return (
-    // `--pack-w` - one window's width - is sized by the screen's height as well as its width, so the heading, the rail
-    // and the actions fit one screen without scrolling (the rest of the section is about 21rem tall); it starts right under the header.
+    // `--pack-w` - one window's width - is about half the screen (two windows side by side), and sized by the screen's
+    // height as well, so the whole section stays well within one screen; it starts right under the header.
     <section
       id="video-pack"
-      className="relative flex min-h-[100svh] flex-col justify-start overflow-x-clip pt-[5.25rem] pb-6 text-white [--pack-w:min(92vw,76rem,calc((100svh-21rem)*16/9))] max-md:[--pack-w:88vw]"
+      className="relative flex flex-col justify-start overflow-x-clip pt-[5.25rem] pb-10 text-white [--pack-w:min(46vw,38rem,calc((100svh-21rem)*8/9))] max-md:[--pack-w:78vw]"
     >
       {/* The heading on the left (centred on phones), its edge on the first window's - the same side margin as the rail. */}
       <div className="flex w-full flex-col items-center px-[max(1.25rem,3vw)] text-center sm:items-start sm:text-left">
@@ -233,15 +233,15 @@ function PackWindow({
         {/* Netflix-style caption over the film: a black, half-transparent gradient rising from the bottom, the title
             and its line on it, bottom-left - the line slides up a touch and the title turns orange on hover. */}
         <div className="pointer-events-none absolute inset-x-0 bottom-0 h-3/5 bg-[linear-gradient(to_top,rgba(0,0,0,0.88)_0%,rgba(0,0,0,0.55)_45%,rgba(0,0,0,0)_100%)]" />
-        <div className="absolute inset-x-0 bottom-0 p-5 sm:p-7">
-          <p className="mb-2 inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-black/45 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-white/80 backdrop-blur-sm">
-            <IconPlayerPlayFilled className="size-2.5 text-[#ff8a1f]" aria-hidden />
+        <div className="absolute inset-x-0 bottom-0 p-4 sm:p-5">
+          <p className="mb-1.5 inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-black/45 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-[0.14em] text-white/80 backdrop-blur-sm">
+            <IconPlayerPlayFilled className="size-2 text-[#ff8a1f]" aria-hidden />
             {playingLabel}
           </p>
-          <h3 className="font-heading text-2xl font-black uppercase leading-none tracking-tight transition-colors duration-200 group-hover:text-[#ff8a1f] sm:text-3xl lg:text-[2.25rem]">
+          <h3 className="font-heading text-lg font-black uppercase leading-none tracking-tight transition-colors duration-200 group-hover:text-[#ff8a1f] sm:text-xl lg:text-2xl">
             {title}
           </h3>
-          <p className="mt-2 max-w-[46ch] text-sm text-white/80 transition-transform duration-300 ease-out group-hover:-translate-y-0.5 sm:text-[15px]">
+          <p className="mt-1.5 max-w-[46ch] text-xs text-white/80 transition-transform duration-300 ease-out group-hover:-translate-y-0.5 sm:text-[13px]">
             {line}
           </p>
         </div>
