@@ -10,7 +10,9 @@ import { PEARL_TAG, PricingCard } from "@/components/pricing/pricing-card";
 import { MAIN_WITH_FIXED_PAGE_BG_CLASS } from "@/lib/page-shell";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/lib/i18n/language-context";
-import { ANNUAL_PERCENT, PLANS, type Audience, type Billing } from "@/lib/pricing";
+import { ANNUAL_PERCENT, PLANS, type Audience, type Billing, type Plan } from "@/lib/pricing";
+import { openSignup } from "@/lib/signup-dialog";
+import { useAuthUser } from "@/lib/supabase/use-auth-user";
 import { contactProcessPath } from "@/lib/routes";
 
 const AUDIENCES: Audience[] = ["individual", "business"];
@@ -37,6 +39,32 @@ export function PricingPageView({ initialAudience = "business" }: { initialAudie
   const contactHref = contactProcessPath(language);
   const [audience, setAudience] = useState<Audience>(initialAudience);
   const [billing, setBilling] = useState<Billing>("monthly");
+  const user = useAuthUser();
+  const [buying, setBuying] = useState<string | null>(null);
+  const [buyError, setBuyError] = useState<string | null>(null);
+
+  // Buying a pack: a signed-out visitor is asked to sign up first; then Stripe's checkout opens, and once it confirms the
+  // payment the seconds appear in the account (see /api/stripe/webhook).
+  async function buy(plan: Plan) {
+    setBuyError(null);
+    if (!user) {
+      openSignup();
+      return;
+    }
+    setBuying(plan.key);
+    try {
+      const res = await fetch("/api/checkout", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ plan: plan.key, billing }) });
+      const json = (await res.json().catch(() => ({}))) as { url?: string; error?: string };
+      if (res.ok && json.url) {
+        window.location.assign(json.url);
+        return;
+      }
+      setBuyError(json.error === "not_configured" ? p.buy.notConfigured : p.buy.error);
+    } catch {
+      setBuyError(p.buy.error);
+    }
+    setBuying(null);
+  }
 
   return (
     // `theme-dark`: the page (its page background, header and footer too) is dark on the Bulgarian site's light theme
@@ -100,9 +128,14 @@ export function PricingPageView({ initialAudience = "business" }: { initialAudie
 
           <div className="grid grid-cols-1 items-stretch gap-4 md:grid-cols-3">
             {PLANS[audience].map((plan) => (
-              <PricingCard key={plan.key} plan={plan} billing={billing} href={contactHref} />
+              <PricingCard key={plan.key} plan={plan} billing={billing} href={contactHref} onBuy={(x) => void buy(x)} busy={buying === plan.key} />
             ))}
           </div>
+          {buyError ? (
+            <p role="alert" className="mt-4 rounded-xl border border-red-400/30 bg-red-500/10 px-4 py-3 text-center text-sm text-red-200">
+              {buyError}
+            </p>
+          ) : null}
 
           <section className="mt-7 rounded-[20px] border border-white/[0.09] bg-[#141518] px-[22px] py-5">
             <h2 className="mb-3 font-heading text-[17px] font-black uppercase">{p.everyPlan.title}</h2>

@@ -31,7 +31,21 @@ const RED_TAG = cn(TAG, "bg-[#ff1f5a] text-white");
 const fill = (template: string, values: Record<string, string | number>) =>
   template.replace(/\{(\w+)\}/g, (_, key: string) => String(values[key] ?? ""));
 
-export function PricingCard({ plan, billing, href }: { plan: Plan; billing: Billing; href: string }) {
+export function PricingCard({
+  plan,
+  billing,
+  href,
+  onBuy,
+  busy = false,
+}: {
+  plan: Plan;
+  billing: Billing;
+  /** Where a custom plan goes (the contact page). */
+  href: string;
+  /** Buying a pack: called for every plan that is not custom (the page starts the checkout). */
+  onBuy?: (plan: Plan) => void;
+  busy?: boolean;
+}) {
   const { t } = useLanguage();
   const p = t.plans;
   const copy = p.tiers[plan.key];
@@ -132,17 +146,33 @@ export function PricingCard({ plan, billing, href }: { plan: Plan; billing: Bill
         ))}
       </ul>
 
-      <Link
-        href={href}
-        className={cn(
+      {plan.custom || !onBuy ? (
+        <Link
+          href={href}
+          className={cn(
           "mt-[18px] flex w-full cursor-pointer items-center justify-center rounded-xl p-[13px] text-[15px] font-bold transition-[transform,filter,box-shadow] duration-200 ease-out hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.99]",
           plan.popular
             ? "bg-[linear-gradient(115deg,#ff5e00_0%,#ff8a1f_30%,#ffd2a1_48%,#ff9a3c_62%,#ff5e00_100%)] bg-[length:200%_100%] bg-[position:30%_0] text-[#1f0b00] shadow-[inset_0_1px_0_rgba(255,255,255,0.55),0_10px_28px_-10px_rgba(255,110,20,0.6)] transition-[transform,background-position,box-shadow] hover:bg-[position:70%_0] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.55),0_14px_34px_-10px_rgba(255,110,20,0.75)]"
             : "bg-white text-[#0c0d0f] hover:brightness-95 hover:shadow-[0_12px_28px_-14px_rgba(255,255,255,0.35)]"
         )}
       >
-        {plan.custom ? p.cta.custom : plan.oneTime ? p.cta.oneTime : p.cta.subscribe}
-      </Link>
+          {plan.custom ? p.cta.custom : plan.oneTime ? p.cta.oneTime : p.cta.subscribe}
+        </Link>
+      ) : (
+        <button
+          type="button"
+          onClick={() => onBuy(plan)}
+          disabled={busy}
+          className={cn(
+          "mt-[18px] flex w-full cursor-pointer disabled:cursor-wait disabled:opacity-70 items-center justify-center rounded-xl p-[13px] text-[15px] font-bold transition-[transform,filter,box-shadow] duration-200 ease-out hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.99]",
+          plan.popular
+            ? "bg-[linear-gradient(115deg,#ff5e00_0%,#ff8a1f_30%,#ffd2a1_48%,#ff9a3c_62%,#ff5e00_100%)] bg-[length:200%_100%] bg-[position:30%_0] text-[#1f0b00] shadow-[inset_0_1px_0_rgba(255,255,255,0.55),0_10px_28px_-10px_rgba(255,110,20,0.6)] transition-[transform,background-position,box-shadow] hover:bg-[position:70%_0] hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.55),0_14px_34px_-10px_rgba(255,110,20,0.75)]"
+            : "bg-white text-[#0c0d0f] hover:brightness-95 hover:shadow-[0_12px_28px_-14px_rgba(255,255,255,0.35)]"
+        )}
+      >
+          {plan.custom ? p.cta.custom : plan.oneTime ? p.cta.oneTime : p.cta.subscribe}
+        </button>
+      )}
     </article>
   );
 }

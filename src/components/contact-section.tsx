@@ -3,11 +3,11 @@
 import * as React from "react";
 import { useLanguage } from "@/lib/i18n/language-context";
 import { cn } from "@/lib/utils";
-import Image from "next/image";
 import { motion } from "motion/react";
 import { ContactInquiryForm } from "@/components/contact-inquiry-form";
 import { JourneyItem } from "@/components/ui/scroll-journey";
 import { SOCIAL_LINKS } from "@/lib/social-links";
+import { SocialIcon } from "@/components/social-icon";
 import { ClutchBadge, GoogleReviewsBadge } from "@/components/review-badges";
 import { ButtonWithIcon } from "@/components/ui/button-with-icon";
 import { GradientMailIcon, GradientMapPinIcon, GradientPhoneIcon } from "@/components/ui/gradient-icons";
@@ -36,27 +36,6 @@ function reveal(index: number) {
 /** Snappy, delay-free gesture transitions (see `reveal`). */
 const HOVER_TRANSITION = { duration: 0.28, ease: EASE_OUT };
 const TAP_TRANSITION = { duration: 0.12, ease: EASE_OUT };
-
-function SocialIcon({
-  src,
-  alt,
-}: {
-  src: string;
-  alt: string;
-}) {
-  return (
-    <Image
-      src={src}
-      alt={alt}
-      width={256}
-      height={256}
-      // The lossless 256px PNG, downsampled once by the browser: the optimizer's small lossy WebP read blurry.
-      unoptimized
-      // `shrink-0` + `object-contain`: never let the flex row squash the square.
-      className="h-10 w-10 shrink-0 object-contain opacity-90 transition-all group-hover:opacity-100 sm:h-12 sm:w-12"
-    />
-  );
-}
 
 const contactInfoIconCircle =
   "relative flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-full bg-card shadow-sm ring-1 ring-border/40 dark:shadow-[0_10px_28px_rgba(0,0,0,0.45)] dark:ring-white/10";
@@ -233,6 +212,7 @@ export function ContactSection({
                 <MotionLink
                   key={s.alt}
                   href={s.href}
+                  aria-label={s.alt}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="group inline-flex shrink-0 cursor-pointer items-center justify-center"
@@ -240,7 +220,7 @@ export function ContactSection({
                   whileTap={{ scale: 0.95, transition: TAP_TRANSITION }}
                   {...reveal(4 + i)}
                 >
-                  <SocialIcon src={s.src} alt={s.alt} />
+                  <SocialIcon name={s.alt} className="size-11 sm:size-12" />
                 </MotionLink>
               ))}
             </div>

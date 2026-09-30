@@ -2,7 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { IconArrowRight, IconChevronLeft, IconChevronRight, IconPlayerPlayFilled } from "@tabler/icons-react";
+import { motion } from "motion/react";
+import { IconArrowRight, IconChevronLeft, IconChevronRight } from "@tabler/icons-react";
 import { TigerCta } from "@/components/hero-tiger/tiger-cta";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/lib/i18n/language-context";
@@ -78,15 +79,17 @@ export function VideoPackSection() {
         <div
           ref={railRef}
           onScroll={measure}
-          className="flex snap-x snap-mandatory scroll-px-[max(1.25rem,3vw)] gap-5 overflow-x-auto scroll-smooth px-[max(1.25rem,3vw)] pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          // The rail scrolls sideways, which clips it vertically too: it carries room above and below the windows (and
+          // takes it back with negative margins) so a window lifting on hover and its glow are never cut off.
+          className="flex snap-x snap-proximity scroll-px-[max(1.25rem,3vw)] -mt-5 -mb-7 gap-5 overflow-x-auto scroll-smooth px-[max(1.25rem,3vw)] pt-5 pb-9 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         >
-          {VIDEO_PACK.map((item) => (
+          {VIDEO_PACK.map((item, index) => (
             <PackWindow
               key={item.key}
+              index={index}
               clip={item.clip}
               title={p.items[item.key].title}
               line={p.items[item.key].line}
-              playingLabel={p.preview}
             />
           ))}
         </div>
@@ -111,7 +114,6 @@ export function VideoPackSection() {
           />
         </Link>
       </div>
-
     </section>
   );
 }
@@ -146,22 +148,21 @@ function RailArrow({
 }
 
 /**
- * One window: the film in a rounded 16:9 frame (its poster until it plays) with a Netflix-style caption on it - a
- * "Preview" tag, the title in Archivo uppercase (orange on hover) and its line, on a black gradient along the bottom.
+ * One window: the film in a rounded 16:9 frame (its poster until it plays) with a Netflix-style caption on it - the title in Archivo uppercase (orange on hover) and its line, on a black gradient along the bottom.
  * The film is only fetched and played while the frame is at least 60% on screen (the rail's own clipping counts, so a
  * window scrolled off to the side stops too); it pauses where it was when it leaves.
  */
 function PackWindow({
+  index,
   clip,
   title,
   line,
-  playingLabel,
 }: {
+  /** Position in the rail: the windows rise in one after another. */
+  index: number;
   clip: BunnyVideo | null;
   title: string;
   line: string;
-  /** The small tag above the title ("Preview"). */
-  playingLabel: string;
 }) {
   const frameRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -205,47 +206,64 @@ function PackWindow({
   }, [src]);
 
   return (
-    <article data-pack-window className="group w-[var(--pack-w)] shrink-0 snap-start">
-      <div
-        ref={frameRef}
-        className="relative aspect-video overflow-hidden rounded-2xl border border-white/10 bg-[#141518] shadow-[0_24px_60px_-28px_rgba(0,0,0,0.9)] transition-[transform,border-color] duration-300 ease-out group-hover:-translate-y-1 group-hover:border-[#ff7a1a]/50"
-      >
-        {clip ? (
-          <video
-            ref={videoRef}
-            src={src ?? undefined}
-            poster={bunnyThumbnailUrl(clip)}
-            muted
-            loop
-            playsInline
-            preload="none"
-            // Whichever comes last - coming on screen or the film being ready - starts it (a play() fired while the
-            // file was still attaching could be lost on the first load).
-            onLoadedData={(event) => {
-              if (onScreen.current) void event.currentTarget.play().catch(() => {});
-            }}
-            className="absolute inset-0 size-full object-cover"
-          />
-        ) : (
-          <div className="absolute inset-0 bg-[radial-gradient(120%_90%_at_30%_20%,rgba(255,110,20,0.22),transparent_60%)]" />
-        )}
+    // The windows rise and fade in one after another as the rail comes into view (once), then lift on hover with a long
+    // ease-out so nothing snaps: the frame rises and glows, the film inside eases a touch closer.
+    <motion.article
+      data-pack-window
+      className="group w-[var(--pack-w)] shrink-0 snap-start"
+      initial={{ opacity: 0, y: 32 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.2 }}
+      transition={{
+        duration: 0.9,
+        delay: Math.min(index, 3) * 0.12,
+        ease: [0.22, 1, 0.36, 1],
+      }}
+    >
+      {/* The hover glow is its own layer behind the frame, and only its opacity changes: the browser fades it on the
+          graphics card, where animating a big box-shadow repainted the frame (and the film in it) on every step. */}
+      <div className="relative isolate">
+        <span
+          aria-hidden
+          className="pointer-events-none absolute inset-x-8 -bottom-3 -z-10 h-2/3 rounded-full bg-[#ff6a14]/45 opacity-0 blur-2xl transition-opacity duration-[800ms] ease-out group-hover:opacity-100"
+        />
+        <div
+          ref={frameRef}
+          className="relative aspect-video transform-gpu overflow-hidden rounded-2xl border border-white/10 bg-[#141518] shadow-[0_24px_60px_-28px_rgba(0,0,0,0.9)] transition-[transform,border-color] duration-[800ms] ease-[cubic-bezier(0.16,1,0.3,1)] will-change-transform group-hover:-translate-y-1.5 group-hover:border-[#ff7a1a]/50"
+        >
+          {clip ? (
+            <video
+              ref={videoRef}
+              src={src ?? undefined}
+              poster={bunnyThumbnailUrl(clip)}
+              muted
+              loop
+              playsInline
+              preload="none"
+              // Whichever comes last - coming on screen or the film being ready - starts it (a play() fired while the
+              // file was still attaching could be lost on the first load).
+              onLoadedData={(event) => {
+                if (onScreen.current) void event.currentTarget.play().catch(() => {});
+              }}
+              className="absolute inset-0 size-full transform-gpu object-cover transition-transform duration-[1400ms] ease-[cubic-bezier(0.16,1,0.3,1)] will-change-transform group-hover:scale-[1.035]"
+            />
+          ) : (
+            <div className="absolute inset-0 bg-[radial-gradient(120%_90%_at_30%_20%,rgba(255,110,20,0.22),transparent_60%)]" />
+          )}
 
-        {/* Netflix-style caption over the film: a black, half-transparent gradient rising from the bottom, the title
+          {/* Netflix-style caption over the film: a black, half-transparent gradient rising from the bottom, the title
             and its line on it, bottom-left - the line slides up a touch and the title turns orange on hover. */}
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-3/5 bg-[linear-gradient(to_top,rgba(0,0,0,0.88)_0%,rgba(0,0,0,0.55)_45%,rgba(0,0,0,0)_100%)]" />
-        <div className="absolute inset-x-0 bottom-0 p-4 sm:p-5">
-          <p className="mb-1.5 inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-black/45 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-[0.14em] text-white/80 backdrop-blur-sm">
-            <IconPlayerPlayFilled className="size-2 text-[#ff8a1f]" aria-hidden />
-            {playingLabel}
-          </p>
-          <h3 className="font-heading text-lg font-black uppercase leading-none tracking-tight transition-colors duration-200 group-hover:text-[#ff8a1f] sm:text-xl lg:text-2xl">
-            {title}
-          </h3>
-          <p className="mt-1.5 max-w-[46ch] text-xs text-white/80 transition-transform duration-300 ease-out group-hover:-translate-y-0.5 sm:text-[13px]">
-            {line}
-          </p>
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-3/5 bg-[linear-gradient(to_top,rgba(0,0,0,0.88)_0%,rgba(0,0,0,0.55)_45%,rgba(0,0,0,0)_100%)]" />
+          <div className="absolute inset-x-0 bottom-0 p-4 sm:p-5">
+            <h3 className="font-heading text-lg font-black uppercase leading-none tracking-tight transition-colors duration-200 group-hover:text-[#ff8a1f] sm:text-xl lg:text-2xl">
+              {title}
+            </h3>
+            <p className="mt-1.5 max-w-[46ch] text-xs text-white/80 transition-transform duration-300 ease-out group-hover:-translate-y-0.5 sm:text-[13px]">
+              {line}
+            </p>
+          </div>
         </div>
       </div>
-    </article>
+    </motion.article>
   );
 }

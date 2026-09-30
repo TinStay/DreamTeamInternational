@@ -38,7 +38,7 @@ export function PackagesSection() {
   const plansHref = `${pricingPath(language)}?for=business`;
 
   return (
-    <section id="packages" className="relative px-[max(1.25rem,3vw)] py-20 text-white sm:py-28">
+    <section id="packages" className="relative px-[max(1.25rem,3vw)] py-12 text-white sm:py-16">
       <header className="max-w-3xl">
         <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#ff8a1f]">{p.eyebrow}</p>
         <h2 className="mt-3 font-heading text-[clamp(30px,3.8vw,60px)] font-black uppercase leading-[0.95] tracking-[-0.01em] text-balance">

@@ -1,3 +1,4 @@
+import Image from "next/image";
 import type { CSSProperties } from "react";
 import { cn } from "@/lib/utils";
 
@@ -7,6 +8,8 @@ export type AvatarShape = "circle" | "octagon" | "square" | "hexagon" | "diamond
 export const AVATAR_SHAPES: AvatarShape[] = ["circle", "octagon", "square", "hexagon", "diamond", "circle", "pentagon", "octagon"];
 
 export type TestimonialProps = {
+  /** The client's mark (a white-ink PNG for the dark ground): shown above the name in place of the initials avatar. */
+  logo?: string;
   name: string;
   role?: string;
   text: string;
@@ -124,6 +127,7 @@ export function Testimonial({
   initials,
   color,
   shape,
+  logo,
   compact = false,
   className,
 }: TestimonialProps) {
@@ -131,23 +135,35 @@ export function Testimonial({
     <div
       className={cn(
         "relative flex w-80 max-w-full flex-col items-center rounded-2xl border border-card-border bg-card/80 text-center shadow-[0_16px_40px_-14px_rgba(15,23,42,0.28)] backdrop-blur-sm transition-shadow duration-300 hover:shadow-[0_22px_50px_-14px_rgba(15,23,42,0.36)] dark:shadow-[0_18px_44px_-14px_rgba(0,0,0,0.7)] dark:hover:shadow-[0_24px_56px_-14px_rgba(0,0,0,0.8)]",
-        compact ? "px-5 pb-3.5 pt-8" : "px-6 pb-6 pt-11",
+        compact ? (logo ? "px-5 pb-3.5 pt-5" : "px-5 pb-3.5 pt-8") : logo ? "px-6 pb-6 pt-7" : "px-6 pb-6 pt-11",
         className
       )}
     >
+      {logo ? (
+        // The client's mark, above the name (the initials avatar is for cards without one).
+        <Image
+          src={logo}
+          alt=""
+          width={240}
+          height={96}
+          unoptimized
+          className={cn("mb-3 w-auto max-w-[9rem] object-contain opacity-95", compact ? "h-9" : "h-10")}
+        />
+      ) : (
       <div
-        className={cn(
-          "absolute flex items-center justify-center font-bold",
-          "[--avatar-fill:var(--avatar-fill-light)] [--avatar-edge:var(--avatar-edge-light)] text-[var(--avatar-ink-light)]",
-          "dark:[--avatar-fill:var(--avatar-fill-dark)] dark:[--avatar-edge:var(--avatar-edge-dark)] dark:text-[var(--avatar-ink-dark)]",
-          compact ? "-top-7 h-14 w-14 text-base" : "-top-8 h-16 w-16 text-lg"
-        )}
-        style={avatarTints(color ?? BRAND_VIOLET)}
-        aria-hidden
-      >
-        <AvatarShapeSvg shape={shape ?? shapeFor(name)} />
-        <span className="relative">{initials ?? computeInitials(name)}</span>
-      </div>
+          className={cn(
+            "absolute flex items-center justify-center font-bold",
+            "[--avatar-fill:var(--avatar-fill-light)] [--avatar-edge:var(--avatar-edge-light)] text-[var(--avatar-ink-light)]",
+            "dark:[--avatar-fill:var(--avatar-fill-dark)] dark:[--avatar-edge:var(--avatar-edge-dark)] dark:text-[var(--avatar-ink-dark)]",
+            compact ? "-top-7 h-14 w-14 text-base" : "-top-8 h-16 w-16 text-lg"
+          )}
+          style={avatarTints(color ?? BRAND_VIOLET)}
+          aria-hidden
+        >
+          <AvatarShapeSvg shape={shape ?? shapeFor(name)} />
+          <span className="relative">{initials ?? computeInitials(name)}</span>
+        </div>
+      )}
 
       <h3 className={cn("font-heading font-semibold text-foreground", compact ? "text-lg" : "text-xl")}>{name}</h3>
       {role ? <p className={cn("text-muted-foreground", compact ? "text-sm md:text-xs" : "text-sm")}>{role}</p> : null}

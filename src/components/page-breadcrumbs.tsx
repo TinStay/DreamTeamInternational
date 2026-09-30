@@ -39,6 +39,16 @@ function segmentToLabel(
       return t.header.services;
     case "pricing":
       return t.header.pricingPage;
+    case "account":
+      return t.account.manageAccount;
+    case "about":
+      return t.header.about;
+    case "team":
+      return t.team.title;
+    case "profile":
+      return t.account.viewProfile;
+    case "my-projects":
+      return t.account.yourProjects;
     case "individual":
       return t.training.cards.individual.title;
     case "skool":
