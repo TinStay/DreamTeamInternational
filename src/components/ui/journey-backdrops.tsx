@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, type CSSProperties, type RefObject } from "react";
+import { useEffect, useRef, type RefObject } from "react";
 import { motion, useMotionTemplate, useMotionValue, useTransform, type MotionValue } from "motion/react";
 import { cn } from "@/lib/utils";
 import type { JourneyBackdrop, JourneyBackdropProps, JourneyMorph } from "@/components/ui/scroll-journey";

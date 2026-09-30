@@ -1188,3 +1188,128 @@ html.site-deep .text-section-accent {
   background-image: var(--orange-pearl);
 }
 
+
+/* The "-20%" badge (Explore in the nav): green ink with a band of brushed-aluminium light sweeping through the letters
+   now and then. The gradient is wider than the text and slides across it; still under reduced motion. */
+.discount-shine {
+  background-image: linear-gradient(
+    105deg,
+    #16a34a 0%,
+    #22c55e 34%,
+    #f4f8f6 47%,
+    #cfd8d3 50%,
+    #f4f8f6 53%,
+    #22c55e 66%,
+    #16a34a 100%
+  );
+  background-size: 260% 100%;
+  background-position: 100% 0;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: discount-shine 3.2s ease-in-out infinite;
+}
+@keyframes discount-shine {
+  0%,
+  35% {
+    background-position: 100% 0;
+  }
+  80%,
+  100% {
+    background-position: 0% 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .discount-shine {
+    animation: none;
+    background-position: 50% 0;
+  }
+}
+
+/* The badge around the "-20%": a slanted line of light runs across it, over the letters' own shine (the line is a
+   pseudo-element, so it crosses the border and background too). Still under reduced motion. */
+.discount-badge {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+.discount-badge::after {
+  content: "";
+  position: absolute;
+  inset: -20% auto -20% 0;
+  width: 42%;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(100deg, transparent 0%, rgba(255, 255, 255, 0.05) 25%, rgba(255, 255, 255, 0.85) 50%, rgba(255, 255, 255, 0.05) 75%, transparent 100%);
+  transform: translateX(-140%) skewX(-18deg);
+  animation: discount-line 2.6s ease-in-out infinite;
+}
+@keyframes discount-line {
+  0%,
+  30% {
+    transform: translateX(-140%) skewX(-18deg);
+  }
+  75%,
+  100% {
+    transform: translateX(340%) skewX(-18deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .discount-badge::after {
+    animation: none;
+    opacity: 0;
+  }
+}
+
+/* The About page's team cards: the grainy gradient drifts slowly behind the card (a transform only, so it runs on the
+   compositor); the layer is larger than the card so its edges never show. Still under reduced motion. */
+.team-gradient {
+  animation: team-drift 22s ease-in-out infinite;
+  will-change: transform;
+}
+@keyframes team-drift {
+  0%,
+  100% {
+    transform: translate3d(-5%, -3%, 0) scale(1.2) rotate(0deg);
+  }
+  50% {
+    transform: translate3d(5%, 3%, 0) scale(1.4) rotate(4deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .team-gradient {
+    animation: none;
+  }
+}
+
+/* The AI-partners card's streaks of shade and light drift slowly (a transform only). */
+@keyframes ai-partners-drift {
+  0%,
+  100% {
+    transform: translate3d(-4%, -2%, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(5%, 3%, 0) scale(1.12);
+  }
+}
+
+/* The AI-partners logo row: an endless, seamless slide (two identical rows, moved by exactly one row's width). */
+.ai-marquee {
+  animation: ai-marquee 42s linear infinite;
+}
+.group\/marquee:hover .ai-marquee {
+  animation-play-state: paused;
+}
+@keyframes ai-marquee {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ai-marquee {
+    animation: none;
+  }
+}

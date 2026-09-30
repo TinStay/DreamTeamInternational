@@ -11,6 +11,7 @@ import { organizationGraph } from "@/lib/seo-graph";
 import { Analytics } from "@vercel/analytics/next";
 import { PostHogProvider } from "@/components/posthog-provider";
 import { PostHogPageView } from "@/components/posthog-pageview";
+import { PromoBar } from "@/components/promo-bar";
 import { ConsentBanner } from "@/components/consent/consent-banner";
 import { TrackingScripts } from "@/components/consent/tracking-scripts";
 import { Suspense } from "react";
@@ -189,6 +190,7 @@ export default async function RootLayout({
                 <Suspense fallback={null}>
                   <PostHogPageView />
                 </Suspense>
+                {deep ? <PromoBar /> : null}
                 <div className="relative z-10">
                   {children}
                 </div>

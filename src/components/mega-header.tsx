@@ -4,7 +4,6 @@ import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { motion } from "motion/react";
-import { IconArrowUpRight } from "@tabler/icons-react";
 import { cn } from "@/lib/utils";
 import { brandLogo } from "@/lib/brand-logo";
 
@@ -27,7 +26,7 @@ export type MegaNavGroup = {
 const INK =
   "bg-gradient-to-r from-[var(--primary-gradient-start)] to-[var(--primary-gradient-end)] bg-clip-text transition-colors duration-200 ease-out group-hover/link:text-transparent group-focus-visible/link:text-transparent";
 
-/** A menu link: the label, and a small ↗ that slides in beside it on hover. */
+/** A menu link: the label, its ink turning to the brand gradient on hover. */
 function MegaLink({ href, className, children }: { href: string; className?: string; children: ReactNode }) {
   return (
     <Link
@@ -38,11 +37,6 @@ function MegaLink({ href, className, children }: { href: string; className?: str
       )}
     >
       <span className={INK}>{children}</span>
-      {/* Out of the flow (hanging after the text's end), so the hidden arrow never takes room from the label. */}
-      <IconArrowUpRight
-        className="absolute bottom-[0.2em] left-full ml-1 size-3.5 -translate-x-1 text-[var(--primary-gradient-end)] opacity-0 transition-[opacity,transform] duration-200 ease-out group-hover/link:translate-x-0 group-hover/link:opacity-100 group-focus-visible/link:translate-x-0 group-focus-visible/link:opacity-100"
-        aria-hidden
-      />
     </Link>
   );
 }
@@ -50,9 +44,9 @@ function MegaLink({ href, className, children }: { href: string; className?: str
 /**
  * The English site's desktop header (the client's "FMI" reference): a glass bar across the whole width of the screen,
  * sliding away as the page scrolls down and back as soon as it scrolls up; hovering
- * (or tabbing into) the nav opens the whole bar into one panel with **every** section's links listed in a column under
- * its title - no per-item dropdowns - and it folds back up as the pointer leaves. The logo and the right-hand controls
- * stay on the top row. `/bg` keeps `SiteHeader`'s own desktop header.
+ * the one tab that holds a list (Custom Services) drops a floating card under itself - the bar does not unfold, the
+ * other tabs are plain links - and it folds away as the pointer leaves. The logo and the right-hand controls stay on
+ * the top row. `/bg` keeps `SiteHeader`'s own desktop header.
  */
 export function MegaHeader({
   logoHref,
@@ -111,6 +105,8 @@ export function MegaHeader({
         "fixed inset-x-0 top-0 z-50 hidden w-full transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] lg:block",
         hidden && !open ? "-translate-y-full" : "translate-y-0"
       )}
+      // Under the announcement bar while it is on screen (`--promo-h`, set by `PromoBar`).
+      style={{ top: "var(--promo-h, 0px)" }}
       // Hidden off screen: out of the tab order and the accessibility tree until it comes back.
       inert={hidden && !open}
       onMouseLeave={hide}
@@ -124,8 +120,7 @@ export function MegaHeader({
       {/* The whole width of the screen, edge to edge, in smoked glass (`.smoke-bar`, globals.css). */}
       <div
         className={cn(
-          "smoke-bar overflow-hidden px-[clamp(1.5rem,3vw,3.5rem)] text-white",
-          open && "is-open"
+          "smoke-bar px-[clamp(1.5rem,3vw,3.5rem)] text-white"
         )}
       >
         <div className="flex w-full items-start justify-between gap-6">
@@ -145,14 +140,14 @@ export function MegaHeader({
           {/* Left-aligned beside the logo, one row of tabs at an even gap, the groups split by thin vertical lines. Only a
               tab with a list (Custom Services) opens the panel - hovering or tabbing into it; the other tabs are plain
               links and close it. */}
-          <nav className="flex min-w-0 flex-1 items-start justify-start gap-x-3 ps-4 text-[15px] font-semibold text-[#ececee] xl:gap-x-4 2xl:gap-x-6 2xl:ps-8 2xl:text-base">
+          <nav className="flex min-w-0 flex-1 items-start justify-start gap-x-3 ps-4 text-[13px] font-semibold text-[#ececee] xl:gap-x-3.5 2xl:gap-x-5 2xl:ps-8 2xl:text-sm">
             {groups.map((group, groupIndex) => (
               // Each tab as wide as its title (or its list, if wider) - never narrower, so titles never overlap.
               <div
                 key={group.href}
                 className={cn(
                   "shrink-0 flex-row",
-                  group.showFrom === "ultra" ? "hidden min-[1600px]:flex" : group.showFrom === "wide" ? "hidden min-[1400px]:flex" : group.showFrom === "xl" ? "hidden xl:flex" : "flex"
+                  group.showFrom === "ultra" ? "hidden min-[1800px]:flex" : group.showFrom === "wide" ? "hidden min-[1400px]:flex" : group.showFrom === "xl" ? "hidden xl:flex" : "flex"
                 )}
                 onMouseEnter={group.items.length ? show : hide}
                 onFocus={group.items.length ? show : () => setOpen(false)}
@@ -167,42 +162,38 @@ export function MegaHeader({
                     )}
                   />
                 ) : null}
-                <div className="flex flex-col">
-                <div className="flex h-[4.25rem] items-center">
-                  <MegaLink href={group.href}>{group.label}</MegaLink>
-                </div>
-                {group.items.length ? (
-                  <motion.div
-                    initial={false}
-                    animate={open ? { height: "auto", opacity: 1 } : { height: 0, opacity: 0 }}
-                    transition={{ duration: open ? 0.32 : 0.2, ease: EASE }}
-                    // Clipped only vertically (the fold). The last tab's links hang out to the right, over the room under
-                    // Log in / Sign up, instead of widening the tab (the bar has no width to spare); any other tab's
-                    // list sets its width, so its links never run into the next tab's.
-                    className={cn(
-                      "overflow-x-visible overflow-y-clip",
-                      groupIndex === groups.length - 1 && "w-0 min-w-full"
-                    )}
-                  >
-                    <ul
-                      aria-label={group.label}
-                      className="flex flex-col gap-2.5 pb-7 text-sm font-medium text-[#a7abb2] xl:text-[0.9375rem]"
+                <div className="relative flex flex-col">
+                  <div className="flex h-[4.25rem] items-center">
+                    <MegaLink href={group.href}>{group.label}</MegaLink>
+                  </div>
+                  {group.items.length ? (
+                    // The drop-down: a floating glass card under this tab alone (the bar itself stays as it is), right-aligned
+                    // under the last tab so it never runs off the screen.
+                    <motion.div
+                      initial={false}
+                      animate={open ? { opacity: 1, y: 0 } : { opacity: 0, y: -8 }}
+                      transition={{ duration: open ? 0.24 : 0.16, ease: EASE }}
+                      inert={!open}
+                      className={cn(
+                        "absolute top-full z-10 min-w-[15rem] rounded-2xl border border-white/10 bg-[linear-gradient(180deg,rgba(24,24,28,0.94)_0%,rgba(10,10,13,0.94)_100%)] p-2 shadow-[0_30px_70px_-20px_rgba(0,0,0,0.85)] backdrop-blur-xl",
+                        groupIndex === groups.length - 1 ? "right-0" : "left-0",
+                        !open && "pointer-events-none"
+                      )}
                     >
-                      {group.items.map((item, i) => (
-                        <motion.li
-                          key={item.href}
-                          initial={false}
-                          animate={open ? { opacity: 1, y: 0 } : { opacity: 0, y: -4 }}
-                          transition={{ duration: 0.25, delay: open ? 0.05 + i * 0.025 : 0, ease: EASE }}
-                        >
-                          <MegaLink href={item.href} className="leading-snug hover:text-white">
-                            {item.label}
-                          </MegaLink>
-                        </motion.li>
-                      ))}
-                    </ul>
-                  </motion.div>
-                ) : null}
+                      <ul aria-label={group.label} className="flex flex-col text-[0.9375rem] font-medium text-[#c9ccd2]">
+                        {group.items.map((item) => (
+                          <li key={item.href}>
+                            <Link
+                              href={item.href}
+                              className="block cursor-pointer rounded-xl px-3.5 py-2.5 whitespace-nowrap transition-[background-color,color,transform] duration-200 ease-out hover:translate-x-0.5 hover:bg-white/[0.08] hover:text-white focus-visible:bg-white/[0.08] focus-visible:text-white focus-visible:outline-none"
+                            >
+                              {item.label}
+                            </Link>
+                          </li>
+                        ))}
+                      </ul>
+                    </motion.div>
+                  ) : null}
                 </div>
               </div>
             ))}

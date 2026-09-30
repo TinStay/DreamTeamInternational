@@ -2,13 +2,14 @@
 
 import { useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
-import Lenis from "lenis";
 import { scrollToElement } from "@/lib/smooth-scroll";
 
 /*
- * Site-wide smooth scrolling (Lenis, mounted once in the root layout): wheel
- * input glides instead of stepping, so the scroll-driven choreography reads as
- * motion. Touch stays native - and on a touch device (`pointer: coarse`) Lenis
+ * Scrolling is the browser's own everywhere now (the client wanted the wheel to behave normally, not glide): Lenis is
+ * no longer created, `window.__lenis` stays absent and every caller already falls back to native scrolling - the
+ * scroll-driven choreography eases itself through `useScrollEased`'s spring. What this component still does: same-page
+ * hash links land clear of the header, and a route change starts at the top. The note below is the history of the
+ * Lenis version, kept for the day it comes back. Touch stays native - and on a touch device (`pointer: coarse`) Lenis
  * is not mounted at all: it would only add its rAF loop, a main-thread frame
  * every vsync, at rest too, in which every running animation on the page is
  * ticked - on a throttled phone profile the single biggest cost while nothing
@@ -53,15 +54,6 @@ export function SmoothScroll() {
   }, [pathname]);
 
   useEffect(() => {
-    // lerp 0.07: a longer glide than the default 0.1 (about a quarter second to settle) - the scroll-driven choreography
-    // reads as motion even on a single wheel tick, without the page feeling like ice.
-    // wheelMultiplier 0.85: a wheel tick moves the page a little less, so the pages read at a calmer pace.
-    // Fine pointers only (see the note above) - the hash-link interception below runs everywhere.
-    const lenis = window.matchMedia("(pointer: coarse)").matches
-      ? null
-      : new Lenis({ lerp: 0.06, wheelMultiplier: 0.85, autoRaf: true, allowNestedScroll: true });
-    if (lenis) window.__lenis = lenis;
-
     // Hash links to this very page: Lenis handles `#…` hrefs itself; ours mostly carry the locale path in front.
     const onClick = (event: MouseEvent) => {
       if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
@@ -79,8 +71,6 @@ export function SmoothScroll() {
 
     return () => {
       document.removeEventListener("click", onClick, true);
-      lenis?.destroy();
-      if (lenis) delete window.__lenis;
     };
   }, []);
   return null;

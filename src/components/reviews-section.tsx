@@ -68,6 +68,7 @@ type Review = { name: string; role: string; text: string; rating: number; initia
  * has reached its last row the moment the stage lets go and the scene can hand over.
  */
 function ReviewConveyor({ items, heading }: { items: Review[]; heading: React.ReactNode }) {
+  const { language } = useLanguage();
   const runwayRef = React.useRef<HTMLDivElement>(null);
   const windowRef = React.useRef<HTMLDivElement>(null);
   const trackRef = React.useRef<HTMLDivElement>(null);
@@ -123,7 +124,13 @@ function ReviewConveyor({ items, heading }: { items: Review[]; heading: React.Re
               // Odd card at the end of a two-column stack: centred across both columns.
               // On phones the rows are 2.5rem apart: the next card's avatar hangs 1.75rem above its card, so that
               // leaves a little air between it and the card before (from md the stack stays close-packed).
-              className="absolute inset-x-0 mx-auto grid w-[calc(100%-1.25rem)] grid-cols-1 gap-10 will-change-transform md:w-[min(84rem,calc(94vw-2rem))] md:grid-cols-2 md:gap-4 md:[&>*:nth-child(odd):last-child]:col-span-2 md:[&>*:nth-child(odd):last-child]:w-[calc(50%-0.5rem)] md:[&>*:nth-child(odd):last-child]:justify-self-center"
+              className={cn(
+                "absolute inset-x-0 mx-auto grid grid-cols-1 gap-10 will-change-transform md:grid-cols-2 md:gap-4 md:[&>*:nth-child(odd):last-child]:col-span-2 md:[&>*:nth-child(odd):last-child]:w-[calc(50%-0.5rem)] md:[&>*:nth-child(odd):last-child]:justify-self-center",
+                // English: the page's own side margin, like every other section; bg keeps the old width.
+                language === "en"
+                  ? "w-[calc(100%-2*max(1.25rem,3vw))]"
+                  : "w-[calc(100%-1.25rem)] md:w-[min(84rem,calc(94vw-2rem))]"
+              )}
               style={{ top: TOP_INSET, y, gridAutoRows: rowMin > 0 ? `minmax(${Math.round(rowMin)}px, auto)` : undefined }}
             >
               {items.map((review, index) => (
@@ -151,7 +158,7 @@ function ReviewConveyor({ items, heading }: { items: Review[]; heading: React.Re
 }
 
 export function ReviewsSection({ className, spotlight }: { className?: string; spotlight?: React.ReactNode }) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const r = t.reviews;
   const journey = useJourney();
   // Phones (plain flow, no journey): every card stacked - readable, nothing moving.
@@ -172,14 +179,29 @@ export function ReviewsSection({ className, spotlight }: { className?: string; s
 
   // Journey part (home): the heading arrives first, then the conveyor; it sits inside the sticky stage so it stays
   // put while the cards scroll through under it.
+  const en = language === "en";
   const heading = (
     <JourneyItem
       kind="title"
-      className={cn("relative z-10 mx-auto w-full max-w-7xl shrink-0 px-4 text-center", journey ? "mb-4" : "mb-8 lg:mb-10")}
+      className={cn(
+        "relative z-10 w-full shrink-0",
+        // The English site's section head: left-aligned on the page margin, orange eyebrow, Archivo capitals.
+        en ? "px-[max(1.25rem,3vw)] text-left" : "mx-auto max-w-7xl px-4 text-center",
+        journey ? "mb-4" : "mb-8 lg:mb-10"
+      )}
     >
-      <h2 className="font-heading text-[2.75rem] leading-[1.06] font-extrabold sm:text-5xl md:text-6xl text-foreground">
-        {r.title1} <span className="text-section-accent">{r.title2}</span>
-      </h2>
+      {en ? (
+        <>
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#ff8a1f]">{r.eyebrow}</p>
+          <h2 className="mt-3 font-heading text-[clamp(30px,3.8vw,60px)] font-black uppercase leading-[0.95] tracking-[-0.01em] text-balance text-white">
+            {r.title1} <span className="text-section-accent">{r.title2}</span>
+          </h2>
+        </>
+      ) : (
+        <h2 className="font-heading text-[2.75rem] leading-[1.06] font-extrabold sm:text-5xl md:text-6xl text-foreground">
+          {r.title1} <span className="text-section-accent">{r.title2}</span>
+        </h2>
+      )}
     </JourneyItem>
   );
 
@@ -197,7 +219,7 @@ export function ReviewsSection({ className, spotlight }: { className?: string; s
           {spotlight && <div className="mb-14">{spotlight}</div>}
           {/* The same compact cards as the conveyor's phone grid, the same 2.5rem apart (the next card's avatar hangs
               1.75rem above its card), in plain flow. */}
-          <div className="mx-auto grid w-[calc(100%-1.25rem)] max-w-7xl grid-cols-1 gap-10 pt-4">
+          <div className={cn("mx-auto grid grid-cols-1 gap-10 pt-4", en ? "w-[calc(100%-2*max(1.25rem,3vw))]" : "w-[calc(100%-1.25rem)] max-w-7xl")}>
             {items.map((review, index) => (
               <Testimonial
                 key={review.name}
@@ -222,9 +244,17 @@ export function ReviewsSection({ className, spotlight }: { className?: string; s
           {/* A short list (a handful of reviews) is laid out still, centred: scrolling columns would loop the same few
               cards past each other. */}
           {items.length <= 6 ? (
-            <div className="mx-auto flex w-full max-w-7xl flex-wrap justify-center gap-x-6 gap-y-14 px-4 pt-8">
+            <div
+              className={cn(
+                "w-full pt-8",
+                // English: spread across the page's own side margin, three across from lg; bg keeps the centred row.
+                en
+                  ? "grid grid-cols-1 gap-x-4 gap-y-14 px-[max(1.25rem,3vw)] md:grid-cols-2 lg:grid-cols-3"
+                  : "mx-auto flex max-w-7xl flex-wrap justify-center gap-x-6 gap-y-14 px-4"
+              )}
+            >
               {items.map((review, index) => (
-                <JourneyItem key={review.name} index={index} from="bottom" className="flex w-full max-w-sm">
+                <JourneyItem key={review.name} index={index} from="bottom" className={cn("flex w-full", !en && "max-w-sm")}>
                   <Testimonial
                     name={review.name}
                     role={review.role}
@@ -241,7 +271,7 @@ export function ReviewsSection({ className, spotlight }: { className?: string; s
             </div>
           ) : (
           /* Elsewhere (reduced motion, tablets and up outside the journey): vertically scrolling review columns (paused on hover). */
-          <div className="mx-auto flex max-h-[44rem] w-full max-w-7xl justify-center gap-6 overflow-hidden px-4 [mask-image:linear-gradient(to_bottom,transparent,black_15%,black_85%,transparent)]">
+          <div className={cn("mx-auto flex max-h-[44rem] w-full justify-center gap-6 overflow-hidden [mask-image:linear-gradient(to_bottom,transparent,black_15%,black_85%,transparent)]", en ? "px-[max(1.25rem,3vw)]" : "max-w-7xl px-4")}>
             {columns.map((column, columnIndex) => (
               <JourneyItem
                 key={columnIndex}

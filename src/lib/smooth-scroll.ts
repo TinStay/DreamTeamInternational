@@ -55,7 +55,8 @@ export function scrollToElement(target: Element | null | undefined, options: { o
     lenis.scrollTo(target as HTMLElement, { offset });
     return;
   }
-  target.scrollIntoView({ behavior: "smooth", block: options.block ?? "start" });
+  // The browser's own scroll, clear of the header (`scrollIntoView` would ignore the offset).
+  window.scrollTo({ top: target.getBoundingClientRect().top + window.scrollY + offset, behavior: "smooth" });
 }
 
 export function scrollToY(top: number) {

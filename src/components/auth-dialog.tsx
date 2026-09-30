@@ -14,7 +14,7 @@ import { MODAL_BACKDROP_Z, MODAL_CONTENT_Z, MODAL_CONTROL_Z } from "@/lib/modal-
 import { cn } from "@/lib/utils";
 
 /** The launch film on Bunny Stream, played in the popup's window at the top. */
-const LAUNCH_FILM = bunny("a9efb9af-1512-48f5-a446-2067567e02d7");
+const LAUNCH_FILM = bunny("cc58325c-b388-4b60-a415-2669a0c26309");
 
 const PEARL_INK =
   "bg-[linear-gradient(115deg,#ff5e00_0%,#ff8a1f_30%,#ffd2a1_48%,#ff9a3c_62%,#ff5e00_100%)] bg-clip-text text-transparent";
@@ -192,7 +192,7 @@ export function AuthDialog() {
         <DialogPrimitive.Popup
           data-lenis-prevent
           className={cn(
-            "fixed inset-0 m-auto h-fit max-h-[calc(100dvh-1.5rem)] w-[calc(100%-1.5rem)] max-w-[34rem] overflow-x-hidden overflow-y-auto overscroll-contain rounded-3xl border border-white/10 bg-[linear-gradient(160deg,#1b1c21_0%,#101114_70%)] text-white shadow-[0_50px_120px_-30px_rgba(0,0,0,0.95),0_0_0_1px_rgba(255,255,255,0.03)] outline-none duration-300 data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95",
+            "fixed inset-0 m-auto h-fit max-h-[calc(100dvh-1.5rem)] w-[calc(100%-1.5rem)] max-w-[34rem] xl:flex xl:h-[min(40rem,calc(100dvh-1.5rem))] xl:max-w-[60rem] xl:overflow-y-hidden overflow-x-hidden overflow-y-auto overscroll-contain rounded-3xl border border-white/10 bg-[linear-gradient(160deg,#1b1c21_0%,#101114_70%)] text-white shadow-[0_50px_120px_-30px_rgba(0,0,0,0.95),0_0_0_1px_rgba(255,255,255,0.03)] outline-none duration-300 data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95",
             MODAL_CONTENT_Z
           )}
         >
@@ -206,8 +206,9 @@ export function AuthDialog() {
             <IconX className="size-4" aria-hidden />
           </DialogPrimitive.Close>
 
-          {/* The window: the launch film across the top, in its own 16:9 (nothing cropped), so it reads clearly. */}
-          <div className="relative aspect-video w-full overflow-hidden bg-black">
+          {/* The window: the launch film. A wide strip across the top on a phone and tablet; from xl a tall frame in the film's own 9:16 (it is a
+              vertical film - nothing cropped) down the left of the log-in, the whole window one screen high - nothing scrolls. */}
+          <div className="relative h-[12.5rem] w-full overflow-hidden bg-black xl:aspect-auto xl:h-full xl:w-[calc(min(40rem,100dvh-1.5rem)*9/16)] xl:shrink-0">
             {filmFailed ? (
               // The film is not there yet (Bunny is still encoding it, or offline): a branded stand-in, not a blank box.
               <div className="absolute inset-0 flex items-center justify-center bg-[radial-gradient(90%_90%_at_50%_100%,rgba(255,110,20,0.28),transparent_65%),#0d0e10]">
@@ -232,23 +233,19 @@ export function AuthDialog() {
                   void e.currentTarget.play().catch(() => {});
                 }}
                 onError={() => setFilmFailed(true)}
-                className="absolute inset-0 size-full object-cover"
+                className="absolute inset-0 size-full object-contain xl:object-cover"
               />
             )}
             <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-[linear-gradient(to_top,rgba(16,17,20,0.9),transparent)]" />
-            <p className="absolute top-3 left-3 inline-flex items-center gap-2 rounded-full border border-white/15 bg-black/55 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-white/85 backdrop-blur-sm">
-              <span className="size-1.5 rounded-full bg-[#ff8a1f] shadow-[0_0_10px_#ff8a1f]" aria-hidden />
-              {s.tag}
-            </p>
             {/* The pearl hairline where the film meets the panel. */}
             <span
               aria-hidden
-              className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-[linear-gradient(90deg,transparent,#ff8a1f_25%,#ffd2a1_50%,#ff8a1f_75%,transparent)]"
+              className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-[linear-gradient(90deg,transparent,#ff8a1f_25%,#ffd2a1_50%,#ff8a1f_75%,transparent)] xl:inset-y-0 xl:right-0 xl:left-auto xl:h-auto xl:w-px xl:bg-[linear-gradient(180deg,transparent,#ff8a1f_25%,#ffd2a1_50%,#ff8a1f_75%,transparent)]"
             />
           </div>
 
           {/* The way in, beneath it. */}
-          <div className="relative p-6 pt-5 sm:px-8 sm:pb-7">
+          <div className="relative overflow-hidden p-6 pt-5 sm:px-8 sm:pb-7 xl:flex xl:min-w-0 xl:flex-1 xl:flex-col xl:justify-center xl:p-10">
             <span
               aria-hidden
               className="pointer-events-none absolute -right-24 -bottom-24 size-72 rounded-full bg-[radial-gradient(circle,rgba(255,122,26,0.12),transparent_65%)]"

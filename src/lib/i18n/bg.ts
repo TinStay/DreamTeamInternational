@@ -1329,6 +1329,7 @@ export const bg = {
     ],
   },
   faq: {
+    eyebrow: "Въпроси и отговори",
     title1: "Често",
     title2: "Задавани Въпроси",
     subtitle:
@@ -1393,6 +1394,7 @@ export const bg = {
     ],
   },
   reviews: {
+    eyebrow: "Отзиви",
     title1: "Какво казват",
     title2: "клиентите ни",
     // Google reviews. `initials` + `color` mirror the avatar letter icons on
