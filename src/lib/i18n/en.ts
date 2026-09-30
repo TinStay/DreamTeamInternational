@@ -8,7 +8,7 @@ export const en = {
     quoteCta: "Request a quote",
     contactCta: "Contact us",
     training: "Training",
-    projects: "Case Studies",
+    projects: "Customers",
     pricingPage: "Pricing",
     // The mega menu's tabs (`site-header.tsx`): Explore (home), the video services, Pricing, and "Other" for the rest.
     nav: {
@@ -100,6 +100,10 @@ export const en = {
     savedAnnual: "You save {amount} a year · billed {total}/yr",
     vsOneTime: "Save {n}% vs one-time orders",
     notIncluded: "Not included:",
+    buy: {
+      notConfigured: "Payments aren't switched on yet - please contact us and we'll set your pack up by hand.",
+      error: "We couldn't start the checkout. Please try again."
+    },
     cta: {
       subscribe: "Get started",
       oneTime: "Order now",
@@ -279,6 +283,258 @@ export const en = {
     }
   },
   // The English home page's "find the package" grid (`packages-section.tsx`), in place of the services + quote wizard.
+  // The sign-up / log-in popup (`auth-dialog.tsx`), opened by the header's Sign up and Log in.
+  signup: {
+    tag: "IzI Video",
+    filmTitle1: "Your next video",
+    filmTitle2: "starts here",
+    signupCopy: {
+      title1: "Create your",
+      title2: "account",
+      subtitle: "Start with one video, or a subscription you can pause anytime.",
+      google: "Sign up with Google",
+      microsoft: "Sign up with Microsoft",
+      email: "Continue with email",
+      switchLead: "Already have an account?",
+      switchAction: "Log in"
+    },
+    loginCopy: {
+      title1: "Welcome",
+      title2: "back",
+      subtitle: "Log in to your IzI Video account.",
+      google: "Log in with Google",
+      microsoft: "Log in with Microsoft",
+      email: "Log in with email",
+      switchLead: "New to IzI Video?",
+      switchAction: "Sign up"
+    },
+    google: "Google",
+    microsoft: "Microsoft",
+    or: "or",
+    emailLabel: "Email address",
+    emailPlaceholder: "you@company.com",
+    consent1: "I agree to the",
+    terms: "Terms of Use",
+    consent2: ", acknowledge the",
+    privacy: "Privacy Policy",
+    consent3: ", and confirm I'm at least 18 years old.",
+    consentHint: "Please tick the box above to continue.",
+    sentTitle: "Check your inbox.",
+    sentBefore: "We sent a one-time sign-in link to",
+    sentAfter: ". Open it on this device to finish - it works once and expires soon.",
+    providerOff: "{provider} sign-in isn't switched on yet. Please use another option or your email.",
+    noAccount: "We couldn't find an account with that email. Sign up first.",
+    errorGeneric: "Something went wrong. Please try again.",
+    notReady: "Sign-in isn't available just yet. Please check back soon.",
+    close: "Close"
+  },
+  // The signed-in header menu and the account pages (/account, /profile, /my-projects).
+  account: {
+    menu: "Account menu",
+    logout: "Sign out",
+    metaTitle: "Manage account | IzI Video",
+    profileMetaTitle: "Your profile | IzI Video",
+    projectsMetaTitle: "Your Projects | IzI Video",
+    eyebrow: "Your account",
+    manageTitle1: "Manage",
+    manageTitle2: "account",
+    currentPlan: "Current plan",
+    timeLeft: "Video time left",
+    noTime: "No video time yet. Buy a pack and your seconds appear here at once.",
+    upgrade: "Upgrade",
+    buyPack: "Buy a pack",
+    noPlan: "No pack yet",
+    yourProjects: "Your Projects",
+    viewProfile: "View profile",
+    manageAccount: "Manage account",
+    signedInWith: "Signed in with",
+    email: "Email",
+    memberSince: "Member since",
+    deleteAccount: "Need your account deleted? Contact us",
+    ordersEmpty: "Nothing here yet. Your orders and finished videos will appear here.",
+    startOrder: "Start with one video",
+    providers: { google: "Google", azure: "Microsoft", email: "Email link" },
+    // The header's Your Projects button and the /my-projects page.
+    projectsButton: "Your Projects",
+    projectsPage: {
+      trySample: "Want to see how it will look? Preview with sample projects",
+      purchased: "Payment received - thank you! Your video seconds are being added to your account and will show in the menu in a few seconds. You can submit your first project now.",
+      sampleBanner: "Sample projects - made up, to preview this page.",
+      subtitle: "Every video we're making for you, and every one we've delivered. Select a project to see its details and timeline.",
+      status: {
+        brief: "Brief received",
+        scripting: "Scripting",
+        production: "In production",
+        review: "In review",
+        delivered: "Delivered"
+      },
+      due: "Due",
+      length: "Length",
+      format: "Format",
+      started: "Started",
+      tbd: "To be confirmed",
+      tabs: { overview: "Overview", timeline: "Timeline", files: "Files", comments: "Comments" },
+      askedFor: "What you told us",
+      revisionsTitle: "Revisions",
+      left: "left",
+      noRevisions: "No revisions requested yet.",
+      requestRevision: "Request a revision",
+      producer: "Your producer",
+      teamName: "The IzI Video team",
+      producerLine: "Questions? We reply within a working day.",
+      messageUs: "Message us",
+      whereWeAre: "Where we are",
+      nextStep: "Next step",
+      nextStepDefault: "We will let you know here as soon as there is something for you to review.",
+      notReady: "Your video will appear here as soon as it's ready.",
+      noFiles: "Your files will appear here when the video is delivered.",
+      download: "Download",
+      panelDescription: "Details, brief, revisions and timeline of this project.",
+      comments: {
+        intro: "Questions, notes and revision requests go here. We reply on this page - it is not a chat, so there is no need to wait online.",
+        loading: "Loading comments…",
+        empty: "No comments yet. Ask a question or leave a note for the team - we reply here.",
+        emptyTeam: "No comments yet from the client.",
+        label: "Write a comment",
+        placeholder: "Write a comment for the team - a question, a note, a revision request…",
+        placeholderTeam: "Reply to the client - they see this on their project.",
+        post: "Post comment",
+        error: "We couldn't post your comment. Please try again.",
+        you: "You",
+        client: "Client",
+        teamName: "IzI Video team",
+        teamBadge: "Team",
+        revisionPrefill: "Revision request: "
+      },
+      submit: {
+        button: "Submit a project",
+        title1: "Submit a",
+        title2: "project",
+        kind: "AI video",
+        submit: "Submit project",
+        close: "Close",
+        error: "We couldn't save your project. Please check your connection and try again.",
+        done: "Thank you - your project is in. We're reviewing your brief and will confirm the details within one working day.",
+        doneNoFiles: "Your project is saved, but we couldn't send your attached files. Please email them to info@dreamteam.technology and mention the project name.",
+        nextStep: "We're reviewing your brief and will confirm the details within one working day.",
+        available: "Video time available",
+        cost: "This project uses {needed} of your {available}.",
+        notEnough: "This project needs {needed}, but you have {available}.",
+        buyPack: "Buy a pack",
+        insufficient: "You don't have enough video time for this length. Buy a pack or choose a shorter video.",
+        nameLabel: "Project name (optional)",
+        namePlaceholder: "For example: Spring campaign reel",
+        autoTitleDefault: "New video project",
+        autoTitles: {
+          sales: "Sales video",
+          awareness: "Brand awareness video",
+          launch: "Product launch video",
+          trust: "Image & trust video",
+          education: "Educational video",
+          other: "New video project"
+        } as Record<string, string>,
+        answers: {
+          goal: "Goal",
+          script: "Script",
+          length: "Length",
+          format: "Format",
+          voiceover: "Voice-over",
+          platforms: "Where it runs",
+          examples: "Examples",
+          deadline: "Deadline",
+          notes: "Notes",
+          files: "Files you sent"
+        }
+      },
+      close: "Close"
+    }
+  },
+  // The About page (/about), linked from the footer and the menu.
+  about: {
+    metaTitle: "About us | IzI Video",
+    metaDescription:
+      "IzI Video is an AI video production company: we write, direct and produce your video with the best AI tools - for brands and creators in the USA, Europe and worldwide.",
+    eyebrow: "About us",
+    title1: "We make",
+    title2: "AI video",
+    lead: "Our mission is to bring great AI video to everyone - without pricey subscriptions, a learning curve, endless prompting or budgets burned on credits and platforms. You give us the direction; we deliver the best video for your personal project, your business, or whatever you need.",
+    blocks: [
+      {
+        title: "Who we are",
+        text: "A team of AI video producers. We handle end-to-end video production with the latest AI technologies, so you don't need to prompt, learn any tools or hire a crew."
+      },
+      {
+        title: "What we make",
+        text: "Social media ads, corporate videos, TV ads, product videos, brand mascots, motion graphics, launch and explainer videos, UGC-style ads, real estate videos and music videos."
+      },
+      {
+        title: "How we work",
+        text: "Fully online, with clients in the USA, Europe and worldwide. Choose a pack, send your brief, and get your video in 3-10 days - yours to use anywhere."
+      }
+    ],
+    ctaWork: "See our work",
+    ctaPricing: "See pricing"
+  },
+  // The team dashboard (/team): every client's projects and the files they submitted.
+  team: {
+    metaTitle: "Team dashboard | IzI Video",
+    eyebrow: "Internal",
+    title: "Team",
+    title2: "dashboard",
+    menu: "Team dashboard",
+    sampleBanner: "Sample data - made up, to preview this page.",
+    stats: { total: "All projects", new: "New briefs", inWork: "In work", inReview: "In review", delivered: "Delivered", overdue: "Overdue" },
+    search: "Search project or client",
+    stageFilter: "Filter by stage",
+    all: "All",
+    sortBy: "Sort by",
+    sort: { newest: "Newest first", due: "Due date", client: "Client" },
+    cols: { project: "Project", client: "Client", stage: "Stage", due: "Due", submitted: "Submitted", files: "Files", comments: "Comments" },
+    reply: "Reply",
+    awaiting: "{n} project(s) with a client comment waiting for your reply",
+    commentsTitle: "Comments",
+    commentsHint: "The client sees your replies on their project, in the Comments tab. This is a thread, not a chat.",
+    credits: {
+      title: "Video seconds",
+      hint: "The client's balance. Add minutes and seconds for a custom pack or a gift, or take some back for a refund.",
+      balance: "Balance",
+      action: "Add or take back",
+      add: "Add",
+      take: "Take back",
+      minutes: "min",
+      seconds: "sec",
+      note: "Note",
+      notePlaceholder: "Note (for example: Enterprise pack, or refund for the cancelled reel)",
+      apply: "Apply",
+      done: "Done - the client's balance is updated.",
+      error: "We couldn't change the balance. Are you signed in as a team member?"
+    },
+    empty: "No projects yet. They appear here as soon as a client submits one.",
+    noMatch: "No project matches this search or filter.",
+    unknownClient: "Unknown client",
+    client: "Client",
+    emailClient: "Email the client",
+    submitted: "Submitted",
+    brief: "What the client told us",
+    filesTitle: "Files from the client",
+    filesHint: "Everything they attached when they submitted the project. Links open for two minutes.",
+    noFiles: "The client didn't attach any files.",
+    sampleFile: "This is a sample file - real ones download here.",
+    fileError: "We couldn't open that file. Please try again.",
+    manageTitle: "Manage this project",
+    manageHint: "Changes save to the client's Your Projects page right away.",
+    stage: "Stage",
+    nextStep: "Next step (the client sees this)",
+    nextStepHint: "For example: We're generating the scenes. Nothing needed from you right now.",
+    producer: "Producer",
+    revisionsUsed: "Revisions used",
+    included: "included",
+    videoId: "Finished video (Bunny video id)",
+    save: "Save changes",
+    saved: "Saved",
+    saveError: "We couldn't save. Are you signed in as a team member? Please try again.",
+    popupDescription: "The client's information, brief and files, and the controls to update this project."
+  },
   packages: {
     eyebrow: "What we make",
     title1: "Find the package that",
@@ -354,10 +610,42 @@ export const en = {
     title2: "works",
     subtitle: "No prompting, no credits, no learning curve. Four simple steps from idea to finished video - we do the heavy lifting.",
     steps: [
-      { title: "Choose Your Package", description: "Pick a one-off video or a monthly plan that matches how much content you need. Pause or cancel anytime." },
-      { title: "Send Your Brief", description: "Tell us what you want in a few lines - your goal, your audience, any references. No scripts or prompts needed from you." },
-      { title: "We Create", description: "Our team writes, directs and produces your video with the best AI tools, adds voiceover, music and subtitles." },
-      { title: "Review & Receive", description: "You watch, request changes within your revisions, and get the final files in 3-10 days - yours to use anywhere." }
+      {
+        title: "Choose Your Package",
+        description: "Pick a one-off video or a monthly plan that matches how much content you need. Pause or cancel anytime.",
+        more: [
+          "Individual or business plans, billed monthly or annually",
+          "A one-off video if you only need a single project",
+          "Pause, change or cancel a subscription whenever you like"
+        ]
+      },
+      {
+        title: "Send Your Brief",
+        description: "Tell us what you want in a few lines - your goal, your audience, any references. No scripts or prompts needed from you.",
+        more: [
+          "Share your goal, your audience and the feeling you want",
+          "Add logos, product photos or reference videos if you have them",
+          "Not sure what to write? We ask the right questions for you"
+        ]
+      },
+      {
+        title: "We Create",
+        description: "Our team writes, directs and produces your video with the best AI tools, adds voiceover, music and subtitles.",
+        more: [
+          "Script and shot-by-shot storyboard written by our team",
+          "Scenes generated and directed with the best AI tools for your idea",
+          "Voiceover, music, subtitles and colour finished for you"
+        ]
+      },
+      {
+        title: "Review & Receive",
+        description: "You watch, request changes within your revisions, and get the final files in 3-10 days - yours to use anywhere.",
+        more: [
+          "Watch the cut and send your notes in one place",
+          "Changes are included within your plan's revisions",
+          "Final files in every format you need, with full commercial rights"
+        ]
+      }
     ]
   },
   portfolio: {
@@ -406,11 +694,23 @@ export const en = {
     title: "Trusted By"
   },
   projects: {
-    metaTitle: "AI Video Case Studies | DreamTeam",
+    metaTitle: "Customers & Case Studies | DreamTeam",
     metaDescription:
-      "Case studies of AI video campaigns DreamTeam produced for clients in software, products and construction - goals, results and where each video ran.",
-    title1: "Case",
-    title2: "Studies",
+      "The brands DreamTeam makes AI video for, and case studies of campaigns we produced for clients in software, products and construction - goals, results and where each video ran.",
+    title1: "Our",
+    title2: "Customers",
+    // The Customers page (/projects): the logo wall, then the case studies as windows.
+    customers: {
+      eyebrow: "Customers",
+      title1: "Brands that",
+      title2: "trust us",
+      subtitle: "From software to construction - the companies we make AI video for.",
+      studiesTitle1: "Case",
+      studiesTitle2: "studies",
+      studiesSubtitle: "A closer look at videos we produced for clients, each with its own story. Hover a window to watch.",
+      ctaPricing: "See pricing",
+      ctaWork: "Our work"
+    },
     subtitle:
       "A closer look at videos we produced for clients - software, products and construction, each with its own story.",
     explore: "Explore the case studies",
@@ -920,7 +1220,7 @@ export const en = {
           eyebrow: "Client testimonial",
           items: [
             {
-              quote: "I am literally 100% happy! Will recommend you guys to literally anyone asking me for a video team / creative guys. I love you guys! Dinner on me when we meet next in Bulgaria!",
+              quote: "I am literally 100% happy! Will recommend you to literally anyone asking me for a video/creative. I love you!",
               name: "Benjamin B. Bargetzi",
               role: "Founder & CEO, MindGuard"
             },
@@ -1418,24 +1718,49 @@ export const en = {
     title2: "Asked Questions",
     subtitle:
       "Answers to the questions clients ask us most - about pricing, timelines, rights, and how we work.",
-    cta: "Get in touch",
-    // The questions in three topics: the menu on the left of the FAQ (`key` picks the icon).
+    // The questions in topics: the menu on the left of the FAQ (`key` picks the icon).
     groups: [
       {
         key: "pricing",
-        label: "Pricing & timing",
+        label: "Packs & pricing",
         items: [
           {
             q: "How much does an AI video cost?",
-            a: "The price depends on the complexity and length of the video, so we work with individual quotes rather than fixed packages. Describe your project through the quote form and you get a specific price for your case.",
+            a: "Personal is a single video for $299 (up to 20 seconds, +$119 for every extra 10 seconds). Monthly plans start at $389 a month for individuals (Creator, 40 seconds of video a month; Pro, 1 minute for $629) and at $990 a month for businesses (Local, 1.5 minutes; Brand, 3 minutes for $3,490). Enterprise is priced around your campaigns. All prices are in US dollars on the Pricing page.",
           },
           {
-            q: "How long does a video take?",
-            a: "Usually between 5 and 12 working days depending on the video's complexity, length, and revisions. If you need it sooner, we offer a paid priority option. If you want the highest quality, we take the time it needs - meeting your expectations always comes first.",
+            q: "What is the difference between a one-time video and a subscription?",
+            a: "A one-time Personal video is a single order with a single payment and no subscription. A monthly plan gives you a set amount of video time every month - for example 40 seconds with Creator or 3 minutes with Brand - plus more included extras such as subtitles, sound design and colour grading on the higher plans. You can pause or cancel a subscription anytime.",
+          },
+          {
+            q: "Is there a discount for paying annually?",
+            a: "Yes. With annual billing you pay for ten months and get twelve - two months free, about 17% off - on every monthly plan. Your video time for the whole year is added to your account when you pay.",
           },
           {
             q: "Is AI video cheaper than traditional filming?",
-            a: "In most cases, yes. There are no film crews, extras, locations, or props to hire, so you get a high-end look on a smaller budget. It's especially cost-effective for scenes that would be expensive or hard to shoot in real life.",
+            a: "In most cases, yes. There are no film crews, actors, locations or props to hire, so you get a high-end look on a smaller budget. It's especially cost-effective for scenes that would be expensive or hard to shoot in real life.",
+          },
+          {
+            q: "Can I use an Individual plan to advertise my business?",
+            a: "No - Individual plans are for personal projects and creators. Advertising a business needs a Business plan, which includes full commercial use.",
+          },
+        ],
+      },
+      {
+        key: "account",
+        label: "Your account & video time",
+        items: [
+          {
+            q: "How does video time work?",
+            a: "When you buy a pack, its seconds of video are added to your account and shown as minutes and seconds in your account menu. When you submit a project, its length is taken from that balance - for example a 30-second video uses 30 seconds. If you don't have enough, we show it before you submit, and you can buy another pack.",
+          },
+          {
+            q: "How do I order a video?",
+            a: "Sign up, buy a pack, then open Your Projects and press Submit a project. A short form asks whether you have a script, what the goal is, the length, format, voice-over, where it will run and your deadline - and you can attach files. Then we get to work.",
+          },
+          {
+            q: "Where do I follow my project and talk to you?",
+            a: "In Your Projects. Each project shows its stage from brief to delivery, a timeline, your revisions, the files to download and a Comments tab. We use comments instead of a chat: write a question or a revision request and we reply on the same page, so you never have to wait online.",
           },
         ],
       },
@@ -1444,16 +1769,24 @@ export const en = {
         label: "How we work",
         items: [
           {
+            q: "How long does a video take?",
+            a: "Most videos are delivered in 3-10 days, depending on the complexity and length. Enterprise clients get priority delivery. If you want the highest quality, we take the time it needs - meeting your expectations always comes first.",
+          },
+          {
             q: "What do you need from me to get started?",
-            a: "Your idea or message and a few assets are enough - product photos, logo, and brand guidelines. If you don't have a concept ready, we propose one that fits your company and audience.",
+            a: "Your idea and a few assets are enough - product photos, your logo and brand guidelines. If you don't have a script, choose \"No, I want you to write it\" in the form and we propose one based on your brief. Scriptwriting is an add-on at $100 per 30 seconds of video (included in the Brand plan).",
+          },
+          {
+            q: "How do revisions work?",
+            a: "One revision is one round of changes per video, covering up to 30% of the video's length - up to 9 seconds of a 30-second video. Personal includes 1 free revision, Creator 1 per video, Pro and Local 2, Brand 3 and Enterprise 4 or more. Fixes for mistakes on our side are always free and don't count.",
           },
           {
             q: "Can you match my brand style and provide voiceover?",
-            a: "Yes. We work from your colors, logo, and tone so the video looks like part of your brand. We also provide professional voiceover with a male or female voice in Bulgarian, English, and other languages when needed.",
+            a: "Yes. We work from your colours, logo and tone so the video looks like part of your brand. Voiceover is included in every plan - one language per video, male or female voice - and subtitles are included from Creator up.",
           },
           {
-            q: "Do you work with clients across Bulgaria and abroad?",
-            a: "Yes. We are based in Sofia but work fully online with clients across Bulgaria and around the world. The whole process - from brief to delivery - runs remotely, with no need to meet in person.",
+            q: "Do you work with clients around the world?",
+            a: "Yes. We work fully online with clients in the USA, Europe and worldwide. The whole process - from brief to delivery - runs remotely, with no need to meet in person.",
           },
         ],
       },
@@ -1463,15 +1796,33 @@ export const en = {
         items: [
           {
             q: "What types of videos can you make?",
-            a: "We make AI-powered video ads for TV and social media (TikTok, Instagram, Reels, YouTube), product videos, corporate video, tutorials, and stories with AI avatars. We can show your product in settings traditional filming can't easily reach.",
+            a: "Social media ads (Reels, TikTok, Shorts), corporate videos, TV ads, product videos, brand mascots, motion graphics, launch and explainer videos, UGC-style ads, real estate videos and music videos. We can show your product in settings traditional filming can't easily reach.",
           },
           {
             q: "Which tools and AI models do you use?",
             a: "We use the best tools on the market and pick the right one for each scenario. We work with different AI and video models and know the strengths and weaknesses of each, so we choose the one that fits your project.",
           },
           {
+            q: "What resolution and formats do I get?",
+            a: "Personal is delivered in 720p HD, Creator, Pro and Local in 1080p Full HD, and Brand and Enterprise up to 4K. You choose one aspect ratio per video - 9:16, 16:9, 1:1 or 4:5 - and the final files come ready for social media, your website or TV.",
+          },
+          {
             q: "Do I get full commercial usage rights to the video?",
-            a: "Yes. After final delivery the video is yours to use for advertising, social media, your website, TV, and any commercial purpose. We put the details in the quote so everything is clear before we start.",
+            a: "Business plans include full commercial use, and every plan means you own your videos and source files. After final delivery the video is yours to use for advertising, social media, your website, TV and any commercial purpose.",
+          },
+        ],
+      },
+      {
+        key: "training",
+        label: "Training & more",
+        items: [
+          {
+            q: "Do you teach AI video production?",
+            a: "Yes. We offer training in AI video production - individual lessons, a community on Skool and workshops for teams - so you can learn to make your own videos. Find the details on our Training page.",
+          },
+          {
+            q: "Can you make a brand mascot?",
+            a: "Yes. We create an AI brand mascot - a character that becomes the face of your brand - and bring it to life in your videos. Tell us about your brand when you submit a project or contact us.",
           },
         ],
       },
@@ -1480,56 +1831,45 @@ export const en = {
   reviews: {
     title1: "What our",
     title2: "clients say",
+    // The English home page's MindGuard spotlight above the reviews (`client-spotlight.tsx`).
+    spotlight: {
+      eyebrow: "Client spotlight",
+      line: "AI presentation films for one of Switzerland's most promising startups."
+    },
     // Google reviews. `initials` + `color` mirror the avatar letter icons on
     // Google; rating/color stay identical across locales.
     items: [
       {
-        name: "Rada Gulubova",
-        role: "Influencer, Entrepreneur",
-        initials: "R",
-        color: "#00897B",
-        rating: 5,
-        text: "Exceptional professionals! Worth it. Very fast and high quality. Great communication.",
-      },
-      {
-        name: "Stoika Stankova",
-        role: "Marketing Department, Hus Estate",
-        initials: "S",
-        color: "#34A853",
-        rating: 5,
-        text: "Amazing specialists! They understood our brand's needs perfectly and turned them into attractive, professional visuals for social media. The designs are consistent, modern, and in line with current trends.",
-      },
-      {
-        name: "Vladimir Shehov",
-        role: "Showroom owner",
-        initials: "V",
-        color: "#7E57C2",
-        rating: 5,
-        text: "Very fair and responsive. It was my first time using an AI video ad service and I didn't know what to expect, but the final result was truly impressive. Thank you for the professionalism and attention to detail.",
-      },
-      {
-        name: "Dimitar Vladikov",
-        role: "Executive Manager, Phivex",
-        initials: "D",
-        color: "#8E24AA",
-        rating: 5,
-        text: "They made me a very good, professionally produced video. The message is clear, the visuals are modern, and the editing holds your attention all the way through.",
-      },
-      {
-        name: "Lucy Nguyen",
-        role: "Owner, Asia Event Agency",
-        initials: "LN",
+        name: "iSupport",
+        role: "Client",
+        initials: "i",
         color: "#3949AB",
         rating: 5,
-        text: "Thank you - we had a consultation, they listened to me and patiently made the changes I asked for. I'm happy and I recommend them.",
+        text: "They understood exactly what I wanted from the very beginning and did an excellent job. They also went above and beyond with the revisions to make sure everything was exactly as expected. Thank you very much. I'll definitely be back for more. Great work!",
       },
       {
-        name: "Rosen Kanev",
-        role: "Co-founder & Managing Director, RAIBRANCH",
+        name: "Raibranch",
+        role: "Client",
         initials: "R",
-        color: "#7B1FA2",
+        color: "#D81B60",
         rating: 5,
-        text: "Working with them was a pleasure! Professionalism and on-time delivery. Highly recommend!",
+        text: "Professional work, delivery on time. The criteria was perfectly met! I will be using this service again!",
+      },
+      {
+        name: "chargecloud",
+        role: "Client",
+        initials: "c",
+        color: "#00897B",
+        rating: 5,
+        text: "Thank you a lot for your support and for responding to our individual wishes! You were reachable for us anytime and helped us out a lot.",
+      },
+      {
+        name: "Iceheart",
+        role: "Client",
+        initials: "I",
+        color: "#7E57C2",
+        rating: 5,
+        text: "Great to work with and quick to understand the need.",
       },
       {
         name: "BG BROKER",
@@ -1538,22 +1878,6 @@ export const en = {
         color: "#D81B60",
         rating: 5,
         text: "Extremely happy with the team's work! Great videos, fast turnaround, and reasonable prices. I recommend them!",
-      },
-      {
-        name: "Radoslav Kochev",
-        role: "",
-        initials: "R",
-        color: "#2E7D32",
-        rating: 4,
-        text: "The company is serious and delivered my project at 90% of what I had in mind. In my opinion the price is above average, but for me personally it's acceptable for the quality I received.",
-      },
-      {
-        name: "Kaloyan Georgiev",
-        role: "",
-        initials: "KG",
-        color: "#6D4C41",
-        rating: 5,
-        text: "Unique professionals! They made us a great AI video ad that collected plenty of compliments. The process was very pleasant, and the final product is top level. Lots of fresh ideas and a fair attitude. We will definitely work together again!",
       },
     ],
   },
@@ -1913,13 +2237,21 @@ export const en = {
   },
   footer: {
     desc: "At DreamTeam, we handle end-to-end video production using the latest AI technologies.",
-    links: "Links",
+    orderVideo: "Order a video",
+    pricing: "Pricing",
+    company: "Company",
+    aboutUs: "About us",
+    policies: "Policies",
+    cookies: "Cookies",
+    terms: "Terms and conditions",
+    resources: "Resources",
+    customers: "Customers",
+    ourWork: "Our work",
+    socials: "Socials",
+    contact: "Contact",
+    address: "San Francisco, Silicon Valley, CA, USA",
     reviews: "Reviews",
     googleReviews: "reviews on Google",
-    legal: "Legal",
-    terms: "Terms and Conditions",
-    privacy: "Privacy Policy",
-    cookies: "Cookie settings",
     copy: "DreamTeam. All rights reserved.",
     made: "Made with ♥ and AI."
   },
@@ -1950,8 +2282,8 @@ export const en = {
       necessary: {
         name: "Necessary",
         status: "Always on",
-        desc: "Remember your language, theme and this cookie choice. The site does not work properly without them.",
-        cookies: "dt_consent (6 months) · app-lang, theme (browser storage)",
+        desc: "Remember your language, theme and this cookie choice, and keep you signed in if you log in. The site does not work properly without them.",
+        cookies: "dt_consent (6 months) · sb-* sign-in session (until log out) · app-lang, theme (browser storage)",
       },
       analytics: {
         name: "Analytics",

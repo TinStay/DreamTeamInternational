@@ -11,6 +11,15 @@ import { useScrollEased } from "@/lib/smooth-scroll";
 import { PHONE_QUERY, useMediaQuery } from "@/lib/use-media-query";
 import { cn } from "@/lib/utils";
 
+/** The clients' marks (white-ink files from the hero's logo strip), by the review's name - shown above it. */
+const REVIEW_LOGOS: Record<string, string> = {
+  iSupport: "/hero-tiger/logos/isupport.png",
+  Raibranch: "/hero-tiger/logos/raibranch.png",
+  chargecloud: "/hero-tiger/logos/chargecloud.png",
+  Iceheart: "/hero-tiger/logos/iceheart.png",
+  "BG BROKER": "/hero-tiger/logos/bgbroker.png",
+};
+
 const COLUMN_DURATIONS = [55, 75, 62];
 const COLUMN_SIDES: JourneySide[] = ["left", "bottom", "right"];
 
@@ -126,6 +135,7 @@ function ReviewConveyor({ items, heading }: { items: Review[]; heading: React.Re
                     rating={review.rating}
                     initials={review.initials}
                     color={review.color}
+                    logo={REVIEW_LOGOS[review.name]}
                     shape={AVATAR_SHAPES[index % AVATAR_SHAPES.length]}
                     compact
                     className="w-full max-w-none"
@@ -140,7 +150,7 @@ function ReviewConveyor({ items, heading }: { items: Review[]; heading: React.Re
   );
 }
 
-export function ReviewsSection({ className }: { className?: string }) {
+export function ReviewsSection({ className, spotlight }: { className?: string; spotlight?: React.ReactNode }) {
   const { t } = useLanguage();
   const r = t.reviews;
   const journey = useJourney();
@@ -177,13 +187,14 @@ export function ReviewsSection({ className }: { className?: string }) {
     <section
       id="reviews"
       // overflow-clip, never hidden: the conveyor stage inside is sticky and must stick to the viewport, not the section.
-      className={cn("relative w-full overflow-x-clip", !journey && "py-16 sm:py-20", className)}
+      className={cn("relative w-full overflow-x-clip", !journey && "py-10 sm:py-14", className)}
     >
       {journey ? (
         <ReviewConveyor items={items} heading={heading} />
       ) : phone ? (
         <>
           {heading}
+          {spotlight && <div className="mb-14">{spotlight}</div>}
           {/* The same compact cards as the conveyor's phone grid, the same 2.5rem apart (the next card's avatar hangs
               1.75rem above its card), in plain flow. */}
           <div className="mx-auto grid w-[calc(100%-1.25rem)] max-w-7xl grid-cols-1 gap-10 pt-4">
@@ -196,6 +207,7 @@ export function ReviewsSection({ className }: { className?: string }) {
                 rating={review.rating}
                 initials={review.initials}
                 color={review.color}
+                    logo={REVIEW_LOGOS[review.name]}
                 shape={AVATAR_SHAPES[index % AVATAR_SHAPES.length]}
                 compact
                 className="w-full max-w-none"
@@ -206,7 +218,29 @@ export function ReviewsSection({ className }: { className?: string }) {
       ) : (
         <>
           {heading}
-          {/* Elsewhere (reduced motion, tablets and up outside the journey): vertically scrolling review columns (paused on hover). */}
+          {spotlight && <div className="mb-6">{spotlight}</div>}
+          {/* A short list (a handful of reviews) is laid out still, centred: scrolling columns would loop the same few
+              cards past each other. */}
+          {items.length <= 6 ? (
+            <div className="mx-auto flex w-full max-w-7xl flex-wrap justify-center gap-x-6 gap-y-14 px-4 pt-8">
+              {items.map((review, index) => (
+                <JourneyItem key={review.name} index={index} from="bottom" className="flex w-full max-w-sm">
+                  <Testimonial
+                    name={review.name}
+                    role={review.role}
+                    text={review.text}
+                    rating={review.rating}
+                    initials={review.initials}
+                    color={review.color}
+                    logo={REVIEW_LOGOS[review.name]}
+                    shape={AVATAR_SHAPES[index % AVATAR_SHAPES.length]}
+                    className="w-full"
+                  />
+                </JourneyItem>
+              ))}
+            </div>
+          ) : (
+          /* Elsewhere (reduced motion, tablets and up outside the journey): vertically scrolling review columns (paused on hover). */
           <div className="mx-auto flex max-h-[44rem] w-full max-w-7xl justify-center gap-6 overflow-hidden px-4 [mask-image:linear-gradient(to_bottom,transparent,black_15%,black_85%,transparent)]">
             {columns.map((column, columnIndex) => (
               <JourneyItem
@@ -225,6 +259,7 @@ export function ReviewsSection({ className }: { className?: string }) {
                         rating={review.rating}
                         initials={review.initials}
                         color={review.color}
+                    logo={REVIEW_LOGOS[review.name]}
                         shape={AVATAR_SHAPES[items.indexOf(review) % AVATAR_SHAPES.length]}
                         className="w-full"
                       />
@@ -234,6 +269,7 @@ export function ReviewsSection({ className }: { className?: string }) {
               </JourneyItem>
             ))}
           </div>
+          )}
         </>
       )}
     </section>

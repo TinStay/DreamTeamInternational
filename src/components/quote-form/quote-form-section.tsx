@@ -19,6 +19,7 @@ import { scrollToElement } from "@/lib/smooth-scroll";
 import { EMAIL_RE } from "@/lib/server/form-guards";
 import { servicesPath } from "@/lib/routes";
 import { SOCIAL_LINKS } from "@/lib/social-links";
+import { SocialIcon } from "@/components/social-icon";
 import { trackLeadCreated } from "@/lib/openai-pixel";
 import {
   QUOTE_FORM_DEFAULTS,
@@ -375,19 +376,12 @@ export function QuoteFormSection({
                       <a
                         key={social.alt}
                         href={social.href}
+                        aria-label={social.alt}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex shrink-0 cursor-pointer items-center justify-center transition-transform hover:scale-110"
+                        className="group inline-flex shrink-0 cursor-pointer items-center justify-center transition-transform duration-200 ease-out hover:scale-110"
                       >
-                        <Image
-                          src={social.src}
-                          alt={social.alt}
-                          width={256}
-                          height={256}
-                          // The lossless PNG at its native size (see the footer): the optimizer's small WebP read blurry.
-                          unoptimized
-                          className="size-10 shrink-0 object-contain opacity-90 transition-opacity hover:opacity-100"
-                        />
+                        <SocialIcon name={social.alt} />
                       </a>
                     ))}
                   </motion.div>

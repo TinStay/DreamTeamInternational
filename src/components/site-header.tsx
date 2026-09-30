@@ -10,15 +10,17 @@ import { ThemeToggle } from "./theme-toggle";
 import { ButtonWithIcon } from "@/components/ui/button-with-icon";
 import { GlassShell } from "@/components/ui/glass-shell";
 import { MegaHeader, type MegaNavGroup } from "@/components/mega-header";
-import { TigerCta } from "@/components/hero-tiger/tiger-cta";
 import { useTrainingCards } from "@/components/training/use-training-cards";
 import { cn } from "@/lib/utils";
 import { brandLogo } from "@/lib/brand-logo";
 import { useLanguage } from "@/lib/i18n/language-context";
+import { AccountControls } from "@/components/account-controls";
+import { AuthDialog } from "@/components/auth-dialog";
 import { PARTNERS, PARTNER_ICON_BASE } from "@/lib/partners";
 import { PROJECTS } from "@/lib/projects";
 import { getServiceSlug } from "@/lib/services/constants";
 import {
+  aboutPath,
   contactProcessPath,
   homePath,
   portfolioPath,
@@ -221,11 +223,11 @@ export function SiteHeader() {
   // 1400px.
   const portfolioCategory = (key: string) => `${portfolioPath(language)}?category=${key}`;
   const megaGroups: MegaNavGroup[] = [
-    { label: t.header.nav.explore, href: homeHref, items: [], showFrom: "xl" },
-    { label: t.header.nav.socialAds, href: servicePath(language, "ai-video"), items: [], divideBefore: "xl" },
-    { label: t.header.nav.corporate, href: portfolioCategory("services"), items: [], showFrom: "xl" },
+    { label: t.header.nav.explore, href: homeHref, items: [], showFrom: "wide" },
+    { label: t.header.nav.socialAds, href: servicePath(language, "ai-video"), items: [], divideBefore: "wide" },
+    { label: t.header.nav.corporate, href: portfolioCategory("services"), items: [], showFrom: "wide" },
     { label: t.header.nav.tvAds, href: portfolioCategory("tv"), items: [] },
-    { label: t.header.nav.productVideos, href: portfolioCategory("product"), items: [], showFrom: "wide" },
+    { label: t.header.nav.productVideos, href: portfolioCategory("product"), items: [], showFrom: "ultra" },
     { label: t.header.pricingPage, href: pricingPath(language), items: [], divideBefore: true },
     {
       label: t.header.nav.other,
@@ -237,7 +239,7 @@ export function SiteHeader() {
         { label: t.header.nav.brandMascots, href: servicePath(language, "brand-mascots") },
         { label: t.header.training, href: trainingPath(language) },
         { label: t.header.projects, href: projectsPath(language) },
-        { label: t.header.about, href: `${homeHref}#stats` },
+        { label: t.header.about, href: aboutPath(language) },
         { label: t.header.contact, href: contactProcessPath(language) },
       ],
     },
@@ -260,6 +262,7 @@ export function SiteHeader() {
 
   return (
     <>
+      {language === "en" ? <AuthDialog /> : null}
       {/* Mobile: glass bar — DT logo left, theme toggle right. Wider and taller than the bottom dock (96%, a 2.5rem
           logo, 2.5rem round buttons) so the brand reads at a glance. */}
       <header
@@ -297,18 +300,8 @@ export function SiteHeader() {
           groups={megaGroups}
           // English: one theme (no theme toggle, `forcedTheme` in the layout), no copy buttons - Log in, and Sign up
           // as the orange pearl pill with the hero CTA's animation (letter roll, fill from the pointer, magnetic
-          // pull). No accounts yet: Sign up opens the plans, Log in stays put until there is a login.
-          controls={
-            <>
-              <Link
-                href="#"
-                className="inline-flex h-11 cursor-pointer items-center rounded-full px-4 text-[15px] font-semibold text-white/85 transition-[transform,background-color,color] duration-200 ease-out hover:-translate-y-px hover:bg-white/[0.08] hover:text-white"
-              >
-                {t.header.login}
-              </Link>
-              <TigerCta href={pricingPath(language)} label={t.header.signup} className="tiger-cta--sm tiger-cta--orange" />
-            </>
-          }
+          // pull) - both open the sign-up / log-in popup, and once signed in the account pill + Log out (`account-controls.tsx`).
+          controls={<AccountControls />}
         />
       ) : (
       /* Desktop: floating pill (like the mobile bar) - 96% wide, detached from the top and the corners. */

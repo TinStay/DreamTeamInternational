@@ -33,9 +33,19 @@ export function PrivacyEnglishContent() {
         files you attach), and we receive it by email in order to reply.
       </p>
       <p>
+        <strong>Account Data:</strong> If you create an account or log in, we collect your email
+        address and, when you use Google or Microsoft to sign in, the name and email that
+        provider shares with us. We also record when you signed up and that you accepted the Terms
+        of Use, acknowledged this Privacy Policy and confirmed you are at least 18 years old. This is
+        stored with our authentication provider, Supabase, and is used only to sign you in and show
+        you your account. You can ask us to delete your account at any time.
+      </p>
+      <p>
         <strong>Cookies and similar technologies:</strong> By itself the website stores only what it
-        needs to work: your language and theme and your cookie choice (the <code>dt_consent</code>{" "}
-        cookie, kept for six months). Everything else runs only after you agree in the cookie banner,
+        needs to work: your language and theme, your cookie choice (the <code>dt_consent</code>{" "}
+        cookie, kept for six months) and, if you log in, the session cookies that keep you signed in
+        (<code>sb-*</code>, set by Supabase and removed when you log out or the session expires).
+        Everything else runs only after you agree in the cookie banner,
         and you can change or withdraw your choice at any time from &ldquo;Cookie settings&rdquo; in
         the footer:
       </p>
@@ -77,7 +87,8 @@ export function PrivacyEnglishContent() {
       <ul>
         <li>
           <strong>Service Providers:</strong> Vercel (hosting and cookieless analytics), Resend
-          (delivery of your inquiries to our email), PostHog (analytics, EU), Google and OpenAI
+          (delivery of your inquiries to our email), Supabase (accounts and sign-in), Google
+          and Microsoft (only if you choose them to sign in), PostHog (analytics, EU), Google and OpenAI
           (advertising measurement &mdash; only with your consent), Bunny Stream and YouTube (video
           hosting).
         </li>

@@ -996,6 +996,97 @@ body.service-modal-open .service-mobile-dock {
   }
 }
 
+/* "Your Projects" (the English header, `components/water-button.tsx`): an outlined orange pill that fills with water on
+   hover - two rotating rounded squares rise through it (their edges are the waves) until the orange covers the pill,
+   the text turns dark, and a glow breathes around it for as long as the pointer (or focus) is on it. */
+@layer components {
+  .water-btn {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    height: 44px;
+    padding: 0 18px;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 138, 31, 0.6);
+    background: rgba(255, 122, 26, 0.08);
+    color: #ff8a1f;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: color 0.5s ease, border-color 0.5s ease, box-shadow 0.6s ease, transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .water-btn__wave {
+    position: absolute;
+    z-index: -1;
+    left: 50%;
+    top: 50%;
+    width: 150%;
+    aspect-ratio: 1;
+    border-radius: 42%;
+    pointer-events: none;
+    translate: -50% calc(-50% + 62%);
+    transition: translate 1s cubic-bezier(0.33, 0.9, 0.3, 1);
+    animation: water-spin 7s linear infinite;
+  }
+  .water-btn__wave--a {
+    background: radial-gradient(circle at 35% 30%, #ffd2a1 0%, #ff9a3c 38%, #ff6a14 100%);
+    opacity: 0.95;
+  }
+  .water-btn__wave--b {
+    background: #ff5e00;
+    opacity: 0.55;
+    border-radius: 46%;
+    translate: -50% calc(-50% + 70%);
+    transition-duration: 1.25s;
+    animation-duration: 11s;
+    animation-direction: reverse;
+  }
+  .water-btn:is(:hover, :focus-visible) {
+    color: #1f0b00;
+    border-color: rgba(255, 190, 120, 0.9);
+    transform: translateY(-1px);
+    animation: water-glow 1.8s ease-in-out infinite;
+  }
+  .water-btn:is(:hover, :focus-visible) .water-btn__wave {
+    translate: -50% -50%;
+  }
+  .water-btn:active {
+    transform: scale(0.97);
+  }
+  .water-btn:focus-visible {
+    outline: 2px solid #ffb066;
+    outline-offset: 4px;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .water-btn,
+    .water-btn__wave {
+      animation: none !important;
+      transition-duration: 0.01s !important;
+    }
+    .water-btn:is(:hover, :focus-visible) {
+      box-shadow: 0 0 22px rgba(255, 110, 20, 0.6);
+    }
+  }
+}
+
+@keyframes water-spin {
+  to {
+    rotate: 360deg;
+  }
+}
+
+@keyframes water-glow {
+  0%,
+  100% {
+    box-shadow: 0 0 0 1px rgba(255, 170, 90, 0.35), 0 0 16px rgba(255, 110, 20, 0.5), 0 12px 34px -10px rgba(255, 110, 20, 0.7);
+  }
+  50% {
+    box-shadow: 0 0 0 4px rgba(255, 170, 90, 0.16), 0 0 34px rgba(255, 110, 20, 0.85), 0 16px 46px -8px rgba(255, 110, 20, 0.95);
+  }
+}
+
 @keyframes tiger-logos {
   to {
     transform: translateX(-100%);

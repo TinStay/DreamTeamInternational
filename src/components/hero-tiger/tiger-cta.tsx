@@ -9,7 +9,18 @@ import { cn } from "@/lib/utils";
  * its letters rolling up one after another, the pill and its label pulled a little toward the pointer (fine pointers
  * only, never under reduced motion). The look lives in `globals.css` (`.tiger-cta*`).
  */
-export function TigerCta({ href, label, className }: { href: string; label: string; className?: string }) {
+export function TigerCta({
+  href,
+  label,
+  className,
+  onClick,
+}: {
+  href: string;
+  label: string;
+  className?: string;
+  /** Opens something instead of navigating (a popup): the click is kept from following `href`, which stays the fallback. */
+  onClick?: () => void;
+}) {
   const ref = useRef<HTMLAnchorElement>(null);
 
   // Where the amber circle starts from, and how big it must be to cover the pill from any entry point.
@@ -63,6 +74,14 @@ export function TigerCta({ href, label, className }: { href: string; label: stri
       onPointerMove={onMove}
       onPointerLeave={onLeave}
       onFocus={onFocus}
+      onClick={
+        onClick
+          ? (e) => {
+              e.preventDefault();
+              onClick();
+            }
+          : undefined
+      }
     >
       <span className="tiger-cta__fill" aria-hidden />
       <span className="tiger-cta__label" aria-hidden>

@@ -65,3 +65,23 @@ export function localeAlternates(pathSuffix = "") {
     "x-default": `/en${pathSuffix}`,
   };
 }
+
+export function accountPath(language: Language) {
+  return `/${language}/account`;
+}
+
+export function profilePath(language: Language) {
+  return `/${language}/profile`;
+}
+
+export function myProjectsPath(language: Language) {
+  return `/${language}/my-projects`;
+}
+
+export function teamPath(language: Language) {
+  return `/${language}/team`;
+}
+
+export function aboutPath(language: Language) {
+  return `/${language}/about`;
+}

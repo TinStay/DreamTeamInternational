@@ -14,12 +14,12 @@ export type MegaNavGroup = {
   label: string;
   href: string;
   items: { label: string; href: string }[];
-  /** Hide the tab below this width - `xl` (1280px) or `wide` (1400px) - where the bar has no room for it; keep what it
+  /** Hide the tab below this width - `xl` (1280px), `wide` (1400px) or `ultra` (1600px) - where the bar has no room for it; keep what it
    * opens reachable another way. */
-  showFrom?: "xl" | "wide";
+  showFrom?: "xl" | "wide" | "ultra";
   /** A thin vertical line before this tab, starting a new group - `"xl"`: only from 1280px (when the tab before it only
    * shows from there, so the line never opens the bar). */
-  divideBefore?: boolean | "xl";
+  divideBefore?: boolean | "xl" | "wide";
 };
 
 /** A link's ink: the brand's red → violet gradient under the letters, showing as the colour fades out on hover. The
@@ -152,7 +152,7 @@ export function MegaHeader({
                 key={group.href}
                 className={cn(
                   "shrink-0 flex-row",
-                  group.showFrom === "wide" ? "hidden min-[1400px]:flex" : group.showFrom === "xl" ? "hidden xl:flex" : "flex"
+                  group.showFrom === "ultra" ? "hidden min-[1600px]:flex" : group.showFrom === "wide" ? "hidden min-[1400px]:flex" : group.showFrom === "xl" ? "hidden xl:flex" : "flex"
                 )}
                 onMouseEnter={group.items.length ? show : hide}
                 onFocus={group.items.length ? show : () => setOpen(false)}
@@ -162,7 +162,8 @@ export function MegaHeader({
                     aria-hidden
                     className={cn(
                       "me-3 mt-[1.625rem] h-4 w-px bg-white/20 xl:me-4 2xl:me-6",
-                      group.divideBefore === "xl" && "hidden xl:block"
+                      group.divideBefore === "xl" && "hidden xl:block",
+                      group.divideBefore === "wide" && "hidden min-[1400px]:block"
                     )}
                   />
                 ) : null}

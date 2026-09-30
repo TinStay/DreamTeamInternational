@@ -3,11 +3,9 @@ import { MobileNav } from "@/components/mobile-nav";
 import { EnHeroSection } from "@/components/en-hero-section";
 import { VideoPackSection } from "@/components/video-pack-section";
 import { PackagesSection } from "@/components/packages-section";
-import { ContactSection } from "@/components/contact-section";
 import { HowItWorksSection } from "@/components/how-it-works-section";
-import { CompanyStatsSection } from "@/components/company-stats-section";
-import { TrainingSection } from "@/components/training/training-section";
 import { ReviewsSection } from "@/components/reviews-section";
+import { ClientSpotlight } from "@/components/client-spotlight";
 import { FaqSection } from "@/components/faq-section";
 import { Footer } from "@/components/footer";
 import { GradientBlurPageBg } from "@/components/ui/gradient-blur-bg";
@@ -35,10 +33,8 @@ export function EnHomePage() {
         <PackagesSection />
         {/* How it works - right after the packages. */}
         <HowItWorksSection />
-        <CompanyStatsSection className="pt-16 sm:pt-24" />
-        <ReviewsSection />
-        <TrainingSection />
-        <ContactSection />
+        {/* What our clients say, led by the MindGuard founders' words. */}
+        <ReviewsSection spotlight={<ClientSpotlight />} />
         <FaqSection />
       </div>
 
