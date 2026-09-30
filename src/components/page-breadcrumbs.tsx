@@ -43,6 +43,8 @@ function segmentToLabel(
       return t.account.manageAccount;
     case "about":
       return t.header.about;
+    case "careers":
+      return t.careers.title;
     case "team":
       return t.team.title;
     case "profile":

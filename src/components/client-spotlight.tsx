@@ -25,7 +25,7 @@ export function ClientSpotlight() {
 
   return (
     <motion.figure
-      className="relative mx-auto w-[calc(100%-2.5rem)] max-w-7xl overflow-hidden rounded-3xl border border-white/10 bg-[linear-gradient(160deg,#1c1d22_0%,#121316_65%)] p-7 text-white shadow-[0_30px_70px_-35px_rgba(0,0,0,0.95)] sm:p-10 lg:p-12"
+      className="relative mx-auto w-[calc(100%-2*max(1.25rem,3vw))] overflow-hidden rounded-3xl border border-white/10 bg-[linear-gradient(160deg,#1c1d22_0%,#121316_65%)] p-7 text-white shadow-[0_30px_70px_-35px_rgba(0,0,0,0.95)] sm:p-10 lg:p-12"
       initial={{ opacity: 0, y: 28 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.3 }}

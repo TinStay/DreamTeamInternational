@@ -82,6 +82,10 @@ export function teamPath(language: Language) {
   return `/${language}/team`;
 }
 
+export function careersPath(language: Language) {
+  return `/${language}/careers`;
+}
+
 export function aboutPath(language: Language) {
   return `/${language}/about`;
 }

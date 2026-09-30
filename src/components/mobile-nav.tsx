@@ -6,12 +6,21 @@ import Image from "next/image";
 import {
   IconBook,
   IconBriefcase,
+  IconBuildingSkyscraper,
+  IconCoins,
+  IconDeviceMobile,
+  IconDeviceTv,
   IconFolder,
   IconHome,
+  IconInfoCircle,
   IconMail,
   IconMenu2,
+  IconPackage,
   IconVideo,
 } from "@tabler/icons-react";
+import { MobileMenuAccount } from "@/components/mobile-account";
+import { openLogin } from "@/lib/signup-dialog";
+import { useAuthUser } from "@/lib/supabase/use-auth-user";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
 import { useLanguage } from "@/lib/i18n/language-context";
 import { brandLogo } from "@/lib/brand-logo";
@@ -19,10 +28,15 @@ import { primaryGradientInteractiveClassName } from "@/components/ui/button";
 import { ButtonWithIcon } from "@/components/ui/button-with-icon";
 import { GlassShell } from "@/components/ui/glass-shell";
 import {
+  aboutPath,
+  careersPath,
   contactProcessPath,
   homePath,
+  myProjectsPath,
   portfolioPath,
+  pricingPath,
   projectsPath,
+  servicePath,
   servicesPath,
   trainingPath,
 } from "@/lib/routes";
@@ -40,12 +54,56 @@ export function MobileNav() {
   // The dock's Projects opens the listing (it pointed at the home page's projects stage for a while).
   const projectsHref = projectsPath(language);
   const servicesHref = servicesPath(language);
+  const english = language === "en";
+  const user = useAuthUser();
+  const category = (key: string) => `${portfolioHref}?category=${key}`;
+  // The English menu: the same links as the desktop mega menu, in its order.
+  const englishLinks = [
+    { label: t.header.nav.explore, href: homeHref, Icon: IconHome },
+    { label: t.header.nav.socialAds, href: servicePath(language, "ai-video"), Icon: IconDeviceMobile },
+    { label: t.header.nav.corporate, href: category("services"), Icon: IconBuildingSkyscraper },
+    { label: t.header.nav.tvAds, href: category("tv"), Icon: IconDeviceTv },
+    { label: t.header.nav.productVideos, href: category("product"), Icon: IconPackage },
+    { label: t.header.about, href: aboutPath(language), Icon: IconInfoCircle },
+    { label: t.header.projects, href: projectsHref, Icon: IconFolder },
+    { label: t.header.pricingPage, href: pricingPath(language), Icon: IconCoins },
+    { label: t.footer.careers, href: careersPath(language), Icon: IconBriefcase },
+    { label: t.header.portfolio, href: portfolioHref, Icon: IconVideo },
+    { label: t.header.training, href: trainingHref, Icon: IconBook },
+    { label: t.header.contact, href: contactHref, Icon: IconMail },
+  ];
+  const dockItem = "group flex flex-1 select-none flex-col items-center justify-center gap-1 text-muted-foreground transition-colors hover:text-foreground";
+  const dockIcon = "h-[22px] w-[22px] text-neutral-800 transition-transform group-hover:scale-110 dark:text-neutral-200";
 
   return (
     <>
       {/* Dock: Projects first; Portfolio lives in the sheet menu. Tight to the bottom edge (the home indicator's
           inset on iPhones), as wide as the top bar. */}
       <GlassShell className="service-mobile-dock lg:hidden fixed bottom-[max(0.375rem,env(safe-area-inset-bottom))] left-1/2 z-50 flex w-[96%] max-w-lg -translate-x-1/2 items-center gap-1.5 px-3 py-2">
+        {english ? (
+          <>
+            <Link href={homeHref} className={dockItem}>
+              <IconHome className={dockIcon} />
+              <span className="text-xs font-semibold tracking-wide">{t.header.nav.explore}</span>
+            </Link>
+            <Link href={pricingPath(language)} className={dockItem}>
+              <IconCoins className={dockIcon} />
+              <span className="text-xs font-semibold tracking-wide">{t.header.pricingPage}</span>
+            </Link>
+            {user ? (
+              <Link href={myProjectsPath(language)} className={dockItem}>
+                <IconFolder className={dockIcon} />
+                <span className="text-xs font-semibold tracking-wide">{t.account.projectsButton}</span>
+              </Link>
+            ) : (
+              <button type="button" onClick={openLogin} className={dockItem}>
+                <IconFolder className={dockIcon} />
+                <span className="text-xs font-semibold tracking-wide">{t.account.projectsButton}</span>
+              </button>
+            )}
+          </>
+        ) : (
+          <>
         <Link
           href={projectsHref}
           className="group flex flex-1 select-none flex-col items-center justify-center gap-1 text-muted-foreground transition-colors hover:text-foreground"
@@ -69,6 +127,9 @@ export function MobileNav() {
           <IconBriefcase className="h-[22px] w-[22px] text-neutral-800 transition-transform group-hover:scale-110 dark:text-neutral-200" />
           <span className="text-xs font-semibold tracking-wide">{t.header.services}</span>
         </Link>
+
+          </>
+        )}
 
         <Sheet open={isOpen} onOpenChange={setIsOpen}>
           <SheetTrigger
@@ -107,62 +168,80 @@ export function MobileNav() {
                 </div>
               </div>
 
+              {english ? (
+                <div className="flex flex-col gap-5 text-lg font-heading font-semibold">
+                  {englishLinks.map(({ label, href, Icon }) => (
+                    <Link key={href + label} href={href} onClick={() => setIsOpen(false)} className="group flex select-none items-center gap-4 text-foreground/80 transition-colors">
+                      <Icon className="h-6 w-6 shrink-0 text-neutral-800 dark:text-neutral-200" />
+                      <span className="transition-colors group-hover:text-primary">{label}</span>
+                    </Link>
+                  ))}
+                </div>
+              ) : (
               <div className="flex flex-col gap-6 text-xl font-heading font-semibold">
-                <Link
-                  href={homeHref}
-                  onClick={() => setIsOpen(false)}
-                  className="group flex select-none items-center gap-4 text-foreground/80 transition-colors"
-                >
-                  <IconHome className="h-6 w-6 shrink-0 text-neutral-800 dark:text-neutral-200" />
-                  <span className="transition-colors group-hover:text-primary">{t.mobileNav.home}</span>
-                </Link>
-                <Link
-                  href={portfolioHref}
-                  onClick={() => setIsOpen(false)}
-                  className="group flex select-none items-center gap-4 text-foreground/80 transition-colors"
-                >
-                  <IconVideo className="h-6 w-6 shrink-0 text-neutral-800 dark:text-neutral-200" />
-                  <span className="transition-colors group-hover:text-primary">{t.header.portfolio}</span>
-                </Link>
-                <Link
-                  href={projectsPath(language)}
-                  onClick={() => setIsOpen(false)}
-                  className="group flex select-none items-center gap-4 text-foreground/80 transition-colors"
-                >
-                  <IconFolder className="h-6 w-6 shrink-0 text-neutral-800 dark:text-neutral-200" />
-                  <span className="transition-colors group-hover:text-primary">{t.header.projects}</span>
-                </Link>
-                <Link
-                  href={servicesHref}
-                  onClick={() => setIsOpen(false)}
-                  className="group flex select-none items-center gap-4 text-foreground/80 transition-colors"
-                >
-                  <IconBriefcase className="h-6 w-6 shrink-0 text-neutral-800 dark:text-neutral-200" />
-                  <span className="transition-colors group-hover:text-primary">{t.header.services}</span>
-                </Link>
-                <Link
-                  href={contactHref}
-                  onClick={() => setIsOpen(false)}
-                  className="group flex select-none items-center gap-4 text-foreground/80 transition-colors"
-                >
-                  <IconMail className="h-6 w-6 shrink-0 text-neutral-800 dark:text-neutral-200" />
-                  <span className="transition-colors group-hover:text-primary">{t.header.contact}</span>
-                </Link>
-                <Link
-                  href={trainingHref}
-                  onClick={() => setIsOpen(false)}
-                  className="group flex select-none items-center gap-4 text-foreground/80 transition-colors"
-                >
-                  <IconBook className="h-6 w-6 shrink-0 text-neutral-800 dark:text-neutral-200" />
-                  <span className="transition-colors group-hover:text-primary">{t.header.training}</span>
-                </Link>
-              </div>
+                  <Link
+                    href={homeHref}
+                    onClick={() => setIsOpen(false)}
+                    className="group flex select-none items-center gap-4 text-foreground/80 transition-colors"
+                  >
+                    <IconHome className="h-6 w-6 shrink-0 text-neutral-800 dark:text-neutral-200" />
+                    <span className="transition-colors group-hover:text-primary">{t.mobileNav.home}</span>
+                  </Link>
+                  <Link
+                    href={portfolioHref}
+                    onClick={() => setIsOpen(false)}
+                    className="group flex select-none items-center gap-4 text-foreground/80 transition-colors"
+                  >
+                    <IconVideo className="h-6 w-6 shrink-0 text-neutral-800 dark:text-neutral-200" />
+                    <span className="transition-colors group-hover:text-primary">{t.header.portfolio}</span>
+                  </Link>
+                  <Link
+                    href={projectsPath(language)}
+                    onClick={() => setIsOpen(false)}
+                    className="group flex select-none items-center gap-4 text-foreground/80 transition-colors"
+                  >
+                    <IconFolder className="h-6 w-6 shrink-0 text-neutral-800 dark:text-neutral-200" />
+                    <span className="transition-colors group-hover:text-primary">{t.header.projects}</span>
+                  </Link>
+                  <Link
+                    href={servicesHref}
+                    onClick={() => setIsOpen(false)}
+                    className="group flex select-none items-center gap-4 text-foreground/80 transition-colors"
+                  >
+                    <IconBriefcase className="h-6 w-6 shrink-0 text-neutral-800 dark:text-neutral-200" />
+                    <span className="transition-colors group-hover:text-primary">{t.header.services}</span>
+                  </Link>
+                  <Link
+                    href={contactHref}
+                    onClick={() => setIsOpen(false)}
+                    className="group flex select-none items-center gap-4 text-foreground/80 transition-colors"
+                  >
+                    <IconMail className="h-6 w-6 shrink-0 text-neutral-800 dark:text-neutral-200" />
+                    <span className="transition-colors group-hover:text-primary">{t.header.contact}</span>
+                  </Link>
+                  <Link
+                    href={trainingHref}
+                    onClick={() => setIsOpen(false)}
+                    className="group flex select-none items-center gap-4 text-foreground/80 transition-colors"
+                  >
+                    <IconBook className="h-6 w-6 shrink-0 text-neutral-800 dark:text-neutral-200" />
+                    <span className="transition-colors group-hover:text-primary">{t.header.training}</span>
+                  </Link>
+                </div>
+              )}
 
               <div className="mt-auto pt-8">
-                {/* The site's main CTA, to the services page like the desktop header's. */}
-                <ButtonWithIcon href={servicesHref} onClick={() => setIsOpen(false)} surface="auto" className="h-14 w-full text-base">
-                  {t.header.quoteCta}
-                </ButtonWithIcon>
+                {english ? (
+                  // English: Log in / Sign up, or the signed-in links (Your Projects, profile, account, Sign out).
+                  <div className="border-t border-border/20 pt-6">
+                    <MobileMenuAccount onNavigate={() => setIsOpen(false)} />
+                  </div>
+                ) : (
+                  /* The site's main CTA, to the services page like the desktop header's. */
+                  <ButtonWithIcon href={servicesHref} onClick={() => setIsOpen(false)} surface="auto" className="h-14 w-full text-base">
+                    {t.header.quoteCta}
+                  </ButtonWithIcon>
+                )}
               </div>
             </div>
           </SheetContent>

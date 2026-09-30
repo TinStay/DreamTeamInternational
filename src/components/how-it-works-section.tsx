@@ -1,26 +1,20 @@
 "use client";
 
-import type { ComponentType } from "react";
 import { motion } from "motion/react";
-import { IconCheck, IconCircleCheck, IconMessage2, IconPackages, IconSparkles } from "@tabler/icons-react";
+import { IconCheck } from "@tabler/icons-react";
 import { useLanguage } from "@/lib/i18n/language-context";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
-/** One icon per step of `process.steps`, in order. */
-const STEP_ICONS: ComponentType<{ className?: string; stroke?: number }>[] = [
-  IconPackages,
-  IconMessage2,
-  IconSparkles,
-  IconCircleCheck,
-];
+/** One picture per step, in order (`public/process-steps/`): the package, the brief, the set, the screening room. */
+const STEP_IMAGES = ["/process-steps/step-1.jpg", "/process-steps/step-2.jpg", "/process-steps/step-3.jpg", "/process-steps/step-4.jpg"];
 
 /**
  * "How it works" in the English site's style (the home page, right after the packages, and the contact page): a
  * left-aligned heading on the page margin with an orange eyebrow, then the four steps (`process.steps`) as dark cards -
- * the step's icon in the orange pearl ring the package cards wear, a big faint number, the title in Archivo and its
- * line. A thin orange line runs through the icons from lg and draws itself as the row scrolls in; the cards rise in
- * one after another. Replaces the 3D number badges of `process-section.tsx`.
+ * each with its own picture (very dark at rest), a big outlined number and the title large in Archivo over its line.
+ * On hover a window opens out of the card's middle with the picture coming up and the whole step in it; the cards rise
+ * in one after another. Replaces the 3D number badges of `process-section.tsx`.
  */
 export function HowItWorksSection() {
   const { t } = useLanguage();
@@ -37,19 +31,8 @@ export function HowItWorksSection() {
       </header>
 
       <div className="relative mt-10 lg:mt-14">
-        {/* The connector: through the icons' centres (card padding 1.5rem + half the 3.5rem icon), drawn on view. */}
-        <motion.div
-          aria-hidden
-          className="pointer-events-none absolute top-[calc(1.5rem+1.75rem)] right-[12.5%] left-[12.5%] hidden h-px origin-left bg-[linear-gradient(90deg,rgba(255,106,20,0.7),rgba(255,210,161,0.8)_50%,rgba(255,106,20,0.7))] lg:block"
-          initial={{ scaleX: 0 }}
-          whileInView={{ scaleX: 1 }}
-          viewport={{ once: true, amount: 0.4 }}
-          transition={{ duration: 1.2, ease: EASE }}
-        />
-
         <ol className="relative grid grid-cols-1 items-stretch gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {p.steps.map((step, index) => {
-            const Icon = STEP_ICONS[index] ?? IconSparkles;
             return (
               <motion.li
                 key={step.title}
@@ -64,23 +47,26 @@ export function HowItWorksSection() {
                 transition={{ duration: 0.6, delay: 0.12 * index, ease: EASE }}
               >
                 <div className="relative flex h-full flex-col overflow-hidden rounded-2xl border border-white/10 bg-[linear-gradient(160deg,#1c1d22_0%,#121316_60%)] p-6 shadow-[0_24px_50px_-30px_rgba(0,0,0,0.9)] lg:items-center lg:text-center">
-                  {/* The step's number, big and faint, in the card's corner. */}
-                  <span aria-hidden className="pointer-events-none absolute top-3 right-4 font-heading text-6xl font-black leading-none text-white/[0.05]">
+                  {/* The step's picture, very dark at rest (it only hints at the scene) - it slips away as the window opens. */}
+                  <div
+                    aria-hidden
+                    className="pointer-events-none absolute inset-0 bg-cover bg-center opacity-100 transition-opacity duration-700 ease-out [filter:brightness(0.22)_saturate(0.75)] group-hover:opacity-0 [@media(hover:none)]:[filter:brightness(0.4)_saturate(0.9)] [@media(hover:none)]:group-hover:opacity-100"
+                    style={{ backgroundImage: `url(${STEP_IMAGES[index]})` }}
+                  />
+                  <div aria-hidden className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_top,rgba(10,10,12,0.75),rgba(10,10,12,0.35))]" />
+                  {/* The step's number, huge in the card's lower corner behind the content and cropped by it: an orange
+                      outline with a faint fill, sinking away as the window opens. */}
+                  <span
+                    aria-hidden
+                    className="pointer-events-none absolute -right-2 -bottom-10 font-heading text-[11rem] font-black leading-none tracking-tighter text-[#ff8a1f]/[0.05] select-none [-webkit-text-stroke:1.5px_rgba(255,138,31,0.24)] transition-[transform,opacity] duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:translate-y-3 group-hover:opacity-0 xl:text-[13rem]"
+                  >
                     {String(index + 1).padStart(2, "0")}
                   </span>
-                  <span className="relative z-10 flex size-14 items-center justify-center rounded-2xl bg-[linear-gradient(115deg,#ff5e00_0%,#ff8a1f_30%,#ffd2a1_48%,#ff9a3c_62%,#ff5e00_100%)] p-px shadow-[0_0_22px_rgba(255,110,20,0.3)]">
-                    <span className="flex size-full items-center justify-center rounded-[15px] bg-[#141518]">
-                      <Icon className="size-7 text-[#ffb066]" stroke={1.6} />
-                    </span>
-                  </span>
-                  <p className="mt-5 text-xs font-semibold uppercase tracking-[0.16em] text-[#ff8a1f]">
-                    {p.stepLabel} {index + 1}
-                  </p>
-                  <h3 className="mt-1.5 font-heading text-lg font-black uppercase leading-tight tracking-tight xl:text-xl">{step.title}</h3>
-                  <p className="mt-2 text-sm leading-relaxed text-white/60">{step.description}</p>
+                  <h3 className="relative z-10 font-heading text-[1.65rem] font-black uppercase leading-[1.02] tracking-tight xl:text-[2rem]">{step.title}</h3>
+                  <p className="relative z-10 mt-3 text-sm leading-relaxed text-white/75">{step.description}</p>
 
                   {/* No hover (touch): the extra points sit in the card. */}
-                  <ul className="mt-4 hidden flex-col gap-2 text-left [@media(hover:none)]:flex">
+                  <ul className="relative z-10 mt-4 hidden flex-col gap-2 text-left [@media(hover:none)]:flex">
                     {step.more.map((point) => (
                       <li key={point} className="flex items-start gap-2 text-sm leading-relaxed text-white/70">
                         <IconCheck className="mt-0.5 size-4 shrink-0 text-[#ff8a1f]" stroke={3} aria-hidden />
@@ -96,24 +82,24 @@ export function HowItWorksSection() {
                   aria-hidden
                   className="pointer-events-none invisible absolute top-1/2 left-1/2 z-20 w-[calc(100%+2rem)] -translate-x-1/2 -translate-y-1/2 scale-[0.88] rounded-2xl border border-[#ff7a1a]/50 bg-[linear-gradient(160deg,#20212a_0%,#131418_65%)] p-6 opacity-0 shadow-[0_40px_90px_-24px_rgba(0,0,0,0.95),0_0_60px_-18px_rgba(255,106,20,0.45)] transition-[transform,opacity,visibility] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] will-change-transform group-focus-within:pointer-events-auto group-focus-within:visible group-focus-within:scale-100 group-focus-within:opacity-100 group-hover:pointer-events-auto group-hover:visible group-hover:scale-100 group-hover:opacity-100 [@media(hover:none)]:hidden"
                 >
-                  <span aria-hidden className="pointer-events-none absolute top-2 right-4 font-heading text-6xl font-black leading-none text-[#ff8a1f]/12">
-                    {String(index + 1).padStart(2, "0")}
-                  </span>
-                  <div className="flex items-center gap-3.5">
-                    <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-[linear-gradient(115deg,#ff5e00_0%,#ff8a1f_30%,#ffd2a1_48%,#ff9a3c_62%,#ff5e00_100%)] p-px">
-                      <span className="flex size-full items-center justify-center rounded-[11px] bg-[#141518]">
-                        <Icon className="size-6 text-[#ffb066]" stroke={1.6} />
-                      </span>
+                  {/* The picture, opening out of the middle (a circle growing to cover the window) as the window grows, then
+                      drifting in a slow push-in; a dark gradient from the foot keeps the writing readable on it. */}
+                  <span
+                    aria-hidden
+                    className="pointer-events-none absolute inset-0 overflow-hidden rounded-2xl [clip-path:circle(0%_at_50%_50%)] transition-[clip-path] duration-[900ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-focus-within:[clip-path:circle(150%_at_50%_50%)] group-hover:[clip-path:circle(150%_at_50%_50%)]"
+                  >
+                    <span
+                      className="absolute inset-0 scale-[1.18] bg-cover bg-center transition-transform duration-[2400ms] ease-[cubic-bezier(0.16,1,0.3,1)] [filter:brightness(0.92)_saturate(1.08)] group-focus-within:scale-100 group-hover:scale-100"
+                      style={{ backgroundImage: `url(${STEP_IMAGES[index]})` }}
+                    />
+                    <span className="absolute inset-0 bg-[linear-gradient(to_top,rgba(8,8,10,0.9)_0%,rgba(8,8,10,0.6)_50%,rgba(8,8,10,0.08)_100%)]" />
+                    <span className="absolute -right-3 -bottom-8 font-heading text-[12rem] font-black leading-none tracking-tighter text-white/[0.06] [-webkit-text-stroke:2px_rgba(255,190,120,0.5)] select-none">
+                      {String(index + 1).padStart(2, "0")}
                     </span>
-                    <div className="min-w-0">
-                      <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#ff8a1f]">
-                        {p.stepLabel} {index + 1}
-                      </p>
-                      <h3 className="font-heading text-base font-black uppercase leading-tight tracking-tight xl:text-lg">{step.title}</h3>
-                    </div>
-                  </div>
-                  <p className="mt-3.5 text-sm leading-relaxed text-white/70">{step.description}</p>
-                  <ul className="mt-3.5 flex flex-col gap-2 border-t border-white/10 pt-3.5">
+                  </span>
+                  <h3 className="relative font-heading text-[1.75rem] font-black uppercase leading-[1.02] tracking-tight xl:text-[2.1rem]">{step.title}</h3>
+                  <p className="relative mt-3 text-sm leading-relaxed text-white/85">{step.description}</p>
+                  <ul className="relative mt-3.5 flex flex-col gap-2 border-t border-white/15 pt-3.5">
                     {step.more.map((point, i) => (
                       <li
                         key={point}

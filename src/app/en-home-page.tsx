@@ -3,6 +3,7 @@ import { MobileNav } from "@/components/mobile-nav";
 import { EnHeroSection } from "@/components/en-hero-section";
 import { VideoPackSection } from "@/components/video-pack-section";
 import { PackagesSection } from "@/components/packages-section";
+import { AiPartnersSection } from "@/components/ai-partners-section";
 import { HowItWorksSection } from "@/components/how-it-works-section";
 import { ReviewsSection } from "@/components/reviews-section";
 import { ClientSpotlight } from "@/components/client-spotlight";
@@ -31,6 +32,8 @@ export function EnHomePage() {
         {/* "Find the package that fits your needs" - the kinds of video we make (was the services + quote wizard; the
             wizard lives on /services and /contact). */}
         <PackagesSection />
+        {/* The AI companies whose models we work with, scrolling by in an orange card. */}
+        <AiPartnersSection />
         {/* How it works - right after the packages. */}
         <HowItWorksSection />
         {/* What our clients say, led by the MindGuard founders' words. */}

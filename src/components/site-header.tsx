@@ -15,12 +15,14 @@ import { cn } from "@/lib/utils";
 import { brandLogo } from "@/lib/brand-logo";
 import { useLanguage } from "@/lib/i18n/language-context";
 import { AccountControls } from "@/components/account-controls";
+import { MobileTopControls } from "@/components/mobile-account";
 import { AuthDialog } from "@/components/auth-dialog";
 import { PARTNERS, PARTNER_ICON_BASE } from "@/lib/partners";
 import { PROJECTS } from "@/lib/projects";
 import { getServiceSlug } from "@/lib/services/constants";
 import {
   aboutPath,
+  careersPath,
   contactProcessPath,
   homePath,
   portfolioPath,
@@ -225,21 +227,24 @@ export function SiteHeader() {
   const megaGroups: MegaNavGroup[] = [
     { label: t.header.nav.explore, href: homeHref, items: [], showFrom: "wide" },
     { label: t.header.nav.socialAds, href: servicePath(language, "ai-video"), items: [], divideBefore: "wide" },
-    { label: t.header.nav.corporate, href: portfolioCategory("services"), items: [], showFrom: "wide" },
-    { label: t.header.nav.tvAds, href: portfolioCategory("tv"), items: [] },
+    { label: t.header.nav.corporate, href: portfolioCategory("services"), items: [], showFrom: "ultra" },
+    { label: t.header.nav.tvAds, href: portfolioCategory("tv"), items: [], showFrom: "wide" },
     { label: t.header.nav.productVideos, href: portfolioCategory("product"), items: [], showFrom: "ultra" },
-    { label: t.header.pricingPage, href: pricingPath(language), items: [], divideBefore: true },
+    { label: t.header.about, href: aboutPath(language), items: [], divideBefore: true },
+    { label: t.header.projects, href: projectsPath(language), items: [] },
+    { label: t.header.pricingPage, href: pricingPath(language), items: [] },
+    { label: t.footer.careers, href: careersPath(language), items: [] },
     {
       label: t.header.nav.other,
       href: servicesPath(language),
       divideBefore: true,
       items: [
+        { label: t.header.nav.corporate, href: portfolioCategory("services") },
+        { label: t.header.nav.tvAds, href: portfolioCategory("tv") },
         { label: t.header.portfolio, href: portfolioPath(language) },
         { label: t.header.services, href: servicesPath(language) },
         { label: t.header.nav.brandMascots, href: servicePath(language, "brand-mascots") },
         { label: t.header.training, href: trainingPath(language) },
-        { label: t.header.projects, href: projectsPath(language) },
-        { label: t.header.about, href: aboutPath(language) },
         { label: t.header.contact, href: contactProcessPath(language) },
       ],
     },
@@ -266,7 +271,7 @@ export function SiteHeader() {
       {/* Mobile: glass bar — DT logo left, theme toggle right. Wider and taller than the bottom dock (96%, a 2.5rem
           logo, 2.5rem round buttons) so the brand reads at a glance. */}
       <header
-        className={`fixed left-1/2 z-50 w-[96%] max-w-lg -translate-x-1/2 transition-all duration-300 lg:hidden top-[max(0.5rem,env(safe-area-inset-top))] ${
+        className={`fixed left-1/2 z-50 w-[96%] max-w-lg -translate-x-1/2 transition-all duration-300 lg:hidden top-[calc(max(0.5rem,env(safe-area-inset-top))+var(--promo-h,0px))] ${
           isScrolled ? "scale-[0.98]" : "scale-100"
         }`}
       >
@@ -284,12 +289,16 @@ export function SiteHeader() {
               )}
             />
           </Link>
-          <div className="flex shrink-0 items-center gap-2.5">
-            {/* English has one theme (`forcedTheme` in the layout), so no toggle there. */}
-            {language === "en" ? null : <ThemeToggle className="shrink-0" />}
-            <EmailIconLink className="size-10" />
-            <PhoneIconLink className="size-10" />
-          </div>
+          {language === "en" ? (
+            // English: Log in + Sign up (or the account icon once signed in), like the desktop bar.
+            <MobileTopControls />
+          ) : (
+            <div className="flex shrink-0 items-center gap-2.5">
+              <ThemeToggle className="shrink-0" />
+              <EmailIconLink className="size-10" />
+              <PhoneIconLink className="size-10" />
+            </div>
+          )}
         </GlassShell>
       </header>
 

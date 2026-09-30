@@ -3,18 +3,17 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Sphere } from "./iridescent-shapes";
-import { IconMail, IconMapPin } from "@tabler/icons-react";
-import { ClutchBadge } from "@/components/review-badges";
+import { IconMapPin, IconPhone } from "@tabler/icons-react";
 import { openConsentSettings } from "@/lib/consent";
-import { EMAIL_PRIMARY } from "@/lib/contact-info";
+import { PHONE_US } from "@/lib/contact-info";
 import { useLanguage } from "@/lib/i18n/language-context";
 import { brandLogo } from "@/lib/brand-logo";
-import { aboutPath, homePath, portfolioPath, pricingPath, privacyPath, projectsPath, termsPath } from "@/lib/routes";
+import { aboutPath, careersPath, homePath, portfolioPath, pricingPath, privacyPath, projectsPath, termsPath } from "@/lib/routes";
 import { SOCIAL_LINKS } from "@/lib/social-links";
 import { cn } from "@/lib/utils";
 
 /*
- * The site footer: the brand (logo, line, email, the San Francisco address, the Clutch rating) and five link columns -
+ * The site footer: the brand (logo, line, the San Francisco phone and address) and five link columns -
  * Order a video (with every style of video), Pricing (with the packs), Company (About us, Policies, Cookies, Terms),
  * Resources (Customers, Our work) and Socials (text links, no icon buttons) - with the copyright along the bottom.
  */
@@ -44,7 +43,7 @@ export function Footer() {
 
   return (
     <footer className="liquid-glass relative mt-20 overflow-hidden border-t border-card-border">
-      <div className="relative z-10 mx-auto max-w-[88rem] px-6 py-12">
+      <div className="relative z-10 mx-auto max-w-[88rem] px-6 pt-12 pb-28 lg:pb-12">
         <div className="grid gap-10 text-center sm:grid-cols-2 sm:text-left lg:grid-cols-[1.5fr_1.15fr_0.9fr_0.9fr_0.9fr_0.8fr] lg:gap-8">
           {/* Brand column */}
           <div className="flex flex-col items-center gap-4 sm:items-start">
@@ -60,16 +59,15 @@ export function Footer() {
             </Link>
             <p className="max-w-xs text-sm text-muted-foreground">{f.desc}</p>
             <div className="flex flex-col items-center gap-2.5 text-sm sm:items-start">
-              <a href={EMAIL_PRIMARY.href} className={cn(linkClass, "group inline-flex items-center gap-2")}>
-                <IconMail className="size-4 shrink-0 text-primary" aria-hidden />
-                <span>{EMAIL_PRIMARY.label}</span>
+              <a href={PHONE_US.href} className={cn(linkClass, "group inline-flex items-center gap-2")}>
+                <IconPhone className="size-4 shrink-0 text-primary" aria-hidden />
+                <span>{PHONE_US.label}</span>
               </a>
               <p className="inline-flex max-w-xs items-start gap-2 text-left text-muted-foreground">
                 <IconMapPin className="mt-0.5 size-4 shrink-0 text-primary" aria-hidden />
                 <span>{f.address}</span>
               </p>
             </div>
-            <ClutchBadge className="mt-1" />
           </div>
 
           {/* Order a video: the link, and beneath it every style of video (the "find the package" cards). */}
@@ -101,6 +99,9 @@ export function Footer() {
             <h4 className={headingClass}>{f.company}</h4>
             <Link href={aboutPath(language)} className={linkClass}>
               {f.aboutUs}
+            </Link>
+            <Link href={careersPath(language)} className={linkClass}>
+              {f.careers}
             </Link>
             <Link href={privacyPath(language)} className={linkClass}>
               {f.policies}

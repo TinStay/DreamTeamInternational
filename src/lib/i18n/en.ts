@@ -57,7 +57,7 @@ export const en = {
     },
     tiger: {
       cta: "Let’s talk",
-      hint: "Move to wake it",
+      hint: "Move or touch to wake it",
       trustedBy: "Trusted by partners in the USA, Europe and Worldwide",
       regions: {
         usa: "USA",
@@ -450,6 +450,14 @@ export const en = {
     }
   },
   // The About page (/about), linked from the footer and the menu.
+  // The announcement bar above every English page (`components/promo-bar.tsx`).
+  promo: {
+    badge: "-20%",
+    text: "We're launching in the US - take 20% off your first order.",
+    short: "20% off your first order",
+    cta: "Claim discount",
+    ctaShort: "Claim"
+  },
   about: {
     metaTitle: "About us | IzI Video",
     metaDescription:
@@ -457,23 +465,88 @@ export const en = {
     eyebrow: "About us",
     title1: "We make",
     title2: "AI video",
-    lead: "Our mission is to bring great AI video to everyone - without pricey subscriptions, a learning curve, endless prompting or budgets burned on credits and platforms. You give us the direction; we deliver the best video for your personal project, your business, or whatever you need.",
-    blocks: [
+    crossed: ["no learning curve", "no prompts"],
+    imageAlt: "The San Francisco skyline at dusk under the Bay Bridge",
+    story:
+      "We're a team of AI video professionals from across the world, with roots in entrepreneurship, IT, video production, filmmaking and editing. At IzI Video, we take your idea, write it, direct it and produce the finished film with the best AI tools - so you don't need to write a single prompt, learn any software or hire a crew. Social media ads, corporate videos, TV ads, product videos, brand mascots, launch and explainer videos, UGC-style ads, real estate and music videos: all made fully online, for brands and creators in the USA, Europe and worldwide. Choose a pack, send your brief, and get your video in 3-10 days - yours to use anywhere. Our team is ready to make your next video.",
+    team: {
+      eyebrow: "Our team",
+      title1: "The people behind",
+      title2: "the videos",
+      linkedin: "LinkedIn profile of {name}"
+    },
+    mission: {
+      eyebrow: "Our mission",
+      title: "Great AI video, without the complexity",
+      text: "To put great AI video within reach of everyone. No pricey subscriptions, no learning curve, no endless prompting, no budgets burned on credits and platforms. You bring the direction; we deliver the finished video - for your business, your brand or your own project."
+    },
+    vision: {
+      eyebrow: "Our vision",
+      title: "AI video of every kind, easy for everyone",
+      text: "A world where every business and every individual can create any kind of video - ads, films, mascots, product stories - as easily as sending a message. Accessible in price, simple in process, and fast enough to be part of everyday work."
+    },
+    updates: {
+      eyebrow: "Latest updates",
+      tag: "New",
+      title: "We're launching in the US",
+      text: "IzI Video is opening to clients across the United States. Create your account now and take 20% off your first order.",
+      cta: "Claim your 20% discount on your first order"
+    },
+    hiring: {
+      eyebrow: "Join our team",
+      badge: "Coming soon",
+      title: "We're hiring soon",
+      text: "We're growing. Roles for AI video producers, editors and creative directors will appear here - check back soon.",
+      cta: "Check upcoming options"
+    }
+  },
+  // "Powered by the world's best AI" under the packages (`components/ai-partners-section.tsx`).
+  aiPartners: {
+    eyebrow: "AI partners",
+    title1: "Technology",
+    title2: "we use",
+    line: "Partnering with global industry leaders to create your videos."
+  },
+  // /careers: the roles we will open soon (`components/careers-page-view.tsx`).
+  careers: {
+    title: "Careers",
+    metaTitle: "Careers | IzI Video",
+    metaDescription:
+      "Join IzI Video: upcoming roles for a Partnership Manager, AI Video Filmmaker, Marketing Manager and Sales Manager. Fully remote, working with clients in the USA, Europe and worldwide.",
+    eyebrow: "Careers",
+    title1: "Build the future of",
+    title2: "AI video with us",
+    lead: "We're growing and opening new roles soon. Here is what's coming - register your interest and we'll write to you the moment a role opens.",
+    badge: "Opening soon",
+    tag: "Fully remote",
+    apply: "Register your interest",
+    applySubject: "Career interest: {role}",
+    roles: [
       {
-        title: "Who we are",
-        text: "A team of AI video producers. We handle end-to-end video production with the latest AI technologies, so you don't need to prompt, learn any tools or hire a crew."
+        title: "Partnership Manager",
+        summary: "Build and grow the relationships with agencies, platforms and brands that bring IzI Video to more people.",
+        points: ["Find, pitch and sign new partners", "Plan joint campaigns and co-marketing", "Keep every partnership growing and healthy"]
       },
       {
-        title: "What we make",
-        text: "Social media ads, corporate videos, TV ads, product videos, brand mascots, motion graphics, launch and explainer videos, UGC-style ads, real estate videos and music videos."
+        title: "AI Video Filmmaker",
+        summary: "Turn a client's brief into a finished film with the best AI tools - from script and storyboard to the final cut.",
+        points: ["Write, direct and edit AI-made videos", "Choose the right tools for each brief", "Keep the look, sound and story at a high level"]
       },
       {
-        title: "How we work",
-        text: "Fully online, with clients in the USA, Europe and worldwide. Choose a pack, send your brief, and get your video in 3-10 days - yours to use anywhere."
+        title: "Marketing Manager",
+        summary: "Grow the IzI Video brand across the USA and Europe with content, campaigns and community.",
+        points: ["Plan and run campaigns across channels", "Create content that shows what AI video can do", "Track what works and do more of it"]
+      },
+      {
+        title: "Sales Manager",
+        summary: "Turn interest into clients: talk to businesses and creators and guide them from the first question to the first video.",
+        points: ["Meet and qualify new leads", "Recommend the right pack for each client", "Close deals and keep clients coming back"]
       }
     ],
-    ctaWork: "See our work",
-    ctaPricing: "See pricing"
+    otherTitle: "Don't see your role?",
+    otherText: "Tell us who you are and what you'd like to build with us - send your portfolio or profile and we'll keep it on file.",
+    otherCta: "Get in touch",
+    otherSubject: "Career interest: open application"
   },
   // The team dashboard (/team): every client's projects and the files they submitted.
   team: {
@@ -1714,6 +1787,7 @@ export const en = {
     ],
   },
   faq: {
+    eyebrow: "FAQ",
     title1: "Frequently",
     title2: "Asked Questions",
     subtitle:
@@ -1829,6 +1903,7 @@ export const en = {
     ],
   },
   reviews: {
+    eyebrow: "Reviews",
     title1: "What our",
     title2: "clients say",
     // The English home page's MindGuard spotlight above the reviews (`client-spotlight.tsx`).
@@ -2241,6 +2316,7 @@ export const en = {
     pricing: "Pricing",
     company: "Company",
     aboutUs: "About us",
+    careers: "Careers",
     policies: "Policies",
     cookies: "Cookies",
     terms: "Terms and conditions",
