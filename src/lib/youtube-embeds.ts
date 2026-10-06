@@ -1,3 +1,5 @@
+import { bunny, bunnyPlayerEmbedSrc } from "@/lib/bunny-stream";
+
 export type YouTubeEmbed = {
   /** Full iframe src URL (no dynamic building). */
   src: string;
@@ -189,6 +191,11 @@ export const TV_SHORT: YouTubeEmbed[] = [
 ];
 
 export const PRODUCT_WIDE: YouTubeEmbed[] = [
+  // Hosted on Bunny Stream (share link `player.mediadelivery.net/play/750681/1dd9d4d5-…`), played in Bunny's player.
+  {
+    src: bunnyPlayerEmbedSrc(bunny("1dd9d4d5-4459-48d5-9891-207b3bb9da5c")),
+    title: "Product (wide) - Bunny Stream",
+  },
   {
     src: "https://www.youtube-nocookie.com/embed/dvqlJZPQynw",
     title: "Product (wide) 1",
