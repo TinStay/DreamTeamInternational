@@ -1,0 +1,69 @@
+import { NextResponse } from "next/server";
+import type Stripe from "stripe";
+import { getStripe } from "@/lib/stripe";
+import { creditDecision, purchaseFromMetadata, type Purchase } from "@/lib/stripe-credits";
+import { createAdminClient } from "@/lib/supabase/admin";
+import { saveSubscription } from "@/lib/subscriptions";
+
+export const runtime = "nodejs";
+
+/** Adds a purchase to the ledger; the same payment (`ref`) is only ever credited once. Returns false on a real failure. */
+async function credit(p: Purchase): Promise<boolean> {
+  const admin = createAdminClient();
+  if (!admin) return false;
+  const { error } = await admin.from("credit_ledger").insert({
+    user_id: p.userId,
+    seconds: p.seconds,
+    kind: "purchase",
+    plan_key: p.planKey,
+    note: p.note,
+    external_ref: p.ref,
+  });
+  // 23505 = this payment was already credited (Stripe sends events more than once): fine.
+  return !error || error.code === "23505";
+}
+
+/**
+ * Stripe tells us a payment happened; this adds the pack's video seconds to the client's account - **only once the money
+ * is collected** (`creditDecision` in `lib/stripe-credits.ts`): a one-time pack when its checkout completes paid, or when
+ * a delayed bank payment later succeeds (`checkout.session.async_payment_succeeded`); a subscription each time an invoice
+ * is paid (the first month too, and every renewal). Declined cards, failed bank debits and failed renewals add nothing.
+ * Subscription created / updated / deleted events are mirrored into `subscriptions` (one live plan per client). The
+ * signature is verified with `STRIPE_WEBHOOK_SECRET`, so only Stripe can call this.
+ */
+export async function POST(request: Request) {
+  const stripe = getStripe();
+  const secret = process.env.STRIPE_WEBHOOK_SECRET;
+  if (!stripe || !secret) return NextResponse.json({ error: "not_configured" }, { status: 503 });
+
+  const signature = request.headers.get("stripe-signature");
+  const raw = await request.text();
+  let event: Stripe.Event;
+  try {
+    event = stripe.webhooks.constructEvent(raw, signature ?? "", secret);
+  } catch {
+    return NextResponse.json({ error: "bad_signature" }, { status: 400 });
+  }
+
+  // The client's plan itself, mirrored so they are never sold a second one (see /api/checkout).
+  if (event.type === "customer.subscription.created" || event.type === "customer.subscription.updated" || event.type === "customer.subscription.deleted") {
+    const saved = await saveSubscription(event.data.object as Stripe.Subscription);
+    return saved ? NextResponse.json({ received: true }) : NextResponse.json({ error: "subscription_failed" }, { status: 500 });
+  }
+
+  // Only money actually collected adds seconds - a failed, pending or unpaid payment never does (`creditDecision`).
+  const decision = creditDecision(event);
+  let purchase: Purchase | null = null;
+  if (decision.kind === "credit") {
+    purchase = decision.purchase;
+  } else if (decision.kind === "subscription") {
+    const subscription = await stripe.subscriptions.retrieve(decision.subscriptionId);
+    purchase = purchaseFromMetadata(subscription.metadata, decision.ref, "Subscription payment");
+  }
+
+  if (purchase && !(await credit(purchase))) {
+    // Let Stripe retry: better a late credit than a paid client with no seconds.
+    return NextResponse.json({ error: "credit_failed" }, { status: 500 });
+  }
+  return NextResponse.json({ received: true });
+}

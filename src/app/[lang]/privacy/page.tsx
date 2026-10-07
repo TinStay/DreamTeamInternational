@@ -12,13 +12,13 @@ export function generateStaticParams() {
   return LOCALES.map((lang) => ({ lang }));
 }
 
-const LAST_UPDATED = "September 22, 2026";
+const LAST_UPDATED = "October 6, 2026";
 
 const META: Record<Language, { title: string; description: string }> = {
   en: {
     title: "Privacy Policy | DreamTeam",
     description:
-      "How DreamTeam collects and uses personal data, cookies, analytics, and your GDPR rights.",
+      "How DreamTeam collects, uses and shares personal information, cookies and Global Privacy Control, and your privacy rights under US state laws (CCPA / CPRA) and the GDPR.",
   },
   bg: {
     title: "Политика за поверителност | DreamTeam",

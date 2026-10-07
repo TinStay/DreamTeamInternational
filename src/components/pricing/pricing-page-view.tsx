@@ -29,7 +29,8 @@ function segButton(active: boolean) {
  * Archivo expanded, the audience's line), the two segmented controls (Individual / Business, Monthly / Annual with the
  * annual discount's tag), that audience's three cards, the "every plan includes" box with the revision and scriptwriting
  * definitions, and the audience's note. Dark whatever the theme - the file's palette. `initialAudience` comes from
- * `?for=` (the header's Pricing links, read by the route); every button opens the contact page until there is an order flow.
+ * `?for=` (the header's Pricing links, read by the route). A pack's button opens Stripe's checkout (`/api/checkout` - a
+ * client with a live subscription is not sold a second one), the Enterprise one the contact page.
  */
 export function PricingPageView({ initialAudience = "business" }: { initialAudience?: Audience }) {
   const { t, language } = useLanguage();
@@ -37,6 +38,35 @@ export function PricingPageView({ initialAudience = "business" }: { initialAudie
   const contactHref = contactProcessPath(language);
   const [audience, setAudience] = useState<Audience>(initialAudience);
   const [billing, setBilling] = useState<Billing>("monthly");
+<<<<<<< Updated upstream
+=======
+  const user = useAuthUser();
+  const [buying, setBuying] = useState<string | null>(null);
+  const [buyError, setBuyError] = useState<string | null>(null);
+
+  // Buying a pack: a signed-out visitor is asked to sign up first; then Stripe's checkout opens, and once it confirms the
+  // payment the seconds appear in the account (see /api/stripe/webhook).
+  async function buy(plan: Plan) {
+    setBuyError(null);
+    if (!user) {
+      openSignup();
+      return;
+    }
+    setBuying(plan.key);
+    try {
+      const res = await fetch("/api/checkout", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ plan: plan.key, billing }) });
+      const json = (await res.json().catch(() => ({}))) as { url?: string; error?: string };
+      if (res.ok && json.url) {
+        window.location.assign(json.url);
+        return;
+      }
+      setBuyError(json.error === "not_configured" ? p.buy.notConfigured : json.error === "already_subscribed" ? p.buy.alreadySubscribed : p.buy.error);
+    } catch {
+      setBuyError(p.buy.error);
+    }
+    setBuying(null);
+  }
+>>>>>>> Stashed changes
 
   return (
     // `theme-dark`: the page (its page background, header and footer too) is dark on the Bulgarian site's light theme

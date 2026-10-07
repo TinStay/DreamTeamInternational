@@ -2,10 +2,15 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import Image from "next/image";
 import {
   IconBook,
   IconBriefcase,
+<<<<<<< Updated upstream
+=======
+  IconCoins,
+>>>>>>> Stashed changes
   IconFolder,
   IconHome,
   IconMail,
@@ -41,33 +46,81 @@ export function MobileNav() {
   // The dock's Projects opens the listing (it pointed at the home page's projects stage for a while).
   const projectsHref = projectsPath(language);
   const servicesHref = servicesPath(language);
+<<<<<<< Updated upstream
+=======
+  const english = language === "en";
+  const user = useAuthUser();
+  const pathname = usePathname();
+  // The page you are on reads in orange (the dock and the English menu).
+  const isActive = (href: string) => pathname === href;
+  // The English menu: the same links as the desktop mega menu, in its order.
+  const englishLinks = [
+    { label: t.header.nav.explore, href: homeHref, Icon: IconHome },
+    { label: t.header.about, href: aboutPath(language), Icon: IconInfoCircle },
+    { label: t.header.projects, href: projectsHref, Icon: IconFolder },
+    { label: t.header.pricingPage, href: pricingPath(language), Icon: IconCoins },
+    { label: t.footer.careers, href: careersPath(language), Icon: IconBriefcase },
+    { label: t.header.portfolio, href: portfolioHref, Icon: IconVideo },
+    { label: t.header.training, href: trainingHref, Icon: IconBook },
+    { label: t.header.contact, href: contactHref, Icon: IconMail },
+  ];
+  const dockItem = "group flex flex-1 cursor-pointer select-none flex-col items-center justify-center gap-1 text-muted-foreground transition-colors duration-200 ease-out hover:text-primary";
+  const dockIcon = "h-[22px] w-[22px] text-neutral-800 transition-[transform,color] duration-200 ease-out group-hover:scale-110 group-hover:text-primary dark:text-neutral-200";
+>>>>>>> Stashed changes
 
   return (
     <>
       {/* Dock: Projects first; Portfolio lives in the sheet menu. Tight to the bottom edge (the home indicator's
           inset on iPhones), as wide as the top bar. */}
       <GlassShell className="service-mobile-dock lg:hidden fixed bottom-[max(0.375rem,env(safe-area-inset-bottom))] left-1/2 z-50 flex w-[96%] max-w-lg -translate-x-1/2 items-center gap-1.5 px-3 py-2">
+<<<<<<< Updated upstream
+=======
+        {english ? (
+          <>
+            <Link href={homeHref} className={cn(dockItem, isActive(homeHref) && "text-primary")}>
+              <IconHome className={cn(dockIcon, isActive(homeHref) && "text-primary dark:text-primary")} />
+              <span className="text-xs font-semibold tracking-wide">{t.header.nav.explore}</span>
+            </Link>
+            <Link href={pricingPath(language)} className={cn(dockItem, isActive(pricingPath(language)) && "text-primary")}>
+              <IconCoins className={cn(dockIcon, isActive(pricingPath(language)) && "text-primary dark:text-primary")} />
+              <span className="text-xs font-semibold tracking-wide">{t.header.pricingPage}</span>
+            </Link>
+            {user ? (
+              <Link href={myProjectsPath(language)} className={dockItem}>
+                <IconFolder className={dockIcon} />
+                <span className="text-xs font-semibold tracking-wide">{t.account.projectsButton}</span>
+              </Link>
+            ) : (
+              <button type="button" onClick={openLogin} className={dockItem}>
+                <IconFolder className={dockIcon} />
+                <span className="text-xs font-semibold tracking-wide">{t.account.projectsButton}</span>
+              </button>
+            )}
+          </>
+        ) : (
+          <>
+>>>>>>> Stashed changes
         <Link
           href={projectsHref}
-          className="group flex flex-1 select-none flex-col items-center justify-center gap-1 text-muted-foreground transition-colors hover:text-foreground"
+          className="group flex flex-1 select-none flex-col items-center justify-center gap-1 text-muted-foreground transition-colors duration-200 ease-out hover:text-primary"
         >
-          <IconFolder className="h-[22px] w-[22px] text-neutral-800 transition-transform group-hover:scale-110 dark:text-neutral-200" />
+          <IconFolder className="h-[22px] w-[22px] text-neutral-800 transition-[transform,color] duration-200 ease-out group-hover:scale-110 group-hover:text-primary dark:text-neutral-200" />
           <span className="text-xs font-semibold tracking-wide">{t.header.projects}</span>
         </Link>
 
         <Link
           href={contactHref}
-          className="group flex flex-1 select-none flex-col items-center justify-center gap-1 text-muted-foreground transition-colors hover:text-foreground"
+          className="group flex flex-1 select-none flex-col items-center justify-center gap-1 text-muted-foreground transition-colors duration-200 ease-out hover:text-primary"
         >
-          <IconMail className="h-[22px] w-[22px] text-neutral-800 transition-transform group-hover:scale-110 dark:text-neutral-200" />
+          <IconMail className="h-[22px] w-[22px] text-neutral-800 transition-[transform,color] duration-200 ease-out group-hover:scale-110 group-hover:text-primary dark:text-neutral-200" />
           <span className="text-xs font-semibold tracking-wide">{t.header.contact}</span>
         </Link>
 
         <Link
           href={servicesHref}
-          className="group flex flex-1 select-none flex-col items-center justify-center gap-1 text-muted-foreground transition-colors hover:text-foreground"
+          className="group flex flex-1 select-none flex-col items-center justify-center gap-1 text-muted-foreground transition-colors duration-200 ease-out hover:text-primary"
         >
-          <IconBriefcase className="h-[22px] w-[22px] text-neutral-800 transition-transform group-hover:scale-110 dark:text-neutral-200" />
+          <IconBriefcase className="h-[22px] w-[22px] text-neutral-800 transition-[transform,color] duration-200 ease-out group-hover:scale-110 group-hover:text-primary dark:text-neutral-200" />
           <span className="text-xs font-semibold tracking-wide">{t.header.services}</span>
         </Link>
 
@@ -109,6 +162,7 @@ export function MobileNav() {
                 </div>
               </div>
 
+<<<<<<< Updated upstream
               <div className="flex flex-col gap-6 text-xl font-heading font-semibold">
                 <Link
                   href={homeHref}
@@ -159,6 +213,75 @@ export function MobileNav() {
                   <span className="transition-colors group-hover:text-primary">{t.header.training}</span>
                 </Link>
               </div>
+=======
+              {english ? (
+                <div className="flex flex-col gap-5 text-lg font-heading font-semibold">
+                  {englishLinks.map(({ label, href, Icon }) => (
+                    <Link
+                      key={href + label}
+                      href={href}
+                      onClick={() => setIsOpen(false)}
+                      aria-current={isActive(href) ? "page" : undefined}
+                      className="group flex cursor-pointer select-none items-center gap-4 text-foreground/80 transition-[color,transform] duration-200 ease-out hover:translate-x-1 aria-[current=page]:text-primary"
+                    >
+                      <Icon className="h-6 w-6 shrink-0 text-neutral-800 transition-colors duration-200 group-hover:text-primary group-aria-[current=page]:text-primary dark:text-neutral-200 dark:group-aria-[current=page]:text-primary" />
+                      <span className="transition-colors group-hover:text-primary">{label}</span>
+                    </Link>
+                  ))}
+                </div>
+              ) : (
+              <div className="flex flex-col gap-6 text-xl font-heading font-semibold">
+                  <Link
+                    href={homeHref}
+                    onClick={() => setIsOpen(false)}
+                    className="group flex cursor-pointer select-none items-center gap-4 text-foreground/80 transition-[color,transform] duration-200 ease-out hover:translate-x-1"
+                  >
+                    <IconHome className="h-6 w-6 shrink-0 text-neutral-800 transition-colors duration-200 group-hover:text-primary dark:text-neutral-200" />
+                    <span className="transition-colors group-hover:text-primary">{t.mobileNav.home}</span>
+                  </Link>
+                  <Link
+                    href={portfolioHref}
+                    onClick={() => setIsOpen(false)}
+                    className="group flex cursor-pointer select-none items-center gap-4 text-foreground/80 transition-[color,transform] duration-200 ease-out hover:translate-x-1"
+                  >
+                    <IconVideo className="h-6 w-6 shrink-0 text-neutral-800 transition-colors duration-200 group-hover:text-primary dark:text-neutral-200" />
+                    <span className="transition-colors group-hover:text-primary">{t.header.portfolio}</span>
+                  </Link>
+                  <Link
+                    href={projectsPath(language)}
+                    onClick={() => setIsOpen(false)}
+                    className="group flex cursor-pointer select-none items-center gap-4 text-foreground/80 transition-[color,transform] duration-200 ease-out hover:translate-x-1"
+                  >
+                    <IconFolder className="h-6 w-6 shrink-0 text-neutral-800 transition-colors duration-200 group-hover:text-primary dark:text-neutral-200" />
+                    <span className="transition-colors group-hover:text-primary">{t.header.projects}</span>
+                  </Link>
+                  <Link
+                    href={servicesHref}
+                    onClick={() => setIsOpen(false)}
+                    className="group flex cursor-pointer select-none items-center gap-4 text-foreground/80 transition-[color,transform] duration-200 ease-out hover:translate-x-1"
+                  >
+                    <IconBriefcase className="h-6 w-6 shrink-0 text-neutral-800 transition-colors duration-200 group-hover:text-primary dark:text-neutral-200" />
+                    <span className="transition-colors group-hover:text-primary">{t.header.services}</span>
+                  </Link>
+                  <Link
+                    href={contactHref}
+                    onClick={() => setIsOpen(false)}
+                    className="group flex cursor-pointer select-none items-center gap-4 text-foreground/80 transition-[color,transform] duration-200 ease-out hover:translate-x-1"
+                  >
+                    <IconMail className="h-6 w-6 shrink-0 text-neutral-800 transition-colors duration-200 group-hover:text-primary dark:text-neutral-200" />
+                    <span className="transition-colors group-hover:text-primary">{t.header.contact}</span>
+                  </Link>
+                  <Link
+                    href={trainingHref}
+                    onClick={() => setIsOpen(false)}
+                    className="group flex cursor-pointer select-none items-center gap-4 text-foreground/80 transition-[color,transform] duration-200 ease-out hover:translate-x-1"
+                  >
+                    <IconBook className="h-6 w-6 shrink-0 text-neutral-800 transition-colors duration-200 group-hover:text-primary dark:text-neutral-200" />
+                    <span className="transition-colors group-hover:text-primary">{t.header.training}</span>
+                  </Link>
+                </div>
+              )}
+>>>>>>> Stashed changes
 
               <div className="mt-auto pt-8">
                 {/* The site's main CTA, to the services page like the desktop header's. */}

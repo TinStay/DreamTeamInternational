@@ -66,3 +66,26 @@ export function localeAlternates(pathSuffix = "") {
     "x-default": `/en${pathSuffix}`,
   };
 }
+<<<<<<< Updated upstream
+=======
+
+export function accountPath(language: Language) {
+  return `/${language}/account`;
+}
+
+export function myProjectsPath(language: Language) {
+  return `/${language}/my-projects`;
+}
+
+export function teamPath(language: Language) {
+  return `/${language}/team`;
+}
+
+export function careersPath(language: Language) {
+  return `/${language}/careers`;
+}
+
+export function aboutPath(language: Language) {
+  return `/${language}/about`;
+}
+>>>>>>> Stashed changes

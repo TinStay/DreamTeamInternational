@@ -76,6 +76,14 @@ export const en = {
     savedAnnual: "You save {amount} a year · billed {total}/yr",
     vsOneTime: "Save {n}% vs one-time orders",
     notIncluded: "Not included:",
+<<<<<<< Updated upstream
+=======
+    buy: {
+      notConfigured: "Payments aren't switched on yet - please contact us and we'll set your pack up by hand.",
+      error: "We couldn't start the checkout. Please try again.",
+      alreadySubscribed: "You already have an active subscription. To change or add to your plan, message us and we'll switch it for you."
+    },
+>>>>>>> Stashed changes
     cta: {
       subscribe: "Get started",
       oneTime: "Order now",
@@ -220,6 +228,545 @@ export const en = {
       business: "Prices in USD. Business plans include full commercial use."
     }
   },
+<<<<<<< Updated upstream
+=======
+  // The English home page's rail of video categories, right after the hero (`video-pack-section.tsx`, `lib/video-pack.ts`).
+  videoPack: {
+    title: "Get your AI video pack now",
+    subtitle:
+      "Professional AI videos made by our experienced team - in one click. No credits, no prompting, no learning curve: tell us what you need, and we deliver.",
+    preview: "Preview",
+    subscribe: "Get a subscription",
+    oneVideo: "Get one video",
+    previous: "Previous videos",
+    next: "Next videos",
+    items: {
+      socialAds: {
+        title: "Social Media Ads",
+        line: "Scroll-stopping Reels, TikToks and Shorts built to convert"
+      },
+      tvAds: {
+        title: "TV Ads",
+        line: "Broadcast-ready commercials with cinematic quality"
+      },
+      corporate: {
+        title: "Corporate Videos",
+        line: "Brand films, explainers and presentations that build trust"
+      },
+      brandCampaigns: {
+        title: "Brand Video Campaigns",
+        line: "A full series of on-brand videos for every channel"
+      },
+      ugc: {
+        title: "UGC",
+        line: "Authentic creator-style ads, without hiring creators"
+      }
+    }
+  },
+  // The English home page's "find the package" grid (`packages-section.tsx`), in place of the services + quote wizard.
+  // The sign-up / log-in popup (`auth-dialog.tsx`), opened by the header's Sign up and Log in.
+  signup: {
+    tag: "IzI Video",
+    filmTitle1: "Your next video",
+    filmTitle2: "starts here",
+    signupCopy: {
+      title1: "Create your",
+      title2: "account",
+      subtitle: "Start with one video, or a subscription you can pause anytime.",
+      google: "Sign up with Google",
+      microsoft: "Sign up with Microsoft",
+      email: "Continue with email",
+      switchLead: "Already have an account?",
+      switchAction: "Log in"
+    },
+    loginCopy: {
+      title1: "Welcome",
+      title2: "back",
+      subtitle: "Log in to your IzI Video account.",
+      google: "Log in with Google",
+      microsoft: "Log in with Microsoft",
+      email: "Log in with email",
+      switchLead: "New to IzI Video?",
+      switchAction: "Sign up"
+    },
+    google: "Google",
+    microsoft: "Microsoft",
+    or: "or",
+    emailLabel: "Email address",
+    emailPlaceholder: "you@company.com",
+    consent1: "I agree to the",
+    terms: "Terms of Use",
+    consent2: ", acknowledge the",
+    privacy: "Privacy Policy",
+    consent3: ", and confirm I'm at least 18 years old.",
+    consentHint: "Please tick the box above to continue.",
+    sentTitle: "Check your inbox.",
+    sentBefore: "We sent a one-time sign-in link to",
+    sentAfter: ". Open it on this device to finish - it works once and expires soon.",
+    providerOff: "{provider} sign-in isn't switched on yet. Please use another option or your email.",
+    noAccount: "We couldn't find an account with that email. Sign up first.",
+    errorGeneric: "Something went wrong. Please try again.",
+    notReady: "Sign-in isn't available just yet. Please check back soon.",
+    close: "Close"
+  },
+  // The signed-in header menu and the account pages (/account, /profile, /my-projects).
+  account: {
+    menu: "Account menu",
+    logout: "Sign out",
+    metaTitle: "Account & subscription | IzI Video",
+    profileMetaTitle: "Account & subscription | IzI Video",
+    projectsMetaTitle: "Your Projects | IzI Video",
+    eyebrow: "Your account",
+    manageTitle1: "Your",
+    manageTitle2: "account",
+    // The side menu of the account pages (`account-side-nav.tsx`).
+    nav: {
+      label: "Your account",
+      projects: "Your projects",
+      account: "Account & subscription",
+      team: "Team dashboard",
+      buy: "Buy video time",
+      signOut: "Sign out"
+    },
+    // The video time card on Your Projects.
+    credits: {
+      title: "Available video time",
+      of: "of {total} added",
+      noPlan: "No plan yet",
+      empty: "No video time yet - buy a pack or a subscription, then submit your first project.",
+      buy: "Buy more time",
+      submit: "Submit a project"
+    },
+    // The subscription block on the account page.
+    subscription: {
+      title: "Subscription",
+      plan: "Plan",
+      status: "Status",
+      renews: "Renews on",
+      ends: "Ends on",
+      none: "No subscription - you're on one-time packs. A subscription adds fresh video time every month.",
+      seePlans: "See plans",
+      change: "To change or cancel your plan, message us and we'll take care of it."
+    },
+    sections: { account: "Account", plan: "Plan & video time" },
+    currentPlan: "Current plan",
+    timeLeft: "Video time left",
+    noTime: "No video time yet. Buy a pack and your seconds appear here at once.",
+    upgrade: "Upgrade",
+    buyPack: "Buy a pack",
+    noPlan: "No pack yet",
+    yourProjects: "Your Projects",
+    viewProfile: "View profile",
+    manageAccount: "Account & subscription",
+    signedInWith: "Signed in with",
+    email: "Email",
+    memberSince: "Member since",
+    deleteAccount: {
+      title: "Delete your account",
+      text: "Contact our support team and we'll take care of it: we delete your account, your projects and your files within 30 days and confirm by email. We keep only what the law requires us to keep, such as payment and tax records, and only for as long as it requires. Any active subscription is cancelled first.",
+      cta: "Contact support",
+      form: "or use the contact form",
+      subject: "Account deletion request"
+    },
+    profileForm: {
+      title: "Your details",
+      hint: "So our team knows who we're working with. Your email follows the account you sign in with.",
+      name: "Full name",
+      company: "Company",
+      phone: "Phone",
+      country: "Country",
+      save: "Save details",
+      saved: "Saved",
+      error: "We couldn't save your details. Please try again."
+    },
+    ordersEmpty: "Nothing here yet. Your orders and finished videos will appear here.",
+    startOrder: "Start with one video",
+    providers: { google: "Google", azure: "Microsoft", email: "Email link" },
+    // The header's Your Projects button and the /my-projects page.
+    projectsButton: "Your Projects",
+    projectsPage: {
+      trySample: "Want to see how it will look? Preview with sample projects",
+      purchased: "Thank you for your order! Your video seconds are added as soon as your payment is confirmed - for a card, within a few seconds; a bank payment can take a few business days. If the payment fails, nothing is charged and no seconds are added.",
+      sampleBanner: "Sample projects - made up, to preview this page.",
+      subtitle: "Every video we're making for you, and every one we've delivered. Select a project to see its details and timeline.",
+      status: {
+        brief: "Brief received",
+        scripting: "Scripting",
+        production: "In production",
+        review: "In review",
+        delivered: "Delivered"
+      },
+      due: "Due",
+      length: "Length",
+      format: "Format",
+      started: "Started",
+      revisionsLeft: "Revisions",
+      revisionsLeftValue: "{left} of {total} left",
+      tbd: "To be confirmed",
+      tabs: { overview: "Overview", timeline: "Timeline", files: "Files", comments: "Comments" },
+      askedFor: "What you told us",
+      revisionsTitle: "Revisions",
+      left: "left",
+      noRevisions: "No revisions requested yet.",
+      requestRevision: "Request a revision",
+      producer: "Your producer",
+      teamName: "The IzI Video team",
+      producerLine: "Questions? We reply within a working day.",
+      messageUs: "Message us",
+      whereWeAre: "Where we are",
+      nextStep: "Next step",
+      nextStepDefault: "We will let you know here as soon as there is something for you to review.",
+      notReady: "Your video will appear here as soon as it's ready.",
+      noFiles: "Your files will appear here when the video is delivered.",
+      download: "Download",
+      videoFile: "Finished video",
+      fileError: "We couldn't open that file. Please try again.",
+      loadingVideo: "Loading your video…",
+      review: {
+        title: "Your video is ready for review",
+        text: "Watch it, then approve it or tell us what to change. Revisions left: {left}.",
+        approve: "Approve video",
+        revision: "Request a revision",
+        revisionLabel: "What should we change?",
+        revisionPlaceholder: "Be as specific as you can - timestamps help (for example: 0:12 - make the logo bigger).",
+        send: "Send revision request",
+        cancel: "Cancel",
+        noneLeft: "You've used all the revisions included in this project. Message us in the comments and we'll find a way.",
+        approvedNotice: "Thank you - the video is approved. Your files are ready in the Files tab.",
+        revisionNotice: "Got it - your revision request is with the team. We'll keep this project updated.",
+        error: "That didn't go through. Please try again.",
+        approvedOn: "Approved on {date}"
+      },
+      panelDescription: "Details, brief, revisions and timeline of this project.",
+      comments: {
+        intro: "Questions, notes and revision requests go here. We reply on this page - it is not a chat, so there is no need to wait online.",
+        loading: "Loading comments…",
+        empty: "No comments yet. Ask a question or leave a note for the team - we reply here.",
+        emptyTeam: "No comments yet from the client.",
+        label: "Write a comment",
+        placeholder: "Write a comment for the team - a question, a note, a revision request…",
+        placeholderTeam: "Reply to the client - they see this on their project.",
+        post: "Post comment",
+        error: "We couldn't post your comment. Please try again.",
+        you: "You",
+        client: "Client",
+        teamName: "IzI Video team",
+        teamBadge: "Team",
+        revisionPrefill: "Revision request: "
+      },
+      submit: {
+        button: "Submit a project",
+        title1: "Submit a",
+        title2: "project",
+        kind: "AI video",
+        submit: "Submit project",
+        close: "Close",
+        error: "We couldn't save your project. Please check your connection and try again.",
+        done: "Thank you - your project is in. We're reviewing your brief and will confirm the details within one working day.",
+        doneNoFiles: "Your project is saved, but we couldn't send your attached files. Please email them to info@dreamteam.technology and mention the project name.",
+        nextStep: "We're reviewing your brief and will confirm the details within one working day.",
+        available: "Video time available",
+        cost: "This project uses {needed} of your {available}.",
+        notEnough: "This project needs {needed}, but you have {available}.",
+        buyPack: "Buy a pack",
+        insufficient: "You don't have enough video time for this length. Buy a pack or choose a shorter video.",
+        nameLabel: "Project name (optional)",
+        namePlaceholder: "For example: Spring campaign reel",
+        autoTitleDefault: "New video project",
+        autoTitles: {
+          sales: "Sales video",
+          awareness: "Brand awareness video",
+          launch: "Product launch video",
+          trust: "Image & trust video",
+          education: "Educational video",
+          other: "New video project"
+        } as Record<string, string>,
+        answers: {
+          goal: "Goal",
+          script: "Script",
+          length: "Length",
+          format: "Format",
+          voiceover: "Voice-over",
+          platforms: "Where it runs",
+          examples: "Examples",
+          deadline: "Deadline",
+          notes: "Notes",
+          files: "Files you sent"
+        }
+      },
+      close: "Close"
+    }
+  },
+  // The About page (/about), linked from the footer and the menu.
+  // The announcement bar above every English page (`components/promo-bar.tsx`).
+  promo: {
+    badge: "-20%",
+    text: "We're launching in the US - take 20% off your first order.",
+    short: "20% off your first order",
+    cta: "Claim discount",
+    ctaShort: "Claim"
+  },
+  about: {
+    metaTitle: "About us | IzI Video",
+    metaDescription:
+      "IzI Video is an AI video production company: we write, direct and produce your video with the best AI tools - for brands and creators in the USA, Europe and worldwide.",
+    eyebrow: "About us",
+    title1: "We make",
+    title2: "AI video",
+    crossed: ["no learning curve", "no prompts"],
+    imageAlt: "The San Francisco skyline at dusk under the Bay Bridge",
+    story:
+      "We're a team of AI video professionals from across the world, with roots in entrepreneurship, IT, video production, filmmaking and editing. At IzI Video, we take your idea, write it, direct it and produce the finished film with the best AI tools - so you don't need to write a single prompt, learn any software or hire a crew. Social media ads, corporate videos, TV ads, product videos, brand mascots, launch and explainer videos, UGC-style ads, real estate and music videos: all made fully online, for brands and creators in the USA, Europe and worldwide. Choose a pack, send your brief, and get your video in 3-10 days - yours to use anywhere. Our team is ready to make your next video.",
+    team: {
+      eyebrow: "Our team",
+      title1: "The people behind",
+      title2: "the videos",
+      linkedin: "LinkedIn profile of {name}"
+    },
+    mission: {
+      eyebrow: "Our mission",
+      title: "Great AI video, without the complexity",
+      text: "To put great AI video within reach of everyone. No pricey subscriptions, no learning curve, no endless prompting, no budgets burned on credits and platforms. You bring the direction; we deliver the finished video - for your business, your brand or your own project."
+    },
+    vision: {
+      eyebrow: "Our vision",
+      title: "AI video of every kind, easy for everyone",
+      text: "A world where every business and every individual can create any kind of video - ads, films, mascots, product stories - as easily as sending a message. Accessible in price, simple in process, and fast enough to be part of everyday work."
+    },
+    updates: {
+      eyebrow: "Latest updates",
+      tag: "New",
+      title: "We're launching in the US",
+      text: "IzI Video is opening to clients across the United States. Create your account now and take 20% off your first order.",
+      cta: "Claim your 20% discount on your first order"
+    },
+    hiring: {
+      eyebrow: "Join our team",
+      badge: "Coming soon",
+      title: "We're hiring soon",
+      text: "We're growing. Roles for AI video producers, editors and creative directors will appear here - check back soon.",
+      cta: "Check upcoming options"
+    }
+  },
+  // "Powered by the world's best AI" under the packages (`components/ai-partners-section.tsx`).
+  aiPartners: {
+    eyebrow: "AI partners",
+    title1: "Technology",
+    title2: "we use",
+    line: "Partnering with global industry leaders to create your videos."
+  },
+  // /careers: the roles we will open soon (`components/careers-page-view.tsx`).
+  careers: {
+    title: "Careers",
+    metaTitle: "Careers | IzI Video",
+    metaDescription:
+      "Join IzI Video: upcoming roles for a Partnership Manager, AI Video Filmmaker, Marketing Manager and Sales Manager. Fully remote, working with clients in the USA, Europe and worldwide.",
+    eyebrow: "Careers",
+    title1: "Build the future of",
+    title2: "AI video with us",
+    lead: "We're growing and opening new roles soon. Here is what's coming - register your interest and we'll write to you the moment a role opens.",
+    badge: "Opening soon",
+    tag: "Fully remote",
+    apply: "Register your interest",
+    applySubject: "Career interest: {role}",
+    roles: [
+      {
+        title: "Partnership Manager",
+        summary: "Build and grow the relationships with agencies, platforms and brands that bring IzI Video to more people.",
+        points: ["Find, pitch and sign new partners", "Plan joint campaigns and co-marketing", "Keep every partnership growing and healthy"]
+      },
+      {
+        title: "AI Video Filmmaker",
+        summary: "Turn a client's brief into a finished film with the best AI tools - from script and storyboard to the final cut.",
+        points: ["Write, direct and edit AI-made videos", "Choose the right tools for each brief", "Keep the look, sound and story at a high level"]
+      },
+      {
+        title: "Marketing Manager",
+        summary: "Grow the IzI Video brand across the USA and Europe with content, campaigns and community.",
+        points: ["Plan and run campaigns across channels", "Create content that shows what AI video can do", "Track what works and do more of it"]
+      },
+      {
+        title: "Sales Manager",
+        summary: "Turn interest into clients: talk to businesses and creators and guide them from the first question to the first video.",
+        points: ["Meet and qualify new leads", "Recommend the right pack for each client", "Close deals and keep clients coming back"]
+      }
+    ],
+    otherTitle: "Don't see your role?",
+    otherText: "Tell us who you are and what you'd like to build with us - send your portfolio or profile and we'll keep it on file.",
+    otherCta: "Get in touch",
+    otherSubject: "Career interest: open application"
+  },
+  // The team dashboard (/team): every client's projects and the files they submitted.
+  team: {
+    metaTitle: "Team dashboard | IzI Video",
+    eyebrow: "Internal",
+    title: "Team",
+    title2: "dashboard",
+    menu: "Team dashboard",
+    sampleBanner: "Sample data - made up, to preview this page.",
+    tabs: { projects: "Projects", clients: "Clients" },
+    clients: {
+      search: "Search name, email or company",
+      sortBy: "Sort by",
+      sort: { activity: "Last activity", name: "Name", balance: "Video time" },
+      cols: { client: "Client", company: "Company", balance: "Video time", plan: "Plan", projects: "Projects", activity: "Last activity" },
+      open: "open",
+      noPlan: "No plan",
+      subscription: {
+        active: "Active",
+        trialing: "Trial",
+        past_due: "Payment due",
+        unpaid: "Unpaid",
+        canceled: "Cancelled",
+        incomplete: "Incomplete",
+        incomplete_expired: "Expired",
+        paused: "Paused"
+      } as Record<string, string>,
+      empty: "No clients yet. Everyone who signs up appears here.",
+      noMatch: "No client matches this search.",
+      setupNeeded: "The Clients tab needs the profiles table - run supabase/profiles.sql in Supabase.",
+      unnamed: "Unnamed client",
+      popupDescription: "The client's profile, private team notes, video time history and projects.",
+      memberSince: "Member since",
+      lastActivity: "Last activity",
+      plan: "Plan",
+      profileTitle: "Profile",
+      profileHint: "The client sees and can edit these details too, on their profile page.",
+      fields: { name: "Name", email: "Email", company: "Company", phone: "Phone", country: "Country" },
+      save: "Save profile",
+      saved: "Saved",
+      saveError: "We couldn't save the profile. Please try again.",
+      notesTitle: "Private notes",
+      notesHint: "Only the team sees these - never the client.",
+      notePlaceholder: "A note about this client - preferences, agreements, follow-ups…",
+      addNote: "Add note",
+      noNotes: "No notes yet.",
+      deleteNote: "Delete note",
+      noteError: "We couldn't save the note. Please try again.",
+      historyTitle: "Video time history",
+      historyHint: "Every purchase, project and change, newest first. The balance is their sum.",
+      noHistory: "No video time yet.",
+      kinds: { purchase: "Purchase", spend: "Project", refund: "Taken back", adjustment: "Added by team" } as Record<string, string>,
+      projectsTitle: "Projects",
+      noProjects: "No projects yet.",
+      loading: "Loading…"
+    },
+    stats: { total: "All projects", new: "New briefs", inWork: "In work", inReview: "In review", delivered: "Delivered", overdue: "Overdue" },
+    search: "Search project or client",
+    stageFilter: "Filter by stage",
+    all: "All",
+    sortBy: "Sort by",
+    sort: { newest: "Newest first", due: "Due date", client: "Client" },
+    cols: { project: "Project", client: "Client", stage: "Stage", due: "Due", submitted: "Submitted", files: "Files", comments: "Comments" },
+    reply: "Reply",
+    awaiting: "{n} project(s) with a client comment waiting for your reply",
+    commentsTitle: "Comments",
+    commentsHint: "The client sees your replies on their project, in the Comments tab. This is a thread, not a chat.",
+    credits: {
+      title: "Video seconds",
+      hint: "The client's balance. Add minutes and seconds for a custom pack or a gift, or take some back for a refund.",
+      balance: "Balance",
+      action: "Add or take back",
+      add: "Add",
+      take: "Take back",
+      minutes: "min",
+      seconds: "sec",
+      note: "Note",
+      notePlaceholder: "Note (for example: Enterprise pack, or refund for the cancelled reel)",
+      apply: "Apply",
+      done: "Done - the client's balance is updated.",
+      error: "We couldn't change the balance. Are you signed in as a team member?"
+    },
+    empty: "No projects yet. They appear here as soon as a client submits one.",
+    noMatch: "No project matches this search or filter.",
+    unknownClient: "Unknown client",
+    client: "Client",
+    emailClient: "Email the client",
+    submitted: "Submitted",
+    brief: "What the client told us",
+    filesTitle: "Files from the client",
+    filesHint: "Everything they attached when they submitted the project. Links open for two minutes.",
+    noFiles: "The client didn't attach any files.",
+    sampleFile: "This is a sample file - real ones download here.",
+    fileError: "We couldn't open that file. Please try again.",
+    manageTitle: "Manage this project",
+    manageHint: "Changes save to the client's Your Projects page right away.",
+    stage: "Stage",
+    nextStep: "Next step (the client sees this)",
+    nextStepHint: "For example: We're generating the scenes. Nothing needed from you right now.",
+    producer: "Producer",
+    revisionsUsed: "Revisions used",
+    included: "included",
+    approved: "Approved by the client on {date}",
+    delivery: {
+      title: "Delivery",
+      hint: "Upload the finished film and the files the client downloads. They stay private - the client opens them through short-lived links.",
+      videoTitle: "Finished video",
+      noVideo: "No video uploaded yet.",
+      uploadVideo: "Upload video",
+      replaceVideo: "Replace video",
+      filesTitle: "Files to download",
+      noFiles: "No files yet.",
+      addFiles: "Add files",
+      remove: "Remove",
+      download: "Download",
+      uploading: "Uploading {name} - {pct}%",
+      uploaded: "Uploaded - the client can see it now.",
+      error: "The upload didn't go through. If the file is large, check the upload size limit in Supabase (Project Settings -> Storage) and try again.",
+      removeError: "We couldn't remove that file. Please try again.",
+      reviewHint: "When the client should watch it, set the stage to In review below - they can then approve it or ask for a revision.",
+      sample: "Uploads are switched off in sample mode."
+    },
+    timeline: {
+      title: "Timeline (the client sees this)",
+      standard: "Showing the five standard stages, ticked off by the stage above.",
+      customise: "Customise the timeline",
+      reset: "Back to the standard stages",
+      step: "Step",
+      date: "Date",
+      note: "Note (optional)",
+      done: "Done",
+      add: "Add a step",
+      remove: "Remove step"
+    },
+    revisionLog: {
+      title: "Revision requests",
+      hint: "What the client asked to change. Tick a request off when it's done.",
+      empty: "No revision requests yet.",
+      add: "Add a request",
+      placeholder: "What should change",
+      done: "Done",
+      remove: "Remove request"
+    },
+    save: "Save changes",
+    saved: "Saved",
+    saveError: "We couldn't save. Are you signed in as a team member? Please try again.",
+    popupDescription: "The client's information, brief and files, and the controls to update this project."
+  },
+  packages: {
+    eyebrow: "What we make",
+    title1: "Find the package that",
+    title2: "fits your needs",
+    subtitle: "Every kind of video your brand needs - scripted, produced and delivered by our team. Pick a format, then the plan that fits.",
+    getPackage: "Get your package",
+    seeExamples: "See examples",
+    compare: "Compare all packages",
+    custom: "Need something else? Tell us about it",
+    items: {
+      socialAds: { title: "Social Media Ads", line: "Reels, TikToks and Shorts that stop the scroll" },
+      corporate: { title: "Corporate Videos", line: "Brand films, presentations and internal comms" },
+      tvAds: { title: "TV Ads", line: "Broadcast-ready commercials with cinematic polish" },
+      productVideos: { title: "Product Videos", line: "Your product in any setting, from any angle" },
+      brandMascots: { title: "Brand Mascots", line: "A character that becomes the face of your brand" },
+      motionGraphics: { title: "Motion Graphics", line: "Type, logos and data that move with purpose" },
+      launchVideos: { title: "Launch Videos", line: "Make your product or feature launch land" },
+      explainerVideos: { title: "Explainer Videos", line: "Complex ideas made simple in under a minute" },
+      ugcAds: { title: "UGC Ads", line: "Creator-style ads, without hiring creators" },
+      realEstate: { title: "Real Estate Videos", line: "Homes and developments shown before they're built" },
+      musicVideos: { title: "Music Videos", line: "Cinematic visuals for artists and labels" }
+    }
+  },
+>>>>>>> Stashed changes
   contactPage: {
     metaTitle: "Contact & Process | DreamTeam",
     metaDescription:

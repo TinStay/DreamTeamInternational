@@ -24,8 +24,8 @@ const ROWS_ON_STAGE = 3;
 const ROW_MAX = 240;
 /** Soft edge (px) at the top and bottom of the stage - the cards leave and appear through it. */
 const EDGE = 28;
-/** Room above the first row: the (compact) avatars sit half above their card. */
-const TOP_INSET = EDGE + 28;
+/** Room above the first row (the cards lift a little on hover). */
+const TOP_INSET = EDGE + 8;
 /** The cards travel this much faster than the page - a touch livelier than plain scrolling. */
 const SPEED = 1.2;
 /** Track smoothing under native scrolling - stiff, so a wheel tick glides instead of stepping. */
@@ -112,9 +112,21 @@ function ReviewConveyor({ items, heading }: { items: Review[]; heading: React.Re
             <motion.div
               ref={trackRef}
               // Odd card at the end of a two-column stack: centred across both columns.
+<<<<<<< Updated upstream
               // On phones the rows are 2.5rem apart: the next card's avatar hangs 1.75rem above its card, so that
               // leaves a little air between it and the card before (from md the stack stays close-packed).
               className="absolute inset-x-0 mx-auto grid w-[calc(100%-1.25rem)] grid-cols-1 gap-10 will-change-transform md:w-[min(84rem,calc(94vw-2rem))] md:grid-cols-2 md:gap-4 md:[&>*:nth-child(odd):last-child]:col-span-2 md:[&>*:nth-child(odd):last-child]:w-[calc(50%-0.5rem)] md:[&>*:nth-child(odd):last-child]:justify-self-center"
+=======
+              // The cards sit close together - 1.25rem apart on phones, 1rem from md - each stretched to its row
+              // so the cards in a row match in height.
+              className={cn(
+                "absolute inset-x-0 mx-auto grid grid-cols-1 gap-5 will-change-transform md:grid-cols-2 md:gap-4 md:[&>*:nth-child(odd):last-child]:col-span-2 md:[&>*:nth-child(odd):last-child]:w-[calc(50%-0.5rem)] md:[&>*:nth-child(odd):last-child]:justify-self-center",
+                // English: the page's own side margin, like every other section; bg keeps the old width.
+                language === "en"
+                  ? "w-[calc(100%-2*max(1.25rem,3vw))]"
+                  : "w-[calc(100%-1.25rem)] md:w-[min(84rem,calc(94vw-2rem))]"
+              )}
+>>>>>>> Stashed changes
               style={{ top: TOP_INSET, y, gridAutoRows: rowMin > 0 ? `minmax(${Math.round(rowMin)}px, auto)` : undefined }}
             >
               {items.map((review, index) => (
@@ -184,9 +196,16 @@ export function ReviewsSection({ className }: { className?: string }) {
       ) : phone ? (
         <>
           {heading}
+<<<<<<< Updated upstream
           {/* The same compact cards as the conveyor's phone grid, the same 2.5rem apart (the next card's avatar hangs
               1.75rem above its card), in plain flow. */}
           <div className="mx-auto grid w-[calc(100%-1.25rem)] max-w-7xl grid-cols-1 gap-10 pt-4">
+=======
+          {spotlight && <div className="mb-14">{spotlight}</div>}
+          {/* The same compact cards as the conveyor's phone grid, the same 1.25rem apart,
+              in plain flow. */}
+          <div className={cn("mx-auto grid grid-cols-1 gap-5 pt-2", en ? "w-[calc(100%-2*max(1.25rem,3vw))]" : "w-[calc(100%-1.25rem)] max-w-7xl")}>
+>>>>>>> Stashed changes
             {items.map((review, index) => (
               <Testimonial
                 key={review.name}
@@ -206,8 +225,43 @@ export function ReviewsSection({ className }: { className?: string }) {
       ) : (
         <>
           {heading}
+<<<<<<< Updated upstream
           {/* Elsewhere (reduced motion, tablets and up outside the journey): vertically scrolling review columns (paused on hover). */}
           <div className="mx-auto flex max-h-[44rem] w-full max-w-7xl justify-center gap-6 overflow-hidden px-4 [mask-image:linear-gradient(to_bottom,transparent,black_15%,black_85%,transparent)]">
+=======
+          {spotlight && <div className="mb-6">{spotlight}</div>}
+          {/* A short list (a handful of reviews) is laid out still, centred: scrolling columns would loop the same few
+              cards past each other. */}
+          {items.length <= 6 ? (
+            <div
+              className={cn(
+                "w-full pt-2",
+                // English: spread across the page's own side margin, three across from lg; bg keeps the centred row.
+                en
+                  ? "grid grid-cols-1 gap-5 px-[max(1.25rem,3vw)] md:grid-cols-2 lg:grid-cols-3"
+                  : "mx-auto flex max-w-7xl flex-wrap justify-center gap-x-6 gap-y-14 px-4"
+              )}
+            >
+              {items.map((review, index) => (
+                <JourneyItem key={review.name} index={index} from="bottom" className={cn("flex w-full", !en && "max-w-sm")}>
+                  <Testimonial
+                    name={review.name}
+                    role={review.role}
+                    text={review.text}
+                    rating={review.rating}
+                    initials={review.initials}
+                    color={review.color}
+                    logo={REVIEW_LOGOS[review.name]}
+                    shape={AVATAR_SHAPES[index % AVATAR_SHAPES.length]}
+                    className="w-full"
+                  />
+                </JourneyItem>
+              ))}
+            </div>
+          ) : (
+          /* Elsewhere (reduced motion, tablets and up outside the journey): vertically scrolling review columns (paused on hover). */
+          <div className={cn("mx-auto flex max-h-[44rem] w-full justify-center gap-6 overflow-hidden [mask-image:linear-gradient(to_bottom,transparent,black_15%,black_85%,transparent)]", en ? "px-[max(1.25rem,3vw)]" : "max-w-7xl px-4")}>
+>>>>>>> Stashed changes
             {columns.map((column, columnIndex) => (
               <JourneyItem
                 key={columnIndex}
@@ -217,7 +271,7 @@ export function ReviewsSection({ className }: { className?: string }) {
               >
                 <InfiniteSlider duration={COLUMN_DURATIONS[columnIndex % COLUMN_DURATIONS.length]} className="w-full">
                   {column.map((review) => (
-                    <div key={review.name} className="pt-10">
+                    <div key={review.name} className="pt-5">
                       <Testimonial
                         name={review.name}
                         role={review.role}

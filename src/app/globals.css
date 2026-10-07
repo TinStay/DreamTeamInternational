@@ -915,6 +915,10 @@ body.service-modal-open .service-mobile-dock {
   .tiger-cta:is(:hover, :focus-visible) .tiger-cta__ch {
     transform: translateY(-1.25em);
   }
+  /* The orange primary pill keeps its letters still on hover - only the pearl flood, the lift and the glow move. */
+  .tiger-cta.tiger-cta--orange:is(:hover, :focus-visible) .tiger-cta__ch {
+    transform: none;
+  }
   .tiger-cta:active {
     --press: 0.97;
   }
@@ -1016,7 +1020,11 @@ body.service-modal-open .service-mobile-dock {
    behind every page - a near-black room lit faintly from the horizon, a perspective grid floor running away into the
    distance and fading into fog, and a vignette closing the edges in - with neutral, see-through black surfaces for the
    cards (the site's dark ones are bluish). Static on purpose: nothing here repaints while the page scrolls. */
-html.site-deep {
+/* A theme-locked block (`.theme-dark` - the pricing page's <main>; `.theme-light` - a light case study) redeclares the
+   whole palette, the old red `--primary` included, so without these selectors the header and the mobile dock inside
+   such a block hovered red while every other page hovered orange. A light-locked block takes the accent only (below). */
+html.site-deep,
+html.site-deep .theme-dark {
   /* The client's pricing file: a black ground and one accent - an "electric" orange pearl (orange with a pale pearl
      sheen through the middle) in place of the brand red -> violet. */
   --primary: #ff6a14;
@@ -1028,6 +1036,12 @@ html.site-deep {
   --card: color-mix(in srgb, #121317 82%, transparent);
   --popover: #101115;
   --muted: #1c1d22;
+}
+html.site-deep .theme-light {
+  --primary: #ff6a14;
+  --primary-gradient-start: #ff5e00;
+  --primary-gradient-end: #ffb066;
+  --primary-soft-glow: rgba(255, 110, 20, 0.35);
 }
 html.site-deep .page-dark-grid-layer {
   display: none;
