@@ -1,10 +1,14 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { IconArrowRight, IconArrowUpRight } from "@tabler/icons-react";
 import { TigerCta } from "@/components/hero-tiger/tiger-cta";
 import { useLanguage } from "@/lib/i18n/language-context";
+import { bunnyMp4Url, type BunnyVideo } from "@/lib/bunny-stream";
+import { PACKAGE_FILMS } from "@/lib/package-films";
+import { PHONE_QUERY, useMediaQuery } from "@/lib/use-media-query";
 import { contactProcessPath, portfolioPath, pricingPath } from "@/lib/routes";
 
 /** The kinds of video in the grid, in order: the header's tabs first, then the rest. Words in `packages.items`, the
@@ -24,9 +28,78 @@ const PACKAGES = [
 ] as const;
 
 /**
+ * A package card's film, over its still picture: muted, looping, cover-fit. It is fetched and played only while the
+ * card is mostly on screen (so one or two run at a time) and paused as soon as it leaves; it fades in once it is really
+ * playing, so until then (and if the clip is not ready, or under reduced motion) the picture shows. A phone gets the
+ * smaller 480p rendition.
+ */
+function PackageFilm({ clip }: { clip: BunnyVideo }) {
+  const ref = useRef<HTMLVideoElement>(null);
+  const onScreen = useRef(false);
+  const phone = useMediaQuery(PHONE_QUERY);
+  const [src, setSrc] = useState<string | null>(null);
+  const [playing, setPlaying] = useState(false);
+  const url = bunnyMp4Url(clip, phone ? 480 : 720);
+
+  useEffect(() => {
+    const video = ref.current;
+    const frame = video?.parentElement;
+    if (!video || !frame) return;
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        onScreen.current = entry.isIntersecting && !reduceMotion;
+        if (onScreen.current) {
+          setSrc((current) => current ?? url);
+          void video.play().catch(() => {});
+        } else {
+          video.pause();
+        }
+      },
+      { threshold: 0.6 }
+    );
+    io.observe(frame);
+    // The browser pauses a video on a hidden page: pick it up again when the page comes back.
+    const onVisible = () => {
+      if (document.visibilityState === "visible" && onScreen.current) void video.play().catch(() => {});
+    };
+    document.addEventListener("visibilitychange", onVisible);
+    return () => {
+      io.disconnect();
+      document.removeEventListener("visibilitychange", onVisible);
+    };
+  }, [url]);
+
+  // The film was just attached (the card came on screen): start it - `play()` is what makes a `preload="none"` video load.
+  useEffect(() => {
+    if (src && onScreen.current) void ref.current?.play().catch(() => {});
+  }, [src]);
+
+  return (
+    <video
+      ref={ref}
+      src={src ?? undefined}
+      muted
+      loop
+      playsInline
+      preload="none"
+      aria-hidden
+      onLoadedData={(event) => {
+        if (onScreen.current) void event.currentTarget.play().catch(() => {});
+      }}
+      onPlaying={() => setPlaying(true)}
+      className={`absolute inset-0 size-full object-cover transition-[opacity,transform] duration-700 ease-out group-hover:scale-105 ${
+        playing ? "opacity-100" : "opacity-0"
+      }`}
+    />
+  );
+}
+
+/**
  * The English home page's "Find the package that fits your needs" (in place of the services + quote wizard): a
  * left-aligned heading on the page margin, then a grid of the kinds of video we make. Each card is its picture with only
- * the name on it (Archivo, on a soft black gradient); on hover - or keyboard focus - the picture dims to half black, the
+ * the name on it (Archivo, on a soft black gradient) - and where there is a film for the kind (`lib/package-films.ts`)
+ * it plays over the picture while the card is on screen; on hover - or keyboard focus - the picture dims to half black, the
  * name rises and its line and two buttons slide in under it: get the package (the plans) or see examples (the
  * portfolio). On a touch screen, which has no hover, the details are always shown. Under the grid, the two ways on:
  * compare the packages (the orange pill) or ask for something custom.
@@ -62,6 +135,7 @@ export function PackagesSection() {
               sizes="(min-width: 1280px) 25vw, (min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
               className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
             />
+            {PACKAGE_FILMS[key] ? <PackageFilm clip={PACKAGE_FILMS[key]} /> : null}
             {/* Resting: a soft black gradient under the name. Open: the whole picture at half black. */}
             <span
               aria-hidden
