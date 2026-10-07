@@ -226,10 +226,10 @@ export function SiteHeader() {
   const portfolioCategory = (key: string) => `${portfolioPath(language)}?category=${key}`;
   const megaGroups: MegaNavGroup[] = [
     { label: t.header.nav.explore, href: homeHref, items: [], showFrom: "wide" },
-    { label: t.header.nav.socialAds, href: servicePath(language, "ai-video"), items: [], divideBefore: "wide" },
-    { label: t.header.nav.corporate, href: portfolioCategory("services"), items: [], showFrom: "ultra" },
-    { label: t.header.nav.tvAds, href: portfolioCategory("tv"), items: [], showFrom: "wide" },
-    { label: t.header.nav.productVideos, href: portfolioCategory("product"), items: [], showFrom: "ultra" },
+    { label: t.header.nav.socialAds, href: portfolioCategory("socialAds"), items: [], divideBefore: "wide" },
+    { label: t.header.nav.corporate, href: portfolioCategory("corporate"), items: [], showFrom: "ultra" },
+    { label: t.header.nav.tvAds, href: portfolioCategory("tvAds"), items: [], showFrom: "wide" },
+    { label: t.header.nav.productVideos, href: portfolioCategory("productVideos"), items: [], showFrom: "ultra" },
     { label: t.header.about, href: aboutPath(language), items: [], divideBefore: true },
     { label: t.header.projects, href: projectsPath(language), items: [] },
     { label: t.header.pricingPage, href: pricingPath(language), items: [] },
@@ -239,8 +239,8 @@ export function SiteHeader() {
       href: servicesPath(language),
       divideBefore: true,
       items: [
-        { label: t.header.nav.corporate, href: portfolioCategory("services") },
-        { label: t.header.nav.tvAds, href: portfolioCategory("tv") },
+        { label: t.header.nav.corporate, href: portfolioCategory("corporate") },
+        { label: t.header.nav.tvAds, href: portfolioCategory("tvAds") },
         { label: t.header.portfolio, href: portfolioPath(language) },
         { label: t.header.services, href: servicesPath(language) },
         { label: t.header.nav.brandMascots, href: servicePath(language, "brand-mascots") },

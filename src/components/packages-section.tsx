@@ -165,7 +165,7 @@ export function PackagesSection() {
                         <IconArrowUpRight className="hidden size-3.5 @[20rem]:block" aria-hidden />
                       </Link>
                       <Link
-                        href={portfolioPath(language)}
+                        href={`${portfolioPath(language)}?category=${key}`}
                         className="inline-flex h-9 shrink-0 cursor-pointer items-center rounded-full border border-white/40 bg-white/10 px-3 text-xs font-semibold @[20rem]:px-3.5 @[20rem]:text-[13px] whitespace-nowrap text-white backdrop-blur-sm transition-[transform,background-color,border-color] duration-200 ease-out hover:-translate-y-0.5 hover:border-white/80 hover:bg-white/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
                       >
                         {p.seeExamples}

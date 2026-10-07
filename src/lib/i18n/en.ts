@@ -724,10 +724,14 @@ export const en = {
   portfolio: {
     metaTitle: "AI Video Portfolio | DreamTeam",
     metaDescription:
-      "AI-generated video productions by DreamTeam - product, cinema advertising, mascots, construction, cars, services and animation, in 16:9 and 9:16.",
-    title1: "Featured",
-    title2: "Work",
-    subtitle: "Explore our diverse range of AI-generated video productions tailored for cutting-edge brands.",
+      "Watch AI videos by IzI Video: social media ads, corporate videos, TV ads, product videos, brand mascots, motion graphics, launch and explainer videos, UGC ads, real estate and music videos.",
+    eyebrow: "Portfolio",
+    title1: "Our",
+    title2: "work",
+    subtitle: "Every kind of video we make - pick a category and open any film full screen.",
+    play: "Play",
+    close: "Close",
+    empty: "More films in this category are on their way.",
     categories: {
       all: "All",
       construction: "Construction",

@@ -6,7 +6,7 @@ import { Footer } from "@/components/footer";
 import { GradientBlurPageBg } from "@/components/ui/gradient-blur-bg";
 import { MAIN_WITH_FIXED_PAGE_BG_CLASS } from "@/lib/page-shell";
 import { PageBreadcrumbs } from "@/components/page-breadcrumbs";
-import { PortfolioSection } from "@/components/portfolio-section";
+import { PortfolioGrid } from "@/components/portfolio/portfolio-grid";
 
 export function PortfolioPageView() {
   return (
@@ -18,11 +18,11 @@ export function PortfolioPageView() {
       <SiteHeader />
 
       <div className="relative z-10 flex w-full flex-1 flex-col pb-20 pt-24 lg:pb-24 lg:pt-32">
-        {/* Same gutters as the section below so the crumbs line up with its heading. */}
-        <div className="mx-auto w-full max-w-none px-4 lg:px-6">
-          <PageBreadcrumbs className="mb-2" />
+        {/* Same gutters as the grid below so the crumbs line up with its heading. */}
+        <div className="mx-auto w-full max-w-none px-[max(1.25rem,3vw)]">
+          <PageBreadcrumbs className="mb-6" />
         </div>
-        <PortfolioSection headingLevel="h1" />
+        <PortfolioGrid />
       </div>
 
       <div className="relative z-10">

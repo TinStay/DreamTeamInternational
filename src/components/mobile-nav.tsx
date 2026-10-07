@@ -36,7 +36,6 @@ import {
   portfolioPath,
   pricingPath,
   projectsPath,
-  servicePath,
   servicesPath,
   trainingPath,
 } from "@/lib/routes";
@@ -60,10 +59,10 @@ export function MobileNav() {
   // The English menu: the same links as the desktop mega menu, in its order.
   const englishLinks = [
     { label: t.header.nav.explore, href: homeHref, Icon: IconHome },
-    { label: t.header.nav.socialAds, href: servicePath(language, "ai-video"), Icon: IconDeviceMobile },
-    { label: t.header.nav.corporate, href: category("services"), Icon: IconBuildingSkyscraper },
-    { label: t.header.nav.tvAds, href: category("tv"), Icon: IconDeviceTv },
-    { label: t.header.nav.productVideos, href: category("product"), Icon: IconPackage },
+    { label: t.header.nav.socialAds, href: category("socialAds"), Icon: IconDeviceMobile },
+    { label: t.header.nav.corporate, href: category("corporate"), Icon: IconBuildingSkyscraper },
+    { label: t.header.nav.tvAds, href: category("tvAds"), Icon: IconDeviceTv },
+    { label: t.header.nav.productVideos, href: category("productVideos"), Icon: IconPackage },
     { label: t.header.about, href: aboutPath(language), Icon: IconInfoCircle },
     { label: t.header.projects, href: projectsHref, Icon: IconFolder },
     { label: t.header.pricingPage, href: pricingPath(language), Icon: IconCoins },
