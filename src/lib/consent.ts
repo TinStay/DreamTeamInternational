@@ -101,6 +101,16 @@ export function useConsent(): Consent | null | undefined {
   return useSyncExternalStore(subscribeConsent, getSnapshot, getServerSnapshot);
 }
 
+/**
+ * The browser's Global Privacy Control signal (`navigator.globalPrivacyControl`, sent by Brave, DuckDuckGo, Firefox with
+ * the setting on, and privacy extensions). US state privacy laws - California's CCPA / CPRA, Colorado, Connecticut and
+ * others - treat it as a valid opt-out of selling / sharing personal data for targeted advertising, so with it on the
+ * marketing tags never load, whatever the banner says (the privacy policy promises this). `nav` is for tests.
+ */
+export function globalPrivacyControl(nav: { globalPrivacyControl?: unknown } | undefined = typeof navigator === "undefined" ? undefined : (navigator as { globalPrivacyControl?: unknown })): boolean {
+  return nav?.globalPrivacyControl === true;
+}
+
 /** Reopen the banner on its settings, with the stored choice ticked. */
 export function openConsentSettings(): void {
   window.dispatchEvent(new Event(CONSENT_OPEN_EVENT));

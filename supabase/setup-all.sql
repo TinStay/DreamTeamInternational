@@ -1,8 +1,8 @@
--- ONE-FILE SETUP: projects + team + credits, in the right order. Run this once in the Supabase SQL Editor.
--- (Same content as projects.sql, then team.sql, then credits.sql. After it, make yourself an admin - see the snippet
+-- ONE-FILE SETUP: projects + team + credits + delivery + profiles + orders, in the right order. Run this once in the Supabase SQL Editor.
+-- (Same content as projects.sql, then team.sql, then credits.sql, then delivery.sql, then profiles.sql, then orders.sql. After it, make yourself an admin - see the snippet
 -- inside the team.sql part below, and read README.md.)
 
--- ======================= 1/3  projects =======================
+-- ======================= 1/6  projects =======================
 -- The client's projects for the "Your Projects" page (/en/my-projects).
 -- Run this once in the Supabase dashboard: SQL Editor -> New query -> paste -> Run.
 -- Clients can only READ their own rows (row level security); you add and update projects from the dashboard
@@ -59,7 +59,7 @@ alter table public.projects add column if not exists revisions jsonb not null de
 -- Clients do not insert into this table directly: a project is created (and its video seconds are spent) in one step by
 -- the submit_project() function in supabase/credits.sql.
 
--- ======================= 2/3  team =======================
+-- ======================= 2/6  team =======================
 -- The team dashboard (/en/team): every client's projects and the files they submitted, in one place.
 -- Run this once in the Supabase dashboard (SQL Editor), AFTER supabase/projects.sql.
 
@@ -121,7 +121,7 @@ create policy "Team reads all project files"
   to authenticated
   using (bucket_id = 'project-files' and public.is_admin());
 
--- ======================= 3/3  credits =======================
+-- ======================= 3/6  credits =======================
 -- Video seconds ("credits"), submitting a project, and the comments on it.
 -- Run once in the Supabase SQL Editor, AFTER supabase/projects.sql and supabase/team.sql.
 
@@ -249,3 +249,380 @@ create policy "Write comments on your projects"
       or exists (select 1 from public.projects p where p.id = project_id and p.user_id = auth.uid())
     )
   );
+
+-- ======================= 4/6  delivery =======================
+-- Delivering the work, the client's approval / revision request, and the one-subscription rule.
+-- Run once in the Supabase SQL Editor, AFTER projects.sql, team.sql and credits.sql (setup-all.sql includes it). Safe to re-run.
+
+-- 1) What a delivery carries.
+--    delivery_video: the finished film, kept in the private Storage bucket below - {"name","path","size","type"}.
+--    files:          the deliverables to download - new entries are {"name","path","size"} in that bucket
+--                    (older rows may still hold {"name","url","size"} - the site reads both).
+--    approved_at:    when the client approved the video.
+alter table public.projects add column if not exists delivery_video jsonb;
+alter table public.projects add column if not exists approved_at timestamptz;
+
+-- 2) updated_at follows every change by itself (the site no longer has to send it).
+create or replace function public.touch_updated_at()
+returns trigger
+language plpgsql
+as $$
+begin
+  new.updated_at := now();
+  return new;
+end;
+$$;
+
+drop trigger if exists projects_touch_updated_at on public.projects;
+create trigger projects_touch_updated_at
+  before update on public.projects
+  for each row execute function public.touch_updated_at();
+
+-- 3) A private bucket for the finished work, at  <client user id>/<project id>/<file>.
+--    Only the team uploads, replaces and removes; each client reads their own folder (through short-lived signed links),
+--    so a delivered film is never public.
+--    The upload size is capped by the project's global limit (Project Settings -> Storage: 50 MB on the free plan) -
+--    raise it for long 4K films.
+insert into storage.buckets (id, name, public)
+values ('project-deliveries', 'project-deliveries', false)
+on conflict (id) do nothing;
+
+drop policy if exists "Team manages deliveries" on storage.objects;
+create policy "Team manages deliveries"
+  on storage.objects for all
+  to authenticated
+  using (bucket_id = 'project-deliveries' and public.is_admin())
+  with check (bucket_id = 'project-deliveries' and public.is_admin());
+
+drop policy if exists "Clients read their own deliveries" on storage.objects;
+create policy "Clients read their own deliveries"
+  on storage.objects for select
+  to authenticated
+  using (bucket_id = 'project-deliveries' and (storage.foldername(name))[1] = auth.uid()::text);
+
+-- 4) The client's answer to a video in review: approve it (-> Delivered) or ask for a revision (-> back In production,
+--    one of the included revisions used, the request added to the project's revision history). Clients still cannot
+--    update the table directly - this function is the only door, and it only opens on their own project in review.
+create or replace function public.client_project_action(p_id uuid, p_action text, p_note text default null)
+returns jsonb
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  uid uuid := auth.uid();
+  proj public.projects;
+  note text := nullif(btrim(coalesce(p_note, '')), '');
+begin
+  if uid is null then
+    raise exception 'not_signed_in';
+  end if;
+
+  select * into proj from public.projects where id = p_id and user_id = uid for update;
+  if not found then
+    raise exception 'not_found';
+  end if;
+  if proj.status <> 'review' then
+    raise exception 'not_in_review';
+  end if;
+
+  if p_action = 'approve' then
+    update public.projects
+       set status = 'delivered', approved_at = now(), next_step = null
+     where id = p_id
+    returning * into proj;
+  elsif p_action = 'revision' then
+    if note is null then
+      raise exception 'note_required';
+    end if;
+    if proj.revisions_used >= proj.revisions_total then
+      raise exception 'no_revisions_left';
+    end if;
+    update public.projects
+       set status = 'production',
+           revisions_used = revisions_used + 1,
+           revisions = coalesce(revisions, '[]'::jsonb)
+                       || jsonb_build_array(jsonb_build_object('title', left(note, 2000), 'date', current_date, 'done', false)),
+           next_step = null
+     where id = p_id
+    returning * into proj;
+  else
+    raise exception 'invalid_action';
+  end if;
+
+  return to_jsonb(proj);
+end;
+$$;
+
+revoke all on function public.client_project_action(uuid, text, text) from public;
+grant execute on function public.client_project_action(uuid, text, text) to authenticated;
+
+-- 5) Subscriptions, mirrored from Stripe by the payment webhook (service role), so a client with a live plan is not
+--    sold a second one. Clients read their own; the team reads all; nobody writes here but the webhook.
+create table if not exists public.subscriptions (
+  id                    text primary key,                                  -- Stripe subscription id (sub_...)
+  user_id               uuid not null references auth.users (id) on delete cascade,
+  customer_id           text,                                              -- Stripe customer id (cus_...)
+  plan_key              text,
+  status                text not null,                                     -- Stripe's: active, trialing, past_due, canceled, ...
+  current_period_end    timestamptz,
+  cancel_at_period_end  boolean not null default false,
+  updated_at            timestamptz not null default now()
+);
+create index if not exists subscriptions_user_idx on public.subscriptions (user_id);
+
+alter table public.subscriptions enable row level security;
+
+drop policy if exists "Clients read their own subscriptions" on public.subscriptions;
+create policy "Clients read their own subscriptions"
+  on public.subscriptions for select to authenticated
+  using (auth.uid() = user_id);
+
+drop policy if exists "Team reads all subscriptions" on public.subscriptions;
+create policy "Team reads all subscriptions"
+  on public.subscriptions for select to authenticated
+  using (public.is_admin());
+
+-- ======================= 5/6  profiles =======================
+-- One row per user: the client's profile, the hub every piece of their data points at, plus the team's private notes and
+-- the one-query overview the team's Clients tab reads.
+-- Run once in the Supabase SQL Editor, AFTER projects.sql, team.sql, credits.sql and delivery.sql (setup-all.sql includes
+-- it). Safe to re-run. Existing users get their profile backfilled; existing projects, credits and comments stay intact.
+
+-- 1) The profile. Its id IS the sign-in account's id (auth.users.id), so nothing ever has to be matched up.
+create table if not exists public.profiles (
+  id                  uuid primary key references auth.users (id) on delete cascade,
+  email               text,
+  full_name           text,
+  company             text,
+  phone               text,
+  country             text,
+  stripe_customer_id  text,                                -- set by the payment webhook
+  is_team             boolean not null default false,      -- mirrors app_metadata.role = 'admin'
+  created_at          timestamptz not null default now(),
+  updated_at          timestamptz not null default now()
+);
+
+-- updated_at follows every change (the same helper delivery.sql defines; repeated so this file stands alone).
+create or replace function public.touch_updated_at()
+returns trigger
+language plpgsql
+as $$
+begin
+  new.updated_at := now();
+  return new;
+end;
+$$;
+
+drop trigger if exists profiles_touch_updated_at on public.profiles;
+create trigger profiles_touch_updated_at
+  before update on public.profiles
+  for each row execute function public.touch_updated_at();
+
+-- 2) A profile is created the moment someone signs up, and follows their email and team role afterwards.
+create or replace function public.handle_new_user()
+returns trigger
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  insert into public.profiles (id, email, full_name, is_team)
+  values (
+    new.id,
+    new.email,
+    nullif(coalesce(new.raw_user_meta_data ->> 'full_name', new.raw_user_meta_data ->> 'name'), ''),
+    coalesce(new.raw_app_meta_data ->> 'role', '') = 'admin'
+  )
+  on conflict (id) do nothing;
+  return new;
+end;
+$$;
+
+drop trigger if exists on_auth_user_created on auth.users;
+create trigger on_auth_user_created
+  after insert on auth.users
+  for each row execute function public.handle_new_user();
+
+create or replace function public.handle_user_updated()
+returns trigger
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  update public.profiles
+     set email = new.email,
+         is_team = coalesce(new.raw_app_meta_data ->> 'role', '') = 'admin',
+         -- A name from Google / Microsoft fills an empty one, never overwrites what the client typed.
+         full_name = coalesce(full_name, nullif(coalesce(new.raw_user_meta_data ->> 'full_name', new.raw_user_meta_data ->> 'name'), ''))
+   where id = new.id;
+  return new;
+end;
+$$;
+
+drop trigger if exists on_auth_user_updated on auth.users;
+create trigger on_auth_user_updated
+  after update of email, raw_app_meta_data, raw_user_meta_data on auth.users
+  for each row execute function public.handle_user_updated();
+
+-- Everyone who signed up before this file: a profile each.
+insert into public.profiles (id, email, full_name, is_team, created_at)
+select u.id,
+       u.email,
+       nullif(coalesce(u.raw_user_meta_data ->> 'full_name', u.raw_user_meta_data ->> 'name'), ''),
+       coalesce(u.raw_app_meta_data ->> 'role', '') = 'admin',
+       u.created_at
+  from auth.users u
+on conflict (id) do nothing;
+
+-- 3) Who may read and change a profile: the client their own, the team all. Only the contact fields can be edited -
+--    the email follows the sign-in account, stripe_customer_id the webhook (service role), is_team the role.
+alter table public.profiles enable row level security;
+
+drop policy if exists "Read your own profile" on public.profiles;
+create policy "Read your own profile"
+  on public.profiles for select to authenticated
+  using (auth.uid() = id or public.is_admin());
+
+drop policy if exists "Update your own profile" on public.profiles;
+create policy "Update your own profile"
+  on public.profiles for update to authenticated
+  using (auth.uid() = id or public.is_admin())
+  with check (auth.uid() = id or public.is_admin());
+
+revoke insert, update, delete on public.profiles from authenticated;
+grant select on public.profiles to authenticated;
+grant update (full_name, company, phone, country) on public.profiles to authenticated;
+
+-- 4) Every piece of a client's data now points at their profile (it used to point at auth.users directly, which the
+--    API cannot join through). Deleting the sign-in account still deletes everything: auth.users -> profiles -> the rest.
+alter table public.projects drop constraint if exists projects_user_id_fkey;
+alter table public.projects
+  add constraint projects_user_id_fkey foreign key (user_id) references public.profiles (id) on delete cascade;
+
+alter table public.credit_ledger drop constraint if exists credit_ledger_user_id_fkey;
+alter table public.credit_ledger
+  add constraint credit_ledger_user_id_fkey foreign key (user_id) references public.profiles (id) on delete cascade;
+
+alter table public.project_comments drop constraint if exists project_comments_user_id_fkey;
+alter table public.project_comments
+  add constraint project_comments_user_id_fkey foreign key (user_id) references public.profiles (id) on delete cascade;
+
+alter table public.subscriptions drop constraint if exists subscriptions_user_id_fkey;
+alter table public.subscriptions
+  add constraint subscriptions_user_id_fkey foreign key (user_id) references public.profiles (id) on delete cascade;
+
+-- 5) The team's private notes about a client - never visible to the client.
+create table if not exists public.client_notes (
+  id           uuid primary key default gen_random_uuid(),
+  client_id    uuid not null references public.profiles (id) on delete cascade,
+  author_id    uuid references public.profiles (id) on delete set null,
+  author_name  text,
+  body         text not null check (char_length(body) between 1 and 4000),
+  created_at   timestamptz not null default now()
+);
+create index if not exists client_notes_client_idx on public.client_notes (client_id, created_at desc);
+
+alter table public.client_notes enable row level security;
+
+drop policy if exists "Team reads client notes" on public.client_notes;
+create policy "Team reads client notes"
+  on public.client_notes for select to authenticated
+  using (public.is_admin());
+
+drop policy if exists "Team writes client notes" on public.client_notes;
+create policy "Team writes client notes"
+  on public.client_notes for insert to authenticated
+  with check (public.is_admin() and author_id = auth.uid());
+
+drop policy if exists "Team deletes client notes" on public.client_notes;
+create policy "Team deletes client notes"
+  on public.client_notes for delete to authenticated
+  using (public.is_admin());
+
+-- 6) One row per client for the team's Clients tab: the profile with the balance, projects, plan and last activity.
+--    security_invoker: the view runs with the reader's own rights, so row level security still decides what they see
+--    (the team everything, a client only their own row).
+create or replace view public.client_overview
+with (security_invoker = true)
+as
+select
+  p.id,
+  p.email,
+  p.full_name,
+  p.company,
+  p.phone,
+  p.country,
+  p.is_team,
+  p.created_at,
+  coalesce((select sum(l.seconds) from public.credit_ledger l where l.user_id = p.id), 0)::integer as balance_seconds,
+  (select count(*) from public.projects pr where pr.user_id = p.id)::integer as project_count,
+  (select count(*) from public.projects pr where pr.user_id = p.id and pr.status <> 'delivered')::integer as open_projects,
+  (select s.plan_key from public.subscriptions s
+     where s.user_id = p.id and s.status in ('active', 'trialing', 'past_due', 'unpaid')
+     order by s.updated_at desc limit 1) as plan_key,
+  (select s.status from public.subscriptions s where s.user_id = p.id order by s.updated_at desc limit 1) as subscription_status,
+  greatest(
+    p.updated_at,
+    (select max(l.created_at) from public.credit_ledger l where l.user_id = p.id),
+    (select max(pr.updated_at) from public.projects pr where pr.user_id = p.id),
+    (select max(c.created_at) from public.project_comments c where c.user_id = p.id)
+  ) as last_activity
+from public.profiles p;
+
+grant select on public.client_overview to authenticated;
+
+-- 7) Hardening (from the Supabase advisors): trigger functions are never called through the API, the client RPCs are
+--    for signed-in users only, fixed search_paths, and indexes for the foreign keys.
+revoke execute on function public.handle_new_user() from public, anon, authenticated;
+revoke execute on function public.handle_user_updated() from public, anon, authenticated;
+revoke execute on function public.client_project_action(uuid, text, text) from anon;
+revoke execute on function public.submit_project(uuid, text, text, text, text, integer, date, jsonb, text, jsonb, text, text) from anon;
+alter function public.is_admin() set search_path = public;
+alter function public.touch_updated_at() set search_path = public;
+create index if not exists client_notes_author_idx on public.client_notes (author_id);
+create index if not exists credit_ledger_project_idx on public.credit_ledger (project_id);
+create index if not exists project_comments_user_idx on public.project_comments (user_id);
+
+-- ======================= 6/6  orders =======================
+-- Every purchase as an order: who bought what - one-time video or subscription, which plan, which billing, how many
+-- seconds, for how much - and whether it was paid. Written by /api/checkout (pending) and the payment webhook (paid /
+-- failed / expired), both with the service role; clients read their own, the team reads all.
+-- Run once in the Supabase SQL Editor, AFTER profiles.sql (setup-all.sql includes it). Safe to re-run.
+
+create table if not exists public.orders (
+  id                      uuid primary key default gen_random_uuid(),
+  user_id                 uuid not null references public.profiles (id) on delete cascade,
+  plan_key                text not null,                                 -- personal, creator, pro, local, brand
+  purchase_type           text not null check (purchase_type in ('one_time', 'subscription')),
+  billing                 text check (billing in ('monthly', 'annual')),   -- subscriptions only
+  seconds                 integer not null check (seconds > 0),          -- per payment (a year of them on annual)
+  amount_cents            integer not null check (amount_cents >= 0),
+  currency                text not null default 'usd',
+  status                  text not null default 'pending' check (status in ('pending', 'paid', 'failed', 'expired')),
+  stripe_session_id       text unique,
+  stripe_subscription_id  text,
+  created_at              timestamptz not null default now(),
+  paid_at                 timestamptz
+);
+create index if not exists orders_user_idx on public.orders (user_id, created_at desc);
+create index if not exists orders_subscription_idx on public.orders (stripe_subscription_id);
+
+alter table public.orders enable row level security;
+
+drop policy if exists "Read your own orders" on public.orders;
+create policy "Read your own orders"
+  on public.orders for select to authenticated
+  using ((select auth.uid()) = user_id or public.is_admin());
+
+revoke insert, update, delete on public.orders from authenticated, anon;
+
+-- Each credit points at the order that paid for it (a subscription's renewals all point at its order).
+alter table public.credit_ledger add column if not exists order_id uuid references public.orders (id) on delete set null;
+create index if not exists credit_ledger_order_idx on public.credit_ledger (order_id);
+
+-- The plan as bought: monthly or annual, and the price per period (from the subscription item, mirrored by the webhook).
+alter table public.subscriptions add column if not exists billing text check (billing in ('monthly', 'annual'));
+alter table public.subscriptions add column if not exists amount_cents integer;
+alter table public.subscriptions add column if not exists currency text;

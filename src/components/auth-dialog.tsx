@@ -7,9 +7,10 @@ import { IconArrowRight, IconCheck, IconLoader2, IconMail, IconMailCheck, IconX 
 import { useLanguage } from "@/lib/i18n/language-context";
 import { AUTH_EVENT, type AuthMode } from "@/lib/signup-dialog";
 import { bunny, bunnyMp4Url, bunnyThumbnailUrl } from "@/lib/bunny-stream";
-import { accountPath, privacyPath, termsPath } from "@/lib/routes";
+import { myProjectsPath, privacyPath, termsPath } from "@/lib/routes";
 import { createClient } from "@/lib/supabase/client";
 import { supabaseConfigured } from "@/lib/supabase/config";
+import { useAuthUser } from "@/lib/supabase/use-auth-user";
 import { MODAL_BACKDROP_Z, MODAL_CONTENT_Z, MODAL_CONTROL_Z } from "@/lib/modal-layer";
 import { cn } from "@/lib/utils";
 
@@ -63,6 +64,13 @@ export function AuthDialog() {
   // idle -> busy (a request is out) -> sent (the email link is on its way) / error.
   const [status, setStatus] = useState<{ kind: "idle" } | { kind: "busy"; provider: Provider } | { kind: "sent"; email: string } | { kind: "error"; message: string }>({ kind: "idle" });
   const [showConsentHint, setShowConsentHint] = useState(false);
+  // The email link was opened (usually in a new tab) and this tab now sees the session: the "Check your inbox" step is
+  // done, so the dialog closes by itself (adjusted during render, React's pattern for state that follows other state).
+  const user = useAuthUser();
+  if (open && user && status.kind === "sent") {
+    setOpen(false);
+    setStatus({ kind: "idle" });
+  }
   const [filmFailed, setFilmFailed] = useState(false);
   const filmReady = useRef(false);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -110,7 +118,7 @@ export function AuthDialog() {
     }
     setStatus({ kind: "busy", provider });
     const supabase = createClient();
-    const redirectTo = `${window.location.origin}/auth/callback?next=${encodeURIComponent(accountPath(language))}`;
+    const redirectTo = `${window.location.origin}/auth/callback?next=${encodeURIComponent(myProjectsPath(language))}`;
 
     if (provider === "email") {
       const { error } = await supabase.auth.signInWithOtp({

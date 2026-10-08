@@ -33,8 +33,8 @@ const ROWS_ON_STAGE = 3;
 const ROW_MAX = 240;
 /** Soft edge (px) at the top and bottom of the stage - the cards leave and appear through it. */
 const EDGE = 28;
-/** Room above the first row: the (compact) avatars sit half above their card. */
-const TOP_INSET = EDGE + 28;
+/** Room above the first row (the cards lift a little on hover). */
+const TOP_INSET = EDGE + 8;
 /** The cards travel this much faster than the page - a touch livelier than plain scrolling. */
 const SPEED = 1.2;
 /** Track smoothing under native scrolling - stiff, so a wheel tick glides instead of stepping. */
@@ -122,10 +122,10 @@ function ReviewConveyor({ items, heading }: { items: Review[]; heading: React.Re
             <motion.div
               ref={trackRef}
               // Odd card at the end of a two-column stack: centred across both columns.
-              // On phones the rows are 2.5rem apart: the next card's avatar hangs 1.75rem above its card, so that
-              // leaves a little air between it and the card before (from md the stack stays close-packed).
+              // The cards sit close together - 1.25rem apart on phones, 1rem from md - each stretched to its row
+              // so the cards in a row match in height.
               className={cn(
-                "absolute inset-x-0 mx-auto grid grid-cols-1 gap-10 will-change-transform md:grid-cols-2 md:gap-4 md:[&>*:nth-child(odd):last-child]:col-span-2 md:[&>*:nth-child(odd):last-child]:w-[calc(50%-0.5rem)] md:[&>*:nth-child(odd):last-child]:justify-self-center",
+                "absolute inset-x-0 mx-auto grid grid-cols-1 gap-5 will-change-transform md:grid-cols-2 md:gap-4 md:[&>*:nth-child(odd):last-child]:col-span-2 md:[&>*:nth-child(odd):last-child]:w-[calc(50%-0.5rem)] md:[&>*:nth-child(odd):last-child]:justify-self-center",
                 // English: the page's own side margin, like every other section; bg keeps the old width.
                 language === "en"
                   ? "w-[calc(100%-2*max(1.25rem,3vw))]"
@@ -217,9 +217,9 @@ export function ReviewsSection({ className, spotlight }: { className?: string; s
         <>
           {heading}
           {spotlight && <div className="mb-14">{spotlight}</div>}
-          {/* The same compact cards as the conveyor's phone grid, the same 2.5rem apart (the next card's avatar hangs
-              1.75rem above its card), in plain flow. */}
-          <div className={cn("mx-auto grid grid-cols-1 gap-10 pt-4", en ? "w-[calc(100%-2*max(1.25rem,3vw))]" : "w-[calc(100%-1.25rem)] max-w-7xl")}>
+          {/* The same compact cards as the conveyor's phone grid, the same 1.25rem apart,
+              in plain flow. */}
+          <div className={cn("mx-auto grid grid-cols-1 gap-5 pt-2", en ? "w-[calc(100%-2*max(1.25rem,3vw))]" : "w-[calc(100%-1.25rem)] max-w-7xl")}>
             {items.map((review, index) => (
               <Testimonial
                 key={review.name}
@@ -246,10 +246,10 @@ export function ReviewsSection({ className, spotlight }: { className?: string; s
           {items.length <= 6 ? (
             <div
               className={cn(
-                "w-full pt-8",
+                "w-full pt-2",
                 // English: spread across the page's own side margin, three across from lg; bg keeps the centred row.
                 en
-                  ? "grid grid-cols-1 gap-x-4 gap-y-14 px-[max(1.25rem,3vw)] md:grid-cols-2 lg:grid-cols-3"
+                  ? "grid grid-cols-1 gap-5 px-[max(1.25rem,3vw)] md:grid-cols-2 lg:grid-cols-3"
                   : "mx-auto flex max-w-7xl flex-wrap justify-center gap-x-6 gap-y-14 px-4"
               )}
             >
@@ -281,7 +281,7 @@ export function ReviewsSection({ className, spotlight }: { className?: string; s
               >
                 <InfiniteSlider duration={COLUMN_DURATIONS[columnIndex % COLUMN_DURATIONS.length]} className="w-full">
                   {column.map((review) => (
-                    <div key={review.name} className="pt-10">
+                    <div key={review.name} className="pt-5">
                       <Testimonial
                         name={review.name}
                         role={review.role}

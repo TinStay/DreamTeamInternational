@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it } from "vitest";
 
 import {
+  globalPrivacyControl,
   CONSENT_COOKIE,
   CONSENT_VERSION,
   deniedCategories,
@@ -115,5 +116,14 @@ describe("deniedCategories", () => {
     expect(deniedCategories({ analytics: true, marketing: true })).toEqual([]);
     expect(deniedCategories({ analytics: true, marketing: false })).toEqual(["marketing"]);
     expect(deniedCategories({ analytics: false, marketing: false })).toEqual(["analytics", "marketing"]);
+  });
+});
+
+describe("globalPrivacyControl", () => {
+  it("is on only when the browser sends the signal", () => {
+    expect(globalPrivacyControl({ globalPrivacyControl: true })).toBe(true);
+    expect(globalPrivacyControl({ globalPrivacyControl: false })).toBe(false);
+    expect(globalPrivacyControl({})).toBe(false);
+    expect(globalPrivacyControl(undefined)).toBe(false);
   });
 });

@@ -13,11 +13,16 @@ import { useLanguage } from "@/lib/i18n/language-context";
 import { formatDateDisplay } from "@/lib/dates";
 import { formatVideoTime } from "@/lib/account-info";
 import { MODAL_BACKDROP_Z, MODAL_CONTENT_Z, MODAL_CONTROL_Z } from "@/lib/modal-layer";
-import { PROJECT_STATUSES, type BriefFile, type ClientProject, type ProjectStatus } from "@/lib/client-projects";
+import { formatBytes, PROJECT_STATUSES, timelineFor, type BriefFile, type ClientProject, type ProjectStatus, type RevisionEntry, type TimelineStep } from "@/lib/client-projects";
 import { createClient } from "@/lib/supabase/client";
+import { TeamDeliveryPanel } from "@/components/team-delivery-panel";
+import { TeamCreditAdjuster } from "@/components/team-credit-adjuster";
+import { RevisionLogEditor, TimelineEditor } from "@/components/team-project-editors";
 import { cn } from "@/lib/utils";
 
-const formatBytes = (n: number | null) => (n == null ? "" : n < 1024 * 1024 ? `${Math.max(1, Math.round(n / 1024))} KB` : `${(n / 1024 / 1024).toFixed(1)} MB`);
+/** The timeline / revision list as stored in Supabase (blank rows dropped). */
+const timelineRows = (steps: TimelineStep[] | null) => (steps ?? []).filter((s) => s.title.trim()).map((s) => ({ ...s, title: s.title.trim() }));
+const revisionRows = (list: RevisionEntry[]) => list.filter((r) => r.title.trim()).map((r) => ({ ...r, title: r.title.trim() }));
 
 function SideTitle({ children }: { children: ReactNode }) {
   return <h3 className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#ff8a1f]">{children}</h3>;
@@ -26,8 +31,9 @@ function SideTitle({ children }: { children: ReactNode }) {
 /**
  * One project, full screen, for the team: on the left everything the client gave us - who they are, the key facts, their
  * brief and answers - and on the right what we do with it: the files they attached (private, opened through short-lived
- * links) and the controls to move it along (stage, next step, producer, due date, revisions used, the finished film's
- * Bunny id). Saving writes to Supabase, so the client sees the change in their Your Projects at once.
+ * links), the delivery (the finished film and the files to download, uploaded to private Storage - `TeamDeliveryPanel`,
+ * saved as they upload) and the controls to move it along (stage, next step, producer, due date, revisions used, the
+ * timeline and the revision requests). Saving writes to Supabase, so the client sees the change in their Your Projects at once.
  */
 export function TeamProjectPopup({
   project,
@@ -70,7 +76,8 @@ function Body({ project, sample, statusLabels, onSaved }: { project: ClientProje
   const [manager, setManager] = useState(project.managerName ?? "");
   const [due, setDue] = useState(project.dueDate?.slice(0, 10) ?? "");
   const [revisions, setRevisions] = useState(String(project.revisionsUsed));
-  const [videoId, setVideoId] = useState(project.videoId ?? "");
+  const [timeline, setTimeline] = useState<TimelineStep[] | null>(project.timeline);
+  const [revisionLog, setRevisionLog] = useState<RevisionEntry[]>(project.revisionHistory);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
@@ -78,14 +85,6 @@ function Body({ project, sample, statusLabels, onSaved }: { project: ClientProje
 
   // The client's video seconds (the team reads every ledger) and a way to add or take back seconds by hand.
   const [balance, setBalance] = useState<number | null>(sample ? 60 : null);
-  const [adjMin, setAdjMin] = useState("");
-  const [adjSec, setAdjSec] = useState("");
-  const [adjTake, setAdjTake] = useState(false);
-  // Minutes and seconds together, added or taken back (a negative amount).
-  const adjustSecs = (Math.max(0, Number.parseInt(adjMin, 10) || 0) * 60 + Math.max(0, Number.parseInt(adjSec, 10) || 0)) * (adjTake ? -1 : 1);
-  const [adjustNote, setAdjustNote] = useState("");
-  const [adjusting, setAdjusting] = useState(false);
-  const [creditMsg, setCreditMsg] = useState<string | null>(null);
   useEffect(() => {
     if (sample || !project.userId) return;
     let alive = true;
@@ -101,36 +100,14 @@ function Body({ project, sample, statusLabels, onSaved }: { project: ClientProje
     };
   }, [sample, project.userId]);
 
-  async function applyAdjustment() {
-    const secs = adjustSecs;
-    if (!secs || adjusting || !project.userId) return;
-    setAdjusting(true);
-    setCreditMsg(null);
-    if (!sample) {
-      const { error } = await createClient()
-        .from("credit_ledger")
-        .insert({ user_id: project.userId, seconds: secs, kind: secs > 0 ? "adjustment" : "refund", note: adjustNote.trim() || null, project_id: project.id });
-      if (error) {
-        setCreditMsg(d.credits.error);
-        setAdjusting(false);
-        return;
-      }
-    }
-    setBalance((b) => (b ?? 0) + secs);
-    setAdjMin("");
-    setAdjSec("");
-    setAdjustNote("");
-    setCreditMsg(d.credits.done);
-    setAdjusting(false);
-  }
-
   const dirty =
     status !== project.status ||
     nextStep !== (project.nextStep ?? "") ||
     manager !== (project.managerName ?? "") ||
     due !== (project.dueDate?.slice(0, 10) ?? "") ||
     revisions !== String(project.revisionsUsed) ||
-    videoId.trim() !== (project.videoId ?? "");
+    JSON.stringify(timelineRows(timeline)) !== JSON.stringify(timelineRows(project.timeline)) ||
+    JSON.stringify(revisionRows(revisionLog)) !== JSON.stringify(revisionRows(project.revisionHistory));
 
   async function save() {
     if (!dirty || saving) return;
@@ -142,7 +119,8 @@ function Body({ project, sample, statusLabels, onSaved }: { project: ClientProje
       manager_name: manager.trim() || null,
       due_date: due || null,
       revisions_used: Math.max(0, Number.parseInt(revisions, 10) || 0),
-      video_id: videoId.trim() || null,
+      timeline: timelineRows(timeline),
+      revisions: revisionRows(revisionLog),
       updated_at: new Date().toISOString(),
     };
     if (!sample) {
@@ -160,8 +138,11 @@ function Body({ project, sample, statusLabels, onSaved }: { project: ClientProje
       managerName: patch.manager_name,
       dueDate: patch.due_date,
       revisionsUsed: patch.revisions_used,
-      videoId: patch.video_id,
+      timeline: patch.timeline.length > 0 ? patch.timeline : null,
+      revisionHistory: patch.revisions,
     });
+    setTimeline(patch.timeline.length > 0 ? patch.timeline : null);
+    setRevisionLog(patch.revisions);
     setSaving(false);
     setSaved(true);
     window.setTimeout(() => setSaved(false), 2500);
@@ -323,47 +304,24 @@ function Body({ project, sample, statusLabels, onSaved }: { project: ClientProje
               <p className="text-sm text-white/60">
                 {d.credits.balance}: <span className="font-semibold text-white">{balance == null ? "…" : fmtTime(balance)}</span>
               </p>
-              <div className="mt-4 flex flex-wrap items-end gap-3">
-                <div className="flex overflow-hidden rounded-full border border-white/15 text-sm font-semibold" role="radiogroup" aria-label={d.credits.action}>
-                  {[false, true].map((take) => (
-                    <button
-                      key={String(take)}
-                      type="button"
-                      role="radio"
-                      aria-checked={adjTake === take}
-                      onClick={() => setAdjTake(take)}
-                      className={cn("cursor-pointer px-4 py-2.5 transition-colors duration-200", adjTake === take ? "bg-[linear-gradient(115deg,#ff5e00,#ff9a3c)] text-white" : "text-white/60 hover:text-white")}
-                    >
-                      {take ? d.credits.take : d.credits.add}
-                    </button>
-                  ))}
-                </div>
-                <label className="flex items-center gap-2 text-sm text-white/60">
-                  <Input type="number" min={0} value={adjMin} onChange={(e) => setAdjMin(e.target.value)} placeholder="0" aria-label={d.credits.minutes} className={cn(field, "w-24")} />
-                  {d.credits.minutes}
-                </label>
-                <label className="flex items-center gap-2 text-sm text-white/60">
-                  <Input type="number" min={0} max={59} value={adjSec} onChange={(e) => setAdjSec(e.target.value)} placeholder="0" aria-label={d.credits.seconds} className={cn(field, "w-24")} />
-                  {d.credits.seconds}
-                </label>
+              <div className="mt-4">
+                {project.userId ? (
+                  <TeamCreditAdjuster userId={project.userId} projectId={project.id} sample={sample} onApplied={(secs) => setBalance((b) => (b ?? 0) + secs)} />
+                ) : null}
               </div>
-              <div className="mt-3 grid gap-3 sm:grid-cols-[1fr_auto]">
-                <Input value={adjustNote} onChange={(e) => setAdjustNote(e.target.value)} placeholder={d.credits.notePlaceholder} aria-label={d.credits.note} className={field} />
-                <button
-                  type="button"
-                  onClick={() => void applyAdjustment()}
-                  disabled={!adjustSecs || adjusting}
-                  className="inline-flex h-11 cursor-pointer items-center justify-center rounded-full border border-[#ff8a1f]/55 px-5 text-sm font-semibold text-[#ffb066] transition-[transform,background-color] duration-200 ease-out hover:-translate-y-0.5 hover:bg-[#ff7a1a]/10 disabled:cursor-not-allowed disabled:opacity-45 disabled:hover:translate-y-0"
-                >
-                  {adjustSecs ? `${adjTake ? d.credits.take : d.credits.add} ${fmtTime(Math.abs(adjustSecs))}` : d.credits.apply}
-                </button>
-              </div>
-              {creditMsg ? (
-                <p role="status" className="mt-3 text-sm text-[#ffb066]">
-                  {creditMsg}
-                </p>
-              ) : null}
             </div>
+          </div>
+
+          <div>
+            <SideTitle>{d.delivery.title}</SideTitle>
+            <p className="mt-1.5 mb-4 text-sm text-white/50">{d.delivery.hint}</p>
+            {project.approvedAt ? (
+              <p className="mb-4 flex items-center gap-1.5 text-sm font-semibold text-emerald-300">
+                <IconCheck className="size-4" stroke={3} aria-hidden />
+                {d.approved.replace("{date}", formatDateDisplay(project.approvedAt.slice(0, 10)))}
+              </p>
+            ) : null}
+            <TeamDeliveryPanel project={project} sample={sample} onChange={(patch) => onSaved({ ...project, ...patch })} />
           </div>
 
           <div>
@@ -414,11 +372,14 @@ function Body({ project, sample, statusLabels, onSaved }: { project: ClientProje
                 <label htmlFor="team-revisions" className={label}>{d.revisionsUsed} ({project.revisionsTotal} {d.included})</label>
                 <Input id="team-revisions" type="number" min={0} value={revisions} onChange={(e) => setRevisions(e.target.value)} className={field} />
               </div>
-              <div>
-                <label htmlFor="team-video" className={label}>{d.videoId}</label>
-                <Input id="team-video" value={videoId} onChange={(e) => setVideoId(e.target.value)} placeholder="a9efb9af-1512-48f5-…" className={field} />
-              </div>
             </div>
+
+            <p className={cn(label, "mt-6")}>{d.timeline.title}</p>
+            <TimelineEditor value={timeline} standard={timelineFor({ ...project, status, timeline: null }, statusLabels)} onChange={setTimeline} />
+
+            <p className={cn(label, "mt-6")}>{d.revisionLog.title}</p>
+            <p className="-mt-1 mb-3 text-sm text-white/50">{d.revisionLog.hint}</p>
+            <RevisionLogEditor value={revisionLog} onChange={setRevisionLog} />
 
             <div className="mt-7 flex items-center gap-4">
               <button

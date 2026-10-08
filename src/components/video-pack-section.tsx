@@ -21,7 +21,7 @@ const PEARL_INK =
  * video (`lib/video-pack.ts`) - that scrolls sideways, by swipe / trackpad or the round arrows at its ends (after the
  * client's Higgsfield reference). Each window's film plays muted and looping only while the window is mostly on
  * screen (`PackWindow`) and pauses as soon as it leaves, so one or two play at a time. Under the rail, on the right,
- * the two ways in: "Start with one video" (the orange pill) or a subscription.
+ * the two ways in: "Get a subscription" (the orange pill) or "Get one video" (a plain text link).
  */
 export function VideoPackSection() {
   const { t, language } = useLanguage();
@@ -79,9 +79,9 @@ export function VideoPackSection() {
         <div
           ref={railRef}
           onScroll={measure}
-          // The rail scrolls sideways, which clips it vertically too: it carries room above and below the windows (and
+          // The rail scrolls sideways, which clips it vertically too: it carries room above and (generously) below the windows (and
           // takes it back with negative margins) so a window lifting on hover and its glow are never cut off.
-          className="flex snap-x snap-proximity scroll-px-[max(1.25rem,3vw)] -mt-5 -mb-7 gap-5 overflow-x-auto scroll-smooth px-[max(1.25rem,3vw)] pt-5 pb-9 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          className="flex snap-x snap-proximity scroll-px-[max(1.25rem,3vw)] -mt-5 -mb-20 gap-5 overflow-x-auto scroll-smooth px-[max(1.25rem,3vw)] pt-5 pb-24 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         >
           {VIDEO_PACK.map((item, index) => (
             <PackWindow
@@ -99,19 +99,16 @@ export function VideoPackSection() {
         <RailArrow side="right" hidden={edges.end} label={p.next} onClick={() => step(1)} />
       </div>
 
-      {/* The two ways in, on the right under the rail: one video (the one-time Personal order), or a subscription. */}
-      <div className="mt-5 flex w-full flex-wrap items-center justify-center gap-x-6 gap-y-3 px-[max(1.25rem,3vw)] sm:justify-end">
-        <TigerCta href={`${pricingPath(language)}?for=individual`} label={p.startOne} className="tiger-cta--orange" />
+      {/* The two ways in, on the right under the rail: a subscription (the orange pill, the Business plans) or one video
+          (the one-time Personal order, a plain text link beside it - secondary, no pill). */}
+      <div className="relative z-10 mt-5 flex w-full flex-wrap items-center justify-center gap-x-6 gap-y-3 px-[max(1.25rem,3vw)] sm:justify-end">
+        <TigerCta href={`${pricingPath(language)}?for=business`} label={p.subscribe} className="tiger-cta--orange" />
         <Link
-          href={`${pricingPath(language)}?for=business`}
-          className="group text-[15px] text-white/65 transition-colors duration-200 hover:text-white"
+          href={`${pricingPath(language)}?for=individual`}
+          className="group inline-flex cursor-pointer items-center gap-1.5 whitespace-nowrap text-[15px] text-white/65 transition-colors duration-200 hover:text-white"
         >
-          {p.orSubscribe}
-          <span className="text-white/40"> — {p.pauseAnytime}</span>
-          <IconArrowRight
-            className="ms-1.5 inline size-4 align-[-2px] text-[#ff8a1f] transition-transform duration-200 ease-out group-hover:translate-x-1"
-            aria-hidden
-          />
+          {p.oneVideo}
+          <IconArrowRight className="size-4 shrink-0 text-primary transition-transform duration-200 ease-out group-hover:translate-x-1" aria-hidden />
         </Link>
       </div>
     </section>

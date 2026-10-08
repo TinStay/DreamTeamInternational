@@ -6,6 +6,7 @@ import { homePath } from "@/lib/routes";
 import { isTeamUser } from "@/lib/team";
 import { projectFromRow } from "@/lib/client-projects";
 import { SAMPLE_PROJECTS } from "@/lib/client-projects-sample";
+import { clientFromRow, SAMPLE_CLIENTS } from "@/lib/clients";
 import { createClient } from "@/lib/supabase/server";
 import { supabaseConfigured } from "@/lib/supabase/config";
 
@@ -22,7 +23,8 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
 }
 
 /**
- * `/team` - the team dashboard: every client's projects and the files they submitted. Only accounts with the admin role
+ * `/team` - the team dashboard: every client's projects and the files they submitted, and (the Clients tab) every client
+ * from `client_overview` - `null` when that view is missing (profiles.sql not run). Only accounts with the admin role
  * (supabase/team.sql) get in; anyone else is sent home. Row level security in Supabase enforces it again on the data itself.
  * `?sample=1` shows made-up projects (any signed-in account) to try the page without data.
  */
@@ -42,7 +44,7 @@ export default async function TeamPage({
   if (!auth.user) redirect(homePath(lang));
 
   const sample = (await searchParams).sample === "1";
-  if (sample) return <TeamDashboardView projects={SAMPLE_PROJECTS} sample />;
+  if (sample) return <TeamDashboardView projects={SAMPLE_PROJECTS} clients={SAMPLE_CLIENTS} sample />;
 
   if (!isTeamUser(auth.user)) redirect(homePath(lang));
   const { data } = await supabase.from("projects").select("*").order("created_at", { ascending: false });
@@ -58,5 +60,12 @@ export default async function TeamPage({
     const t = thread.get(project.id);
     return { ...project, commentCount: t?.count ?? 0, awaitingReply: t ? !t.lastIsTeam : false };
   });
-  return <TeamDashboardView projects={projects} sample={false} />;
+  // Every client (team accounts left out), with balance, projects and plan in one row each (supabase/profiles.sql).
+  const { data: clientRows, error: clientsError } = await supabase
+    .from("client_overview")
+    .select("*")
+    .eq("is_team", false)
+    .order("last_activity", { ascending: false, nullsFirst: false });
+  const clients = clientsError ? null : (clientRows ?? []).map((row) => clientFromRow(row as Record<string, unknown>));
+  return <TeamDashboardView projects={projects} clients={clients} sample={false} />;
 }

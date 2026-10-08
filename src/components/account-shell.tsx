@@ -4,19 +4,27 @@ import { MobileNav } from "@/components/mobile-nav";
 import { Footer } from "@/components/footer";
 import { GradientBlurPageBg } from "@/components/ui/gradient-blur-bg";
 import { PageBreadcrumbs } from "@/components/page-breadcrumbs";
+import { AccountSideNav } from "@/components/account-side-nav";
 import { MAIN_WITH_FIXED_PAGE_BG_CLASS } from "@/lib/page-shell";
 
-/** The frame the account pages share (profile, manage account, your projects): the site chrome, breadcrumbs, a narrow column. */
-export function AccountShell({ children, wide = false }: { children: ReactNode; wide?: boolean }) {
+/**
+ * The frame the account pages share (your projects, account & subscription, the team dashboard): the site chrome,
+ * breadcrumbs, and the side menu (`AccountSideNav`) beside the page's column from `lg` - above it, as a row of pills,
+ * on smaller screens.
+ */
+export function AccountShell({ children }: { children: ReactNode }) {
   return (
     <main className={MAIN_WITH_FIXED_PAGE_BG_CLASS}>
       <div className="fixed inset-0 z-[-1]">
         <GradientBlurPageBg className="h-full w-full" />
       </div>
       <SiteHeader />
-      <div className={`relative z-10 mx-auto w-full ${wide ? "max-w-[96rem]" : "max-w-4xl"} flex-1 px-[max(1.25rem,3vw)] pt-28 pb-16 text-white`}>
+      <div className={`relative z-10 mx-auto w-full max-w-[110rem] flex-1 px-[max(1.25rem,3vw)] pt-28 pb-16 text-white`}>
         <PageBreadcrumbs />
-        {children}
+        <div className="mt-6 grid gap-6 lg:grid-cols-[18rem_minmax(0,1fr)] lg:gap-12 2xl:grid-cols-[20rem_minmax(0,1fr)]">
+          <AccountSideNav />
+          <div className="min-w-0">{children}</div>
+        </div>
       </div>
       <div className="relative z-10">
         <Footer />

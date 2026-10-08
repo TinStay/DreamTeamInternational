@@ -41,6 +41,15 @@ describe("checkoutFor", () => {
     expect(checkoutFor("pro", "annual")).toMatchObject({ amountCents: 62900 * 10, interval: "year", seconds: 60 * 12 });
   });
 
+  it("prices a one-time video by its length: $119 for every 10 seconds over 20", () => {
+    expect(checkoutFor("personal", "monthly", 40)).toMatchObject({ amountCents: (299 + 2 * 119) * 100, oneTime: true, seconds: 40 });
+    expect(checkoutFor("personal", "monthly", "120")).toMatchObject({ amountCents: (299 + 10 * 119) * 100, seconds: 120 });
+  });
+
+  it("refuses a one-time length off the slider", () => {
+    for (const bad of [10, 25, 130, -20, "abc", 30.5]) expect(checkoutFor("personal", "monthly", bad)).toBeNull();
+  });
+
   it("refuses custom and unknown plans", () => {
     expect(checkoutFor("enterprise", "monthly")).toBeNull();
     expect(checkoutFor("free-video", "monthly")).toBeNull();
@@ -48,11 +57,11 @@ describe("checkoutFor", () => {
 });
 
 describe("formatVideoTime", () => {
-  it("always shows minutes and seconds", async () => {
+  it("shows seconds alone under a minute, minutes and seconds from there", async () => {
     const { formatVideoTime } = await import("@/lib/account-info");
     expect(formatVideoTime(95)).toBe("1 min 35 sec");
     expect(formatVideoTime(120)).toBe("2 min 0 sec");
-    expect(formatVideoTime(15)).toBe("0 min 15 sec");
-    expect(formatVideoTime(0)).toBe("0 min 0 sec");
+    expect(formatVideoTime(15)).toBe("15 sec");
+    expect(formatVideoTime(0)).toBe("0 sec");
   });
 });

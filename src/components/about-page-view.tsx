@@ -47,7 +47,7 @@ export function AboutPageView() {
   const a = t.about;
 
   return (
-    <AccountShell wide>
+    <AccountShell>
       {/* Title */}
       <header className="mt-8 sm:mt-12">
         <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#ff8a1f]">{a.eyebrow}</p>

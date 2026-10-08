@@ -70,10 +70,6 @@ export function accountPath(language: Language) {
   return `/${language}/account`;
 }
 
-export function profilePath(language: Language) {
-  return `/${language}/profile`;
-}
-
 export function myProjectsPath(language: Language) {
   return `/${language}/my-projects`;
 }

@@ -31,7 +31,8 @@ function segButton(active: boolean) {
  * Archivo expanded, the audience's line), the two segmented controls (Individual / Business, Monthly / Annual with the
  * annual discount's tag), that audience's three cards, the "every plan includes" box with the revision and scriptwriting
  * definitions, and the audience's note. Dark whatever the theme - the file's palette. `initialAudience` comes from
- * `?for=` (the header's Pricing links, read by the route); every button opens the contact page until there is an order flow.
+ * `?for=` (the header's Pricing links, read by the route). A pack's button opens Stripe's checkout (`/api/checkout` - a
+ * client with a live subscription is not sold a second one), the Enterprise one the contact page.
  */
 export function PricingPageView({ initialAudience = "business" }: { initialAudience?: Audience }) {
   const { t, language } = useLanguage();
@@ -45,7 +46,7 @@ export function PricingPageView({ initialAudience = "business" }: { initialAudie
 
   // Buying a pack: a signed-out visitor is asked to sign up first; then Stripe's checkout opens, and once it confirms the
   // payment the seconds appear in the account (see /api/stripe/webhook).
-  async function buy(plan: Plan) {
+  async function buy(plan: Plan, seconds?: number) {
     setBuyError(null);
     if (!user) {
       openSignup();
@@ -53,13 +54,13 @@ export function PricingPageView({ initialAudience = "business" }: { initialAudie
     }
     setBuying(plan.key);
     try {
-      const res = await fetch("/api/checkout", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ plan: plan.key, billing }) });
+      const res = await fetch("/api/checkout", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ plan: plan.key, billing, ...(seconds ? { seconds } : {}) }) });
       const json = (await res.json().catch(() => ({}))) as { url?: string; error?: string };
       if (res.ok && json.url) {
         window.location.assign(json.url);
         return;
       }
-      setBuyError(json.error === "not_configured" ? p.buy.notConfigured : p.buy.error);
+      setBuyError(json.error === "not_configured" ? p.buy.notConfigured : json.error === "already_subscribed" ? p.buy.alreadySubscribed : p.buy.error);
     } catch {
       setBuyError(p.buy.error);
     }
@@ -128,7 +129,7 @@ export function PricingPageView({ initialAudience = "business" }: { initialAudie
 
           <div className="grid grid-cols-1 items-stretch gap-4 md:grid-cols-3">
             {PLANS[audience].map((plan) => (
-              <PricingCard key={plan.key} plan={plan} billing={billing} href={contactHref} onBuy={(x) => void buy(x)} busy={buying === plan.key} />
+              <PricingCard key={plan.key} plan={plan} billing={billing} href={contactHref} onBuy={(x, secs) => void buy(x, secs)} busy={buying === plan.key} />
             ))}
           </div>
           {buyError ? (

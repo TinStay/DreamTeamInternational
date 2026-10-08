@@ -1,10 +1,11 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { IconCheck, IconDiamondFilled, IconX } from "@tabler/icons-react";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/lib/i18n/language-context";
-import { formatPrice, oneTimeCost, planPricing, type Billing, type Plan, type PlanTint } from "@/lib/pricing";
+import { ONE_TIME, formatPrice, oneTimeCost, planPricing, type Billing, type Plan, type PlanTint } from "@/lib/pricing";
 
 /**
  * One plan's card, after the client's "AI Video Subscription Plans" file, on its dark palette: a black card washed
@@ -12,6 +13,8 @@ import { formatPrice, oneTimeCost, planPricing, type Billing, type Plan, type Pl
  * "Most popular", "One-time"), who it is for, the price (struck through and discounted on the annual toggle), the
  * yearly saving, the monthly volume in an inset box, what is and is not included (a tooltip on the scriptwriting
  * add-on) and the button. The accent is the file's "electric" orange pearl: the popular plan's edge, button and tags.
+ * The one-time plan carries a **length slider** in its volume box: 20 seconds to 2 minutes in 10-second steps, the price
+ * following `oneTimeCost` as it moves; the length goes to the checkout (`onBuy(plan, seconds)`), which prices it again.
  */
 const TINT: Record<PlanTint, string> = {
   gray: "#2a2b2f",
@@ -42,8 +45,8 @@ export function PricingCard({
   billing: Billing;
   /** Where a custom plan goes (the contact page). */
   href: string;
-  /** Buying a pack: called for every plan that is not custom (the page starts the checkout). */
-  onBuy?: (plan: Plan) => void;
+  /** Buying a pack: called for every plan that is not custom (the page starts the checkout); a one-time plan passes its length. */
+  onBuy?: (plan: Plan, seconds?: number) => void;
   busy?: boolean;
 }) {
   const { t } = useLanguage();
@@ -52,6 +55,9 @@ export function PricingCard({
   const subscription = !plan.oneTime && !plan.custom && plan.price !== undefined;
   const annual = billing === "annual" && subscription;
   const pricing = plan.price !== undefined ? planPricing(plan.price, billing) : null;
+  // The one-time video's length, on the slider.
+  const [secs, setSecs] = useState<number>(ONE_TIME.baseSecs);
+  const s = p.lengthSlider;
 
   return (
     <article
@@ -85,7 +91,7 @@ export function PricingCard({
           </>
         ) : plan.oneTime && plan.price !== undefined ? (
           <>
-            <span className="font-heading text-4xl font-black leading-none tracking-[-0.02em]">{formatPrice(plan.price)}</span>
+            <span className="font-heading text-4xl font-black leading-none tracking-[-0.02em] tabular-nums" aria-live="polite">{formatPrice(oneTimeCost(secs))}</span>
             <span className="text-[13.5px] text-[#9a9ba3]">{p.oneTimePer}</span>
           </>
         ) : pricing && plan.price !== undefined ? (
@@ -114,9 +120,34 @@ export function PricingCard({
       <div className="mt-[18px] rounded-xl border border-white/[0.09] bg-white/[0.05] px-3.5 py-3">
         <p className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
           <span className="font-heading text-2xl font-black uppercase leading-[1.1] tracking-[-0.015em]">{copy.volume}</span>
-          <span className="text-[13.5px] font-medium text-[#9a9ba3]">{copy.volumeUnit}</span>
+          <span className="text-[13.5px] font-medium text-[#9a9ba3]">{plan.oneTime ? fill(s.unit, { n: secs }) : copy.volumeUnit}</span>
         </p>
-        <p className="mt-1.5 text-[12.5px] text-[#9a9ba3]">{copy.volumeNote}</p>
+        {plan.oneTime ? (
+          <div className="mt-3">
+            <label htmlFor={`length-${plan.key}`} className="sr-only">
+              {s.label}
+            </label>
+            <input
+              id={`length-${plan.key}`}
+              type="range"
+              min={ONE_TIME.baseSecs}
+              max={ONE_TIME.maxSecs}
+              step={ONE_TIME.step}
+              value={secs}
+              onChange={(e) => setSecs(Number(e.target.value))}
+              aria-valuetext={fill(s.value, { n: secs, price: formatPrice(oneTimeCost(secs)) })}
+              className="h-2 w-full cursor-pointer appearance-none rounded-full bg-white/10 accent-[#ff6a14] [&::-moz-range-thumb]:size-5 [&::-moz-range-thumb]:cursor-grab [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:bg-[#ff8a1f] [&::-webkit-slider-thumb]:size-5 [&::-webkit-slider-thumb]:cursor-grab [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-[linear-gradient(115deg,#ff5e00,#ffb066)] [&::-webkit-slider-thumb]:shadow-[0_0_14px_rgba(255,110,20,0.65)] [&::-webkit-slider-thumb]:transition-transform [&::-webkit-slider-thumb]:hover:scale-110"
+              style={{ background: `linear-gradient(90deg, #ff6a14 0%, #ffb066 ${((secs - ONE_TIME.baseSecs) / (ONE_TIME.maxSecs - ONE_TIME.baseSecs)) * 100}%, rgba(255,255,255,0.1) ${((secs - ONE_TIME.baseSecs) / (ONE_TIME.maxSecs - ONE_TIME.baseSecs)) * 100}%)` }}
+            />
+            <div className="mt-1.5 flex justify-between text-[11px] font-semibold text-[#9a9ba3]" aria-hidden>
+              <span>{fill(s.unit, { n: ONE_TIME.baseSecs })}</span>
+              <span>{fill(s.unit, { n: ONE_TIME.maxSecs })}</span>
+            </div>
+            <p className="mt-2 text-[12.5px] text-[#9a9ba3]">{s.hint}</p>
+          </div>
+        ) : (
+          <p className="mt-1.5 text-[12.5px] text-[#9a9ba3]">{copy.volumeNote}</p>
+        )}
         {plan.secs && pricing ? (
           <p className="mt-2">
             <span className={PEARL_TAG}>
@@ -161,7 +192,7 @@ export function PricingCard({
       ) : (
         <button
           type="button"
-          onClick={() => onBuy(plan)}
+          onClick={() => onBuy(plan, plan.oneTime ? secs : undefined)}
           disabled={busy}
           className={cn(
           "mt-[18px] flex w-full cursor-pointer disabled:cursor-wait disabled:opacity-70 items-center justify-center rounded-xl p-[13px] text-[15px] font-bold transition-[transform,filter,box-shadow] duration-200 ease-out hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.99]",

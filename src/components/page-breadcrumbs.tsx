@@ -79,7 +79,8 @@ function segmentToLabel(
   }
 }
 
-export function PageBreadcrumbs({ className }: { className?: string }) {
+/** `lastLabel` names the final crumb when its segment is an id (a client project: its title, not its uuid). */
+export function PageBreadcrumbs({ className, lastLabel }: { className?: string; lastLabel?: string }) {
   const pathname = usePathname() ?? "/";
   const { language, t } = useLanguage();
 
@@ -94,7 +95,7 @@ export function PageBreadcrumbs({ className }: { className?: string }) {
     parts[0] === "en" ? parts.slice(1) : parts;
   const crumbs = trimmed.map((seg, idx) => {
     const href = `${langPrefix}/${trimmed.slice(0, idx + 1).join("/")}`;
-    return { seg, href, label: segmentToLabel(seg, t) };
+    return { seg, href, label: lastLabel && idx === trimmed.length - 1 ? lastLabel : segmentToLabel(seg, t) };
   });
 
   // The same trail as structured data (rendered on the server like the rest of this component), so every inner

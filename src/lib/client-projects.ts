@@ -7,7 +7,15 @@ export type ProjectStatus = (typeof PROJECT_STATUSES)[number];
 export type TimelineStep = { title: string; date: string | null; note: string | null; done: boolean };
 
 export type BriefAnswer = { label: string; value: string };
-export type ProjectFile = { name: string; url: string; size: string | null };
+/**
+ * A deliverable to download: uploaded by the team to the private bucket `project-deliveries` at `path` (opened through a
+ * short-lived signed link), or - on older rows and the sample projects - a plain `url`.
+ */
+export type ProjectFile = { name: string; url: string | null; path: string | null; size: string | null };
+/** The finished film in the private bucket `project-deliveries` (supabase/delivery.sql). */
+export type DeliveryVideo = { name: string; path: string; size: number | null; type: string | null };
+/** The private bucket the team uploads finished work to. */
+export const DELIVERY_BUCKET = "project-deliveries";
 /** A file the client attached when submitting: stored in the private Supabase bucket `project-files` at `path`. */
 export type BriefFile = { name: string; path: string; size: number | null };
 export type RevisionEntry = { title: string; date: string | null; done: boolean };
@@ -33,6 +41,10 @@ export type ClientProject = {
   /** What the client filled in when ordering. */
   briefAnswers: BriefAnswer[];
   files: ProjectFile[];
+  /** The finished film, uploaded by the team (private - played through a signed link). */
+  deliveryVideo: DeliveryVideo | null;
+  /** When the client approved the video. */
+  approvedAt: string | null;
   /** Revision requests so far (the count used is `revisionsUsed`). */
   revisionHistory: RevisionEntry[];
   /** Who owns it (the team dashboard shows the client). */
@@ -47,6 +59,15 @@ export type ClientProject = {
 };
 
 /** One `projects` row from Supabase -> a `ClientProject` (tolerant: a malformed value falls back, never throws). */
+export const formatBytes = (n: number | null) =>
+  n == null
+    ? ""
+    : n < 1024 * 1024
+      ? `${Math.max(1, Math.round(n / 1024))} KB`
+      : n < 1024 * 1024 * 1024
+        ? `${(n / 1024 / 1024).toFixed(1)} MB`
+        : `${(n / 1024 / 1024 / 1024).toFixed(2)} GB`;
+
 export function projectFromRow(row: Record<string, unknown>): ClientProject {
   const status = PROJECT_STATUSES.includes(row.status as ProjectStatus) ? (row.status as ProjectStatus) : "brief";
   const custom = Array.isArray(row.timeline)
@@ -82,8 +103,15 @@ export function projectFromRow(row: Record<string, unknown>): ClientProject {
       .filter((a) => typeof a.label === "string" && typeof a.value === "string")
       .map((a) => ({ label: String(a.label), value: String(a.value) })),
     files: list(row.files)
-      .filter((f) => typeof f.name === "string" && typeof f.url === "string")
-      .map((f) => ({ name: String(f.name), url: String(f.url), size: text(f.size) })),
+      .filter((f) => typeof f.name === "string" && (typeof f.url === "string" || typeof f.path === "string"))
+      .map((f) => ({
+        name: String(f.name),
+        url: text(f.url),
+        path: text(f.path),
+        size: typeof f.size === "number" ? formatBytes(f.size) : text(f.size),
+      })),
+    deliveryVideo: deliveryFrom(row.delivery_video),
+    approvedAt: text(row.approved_at),
     userId: text(row.user_id),
     clientName: text(row.client_name),
     clientEmail: text(row.client_email),
@@ -96,6 +124,18 @@ export function projectFromRow(row: Record<string, unknown>): ClientProject {
   };
 }
 
+function deliveryFrom(v: unknown): DeliveryVideo | null {
+  if (!v || typeof v !== "object") return null;
+  const o = v as Record<string, unknown>;
+  if (typeof o.path !== "string" || !o.path) return null;
+  return {
+    name: typeof o.name === "string" && o.name ? o.name : (o.path.split("/").pop() ?? "video.mp4"),
+    path: o.path,
+    size: typeof o.size === "number" ? o.size : null,
+    type: typeof o.type === "string" ? o.type : null,
+  };
+}
+
 /** The timeline to draw: the row's own, or the five standard stages with the finished ones ticked off. */
 export function timelineFor(project: ClientProject, labels: Record<ProjectStatus, string>): (TimelineStep & { current: boolean })[] {
   const steps: TimelineStep[] =
@@ -104,7 +144,8 @@ export function timelineFor(project: ClientProject, labels: Record<ProjectStatus
       const at = PROJECT_STATUSES.indexOf(project.status);
       return {
         title: labels[status],
-        date: index === 0 ? project.createdAt.slice(0, 10) : status === "delivered" ? project.dueDate : null,
+        // Only dates that happened: when the brief came in, and when the client approved the video - never the deadline.
+        date: index === 0 ? project.createdAt.slice(0, 10) : status === "delivered" ? (project.approvedAt?.slice(0, 10) ?? null) : null,
         note: null,
         done: index < at || (project.status === "delivered" && index === at),
       };
@@ -113,15 +154,25 @@ export function timelineFor(project: ClientProject, labels: Record<ProjectStatus
   return steps.map((s, i) => ({ ...s, current: i === currentIndex }));
 }
 
-/** How far along, 0-100: the standard stages by status. */
+/**
+ * How far along each stage is, 0-100: a brief that just came in is barely started (5%), and most of the work is the
+ * production; the video in review is nearly done, delivered is all of it.
+ */
+export const STAGE_PROGRESS: Record<ProjectStatus, number> = { brief: 5, scripting: 25, production: 55, review: 85, delivered: 100 };
+
+/** How far along, 0-100, by the project's stage (`STAGE_PROGRESS`). */
 export function progressOf(project: ClientProject): number {
-  return Math.round(((PROJECT_STATUSES.indexOf(project.status) + 1) / PROJECT_STATUSES.length) * 100);
+  return STAGE_PROGRESS[project.status];
 }
 
 export function projectPoster(project: ClientProject): string | null {
   return project.thumbnailUrl ?? (project.videoId ? bunnyThumbnailUrl(bunny(project.videoId)) : null);
 }
 
+/** Whether there is a finished film to watch (uploaded, or an older row's Bunny id). */
+export const hasFilm = (project: ClientProject) => Boolean(project.deliveryVideo || project.videoId);
+
+/** A film that needs no signed link: an older row's (or a sample's) Bunny id. An uploaded `deliveryVideo` wins over it. */
 export function projectFilm(project: ClientProject): string | null {
   return project.videoId ? bunnyMp4Url(bunny(project.videoId), 720) : null;
 }
