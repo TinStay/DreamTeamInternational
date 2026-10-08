@@ -1,3 +1,4 @@
+import Image from "next/image";
 import type { CSSProperties } from "react";
 import { cn } from "@/lib/utils";
 
@@ -7,11 +8,8 @@ export type AvatarShape = "circle" | "octagon" | "square" | "hexagon" | "diamond
 export const AVATAR_SHAPES: AvatarShape[] = ["circle", "octagon", "square", "hexagon", "diamond", "circle", "pentagon", "octagon"];
 
 export type TestimonialProps = {
-<<<<<<< Updated upstream
-=======
   /** The client's mark (a white-ink PNG for the dark ground): shown at the end of the reviewer row. */
   logo?: string;
->>>>>>> Stashed changes
   name: string;
   role?: string;
   text: string;
@@ -135,40 +133,23 @@ export function Testimonial({
   initials,
   color,
   shape,
+  logo,
   compact = false,
   className,
 }: TestimonialProps) {
   return (
     <figure
       className={cn(
-<<<<<<< Updated upstream
-        "relative flex w-80 max-w-full flex-col items-center rounded-2xl border border-card-border bg-card/80 text-center shadow-[0_16px_40px_-14px_rgba(15,23,42,0.28)] backdrop-blur-sm transition-shadow duration-300 hover:shadow-[0_22px_50px_-14px_rgba(15,23,42,0.36)] dark:shadow-[0_18px_44px_-14px_rgba(0,0,0,0.7)] dark:hover:shadow-[0_24px_56px_-14px_rgba(0,0,0,0.8)]",
-        compact ? "px-5 pb-3.5 pt-8" : "px-6 pb-6 pt-11",
-=======
         "group/review relative flex h-full w-80 max-w-full flex-col rounded-3xl p-px text-left",
         // The 1px gradient edge is the wrapper's own background, the card sits inside it.
         "bg-[linear-gradient(150deg,rgba(255,138,31,0.55)_0%,rgba(255,255,255,0.10)_28%,rgba(255,255,255,0.04)_62%,rgba(255,138,31,0.28)_100%)]",
         "shadow-[0_18px_44px_-18px_rgba(15,23,42,0.35)] dark:shadow-[0_22px_50px_-20px_rgba(0,0,0,0.85)]",
         "transition-[transform,box-shadow] duration-300 ease-out hover:-translate-y-1 hover:shadow-[0_26px_60px_-22px_rgba(255,106,20,0.55)] dark:hover:shadow-[0_26px_60px_-22px_rgba(255,106,20,0.5)]",
->>>>>>> Stashed changes
         className
       )}
     >
       <div
         className={cn(
-<<<<<<< Updated upstream
-          "absolute flex items-center justify-center font-bold",
-          "[--avatar-fill:var(--avatar-fill-light)] [--avatar-edge:var(--avatar-edge-light)] text-[var(--avatar-ink-light)]",
-          "dark:[--avatar-fill:var(--avatar-fill-dark)] dark:[--avatar-edge:var(--avatar-edge-dark)] dark:text-[var(--avatar-ink-dark)]",
-          compact ? "-top-7 h-14 w-14 text-base" : "-top-8 h-16 w-16 text-lg"
-        )}
-        style={avatarTints(color ?? BRAND_VIOLET)}
-        aria-hidden
-      >
-        <AvatarShapeSvg shape={shape ?? shapeFor(name)} />
-        <span className="relative">{initials ?? computeInitials(name)}</span>
-      </div>
-=======
           "relative flex flex-1 flex-col overflow-hidden rounded-[calc(1.5rem-1px)] bg-white/90 backdrop-blur-md dark:bg-[linear-gradient(160deg,rgba(26,27,32,0.92)_0%,rgba(12,13,16,0.94)_100%)]",
           compact ? "p-5 md:p-6" : "p-6 sm:p-7"
         )}
@@ -185,7 +166,6 @@ export function Testimonial({
             <StarIcon key={i} filled={i < rating} size={compact ? 17 : 19} />
           ))}
         </div>
->>>>>>> Stashed changes
 
         <blockquote
           className={cn(

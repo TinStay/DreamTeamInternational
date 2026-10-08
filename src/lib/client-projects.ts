@@ -144,7 +144,8 @@ export function timelineFor(project: ClientProject, labels: Record<ProjectStatus
       const at = PROJECT_STATUSES.indexOf(project.status);
       return {
         title: labels[status],
-        date: index === 0 ? project.createdAt.slice(0, 10) : status === "delivered" ? project.dueDate : null,
+        // Only dates that happened: when the brief came in, and when the client approved the video - never the deadline.
+        date: index === 0 ? project.createdAt.slice(0, 10) : status === "delivered" ? (project.approvedAt?.slice(0, 10) ?? null) : null,
         note: null,
         done: index < at || (project.status === "delivered" && index === at),
       };
@@ -153,9 +154,15 @@ export function timelineFor(project: ClientProject, labels: Record<ProjectStatus
   return steps.map((s, i) => ({ ...s, current: i === currentIndex }));
 }
 
-/** How far along, 0-100: the standard stages by status. */
+/**
+ * How far along each stage is, 0-100: a brief that just came in is barely started (5%), and most of the work is the
+ * production; the video in review is nearly done, delivered is all of it.
+ */
+export const STAGE_PROGRESS: Record<ProjectStatus, number> = { brief: 5, scripting: 25, production: 55, review: 85, delivered: 100 };
+
+/** How far along, 0-100, by the project's stage (`STAGE_PROGRESS`). */
 export function progressOf(project: ClientProject): number {
-  return Math.round(((PROJECT_STATUSES.indexOf(project.status) + 1) / PROJECT_STATUSES.length) * 100);
+  return STAGE_PROGRESS[project.status];
 }
 
 export function projectPoster(project: ClientProject): string | null {

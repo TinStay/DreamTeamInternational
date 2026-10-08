@@ -56,18 +56,15 @@ export function privacyPath(language: Language) {
 }
 
 /**
- * hreflang alternates for a path suffix (e.g. `/contact`, `` for home): both locales and `x-default` - the English
- * page, where the bare domain sends a visitor whose browser is not Bulgarian (`next.config.ts`).
+ * hreflang alternates for a path suffix (e.g. `/contact`, `` for home): the English page, also as `x-default` (the
+ * site is English only).
  */
 export function localeAlternates(pathSuffix = "") {
   return {
     en: `/en${pathSuffix}`,
-    bg: `/bg${pathSuffix}`,
     "x-default": `/en${pathSuffix}`,
   };
 }
-<<<<<<< Updated upstream
-=======
 
 export function accountPath(language: Language) {
   return `/${language}/account`;
@@ -88,4 +85,3 @@ export function careersPath(language: Language) {
 export function aboutPath(language: Language) {
   return `/${language}/about`;
 }
->>>>>>> Stashed changes

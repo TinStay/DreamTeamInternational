@@ -8,10 +8,10 @@ import { LOCALES, dictionaries, type Language, type Dictionary } from "./config"
 export { LOCALES };
 export type { Language };
 
+// The locale is the path's first segment - English, the only one today (the root redirects to /en).
 function getRouteLanguage(pathname: string | null): Language {
-  if (pathname?.startsWith("/bg")) return "bg";
-  if (pathname?.startsWith("/en")) return "en";
-  return "bg"; // Bulgarian is the primary locale (root redirects to /bg).
+  const segment = pathname?.split("/")[1] ?? "";
+  return (LOCALES as readonly string[]).includes(segment) ? (segment as Language) : "en";
 }
 
 function switchLocalePath(path: string, target: Language): string {

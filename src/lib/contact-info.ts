@@ -10,6 +10,13 @@ export const PHONE_SECONDARY = {
   label: "+359 88 236 7100",
 } as const;
 
+/** The San Francisco office line shown in the English footer. TODO(content): an example number (555-01xx is the range
+ * reserved for fiction) - put the real US number here before launch. */
+export const PHONE_US = {
+  href: "tel:+14155550142",
+  label: "+1 (415) 555-0142",
+} as const;
+
 /** Public email (header copy button). Stays on the old domain - Resend-verified sender/recipient. */
 export const EMAIL_PRIMARY = {
   href: "mailto:info@dreamteam.technology",

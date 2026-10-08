@@ -12,16 +12,16 @@ import { MAIN_WITH_FIXED_PAGE_BG_CLASS } from "@/lib/page-shell";
  * breadcrumbs, and the side menu (`AccountSideNav`) beside the page's column from `lg` - above it, as a row of pills,
  * on smaller screens.
  */
-export function AccountShell({ children, wide = false }: { children: ReactNode; wide?: boolean }) {
+export function AccountShell({ children }: { children: ReactNode }) {
   return (
     <main className={MAIN_WITH_FIXED_PAGE_BG_CLASS}>
       <div className="fixed inset-0 z-[-1]">
         <GradientBlurPageBg className="h-full w-full" />
       </div>
       <SiteHeader />
-      <div className={`relative z-10 mx-auto w-full ${wide ? "max-w-[100rem]" : "max-w-6xl"} flex-1 px-[max(1.25rem,3vw)] pt-28 pb-16 text-white`}>
+      <div className={`relative z-10 mx-auto w-full max-w-[110rem] flex-1 px-[max(1.25rem,3vw)] pt-28 pb-16 text-white`}>
         <PageBreadcrumbs />
-        <div className="mt-6 grid gap-6 lg:grid-cols-[15rem_minmax(0,1fr)] lg:gap-12">
+        <div className="mt-6 grid gap-6 lg:grid-cols-[18rem_minmax(0,1fr)] lg:gap-12 2xl:grid-cols-[20rem_minmax(0,1fr)]">
           <AccountSideNav />
           <div className="min-w-0">{children}</div>
         </div>

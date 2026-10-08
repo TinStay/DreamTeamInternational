@@ -37,8 +37,18 @@ export const PLANS: Record<Audience, Plan[]> = {
   ],
 };
 
-/** A one-time order: $299 for up to 20 seconds, $119 for every 10 seconds more. */
-export const ONE_TIME = { base: 299, baseSecs: 20, extra: 119 };
+/**
+ * A one-time order: $299 for up to 20 seconds, $119 for every 10 seconds more - chosen on the Personal card's slider in
+ * steps of `step`, from `baseSecs` up to `maxSecs` (longer than that is a custom order).
+ */
+export const ONE_TIME = { base: 299, baseSecs: 20, extra: 119, step: 10, maxSecs: 120 };
+
+/** The length a one-time order may be: a whole step, between the base and the maximum - else `null`. */
+export function validOneTimeSecs(secs: unknown): number | null {
+  const n = typeof secs === "number" ? secs : Number.parseInt(String(secs ?? ""), 10);
+  if (!Number.isInteger(n) || n < ONE_TIME.baseSecs || n > ONE_TIME.maxSecs || n % ONE_TIME.step !== 0) return null;
+  return n;
+}
 
 /** Annual billing: pay for this many months, get twelve. */
 export const ANNUAL_PAID_MONTHS = 10;

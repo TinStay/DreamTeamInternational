@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { AccountPageView, type AccountSubscription } from "@/components/account-page-view";
+import { AccountPageView, type AccountOrder, type AccountSubscription } from "@/components/account-page-view";
 import { LOCALES, isLocale, getDictionary } from "@/lib/i18n/config";
 import { requireAccount } from "@/lib/supabase/account-page";
 import { createClient } from "@/lib/supabase/server";
@@ -21,7 +21,7 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
 /**
  * `/account` - Account & subscription, the one page for the profile and the account (`/profile` redirects here): who
  * they are, their editable details (`profiles`), their plan, video time and subscription (`subscriptions`, mirrored
- * from Stripe), and how to delete the account. Signed-out visitors go to the home page. A table that is not there yet
+ * from Stripe), their orders, and how to delete the account. Signed-out visitors go to the home page. A table that is not there yet
  * (profiles.sql / delivery.sql not run) just leaves its part out.
  */
 export default async function Page({ params }: { params: Promise<{ lang: string }> }) {
@@ -53,5 +53,24 @@ export default async function Page({ params }: { params: Promise<{ lang: string 
       }
     : null;
 
-  return <AccountPageView info={info} fields={fields} subscription={subscription} />;
+  // Their orders, newest first (supabase/orders.sql) - one-time or subscription, plan, seconds, amount, status.
+  const { data: orderRows } = await supabase
+    .from("orders")
+    .select("id, plan_key, purchase_type, billing, seconds, amount_cents, currency, status, created_at")
+    .eq("user_id", uid)
+    .order("created_at", { ascending: false })
+    .limit(20);
+  const orders: AccountOrder[] = (orderRows ?? []).map((o) => ({
+    id: String(o.id),
+    planKey: String(o.plan_key),
+    oneTime: o.purchase_type === "one_time",
+    billing: o.billing ?? null,
+    seconds: Number(o.seconds) || 0,
+    amountCents: Number(o.amount_cents) || 0,
+    currency: String(o.currency ?? "usd"),
+    status: String(o.status),
+    createdAt: String(o.created_at),
+  }));
+
+  return <AccountPageView info={info} fields={fields} subscription={subscription} orders={orders} />;
 }

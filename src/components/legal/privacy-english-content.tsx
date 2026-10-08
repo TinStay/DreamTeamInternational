@@ -32,47 +32,7 @@ export function PrivacyEnglishContent() {
           <strong>Company:</strong> DreamTeam, an AI video production company based in Sofia, Bulgaria
         </li>
         <li>
-<<<<<<< Updated upstream
-          <strong>Contact email:</strong>{" "}
-          <a href="mailto:info@dreamteam.technology">info@dreamteam.technology</a>
-        </li>
-        <li>
-          <strong>Activity:</strong> Company creating video content using artificial intelligence.
-        </li>
-      </ul>
-
-      <h2>2. Data We Collect</h2>
-      <p>Our website is informational in nature; the data we process through it is:</p>
-      <p>
-        <strong>Contact Data:</strong> When you send us an inquiry through a contact or quote form,
-        we collect your name, email address, phone number and what you write to us (including any
-        files you attach), and we receive it by email in order to reply.
-      </p>
-      <p>
-        <strong>Cookies and similar technologies:</strong> By itself the website stores only what it
-        needs to work: your language and theme and your cookie choice (the <code>dt_consent</code>{" "}
-        cookie, kept for six months). Everything else runs only after you agree in the cookie banner,
-        and you can change or withdraw your choice at any time from &ldquo;Cookie settings&rdquo; in
-        the footer:
-      </p>
-      <ul>
-        <li>
-          <strong>Analytics (PostHog, servers in the EU):</strong> How the site is used &mdash; pages
-          visited, clicks and session recordings &mdash; so we can improve it. Cookie{" "}
-          <code>ph_*</code>, 1 year.
-        </li>
-        <li>
-          <strong>Marketing (Google Ads, OpenAI):</strong> Whether our advertisements lead to
-          inquiries, and audiences for remarketing. Cookies <code>_gcl_au</code> (90 days) and{" "}
-          <code>__obref</code> (1 year).
-        </li>
-        <li>
-          <strong>Embedded videos:</strong> YouTube videos load in privacy-enhanced mode and set
-          YouTube&rsquo;s cookies only when you play them; videos hosted on Bunny Stream set no
-          advertising cookies.
-=======
           <strong>Privacy and support contact:</strong> <Mail />
->>>>>>> Stashed changes
         </li>
       </ul>
       <p>
@@ -87,16 +47,9 @@ export function PrivacyEnglishContent() {
       </p>
       <ul>
         <li>
-<<<<<<< Updated upstream
-          <strong>Service Providers:</strong> Vercel (hosting and cookieless analytics), Resend
-          (delivery of your inquiries to our email), PostHog (analytics, EU), Google and OpenAI
-          (advertising measurement &mdash; only with your consent), Bunny Stream and YouTube (video
-          hosting).
-=======
           <strong>Identifiers and contact details:</strong> your name, email address and phone number, your account ID, and
           your IP address. These come from you (when you sign up, contact us or send a quote request), from Google or
           Microsoft if you use them to sign in (they share your name and email), and automatically from your browser.
->>>>>>> Stashed changes
         </li>
         <li>
           <strong>Account records:</strong> when you signed up, how you sign in, and your confirmation that you accepted our

@@ -7,19 +7,22 @@ import { motion } from "motion/react";
 import { IconChevronDown } from "@tabler/icons-react";
 import { EmailCopyButton, EmailIconLink, PhoneCopyButton, PhoneIconLink } from "@/components/phone-copy-button";
 import { ThemeToggle } from "./theme-toggle";
-// import { LanguageDropdown } from "./language-dropdown";
 import { ButtonWithIcon } from "@/components/ui/button-with-icon";
 import { GlassShell } from "@/components/ui/glass-shell";
 import { MegaHeader, type MegaNavGroup } from "@/components/mega-header";
-import { TigerCta } from "@/components/hero-tiger/tiger-cta";
 import { useTrainingCards } from "@/components/training/use-training-cards";
 import { cn } from "@/lib/utils";
 import { brandLogo } from "@/lib/brand-logo";
 import { useLanguage } from "@/lib/i18n/language-context";
+import { AccountControls } from "@/components/account-controls";
+import { MobileTopControls } from "@/components/mobile-account";
+import { AuthDialog } from "@/components/auth-dialog";
 import { PARTNERS, PARTNER_ICON_BASE } from "@/lib/partners";
 import { PROJECTS } from "@/lib/projects";
 import { getServiceSlug } from "@/lib/services/constants";
 import {
+  aboutPath,
+  careersPath,
   contactProcessPath,
   homePath,
   portfolioPath,
@@ -33,8 +36,6 @@ import {
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
-/** The portfolio's categories in its menu's order (`portfolio-section.tsx` - "All" is off the menu). */
-const PORTFOLIO_CATEGORY_KEYS = ["construction", "mascots", "tv", "cars", "product", "services", "animated"] as const;
 
 /**
  * The nav links' ink: the brand's red → violet gradient sits under the letters, clipped to them, and shows as the
@@ -217,41 +218,40 @@ export function SiteHeader() {
     ),
   }));
 
-  // The English mega menu's columns: each section and the pages under it (Contact has none).
+  // The English mega menu's tabs, in the client's order and groups (split by thin lines): Explore (the home page) |
+  // the video services - each on the closest page there is today (a service page or a portfolio category) until it has
+  // its own | Pricing | Custom Services, the one tab that drops down, holding the rest of the site. Below 1280px the bar
+  // is short of room: Explore (the logo is the home link too) and Corporate Videos hide there, and Product Videos below
+  // 1400px.
+  const portfolioCategory = (key: string) => `${portfolioPath(language)}?category=${key}`;
   const megaGroups: MegaNavGroup[] = [
+    { label: t.header.nav.explore, href: homeHref, items: [], showFrom: "wide" },
+    { label: t.header.nav.socialAds, href: servicePath(language, "ai-video"), items: [], divideBefore: "wide" },
+    { label: t.header.nav.corporate, href: portfolioCategory("services"), items: [], showFrom: "ultra" },
+    { label: t.header.nav.tvAds, href: portfolioCategory("tv"), items: [], showFrom: "wide" },
+    { label: t.header.nav.productVideos, href: portfolioCategory("product"), items: [], showFrom: "ultra" },
+    { label: t.header.about, href: aboutPath(language), items: [], divideBefore: true },
+    { label: t.header.projects, href: projectsPath(language), items: [] },
+    { label: t.header.pricingPage, href: pricingPath(language), items: [] },
+    { label: t.footer.careers, href: careersPath(language), items: [] },
     {
-      label: t.header.about,
-      href: `${homeHref}#stats`,
-      items: (["stats", "reviews", "process", "faq"] as const).map((key) => ({
-        label: t.header.aboutItems[key],
-        href: `${homeHref}#${key}`,
-      })),
+      label: t.header.nav.other,
+      href: servicesPath(language),
+      divideBefore: true,
+      items: [
+        { label: t.header.nav.corporate, href: portfolioCategory("services") },
+        { label: t.header.nav.tvAds, href: portfolioCategory("tv") },
+        { label: t.header.portfolio, href: portfolioPath(language) },
+        { label: t.header.services, href: servicesPath(language) },
+        { label: t.header.nav.brandMascots, href: servicePath(language, "brand-mascots") },
+        { label: t.header.training, href: trainingPath(language) },
+        { label: t.header.contact, href: contactProcessPath(language) },
+      ],
     },
-    { label: t.header.projects, href: projectsPath(language), items: projectItems },
-    {
-      label: t.header.portfolio,
-      href: portfolioPath(language),
-      items: PORTFOLIO_CATEGORY_KEYS.map((key) => ({
-        label: t.portfolio.categories[key],
-        href: `${portfolioPath(language)}?category=${key}`,
-      })),
-    },
-    { label: t.header.services, href: servicesPath(language), items: serviceItems },
-    { label: t.header.training, href: trainingPath(language), items: trainingItems },
-    {
-      label: t.header.pricingPage,
-      href: pricingPath(language),
-      items: (["individual", "business"] as const).map((key) => ({
-        label: t.header.pricingItems[key],
-        href: `${pricingPath(language)}?for=${key}`,
-      })),
-    },
-    { label: t.header.contact, href: contactProcessPath(language), items: [] },
   ];
 
   const desktopControls = (
     <>
-      {/* <LanguageDropdown /> */}
       <ThemeToggle className="shrink-0" />
       {/* Plain round icon buttons: copy the email / phone with a "copied" tag as the only feedback. */}
       <EmailCopyButton />
@@ -267,10 +267,11 @@ export function SiteHeader() {
 
   return (
     <>
+      {language === "en" ? <AuthDialog /> : null}
       {/* Mobile: glass bar — DT logo left, theme toggle right. Wider and taller than the bottom dock (96%, a 2.5rem
           logo, 2.5rem round buttons) so the brand reads at a glance. */}
       <header
-        className={`fixed left-1/2 z-50 w-[96%] max-w-lg -translate-x-1/2 transition-all duration-300 lg:hidden top-[max(0.5rem,env(safe-area-inset-top))] ${
+        className={`fixed left-1/2 z-50 w-[96%] max-w-lg -translate-x-1/2 transition-all duration-300 lg:hidden top-[calc(max(0.5rem,env(safe-area-inset-top))+var(--promo-h,0px))] ${
           isScrolled ? "scale-[0.98]" : "scale-100"
         }`}
       >
@@ -288,12 +289,16 @@ export function SiteHeader() {
               )}
             />
           </Link>
-          <div className="flex shrink-0 items-center gap-2.5">
-            {/* English has one theme (`forcedTheme` in the layout), so no toggle there. */}
-            {language === "en" ? null : <ThemeToggle className="shrink-0" />}
-            <EmailIconLink className="size-10" />
-            <PhoneIconLink className="size-10" />
-          </div>
+          {language === "en" ? (
+            // English: Log in + Sign up (or the account icon once signed in), like the desktop bar.
+            <MobileTopControls />
+          ) : (
+            <div className="flex shrink-0 items-center gap-2.5">
+              <ThemeToggle className="shrink-0" />
+              <EmailIconLink className="size-10" />
+              <PhoneIconLink className="size-10" />
+            </div>
+          )}
         </GlassShell>
       </header>
 
@@ -302,9 +307,10 @@ export function SiteHeader() {
         <MegaHeader
           logoHref={homeHref}
           groups={megaGroups}
-          // English: one theme (no theme toggle, `forcedTheme` in the layout), no copy buttons - just the hero's
-          // amber "Let's talk" pill.
-          controls={<TigerCta href={contactProcessPath(language)} label={t.hero.tiger.cta} className="tiger-cta--sm" />}
+          // English: one theme (no theme toggle, `forcedTheme` in the layout), no copy buttons - Log in, and Sign up
+          // as the orange pearl pill with the hero CTA's animation (letter roll, fill from the pointer, magnetic
+          // pull) - both open the sign-up / log-in popup, and once signed in the account pill + Log out (`account-controls.tsx`).
+          controls={<AccountControls />}
         />
       ) : (
       /* Desktop: floating pill (like the mobile bar) - 96% wide, detached from the top and the corners. */

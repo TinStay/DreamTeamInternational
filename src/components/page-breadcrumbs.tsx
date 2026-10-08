@@ -39,6 +39,18 @@ function segmentToLabel(
       return t.header.services;
     case "pricing":
       return t.header.pricingPage;
+    case "account":
+      return t.account.manageAccount;
+    case "about":
+      return t.header.about;
+    case "careers":
+      return t.careers.title;
+    case "team":
+      return t.team.title;
+    case "profile":
+      return t.account.viewProfile;
+    case "my-projects":
+      return t.account.yourProjects;
     case "individual":
       return t.training.cards.individual.title;
     case "skool":
@@ -67,22 +79,23 @@ function segmentToLabel(
   }
 }
 
-export function PageBreadcrumbs({ className }: { className?: string }) {
+/** `lastLabel` names the final crumb when its segment is an id (a client project: its title, not its uuid). */
+export function PageBreadcrumbs({ className, lastLabel }: { className?: string; lastLabel?: string }) {
   const pathname = usePathname() ?? "/";
   const { language, t } = useLanguage();
 
   const parts = pathname.split("/").filter(Boolean);
   const isLocalizedHome =
-    pathname === "/en" || pathname === "/bg" || pathname === "/";
+    pathname === "/en" || pathname === "/";
 
   if (isLocalizedHome) return null;
 
   const langPrefix = homePath(language);
   const trimmed =
-    parts[0] === "en" || parts[0] === "bg" ? parts.slice(1) : parts;
+    parts[0] === "en" ? parts.slice(1) : parts;
   const crumbs = trimmed.map((seg, idx) => {
     const href = `${langPrefix}/${trimmed.slice(0, idx + 1).join("/")}`;
-    return { seg, href, label: segmentToLabel(seg, t) };
+    return { seg, href, label: lastLabel && idx === trimmed.length - 1 ? lastLabel : segmentToLabel(seg, t) };
   });
 
   // The same trail as structured data (rendered on the server like the rest of this component), so every inner

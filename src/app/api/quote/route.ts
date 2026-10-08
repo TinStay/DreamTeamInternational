@@ -1,7 +1,9 @@
 import { NextResponse } from "next/server";
 import { Resend } from "resend";
 
-import { dictionaries } from "@/lib/i18n/config";
+// The site is English only, but the internal email to the team stays in Bulgarian - its labels come from the
+// Bulgarian dictionary, kept for this alone.
+import { bg } from "@/lib/i18n/bg";
 import { formatDateDisplay, ISO_DATE_RE } from "@/lib/dates";
 import { isFoundUsKey } from "@/lib/found-us";
 import {
@@ -254,8 +256,8 @@ export async function POST(req: Request) {
 
   // Internal email is in Bulgarian — labels come from the bg dictionary so the
   // form copy and the email stay in sync.
-  const bgQuote = dictionaries.bg.quoteForm;
-  const foundUsLabels: Record<string, string> = dictionaries.bg.contact.foundUsOptions;
+  const bgQuote = bg.quoteForm;
+  const foundUsLabels: Record<string, string> = bg.contact.foundUsOptions;
   // Key allowlist (not `in` — that would accept prototype keys like "toString").
   const foundUs = isFoundUsKey(payload.foundUs) ? payload.foundUs : "";
 

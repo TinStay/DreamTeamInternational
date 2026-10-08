@@ -69,7 +69,7 @@ export function TeamDashboardView({ projects: initial, clients, sample }: { proj
   );
 
   return (
-    <AccountShell wide>
+    <AccountShell>
       <p className="mt-6 text-xs font-semibold uppercase tracking-[0.18em] text-[#ff8a1f]">{d.eyebrow}</p>
       <h1 className="mt-3 font-heading text-[clamp(30px,4vw,56px)] leading-[0.98] font-black uppercase text-balance">
         {d.title} <span className="text-section-accent">{d.title2}</span>

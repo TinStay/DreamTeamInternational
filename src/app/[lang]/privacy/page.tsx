@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { LegalPageShell } from "@/components/legal/legal-page-shell";
 import { PrivacyEnglishContent } from "@/components/legal/privacy-english-content";
-import { PrivacyBulgarianContent } from "@/components/legal/privacy-bulgarian-content";
 import { localeAlternates } from "@/lib/routes";
 import { LOCALES, isLocale, getDictionary, type Language } from "@/lib/i18n/config";
 
@@ -19,10 +18,6 @@ const META: Record<Language, { title: string; description: string }> = {
     title: "Privacy Policy | DreamTeam",
     description:
       "How DreamTeam collects, uses and shares personal information, cookies and Global Privacy Control, and your privacy rights under US state laws (CCPA / CPRA) and the GDPR.",
-  },
-  bg: {
-    title: "Политика за поверителност | DreamTeam",
-    description: "Политика за поверителност на DreamTeam.",
   },
 };
 
@@ -59,7 +54,7 @@ export default async function LocalePrivacyPage({
       lastUpdated={LAST_UPDATED}
       backLabel={t.legal.backToHome}
     >
-      {lang === "bg" ? <PrivacyBulgarianContent /> : <PrivacyEnglishContent />}
+      <PrivacyEnglishContent />
     </LegalPageShell>
   );
 }

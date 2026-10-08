@@ -1,18 +1,23 @@
 import type Stripe from "stripe";
 import { createAdminClient } from "@/lib/supabase/admin";
 
-/** Stripe statuses that still count as a plan the client has (a payment retry included) - one of these blocks buying another. */
-export const LIVE_SUBSCRIPTION_STATUSES = ["active", "trialing", "past_due", "unpaid"] as const;
+import { isLiveStatus } from "@/lib/subscription-status";
 
-export const isLiveStatus = (status: string) => (LIVE_SUBSCRIPTION_STATUSES as readonly string[]).includes(status);
+export { isLiveStatus, LIVE_SUBSCRIPTION_STATUSES } from "@/lib/subscription-status";
 
 /** A Stripe subscription as a `subscriptions` row (supabase/delivery.sql), or null when it carries no `user_id`. */
 export function subscriptionRow(sub: Stripe.Subscription) {
   const userId = sub.metadata?.user_id;
   if (!userId) return null;
   // Newer API versions keep the period on the items; older ones on the subscription itself.
-  const loose = sub as unknown as { current_period_end?: number; items?: { data?: { current_period_end?: number }[] } };
-  const end = loose.items?.data?.[0]?.current_period_end ?? loose.current_period_end;
+  const loose = sub as unknown as {
+    current_period_end?: number;
+    items?: { data?: { current_period_end?: number; price?: { unit_amount?: number | null; currency?: string; recurring?: { interval?: string } | null } }[] };
+  };
+  const item = loose.items?.data?.[0];
+  const end = item?.current_period_end ?? loose.current_period_end;
+  // The plan as bought: monthly or annual (the price's interval), and what each period costs.
+  const interval = item?.price?.recurring?.interval;
   return {
     id: sub.id,
     user_id: userId,
@@ -21,6 +26,9 @@ export function subscriptionRow(sub: Stripe.Subscription) {
     status: sub.status,
     current_period_end: end ? new Date(end * 1000).toISOString() : null,
     cancel_at_period_end: Boolean(sub.cancel_at_period_end),
+    billing: interval === "year" ? "annual" : interval === "month" ? "monthly" : (sub.metadata?.billing ?? null),
+    amount_cents: item?.price?.unit_amount ?? null,
+    currency: item?.price?.currency ?? null,
     updated_at: new Date().toISOString(),
   };
 }

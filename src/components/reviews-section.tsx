@@ -11,6 +11,15 @@ import { useScrollEased } from "@/lib/smooth-scroll";
 import { PHONE_QUERY, useMediaQuery } from "@/lib/use-media-query";
 import { cn } from "@/lib/utils";
 
+/** The clients' marks (white-ink files from the hero's logo strip), by the review's name - shown above it. */
+const REVIEW_LOGOS: Record<string, string> = {
+  iSupport: "/hero-tiger/logos/isupport.png",
+  Raibranch: "/hero-tiger/logos/raibranch.png",
+  chargecloud: "/hero-tiger/logos/chargecloud.png",
+  Iceheart: "/hero-tiger/logos/iceheart.png",
+  "BG BROKER": "/hero-tiger/logos/bgbroker.png",
+};
+
 const COLUMN_DURATIONS = [55, 75, 62];
 const COLUMN_SIDES: JourneySide[] = ["left", "bottom", "right"];
 
@@ -59,6 +68,7 @@ type Review = { name: string; role: string; text: string; rating: number; initia
  * has reached its last row the moment the stage lets go and the scene can hand over.
  */
 function ReviewConveyor({ items, heading }: { items: Review[]; heading: React.ReactNode }) {
+  const { language } = useLanguage();
   const runwayRef = React.useRef<HTMLDivElement>(null);
   const windowRef = React.useRef<HTMLDivElement>(null);
   const trackRef = React.useRef<HTMLDivElement>(null);
@@ -112,11 +122,6 @@ function ReviewConveyor({ items, heading }: { items: Review[]; heading: React.Re
             <motion.div
               ref={trackRef}
               // Odd card at the end of a two-column stack: centred across both columns.
-<<<<<<< Updated upstream
-              // On phones the rows are 2.5rem apart: the next card's avatar hangs 1.75rem above its card, so that
-              // leaves a little air between it and the card before (from md the stack stays close-packed).
-              className="absolute inset-x-0 mx-auto grid w-[calc(100%-1.25rem)] grid-cols-1 gap-10 will-change-transform md:w-[min(84rem,calc(94vw-2rem))] md:grid-cols-2 md:gap-4 md:[&>*:nth-child(odd):last-child]:col-span-2 md:[&>*:nth-child(odd):last-child]:w-[calc(50%-0.5rem)] md:[&>*:nth-child(odd):last-child]:justify-self-center"
-=======
               // The cards sit close together - 1.25rem apart on phones, 1rem from md - each stretched to its row
               // so the cards in a row match in height.
               className={cn(
@@ -126,7 +131,6 @@ function ReviewConveyor({ items, heading }: { items: Review[]; heading: React.Re
                   ? "w-[calc(100%-2*max(1.25rem,3vw))]"
                   : "w-[calc(100%-1.25rem)] md:w-[min(84rem,calc(94vw-2rem))]"
               )}
->>>>>>> Stashed changes
               style={{ top: TOP_INSET, y, gridAutoRows: rowMin > 0 ? `minmax(${Math.round(rowMin)}px, auto)` : undefined }}
             >
               {items.map((review, index) => (
@@ -138,6 +142,7 @@ function ReviewConveyor({ items, heading }: { items: Review[]; heading: React.Re
                     rating={review.rating}
                     initials={review.initials}
                     color={review.color}
+                    logo={REVIEW_LOGOS[review.name]}
                     shape={AVATAR_SHAPES[index % AVATAR_SHAPES.length]}
                     compact
                     className="w-full max-w-none"
@@ -152,8 +157,8 @@ function ReviewConveyor({ items, heading }: { items: Review[]; heading: React.Re
   );
 }
 
-export function ReviewsSection({ className }: { className?: string }) {
-  const { t } = useLanguage();
+export function ReviewsSection({ className, spotlight }: { className?: string; spotlight?: React.ReactNode }) {
+  const { t, language } = useLanguage();
   const r = t.reviews;
   const journey = useJourney();
   // Phones (plain flow, no journey): every card stacked - readable, nothing moving.
@@ -174,14 +179,29 @@ export function ReviewsSection({ className }: { className?: string }) {
 
   // Journey part (home): the heading arrives first, then the conveyor; it sits inside the sticky stage so it stays
   // put while the cards scroll through under it.
+  const en = language === "en";
   const heading = (
     <JourneyItem
       kind="title"
-      className={cn("relative z-10 mx-auto w-full max-w-7xl shrink-0 px-4 text-center", journey ? "mb-4" : "mb-8 lg:mb-10")}
+      className={cn(
+        "relative z-10 w-full shrink-0",
+        // The English site's section head: left-aligned on the page margin, orange eyebrow, Archivo capitals.
+        en ? "px-[max(1.25rem,3vw)] text-left" : "mx-auto max-w-7xl px-4 text-center",
+        journey ? "mb-4" : "mb-8 lg:mb-10"
+      )}
     >
-      <h2 className="font-heading text-[2.75rem] leading-[1.06] font-extrabold sm:text-5xl md:text-6xl text-foreground">
-        {r.title1} <span className="text-section-accent">{r.title2}</span>
-      </h2>
+      {en ? (
+        <>
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#ff8a1f]">{r.eyebrow}</p>
+          <h2 className="mt-3 font-heading text-[clamp(30px,3.8vw,60px)] font-black uppercase leading-[0.95] tracking-[-0.01em] text-balance text-white">
+            {r.title1} <span className="text-section-accent">{r.title2}</span>
+          </h2>
+        </>
+      ) : (
+        <h2 className="font-heading text-[2.75rem] leading-[1.06] font-extrabold sm:text-5xl md:text-6xl text-foreground">
+          {r.title1} <span className="text-section-accent">{r.title2}</span>
+        </h2>
+      )}
     </JourneyItem>
   );
 
@@ -189,23 +209,17 @@ export function ReviewsSection({ className }: { className?: string }) {
     <section
       id="reviews"
       // overflow-clip, never hidden: the conveyor stage inside is sticky and must stick to the viewport, not the section.
-      className={cn("relative w-full overflow-x-clip", !journey && "py-16 sm:py-20", className)}
+      className={cn("relative w-full overflow-x-clip", !journey && "py-10 sm:py-14", className)}
     >
       {journey ? (
         <ReviewConveyor items={items} heading={heading} />
       ) : phone ? (
         <>
           {heading}
-<<<<<<< Updated upstream
-          {/* The same compact cards as the conveyor's phone grid, the same 2.5rem apart (the next card's avatar hangs
-              1.75rem above its card), in plain flow. */}
-          <div className="mx-auto grid w-[calc(100%-1.25rem)] max-w-7xl grid-cols-1 gap-10 pt-4">
-=======
           {spotlight && <div className="mb-14">{spotlight}</div>}
           {/* The same compact cards as the conveyor's phone grid, the same 1.25rem apart,
               in plain flow. */}
           <div className={cn("mx-auto grid grid-cols-1 gap-5 pt-2", en ? "w-[calc(100%-2*max(1.25rem,3vw))]" : "w-[calc(100%-1.25rem)] max-w-7xl")}>
->>>>>>> Stashed changes
             {items.map((review, index) => (
               <Testimonial
                 key={review.name}
@@ -215,6 +229,7 @@ export function ReviewsSection({ className }: { className?: string }) {
                 rating={review.rating}
                 initials={review.initials}
                 color={review.color}
+                    logo={REVIEW_LOGOS[review.name]}
                 shape={AVATAR_SHAPES[index % AVATAR_SHAPES.length]}
                 compact
                 className="w-full max-w-none"
@@ -225,10 +240,6 @@ export function ReviewsSection({ className }: { className?: string }) {
       ) : (
         <>
           {heading}
-<<<<<<< Updated upstream
-          {/* Elsewhere (reduced motion, tablets and up outside the journey): vertically scrolling review columns (paused on hover). */}
-          <div className="mx-auto flex max-h-[44rem] w-full max-w-7xl justify-center gap-6 overflow-hidden px-4 [mask-image:linear-gradient(to_bottom,transparent,black_15%,black_85%,transparent)]">
-=======
           {spotlight && <div className="mb-6">{spotlight}</div>}
           {/* A short list (a handful of reviews) is laid out still, centred: scrolling columns would loop the same few
               cards past each other. */}
@@ -261,7 +272,6 @@ export function ReviewsSection({ className }: { className?: string }) {
           ) : (
           /* Elsewhere (reduced motion, tablets and up outside the journey): vertically scrolling review columns (paused on hover). */
           <div className={cn("mx-auto flex max-h-[44rem] w-full justify-center gap-6 overflow-hidden [mask-image:linear-gradient(to_bottom,transparent,black_15%,black_85%,transparent)]", en ? "px-[max(1.25rem,3vw)]" : "max-w-7xl px-4")}>
->>>>>>> Stashed changes
             {columns.map((column, columnIndex) => (
               <JourneyItem
                 key={columnIndex}
@@ -279,6 +289,7 @@ export function ReviewsSection({ className }: { className?: string }) {
                         rating={review.rating}
                         initials={review.initials}
                         color={review.color}
+                    logo={REVIEW_LOGOS[review.name]}
                         shape={AVATAR_SHAPES[items.indexOf(review) % AVATAR_SHAPES.length]}
                         className="w-full"
                       />
@@ -288,6 +299,7 @@ export function ReviewsSection({ className }: { className?: string }) {
               </JourneyItem>
             ))}
           </div>
+          )}
         </>
       )}
     </section>

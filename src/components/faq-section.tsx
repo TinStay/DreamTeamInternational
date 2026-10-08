@@ -2,31 +2,27 @@
 
 import { useState } from "react";
 import { motion } from "motion/react";
-import { IconCoins, IconMovie, IconRoute } from "@tabler/icons-react";
+import { IconCoins, IconMovie, IconRoute, IconSchool, IconUserCircle } from "@tabler/icons-react";
 import { useLanguage } from "@/lib/i18n/language-context";
 import { JourneyItem } from "@/components/ui/scroll-journey";
-import { ButtonWithIcon, sideTabClass, sideTabDiscClass } from "@/components/ui/button-with-icon";
+import { sideTabClass, sideTabDiscClass } from "@/components/ui/button-with-icon";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import Link from "next/link";
-import { ctaPillClassName } from "@/components/ui/button";
-import { contactProcessPath, servicesPath } from "@/lib/routes";
 import { cn } from "@/lib/utils";
 
 /*
- * The FAQ: the questions in three topics (`faq.groups` - pricing & timing,
- * how we work, videos & rights), a topic menu on the left (a row of tabs on
+ * The FAQ: the questions in topics (`faq.groups` - packs & pricing, your
+ * account & video time, how we work, videos & rights, training), a topic menu on the left (a row of tabs on
  * phones) and the topic's questions as an accordion on the right, the first
  * one open; a switch slides the new list in, an answer opens and closes with
  * the accordion's own height animation. The menu wears the side-tab dress
  * (`sideTabClass`: the active topic as the site's CTA pill with its icon in
- * the gradient disc on the left). Under the list the site's quote pill (the
- * services page) and an outline pill to the contact page. On the home journey
+ * the gradient disc on the left). On the home journey
  * the heading, the menu and the list are the parts that travel.
  * FAQPage structured data covers every question, whatever topic is open.
  */
 
-const GROUP_ICONS = { pricing: IconCoins, process: IconRoute, videos: IconMovie } as const;
+const GROUP_ICONS = { pricing: IconCoins, account: IconUserCircle, process: IconRoute, videos: IconMovie, training: IconSchool } as const;
 type GroupKey = keyof typeof GROUP_ICONS;
 
 const EASE = [0.22, 1, 0.36, 1] as const;
@@ -57,22 +53,35 @@ export function FaqSection({ className }: { className?: string }) {
   };
 
   return (
-    <section id="faq" className={cn("relative w-full py-16 sm:py-20", className)}>
+    <section id="faq" className={cn("relative w-full py-10 sm:py-14", className)}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-      <div className="relative z-10 mx-auto w-full max-w-7xl px-4">
+      <div className={cn("relative z-10 mx-auto w-full", language === "en" ? "px-[max(1.25rem,3vw)]" : "max-w-7xl px-4")}>
         {/* Journey parts (home): the heading first, then the topic menu from the left and the questions from the right. */}
-        <JourneyItem kind="title" className="mb-10 text-center lg:mb-12">
-          <h2 className="mb-6 font-heading text-[2.75rem] leading-[1.06] font-extrabold sm:text-5xl md:text-6xl text-foreground">
-            {faq.title1} <span className="text-section-accent">{faq.title2}</span>
-          </h2>
-          <p className="mx-auto max-w-2xl text-lg text-muted-foreground">{faq.subtitle}</p>
+        <JourneyItem kind="title" className={language === "en" ? "mb-10 text-left lg:mb-12" : "mb-10 text-center lg:mb-12"}>
+          {language === "en" ? (
+            // The English site's section head, like "How it works": eyebrow, Archivo capitals, the line under it.
+            <>
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#ff8a1f]">{faq.eyebrow}</p>
+              <h2 className="mt-3 font-heading text-[clamp(30px,3.8vw,60px)] font-black uppercase leading-[0.95] tracking-[-0.01em] text-balance text-white">
+                {faq.title1} <span className="text-section-accent">{faq.title2}</span>
+              </h2>
+              <p className="mt-4 max-w-[62ch] text-[clamp(15px,1.15vw,18px)] leading-relaxed text-white/65">{faq.subtitle}</p>
+            </>
+          ) : (
+            <>
+              <h2 className="mb-6 font-heading text-[2.75rem] leading-[1.06] font-extrabold sm:text-5xl md:text-6xl text-foreground">
+                {faq.title1} <span className="text-section-accent">{faq.title2}</span>
+              </h2>
+              <p className="mx-auto max-w-2xl text-lg text-muted-foreground">{faq.subtitle}</p>
+            </>
+          )}
         </JourneyItem>
 
         <Tabs
           value={active}
           onValueChange={(value) => setActive(String(value))}
           orientation="vertical"
-          className="mx-auto w-full max-w-5xl flex-col gap-6 md:flex-row md:items-start md:gap-10 lg:gap-14"
+          className={cn("w-full flex-col gap-6 md:flex-row md:items-start md:gap-10 lg:gap-14", language === "en" ? "" : "mx-auto max-w-5xl")}
         >
           <JourneyItem index={0} from="left" className="md:w-64 md:shrink-0 lg:w-72">
             <TabsList variant="line" className="flex h-auto w-full flex-row flex-wrap gap-2 bg-transparent p-0 md:flex-col md:items-stretch">
@@ -113,21 +122,6 @@ export function FaqSection({ className }: { className?: string }) {
                 </motion.div>
               </TabsContent>
             ))}
-            <div className="mt-8 flex flex-wrap items-center gap-3.5">
-              <ButtonWithIcon href={servicesPath(language)} surface="auto">
-                {t.services.quoteCta}
-              </ButtonWithIcon>
-              <Link
-                href={contactProcessPath(language)}
-                className={cn(
-                  ctaPillClassName,
-                  // The quote pill's height and type ramp (`md`), so the two read as a pair.
-                  "h-12 border border-card-border bg-card-elevated text-foreground transition-[transform,background-color,box-shadow] duration-200 ease-out hover:-translate-y-[1px] hover:bg-muted/60 hover:shadow-sm lg:text-base"
-                )}
-              >
-                {faq.cta}
-              </Link>
-            </div>
           </JourneyItem>
         </Tabs>
       </div>

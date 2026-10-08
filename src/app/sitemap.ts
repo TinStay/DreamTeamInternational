@@ -28,6 +28,8 @@ const PATHS: readonly string[] = [
   // "/training/skool",
   "/training/team",
   "/pricing",
+  "/about",
+  "/careers",
   "/contact",
   "/privacy",
   "/terms",
@@ -72,7 +74,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
       alternates: {
         languages: {
           en: `${SITE_URL}/en${path}`,
-          bg: `${SITE_URL}/bg${path}`,
           "x-default": `${SITE_URL}/en${path}`,
         },
       },

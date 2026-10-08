@@ -11,6 +11,7 @@ import { organizationGraph } from "@/lib/seo-graph";
 import { Analytics } from "@vercel/analytics/next";
 import { PostHogProvider } from "@/components/posthog-provider";
 import { PostHogPageView } from "@/components/posthog-pageview";
+import { PromoBar } from "@/components/promo-bar";
 import { ConsentBanner } from "@/components/consent/consent-banner";
 import { TrackingScripts } from "@/components/consent/tracking-scripts";
 import { Suspense } from "react";
@@ -113,7 +114,7 @@ export function generateStaticParams() {
  */
 export async function generateMetadata({ params }: { params: Promise<{ lang: string }> }): Promise<Metadata> {
   const { lang } = await params;
-  const locale = isLocale(lang) ? lang : "bg";
+  const locale = isLocale(lang) ? lang : "en";
   const t = getDictionary(locale);
   return {
     metadataBase: new URL(SITE_URL),
@@ -125,7 +126,6 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
       type: "website",
       siteName: "DreamTeam",
       locale: OG_LOCALE[locale],
-      alternateLocale: [OG_LOCALE[locale === "bg" ? "en" : "bg"]],
       images: [{ url: OG_IMAGE_PATH, width: 1200, height: 630, alt: "DreamTeam — AI Video Production" }],
     },
     twitter: { card: "summary_large_image" },
@@ -148,7 +148,7 @@ export default async function RootLayout({
   params: Promise<{ lang: string }>;
 }>) {
   const { lang } = await params;
-  const locale = isLocale(lang) ? lang : "bg";
+  const locale = isLocale(lang) ? lang : "en";
   // The English site is dark only, over a deep 3D space (`html.site-deep` in globals.css); /bg starts dark and keeps the
   // visitor's choice.
   const deep = locale === "en";
@@ -190,6 +190,7 @@ export default async function RootLayout({
                 <Suspense fallback={null}>
                   <PostHogPageView />
                 </Suspense>
+                {deep ? <PromoBar /> : null}
                 <div className="relative z-10">
                   {children}
                 </div>

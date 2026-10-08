@@ -2,7 +2,7 @@ import type Stripe from "stripe";
 import { PLAN_SECONDS } from "@/lib/credits";
 
 /** Video seconds to add for one payment; `ref` is the payment's id, so it is only ever credited once. */
-export type Purchase = { userId: string; seconds: number; planKey: string; ref: string; note: string };
+export type Purchase = { userId: string; seconds: number; planKey: string; ref: string; note: string; orderId: string | null };
 
 /**
  * What a Stripe event means for the client's video seconds:
@@ -25,7 +25,7 @@ export function purchaseFromMetadata(m: Stripe.Metadata | null | undefined, ref:
   const seconds = Number.parseInt(m?.seconds ?? "", 10);
   const planKey = m?.plan_key ?? "";
   if (!m?.user_id || !seconds || seconds <= 0 || !(planKey in PLAN_SECONDS)) return null;
-  return { userId: m.user_id, seconds, planKey, ref, note };
+  return { userId: m.user_id, seconds, planKey, ref, note, orderId: m.order_id || null };
 }
 
 const packOrNone = (p: Purchase | null): CreditDecision => (p ? { kind: "credit", purchase: p } : { kind: "none", reason: "not_a_pack" });

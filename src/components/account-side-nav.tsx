@@ -1,15 +1,15 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
-import { IconCoins, IconFolder, IconLayoutDashboard, IconLogout, IconUser } from "@tabler/icons-react";
-import type { ComponentType } from "react";
-import { AccountAvatar } from "@/components/account-avatar";
+import { usePathname } from "next/navigation";
+import { IconChevronRight, IconCoinFilled, IconFolderFilled, IconLayoutDashboardFilled, IconUserFilled } from "@tabler/icons-react";
+import { useState, type ComponentType } from "react";
+import { PlanDetailsDialog } from "@/components/plan-details-dialog";
+import { useMyPlan } from "@/lib/supabase/use-my-plan";
 import { useLanguage } from "@/lib/i18n/language-context";
-import { accountInfoFromUser, formatVideoTime } from "@/lib/account-info";
-import { accountPath, homePath, myProjectsPath, pricingPath, teamPath } from "@/lib/routes";
+import { formatVideoTime } from "@/lib/account-info";
+import { accountPath, myProjectsPath, pricingPath, teamPath } from "@/lib/routes";
 import { isTeamUser } from "@/lib/team";
-import { createClient } from "@/lib/supabase/client";
 import { useAuthUser } from "@/lib/supabase/use-auth-user";
 import { useCredits } from "@/lib/supabase/use-credits";
 import { cn } from "@/lib/utils";
@@ -17,31 +17,34 @@ import { cn } from "@/lib/utils";
 type Item = { href: string; label: string; icon: ComponentType<{ className?: string; "aria-hidden"?: boolean }> };
 
 /**
- * The account pages' side menu: who is signed in and their video time up top, then Your projects · Account &
- * subscription · (Team dashboard, for the team) · Buy video time, and Sign out. A sticky column from `lg`; below it, a
- * row of pills that scrolls sideways under the breadcrumbs. The current page is marked in the orange primary.
+ * The account pages' side menu: the video time available up top (the balance, a bar against everything added, the
+ * plan), then Your projects · Account & subscription · (Team dashboard, for the team) · Buy video time - Sign out lives
+ * in the header's account menu. A sticky column from `lg`; below it, the card and then a row of pills that scrolls
+ * sideways under the breadcrumbs. The current page is marked in the orange primary.
  */
 export function AccountSideNav() {
   const { t, language } = useLanguage();
   const n = t.account.nav;
   const pathname = usePathname();
-  const router = useRouter();
   const user = useAuthUser();
   const credits = useCredits(Boolean(user));
-  const info = user ? accountInfoFromUser(user) : null;
+  const c = t.account.credits;
+  const balance = credits?.balance ?? 0;
+  const added = credits?.added ?? 0;
+  const share = added > 0 ? Math.min(100, Math.round((balance / added) * 100)) : 0;
+  // The plan exactly as bought (the live subscription, else the last one-time video) - the card says it and opens it.
+  const plan = useMyPlan(Boolean(user));
+  const [planOpen, setPlanOpen] = useState(false);
+  const d = t.account.planDetails;
+  const planName = plan && plan.kind !== "none" ? ((t.plans.tiers as Record<string, { name: string }>)[plan.planKey]?.name ?? plan.planKey) : null;
+  const planKind = plan?.kind === "subscription" ? (plan.billing ? d.billing[plan.billing] : d.subscription) : plan?.kind === "one_time" ? d.oneTime : null;
 
   const items: Item[] = [
-    { href: myProjectsPath(language), label: n.projects, icon: IconFolder },
-    { href: accountPath(language), label: n.account, icon: IconUser },
-    ...(isTeamUser(user) ? [{ href: teamPath(language), label: n.team, icon: IconLayoutDashboard }] : []),
-    { href: pricingPath(language), label: n.buy, icon: IconCoins },
+    { href: myProjectsPath(language), label: n.projects, icon: IconFolderFilled },
+    { href: accountPath(language), label: n.account, icon: IconUserFilled },
+    ...(isTeamUser(user) ? [{ href: teamPath(language), label: n.team, icon: IconLayoutDashboardFilled }] : []),
+    { href: pricingPath(language), label: n.buy, icon: IconCoinFilled },
   ];
-
-  const signOut = async () => {
-    await createClient().auth.signOut();
-    router.push(homePath(language));
-    router.refresh();
-  };
 
   const link = (active: boolean) =>
     cn(
@@ -51,15 +54,34 @@ export function AccountSideNav() {
 
   return (
     <nav aria-label={n.label} className="lg:sticky lg:top-28 lg:self-start">
-      {/* Who is signed in and what they have left - desktop only (the header menu shows it on phones). */}
-      {info ? (
-        <div className="mb-4 hidden items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.03] p-3.5 lg:flex">
-          <AccountAvatar name={info.name} url={info.avatarUrl} className="size-10 text-base" />
-          <div className="min-w-0">
-            <p className="truncate text-sm font-semibold">{info.name}</p>
-            <p className="truncate text-xs text-white/50">{credits ? formatVideoTime(credits.balance) : "…"}</p>
+      {/* The video time available. */}
+      {user ? (
+        <button
+          type="button"
+          onClick={() => setPlanOpen(true)}
+          aria-haspopup="dialog"
+          className="group/plan relative mb-4 block w-full cursor-pointer overflow-hidden rounded-2xl text-left transition-[transform,box-shadow] duration-200 ease-out hover:-translate-y-0.5 hover:shadow-[0_18px_40px_-18px_rgba(255,106,20,0.7)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff8a1f] bg-[linear-gradient(135deg,rgba(255,138,31,0.55)_0%,rgba(255,255,255,0.08)_40%,rgba(255,138,31,0.3)_100%)] p-px">
+          <div className="relative overflow-hidden rounded-[calc(1rem-1px)] bg-[linear-gradient(160deg,#1c1d22_0%,#101114_75%)] p-4">
+            <span aria-hidden className="pointer-events-none absolute -top-12 -right-12 size-32 rounded-full bg-[radial-gradient(circle,rgba(255,110,20,0.25),transparent_68%)]" />
+            <div className="relative flex items-center justify-between gap-2">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-white/50">{c.title}</p>
+              <span className="truncate rounded-full bg-[linear-gradient(115deg,#ff5e00,#ff9a3c)] px-2 py-0.5 text-[10px] font-bold text-white">{planName ?? c.noPlan}</span>
+            </div>
+            <p className="relative mt-2 font-heading text-2xl leading-tight font-black text-white">{credits ? formatVideoTime(balance) : <span className="text-white/30">…</span>}</p>
+            <div className="relative mt-3 h-1.5 overflow-hidden rounded-full bg-white/10" aria-hidden>
+              <div className="h-full rounded-full bg-[linear-gradient(90deg,#ff5e00,#ffb066)] transition-[width] duration-700" style={{ width: `${share}%` }} />
+            </div>
+            {added > 0 ? <p className="relative mt-1.5 text-xs text-white/45">{c.of.replace("{total}", formatVideoTime(added))}</p> : null}
+            {/* The plan as bought, and the way into its details. */}
+            <div className="relative mt-3 flex items-center justify-between gap-2 border-t border-white/10 pt-3">
+              <span className="min-w-0 text-xs">
+                {planKind ? <span className="block truncate text-white/55">{planKind}</span> : null}
+                <span className="font-semibold text-[#ffb066]">{d.button}</span>
+              </span>
+              <IconChevronRight className="size-4 shrink-0 text-[#ff8a1f] transition-transform duration-200 group-hover/plan:translate-x-0.5" aria-hidden />
+            </div>
           </div>
-        </div>
+        </button>
       ) : null}
 
       <ul className="-mx-1 flex gap-1.5 overflow-x-auto px-1 pb-1 [scrollbar-width:none] lg:mx-0 lg:flex-col lg:overflow-visible lg:px-0 [&::-webkit-scrollbar]:hidden">
@@ -74,13 +96,8 @@ export function AccountSideNav() {
             </li>
           );
         })}
-        <li className="lg:mt-3 lg:border-t lg:border-white/10 lg:pt-3">
-          <button type="button" onClick={() => void signOut()} className={cn(link(false), "w-full")}>
-            <IconLogout className="size-[19px] shrink-0 transition-transform duration-200 group-hover:scale-110" aria-hidden />
-            {n.signOut}
-          </button>
-        </li>
       </ul>
+      <PlanDetailsDialog plan={plan} open={planOpen} onOpenChange={setPlanOpen} />
     </nav>
   );
 }

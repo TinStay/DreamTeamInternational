@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type Stripe from "stripe";
-import { formatBytes, projectFromRow } from "@/lib/client-projects";
+import { formatBytes, progressOf, projectFromRow, timelineFor } from "@/lib/client-projects";
 import { isLiveStatus, subscriptionRow } from "@/lib/subscriptions";
 import { safeFileName } from "@/lib/supabase/storage";
 
@@ -61,9 +61,24 @@ describe("subscriptions", () => {
       status: "active",
       cancel_at_period_end: false,
       metadata: { user_id: "u1", plan_key: "creator" },
-      items: { data: [{ current_period_end: 1_790_000_000 }] },
+      items: { data: [{ current_period_end: 1_790_000_000, price: { unit_amount: 389000, currency: "usd", recurring: { interval: "year" } } }] },
     } as unknown as Stripe.Subscription;
-    expect(subscriptionRow(sub)).toMatchObject({ id: "sub_1", user_id: "u1", customer_id: "cus_1", plan_key: "creator", status: "active", current_period_end: new Date(1_790_000_000 * 1000).toISOString() });
+    expect(subscriptionRow(sub)).toMatchObject({ id: "sub_1", user_id: "u1", customer_id: "cus_1", plan_key: "creator", status: "active", current_period_end: new Date(1_790_000_000 * 1000).toISOString(), billing: "annual", amount_cents: 389000, currency: "usd" });
     expect(subscriptionRow({ ...sub, metadata: {} } as unknown as Stripe.Subscription)).toBeNull();
+  });
+});
+
+describe("progress and timeline", () => {
+  const base = projectFromRow({ id: "p", status: "brief", created_at: "2026-10-01T09:00:00Z", due_date: "2026-10-20" });
+  const labels = { brief: "Brief", scripting: "Scripting", production: "Production", review: "Review", delivered: "Delivered" };
+
+  it("starts a new brief at 5% and ends at 100%", () => {
+    expect(progressOf(base)).toBe(5);
+    expect(progressOf({ ...base, status: "delivered" })).toBe(100);
+  });
+
+  it("never puts the deadline under Delivered - only the approval date once there is one", () => {
+    expect(timelineFor(base, labels).at(-1)?.date).toBeNull();
+    expect(timelineFor({ ...base, status: "delivered", approvedAt: "2026-10-18T12:00:00Z" }, labels).at(-1)?.date).toBe("2026-10-18");
   });
 });

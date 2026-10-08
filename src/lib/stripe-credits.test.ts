@@ -10,8 +10,13 @@ describe("creditDecision - seconds only for collected money", () => {
   it("credits a one-time pack paid at checkout", () => {
     expect(creditDecision(event("checkout.session.completed", session({})))).toEqual({
       kind: "credit",
-      purchase: { userId: "u1", seconds: 20, planKey: "personal", ref: "cs_1", note: "Pack purchase" },
+      purchase: { userId: "u1", seconds: 20, planKey: "personal", ref: "cs_1", note: "Pack purchase", orderId: null },
     });
+  });
+
+  it("carries the order the checkout recorded", () => {
+    const d = creditDecision(event("checkout.session.completed", session({ metadata: { ...META, seconds: "40", order_id: "o1" } })));
+    expect(d.kind === "credit" && d.purchase).toMatchObject({ seconds: 40, orderId: "o1" });
   });
 
   it("does not credit a checkout whose bank payment is still pending", () => {

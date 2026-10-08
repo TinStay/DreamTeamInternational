@@ -4,7 +4,9 @@
  * Labels come from the Bulgarian dictionary (the internal email is in
  * Bulgarian), so the form copy and the email stay in sync.
  */
-import { dictionaries } from "@/lib/i18n/config";
+// The site is English only, but the internal email to the team stays in Bulgarian - its labels come from the
+// Bulgarian dictionary, kept for this alone.
+import { bg } from "@/lib/i18n/bg";
 import {
   AUTOMATION_INPUT_OPTIONS,
   AUTOMATION_TASK_OPTIONS,
@@ -109,7 +111,7 @@ export const SERVICE_EMAIL_TITLE: Record<QuoteServiceKey, string> = {
 
 /** The service-specific sections of the email (contact / notes are added by the route). */
 export function serviceEmailSections(a: ServiceAnswers): QuoteEmailSection[] {
-  const bgQuote = dictionaries.bg.quoteForm;
+  const bgQuote = bg.quoteForm;
   const references: QuoteEmailSection = {
     title: "Референции и материали",
     fields: [

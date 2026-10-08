@@ -1,8 +1,8 @@
--- ONE-FILE SETUP: projects + team + credits + delivery + profiles, in the right order. Run this once in the Supabase SQL Editor.
--- (Same content as projects.sql, then team.sql, then credits.sql, then delivery.sql, then profiles.sql. After it, make yourself an admin - see the snippet
+-- ONE-FILE SETUP: projects + team + credits + delivery + profiles + orders, in the right order. Run this once in the Supabase SQL Editor.
+-- (Same content as projects.sql, then team.sql, then credits.sql, then delivery.sql, then profiles.sql, then orders.sql. After it, make yourself an admin - see the snippet
 -- inside the team.sql part below, and read README.md.)
 
--- ======================= 1/5  projects =======================
+-- ======================= 1/6  projects =======================
 -- The client's projects for the "Your Projects" page (/en/my-projects).
 -- Run this once in the Supabase dashboard: SQL Editor -> New query -> paste -> Run.
 -- Clients can only READ their own rows (row level security); you add and update projects from the dashboard
@@ -59,7 +59,7 @@ alter table public.projects add column if not exists revisions jsonb not null de
 -- Clients do not insert into this table directly: a project is created (and its video seconds are spent) in one step by
 -- the submit_project() function in supabase/credits.sql.
 
--- ======================= 2/5  team =======================
+-- ======================= 2/6  team =======================
 -- The team dashboard (/en/team): every client's projects and the files they submitted, in one place.
 -- Run this once in the Supabase dashboard (SQL Editor), AFTER supabase/projects.sql.
 
@@ -121,7 +121,7 @@ create policy "Team reads all project files"
   to authenticated
   using (bucket_id = 'project-files' and public.is_admin());
 
--- ======================= 3/5  credits =======================
+-- ======================= 3/6  credits =======================
 -- Video seconds ("credits"), submitting a project, and the comments on it.
 -- Run once in the Supabase SQL Editor, AFTER supabase/projects.sql and supabase/team.sql.
 
@@ -250,7 +250,7 @@ create policy "Write comments on your projects"
     )
   );
 
--- ======================= 4/5  delivery =======================
+-- ======================= 4/6  delivery =======================
 -- Delivering the work, the client's approval / revision request, and the one-subscription rule.
 -- Run once in the Supabase SQL Editor, AFTER projects.sql, team.sql and credits.sql (setup-all.sql includes it). Safe to re-run.
 
@@ -383,7 +383,7 @@ create policy "Team reads all subscriptions"
   on public.subscriptions for select to authenticated
   using (public.is_admin());
 
--- ======================= 5/5  profiles =======================
+-- ======================= 5/6  profiles =======================
 -- One row per user: the client's profile, the hub every piece of their data points at, plus the team's private notes and
 -- the one-query overview the team's Clients tab reads.
 -- Run once in the Supabase SQL Editor, AFTER projects.sql, team.sql, credits.sql and delivery.sql (setup-all.sql includes
@@ -584,3 +584,45 @@ alter function public.touch_updated_at() set search_path = public;
 create index if not exists client_notes_author_idx on public.client_notes (author_id);
 create index if not exists credit_ledger_project_idx on public.credit_ledger (project_id);
 create index if not exists project_comments_user_idx on public.project_comments (user_id);
+
+-- ======================= 6/6  orders =======================
+-- Every purchase as an order: who bought what - one-time video or subscription, which plan, which billing, how many
+-- seconds, for how much - and whether it was paid. Written by /api/checkout (pending) and the payment webhook (paid /
+-- failed / expired), both with the service role; clients read their own, the team reads all.
+-- Run once in the Supabase SQL Editor, AFTER profiles.sql (setup-all.sql includes it). Safe to re-run.
+
+create table if not exists public.orders (
+  id                      uuid primary key default gen_random_uuid(),
+  user_id                 uuid not null references public.profiles (id) on delete cascade,
+  plan_key                text not null,                                 -- personal, creator, pro, local, brand
+  purchase_type           text not null check (purchase_type in ('one_time', 'subscription')),
+  billing                 text check (billing in ('monthly', 'annual')),   -- subscriptions only
+  seconds                 integer not null check (seconds > 0),          -- per payment (a year of them on annual)
+  amount_cents            integer not null check (amount_cents >= 0),
+  currency                text not null default 'usd',
+  status                  text not null default 'pending' check (status in ('pending', 'paid', 'failed', 'expired')),
+  stripe_session_id       text unique,
+  stripe_subscription_id  text,
+  created_at              timestamptz not null default now(),
+  paid_at                 timestamptz
+);
+create index if not exists orders_user_idx on public.orders (user_id, created_at desc);
+create index if not exists orders_subscription_idx on public.orders (stripe_subscription_id);
+
+alter table public.orders enable row level security;
+
+drop policy if exists "Read your own orders" on public.orders;
+create policy "Read your own orders"
+  on public.orders for select to authenticated
+  using ((select auth.uid()) = user_id or public.is_admin());
+
+revoke insert, update, delete on public.orders from authenticated, anon;
+
+-- Each credit points at the order that paid for it (a subscription's renewals all point at its order).
+alter table public.credit_ledger add column if not exists order_id uuid references public.orders (id) on delete set null;
+create index if not exists credit_ledger_order_idx on public.credit_ledger (order_id);
+
+-- The plan as bought: monthly or annual, and the price per period (from the subscription item, mirrored by the webhook).
+alter table public.subscriptions add column if not exists billing text check (billing in ('monthly', 'annual'));
+alter table public.subscriptions add column if not exists amount_cents integer;
+alter table public.subscriptions add column if not exists currency text;

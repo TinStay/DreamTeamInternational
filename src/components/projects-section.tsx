@@ -188,7 +188,7 @@ export function ProjectThumbnail({
  * screen on a coarse one - and is paused and rewound otherwise, so one film
  * runs at a time. Reduced motion never plays it (the poster stays).
  */
-function ProjectRowMedia({ clip, playing }: { clip: BunnyVideo; playing: boolean }) {
+export function ProjectRowMedia({ clip, playing }: { clip: BunnyVideo; playing: boolean }) {
   const ref = useRef<HTMLVideoElement>(null);
   useEffect(() => {
     const video = ref.current;

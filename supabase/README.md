@@ -7,11 +7,11 @@ client approves it (→ Delivered) or requests a revision (→ back In productio
 
 ## 1. Supabase (the database and the sign-in)
 
-**Easiest:** run the single file `setup-all.sql` (it is the five files below in the right order) - one query, one Run.
+**Easiest:** run the single file `setup-all.sql` (it is the six files below in the right order) - one query, one Run.
 Already set up from an earlier version? Run the files you are missing on their own, in order (all are safe to re-run).
 
-> **The live project ("US WEBSITE", `zwhcvnqqdbqlxqtwurnw`) has all five applied** as of 07-10-2026 (`delivery`,
-> `profiles` and the `hardening` block went in as Supabase migrations).
+> **The live project ("US WEBSITE", `zwhcvnqqdbqlxqtwurnw`) has all six applied** as of 07-10-2026 (`delivery`,
+> `profiles`, the `hardening` block and `orders` went in as Supabase migrations).
 
 Or, in the Supabase dashboard → **SQL Editor** → **New query**, run these files **in this order**, one query each:
 
@@ -24,6 +24,10 @@ Or, in the Supabase dashboard → **SQL Editor** → **New query**, run these fi
    backfilled for existing users): name, company, phone, country, Stripe customer id. `projects`, `credit_ledger`,
    `project_comments` and `subscriptions` now point at it. Also the team's private `client_notes`, the
    `client_overview` view the team's Clients tab reads, and the security hardening the Supabase advisors asked for
+
+6. `orders.sql` - **every purchase as an order**: who bought what - one-time video or subscription, the plan, the
+   billing, the seconds, the amount - and its status (pending -> paid / failed / expired). `/api/checkout` writes it
+   pending, the webhook settles it, and each credit in `credit_ledger` points at its order (`order_id`)
 
 To give a client video time by hand (a gift, a test account), add a ledger row - never edit a balance:
 
@@ -49,7 +53,9 @@ Also in Supabase:
 2. **Developers → API keys**: copy the **Secret key** (`sk_test_…`).
 3. **Developers → Webhooks → Add endpoint**:
    - URL: `https://YOUR-SITE/api/stripe/webhook`
-   - Events: `checkout.session.completed`, `checkout.session.async_payment_succeeded`, `invoice.paid`,
+   - Events: `checkout.session.completed`, `checkout.session.async_payment_succeeded`,
+     `checkout.session.async_payment_failed`, `checkout.session.expired` (the last two settle an order as failed /
+     not completed), `invoice.paid`,
      `customer.subscription.created`, `customer.subscription.updated` and `customer.subscription.deleted` (the last three
      keep a client from buying a second plan while one is live)
    - Seconds are added **only for money collected**: a declined card never completes the checkout, a bank payment

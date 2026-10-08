@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { ProjectsPageView } from "@/components/projects/projects-page-view";
+import { CustomersPageView } from "@/components/customers-page-view";
 import { localeAlternates } from "@/lib/routes";
 import { LOCALES, isLocale, getDictionary } from "@/lib/i18n/config";
 import { jsonLd } from "@/lib/seo";
@@ -41,7 +41,7 @@ export default async function LocaleProjectsPage({
     <>
       {/* The listing as a CollectionPage whose list is every case study (`lib/seo-graph.ts`). */}
       <script type="application/ld+json" dangerouslySetInnerHTML={jsonLd(projectsCollectionGraph(lang))} />
-      <ProjectsPageView />
+      <CustomersPageView />
     </>
   );
 }

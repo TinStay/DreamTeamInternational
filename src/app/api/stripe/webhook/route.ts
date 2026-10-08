@@ -4,6 +4,7 @@ import { getStripe } from "@/lib/stripe";
 import { creditDecision, purchaseFromMetadata, type Purchase } from "@/lib/stripe-credits";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { saveSubscription } from "@/lib/subscriptions";
+import { updateOrder } from "@/lib/orders";
 
 export const runtime = "nodejs";
 
@@ -18,9 +19,27 @@ async function credit(p: Purchase): Promise<boolean> {
     plan_key: p.planKey,
     note: p.note,
     external_ref: p.ref,
+    // The order that paid for it (a column from supabase/orders.sql - only sent when there is one).
+    ...(p.orderId ? { order_id: p.orderId } : {}),
   });
   // 23505 = this payment was already credited (Stripe sends events more than once): fine.
   return !error || error.code === "23505";
+}
+
+/** Settles the checkout's order from its checkout events (best effort - the credits never wait on it). */
+async function settleOrder(event: Stripe.Event) {
+  if (!event.type.startsWith("checkout.session.")) return;
+  const session = event.data.object as Stripe.Checkout.Session;
+  const orderId = session.metadata?.order_id;
+  if (!orderId) return;
+  if ((event.type === "checkout.session.completed" || event.type === "checkout.session.async_payment_succeeded") && session.payment_status === "paid") {
+    const sub = typeof session.subscription === "string" ? session.subscription : session.subscription?.id;
+    await updateOrder(orderId, { status: "paid", paid_at: new Date().toISOString(), ...(sub ? { stripe_subscription_id: sub } : {}) });
+  } else if (event.type === "checkout.session.async_payment_failed") {
+    await updateOrder(orderId, { status: "failed" });
+  } else if (event.type === "checkout.session.expired") {
+    await updateOrder(orderId, { status: "expired" });
+  }
 }
 
 /**
@@ -28,7 +47,9 @@ async function credit(p: Purchase): Promise<boolean> {
  * is collected** (`creditDecision` in `lib/stripe-credits.ts`): a one-time pack when its checkout completes paid, or when
  * a delayed bank payment later succeeds (`checkout.session.async_payment_succeeded`); a subscription each time an invoice
  * is paid (the first month too, and every renewal). Declined cards, failed bank debits and failed renewals add nothing.
- * Subscription created / updated / deleted events are mirrored into `subscriptions` (one live plan per client). The
+ * The checkout's **order** (`lib/orders.ts`, its id in the metadata) is settled from the checkout events - paid, failed
+ * (a delayed bank payment that did not go through) or expired (the checkout was abandoned) - and every credit points at
+ * it. Subscription created / updated / deleted events are mirrored into `subscriptions` (one live plan per client). The
  * signature is verified with `STRIPE_WEBHOOK_SECRET`, so only Stripe can call this.
  */
 export async function POST(request: Request) {
@@ -50,6 +71,8 @@ export async function POST(request: Request) {
     const saved = await saveSubscription(event.data.object as Stripe.Subscription);
     return saved ? NextResponse.json({ received: true }) : NextResponse.json({ error: "subscription_failed" }, { status: 500 });
   }
+
+  await settleOrder(event);
 
   // Only money actually collected adds seconds - a failed, pending or unpaid payment never does (`creditDecision`).
   const decision = creditDecision(event);

@@ -7,16 +7,17 @@ import Image from "next/image";
 import {
   IconBook,
   IconBriefcase,
-<<<<<<< Updated upstream
-=======
   IconCoins,
->>>>>>> Stashed changes
   IconFolder,
   IconHome,
+  IconInfoCircle,
   IconMail,
   IconMenu2,
   IconVideo,
 } from "@tabler/icons-react";
+import { MobileMenuAccount } from "@/components/mobile-account";
+import { openLogin } from "@/lib/signup-dialog";
+import { useAuthUser } from "@/lib/supabase/use-auth-user";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
 import { useLanguage } from "@/lib/i18n/language-context";
 import { brandLogo } from "@/lib/brand-logo";
@@ -24,15 +25,18 @@ import { primaryGradientInteractiveClassName } from "@/components/ui/button";
 import { ButtonWithIcon } from "@/components/ui/button-with-icon";
 import { GlassShell } from "@/components/ui/glass-shell";
 import {
+  aboutPath,
+  careersPath,
   contactProcessPath,
   homePath,
+  myProjectsPath,
   portfolioPath,
+  pricingPath,
   projectsPath,
   servicesPath,
   trainingPath,
 } from "@/lib/routes";
 import { cn } from "@/lib/utils";
-import { LanguageToggle } from "./language-toggle";
 import { ThemeToggle } from "./theme-toggle";
 
 export function MobileNav() {
@@ -46,8 +50,6 @@ export function MobileNav() {
   // The dock's Projects opens the listing (it pointed at the home page's projects stage for a while).
   const projectsHref = projectsPath(language);
   const servicesHref = servicesPath(language);
-<<<<<<< Updated upstream
-=======
   const english = language === "en";
   const user = useAuthUser();
   const pathname = usePathname();
@@ -66,15 +68,12 @@ export function MobileNav() {
   ];
   const dockItem = "group flex flex-1 cursor-pointer select-none flex-col items-center justify-center gap-1 text-muted-foreground transition-colors duration-200 ease-out hover:text-primary";
   const dockIcon = "h-[22px] w-[22px] text-neutral-800 transition-[transform,color] duration-200 ease-out group-hover:scale-110 group-hover:text-primary dark:text-neutral-200";
->>>>>>> Stashed changes
 
   return (
     <>
       {/* Dock: Projects first; Portfolio lives in the sheet menu. Tight to the bottom edge (the home indicator's
           inset on iPhones), as wide as the top bar. */}
       <GlassShell className="service-mobile-dock lg:hidden fixed bottom-[max(0.375rem,env(safe-area-inset-bottom))] left-1/2 z-50 flex w-[96%] max-w-lg -translate-x-1/2 items-center gap-1.5 px-3 py-2">
-<<<<<<< Updated upstream
-=======
         {english ? (
           <>
             <Link href={homeHref} className={cn(dockItem, isActive(homeHref) && "text-primary")}>
@@ -99,7 +98,6 @@ export function MobileNav() {
           </>
         ) : (
           <>
->>>>>>> Stashed changes
         <Link
           href={projectsHref}
           className="group flex flex-1 select-none flex-col items-center justify-center gap-1 text-muted-foreground transition-colors duration-200 ease-out hover:text-primary"
@@ -123,6 +121,9 @@ export function MobileNav() {
           <IconBriefcase className="h-[22px] w-[22px] text-neutral-800 transition-[transform,color] duration-200 ease-out group-hover:scale-110 group-hover:text-primary dark:text-neutral-200" />
           <span className="text-xs font-semibold tracking-wide">{t.header.services}</span>
         </Link>
+
+          </>
+        )}
 
         <Sheet open={isOpen} onOpenChange={setIsOpen}>
           <SheetTrigger
@@ -156,64 +157,11 @@ export function MobileNav() {
                   className={cn("mb-6 w-auto grayscale dark:invert", language === "en" ? "h-10" : "h-18")}
                 />
                 <div className="flex items-center gap-4">
-                  <LanguageToggle />
                   {/* English has one theme (`forcedTheme` in the layout), so no toggle there. */}
                   {language === "en" ? null : <ThemeToggle className="shrink-0" />}
                 </div>
               </div>
 
-<<<<<<< Updated upstream
-              <div className="flex flex-col gap-6 text-xl font-heading font-semibold">
-                <Link
-                  href={homeHref}
-                  onClick={() => setIsOpen(false)}
-                  className="group flex select-none items-center gap-4 text-foreground/80 transition-colors"
-                >
-                  <IconHome className="h-6 w-6 shrink-0 text-neutral-800 dark:text-neutral-200" />
-                  <span className="transition-colors group-hover:text-primary">{t.mobileNav.home}</span>
-                </Link>
-                <Link
-                  href={portfolioHref}
-                  onClick={() => setIsOpen(false)}
-                  className="group flex select-none items-center gap-4 text-foreground/80 transition-colors"
-                >
-                  <IconVideo className="h-6 w-6 shrink-0 text-neutral-800 dark:text-neutral-200" />
-                  <span className="transition-colors group-hover:text-primary">{t.header.portfolio}</span>
-                </Link>
-                <Link
-                  href={projectsPath(language)}
-                  onClick={() => setIsOpen(false)}
-                  className="group flex select-none items-center gap-4 text-foreground/80 transition-colors"
-                >
-                  <IconFolder className="h-6 w-6 shrink-0 text-neutral-800 dark:text-neutral-200" />
-                  <span className="transition-colors group-hover:text-primary">{t.header.projects}</span>
-                </Link>
-                <Link
-                  href={servicesHref}
-                  onClick={() => setIsOpen(false)}
-                  className="group flex select-none items-center gap-4 text-foreground/80 transition-colors"
-                >
-                  <IconBriefcase className="h-6 w-6 shrink-0 text-neutral-800 dark:text-neutral-200" />
-                  <span className="transition-colors group-hover:text-primary">{t.header.services}</span>
-                </Link>
-                <Link
-                  href={contactHref}
-                  onClick={() => setIsOpen(false)}
-                  className="group flex select-none items-center gap-4 text-foreground/80 transition-colors"
-                >
-                  <IconMail className="h-6 w-6 shrink-0 text-neutral-800 dark:text-neutral-200" />
-                  <span className="transition-colors group-hover:text-primary">{t.header.contact}</span>
-                </Link>
-                <Link
-                  href={trainingHref}
-                  onClick={() => setIsOpen(false)}
-                  className="group flex select-none items-center gap-4 text-foreground/80 transition-colors"
-                >
-                  <IconBook className="h-6 w-6 shrink-0 text-neutral-800 dark:text-neutral-200" />
-                  <span className="transition-colors group-hover:text-primary">{t.header.training}</span>
-                </Link>
-              </div>
-=======
               {english ? (
                 <div className="flex flex-col gap-5 text-lg font-heading font-semibold">
                   {englishLinks.map(({ label, href, Icon }) => (
@@ -281,13 +229,19 @@ export function MobileNav() {
                   </Link>
                 </div>
               )}
->>>>>>> Stashed changes
 
               <div className="mt-auto pt-8">
-                {/* The site's main CTA, to the services page like the desktop header's. */}
-                <ButtonWithIcon href={servicesHref} onClick={() => setIsOpen(false)} surface="auto" className="h-14 w-full text-base">
-                  {t.header.quoteCta}
-                </ButtonWithIcon>
+                {english ? (
+                  // English: Log in / Sign up, or the signed-in links (Your Projects, profile, account, Sign out).
+                  <div className="border-t border-border/20 pt-6">
+                    <MobileMenuAccount onNavigate={() => setIsOpen(false)} />
+                  </div>
+                ) : (
+                  /* The site's main CTA, to the services page like the desktop header's. */
+                  <ButtonWithIcon href={servicesHref} onClick={() => setIsOpen(false)} surface="auto" className="h-14 w-full text-base">
+                    {t.header.quoteCta}
+                  </ButtonWithIcon>
+                )}
               </div>
             </div>
           </SheetContent>

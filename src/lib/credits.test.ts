@@ -41,6 +41,15 @@ describe("checkoutFor", () => {
     expect(checkoutFor("pro", "annual")).toMatchObject({ amountCents: 62900 * 10, interval: "year", seconds: 60 * 12 });
   });
 
+  it("prices a one-time video by its length: $119 for every 10 seconds over 20", () => {
+    expect(checkoutFor("personal", "monthly", 40)).toMatchObject({ amountCents: (299 + 2 * 119) * 100, oneTime: true, seconds: 40 });
+    expect(checkoutFor("personal", "monthly", "120")).toMatchObject({ amountCents: (299 + 10 * 119) * 100, seconds: 120 });
+  });
+
+  it("refuses a one-time length off the slider", () => {
+    for (const bad of [10, 25, 130, -20, "abc", 30.5]) expect(checkoutFor("personal", "monthly", bad)).toBeNull();
+  });
+
   it("refuses custom and unknown plans", () => {
     expect(checkoutFor("enterprise", "monthly")).toBeNull();
     expect(checkoutFor("free-video", "monthly")).toBeNull();
