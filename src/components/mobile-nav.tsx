@@ -167,14 +167,14 @@ export function MobileNav() {
 
               {english ? (
                 <div className="flex flex-col gap-5 text-lg font-heading font-semibold">
-                  {/* The big glowing button, as in the desktop bar: opens the portfolio (its chips are every category). */}
+                  {/* The glowing orange "EXPLORE VIDEOS", as in the desktop bar: opens the portfolio (its chips are every category). */}
                   <Link
                     href={portfolioHref}
                     onClick={() => setIsOpen(false)}
-                    className="nav-explore mb-1 flex h-14 w-full cursor-pointer select-none items-center justify-center gap-2.5 rounded-full text-lg font-extrabold text-[#1f0b00]"
+                    className="group flex cursor-pointer select-none items-center gap-4 transition-transform duration-200 ease-out hover:translate-x-1"
                   >
-                    <IconVideo className="relative z-[2] size-6" stroke={2.2} aria-hidden />
-                    <span className="relative z-[2]">{t.header.nav.exploreVideos}</span>
+                    <IconVideo className="h-6 w-6 shrink-0 text-[#ff8a1f] drop-shadow-[0_0_6px_rgba(255,110,20,0.7)]" aria-hidden />
+                    <span className="nav-explore font-extrabold uppercase tracking-[0.09em]">{t.header.nav.exploreVideos}</span>
                   </Link>
                   {englishLinks.map(({ label, href, Icon }) => (
                     <Link

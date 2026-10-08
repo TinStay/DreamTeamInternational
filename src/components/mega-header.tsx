@@ -4,7 +4,6 @@ import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import { motion } from "motion/react";
-import { IconChevronDown } from "@tabler/icons-react";
 import { cn } from "@/lib/utils";
 import { brandLogo } from "@/lib/brand-logo";
 
@@ -13,7 +12,7 @@ const EASE = [0.22, 1, 0.36, 1] as const;
 /** How far the tabs may be set smaller to fit (1 = their size): below this tabs fold into the last one. */
 const MIN_FIT = 0.8;
 
-export type MegaNavItem = { label: string; href: string; /** A short line under the label (the big button's list). */ hint?: string };
+export type MegaNavItem = { label: string; href: string; /** A short line under the label (the Explore Videos list). */ hint?: string };
 
 export type MegaNavGroup = {
   label: string;
@@ -27,9 +26,9 @@ export type MegaNavGroup = {
   collapse?: number;
   /** A thin vertical line before this tab, starting a new group. */
   divideBefore?: boolean;
-  /** The big glowing button ("Explore Videos"): never folds, and its list opens as a wide card under it. */
+  /** The glowing orange "Explore Videos" tab: never folds, and its list opens as a wide card under it. */
   cta?: boolean;
-  /** A link at the foot of a big button's list ("Browse all videos"). */
+  /** A link at the foot of the glowing tab's list ("Browse all videos"). */
   footerLink?: { label: string; href: string };
 };
 
@@ -52,28 +51,14 @@ function MegaLink({ href, className, children }: { href: string; className?: str
   );
 }
 
-/** The big button's box (`.nav-explore`, globals.css: the orange glow and the band of light sliding across it). In `em`,
- * so it is set smaller with the tabs when the bar is short of room. The ruler measures this same box. */
-const CTA_BOX =
-  "nav-explore inline-flex items-center gap-[0.55em] rounded-full px-[1.45em] py-[0.72em] text-[1.1em] leading-none font-extrabold whitespace-nowrap text-[#1f0b00]";
-
-function CtaContent({ label, open }: { label: string; open?: boolean }) {
-  return (
-    <>
-      <span className="relative z-[2]">{label}</span>
-      <IconChevronDown
-        className={cn("relative z-[2] size-[1.15em] transition-transform duration-300 ease-out", open && "rotate-180")}
-        stroke={2.8}
-        aria-hidden
-      />
-    </>
-  );
-}
+/** The "Explore Videos" tab (`.nav-explore`, globals.css): the other tabs' size, but in capitals with wide letter-spacing, orange
+ * letters that glow and a band of light sliding across them. The ruler measures this same text. */
+const CTA_TEXT = "nav-explore inline-block whitespace-nowrap uppercase tracking-[0.09em] font-extrabold";
 
 /**
  * The English site's desktop header: a glass bar across the whole width of the screen, sliding away as the page
- * scrolls down and back as soon as it scrolls up. One row of tabs beside the logo - Home, the big glowing "Explore
- * Videos" button, About Us, Customers, Pricing, Careers and "More". The big button and "More" hold
+ * scrolls down and back as soon as it scrolls up. One row of tabs beside the logo - Home, the glowing orange "EXPLORE
+ * VIDEOS" tab, About Us, Customers, Pricing, Careers and "More". "Explore Videos" and "More" hold
  * a list: hovering or tabbing into one drops a floating card under it - the bar does not unfold, the other tabs are
  * plain links - and it folds away as the pointer leaves. The logo and the right-hand controls stay on the top row.
  * `/bg` keeps `SiteHeader`'s own desktop header.
@@ -235,7 +220,7 @@ export function MegaHeader({
           </Link>
 
           {/* Left-aligned beside the logo, one row of tabs at an even gap, the groups split by thin vertical lines. The
-              big button and the last tab hold a list - hovering or tabbing into one opens its panel; the other tabs are
+              "Explore Videos" and the last tab hold a list - hovering or tabbing into one opens its panel; the other tabs are
               plain links and close it. */}
           <nav
             ref={navRef}
@@ -257,13 +242,7 @@ export function MegaHeader({
                 <div key={group.href} className="flex shrink-0 flex-row">
                   {group.divideBefore ? <span className="me-[1em] h-4 w-px xl:me-[1.33em] min-[1900px]:me-[1.85em]" /> : null}
                   <span className="flex h-[4.25rem] items-center">
-                    {group.cta ? (
-                      <span className={CTA_BOX}>
-                        <CtaContent label={group.label} />
-                      </span>
-                    ) : (
-                      group.label
-                    )}
+                    {group.cta ? <span className={CTA_TEXT}>{group.label}</span> : group.label}
                   </span>
                 </div>
               ))}
@@ -286,8 +265,11 @@ export function MegaHeader({
                   <div className="relative flex flex-col">
                     <div className="flex h-[4.25rem] items-center">
                       {group.cta ? (
-                        <Link href={group.href} className={cn(CTA_BOX, "cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-white/80")}>
-                          <CtaContent label={group.label} open={isOpen} />
+                        <Link
+                          href={group.href}
+                          className={cn(CTA_TEXT, "cursor-pointer outline-none transition-transform duration-200 ease-out hover:translate-x-0.5")}
+                        >
+                          {group.label}
                         </Link>
                       ) : (
                         <MegaLink href={group.href}>{group.label}</MegaLink>
