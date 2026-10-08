@@ -13,7 +13,6 @@ import {
   IconInfoCircle,
   IconMail,
   IconMenu2,
-  IconSparkles,
   IconTrendingUp,
   IconVideo,
 } from "@tabler/icons-react";
@@ -66,7 +65,6 @@ export function MobileNav() {
     { label: t.header.projects, href: projectsHref, Icon: IconFolder },
     { label: t.header.pricingPage, href: pricingPath(language), Icon: IconCoins },
     { label: t.footer.careers, href: careersPath(language), Icon: IconBriefcase },
-    { label: t.header.services, href: servicesHref, Icon: IconSparkles },
     { label: t.header.investors, href: investorsPath(language), Icon: IconTrendingUp },
   ];
   const dockItem = "group flex flex-1 cursor-pointer select-none flex-col items-center justify-center gap-1 text-muted-foreground transition-colors duration-200 ease-out hover:text-primary";

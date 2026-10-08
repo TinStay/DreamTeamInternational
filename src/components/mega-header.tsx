@@ -10,7 +10,7 @@ import { brandLogo } from "@/lib/brand-logo";
 const EASE = [0.22, 1, 0.36, 1] as const;
 
 /** How far the tabs may be set smaller to fit (1 = their size): below this tabs fold into the last one. */
-const MIN_FIT = 0.8;
+const MIN_FIT = 0.87;
 
 export type MegaNavItem = { label: string; href: string; /** A short line under the label (the Explore Videos list). */ hint?: string };
 
@@ -26,6 +26,8 @@ export type MegaNavGroup = {
   collapse?: number;
   /** A thin vertical line before this tab, starting a new group. */
   divideBefore?: boolean;
+  /** The "More" tab: on the bar only while other tabs are folded into it - its list is those tabs (plus its own `items`). */
+  overflow?: boolean;
   /** The glowing orange "Explore Videos" tab: never folds, and its list opens as a wide card under it. */
   cta?: boolean;
   /** A link at the foot of the glowing tab's list ("Browse all videos"). */
@@ -86,7 +88,7 @@ export function MegaHeader({
   const [fit, setFit] = useState(1);
   /** False in the server HTML and until the first measurement: the tabs are not shown before they are fitted. */
   const [fitted, setFitted] = useState(false);
-  const groupsKey = groups.map((g) => `${g.href}|${g.label}|${g.collapse ?? ""}${g.cta ? "b" : ""}`).join("~");
+  const groupsKey = groups.map((g) => `${g.href}|${g.label}|${g.collapse ?? ""}${g.cta ? "b" : ""}${g.overflow ? "o" : ""}`).join("~");
 
   // Fit the tabs to the room there is: an invisible copy of the whole row (`ruler`) gives every tab's natural width;
   // while the row is wider than the nav, the not-main tabs fold into the last tab's list and the main ones shrink.
@@ -98,15 +100,18 @@ export function MegaHeader({
       const widths = Array.from(ruler.children, (el) => (el as HTMLElement).offsetWidth).slice(0, groups.length);
       const gap = parseFloat(getComputedStyle(ruler).columnGap) || 0;
       const room = nav.clientWidth - (parseFloat(getComputedStyle(nav).paddingInlineStart) || 0);
-      const shown = widths.map(() => true);
-      // The least room the row needs: the shown tabs, each thin line between two groups (an item of its own, 1px wide)
-      // and a gap between every two items. The tabs are then spread over whatever room is left (`justify-between`).
+      const moreIdx = groups.findIndex((g) => g.overflow);
+      const tabHidden = widths.map(() => false);
+      // "More" is on the bar only while something is folded into it.
+      const present = (i: number) => (i === moreIdx ? tabHidden.some((f) => f) : !tabHidden[i]);
+      // The least room the row needs: the tabs on the bar, each thin line between two groups (an item of its own,
+      // 1px wide) and a gap between every two items. The tabs are then spread over whatever room is left (`justify-between`).
       const total = () => {
         let sum = 0;
         let items = 0;
         let shownCount = 0;
         groups.forEach((g, i) => {
-          if (!shown[i]) return;
+          if (!present(i)) return;
           if (g.divideBefore && shownCount > 0) {
             sum += 1;
             items += 1;
@@ -118,19 +123,19 @@ export function MegaHeader({
         return sum + gap * Math.max(0, items - 1);
       };
       // Every tab stays on the bar, set smaller to fit - down to `MIN_FIT`. Only when even that is not enough do tabs
-      // fold into the last one, the higher `collapse` first.
+      // fold into "More", the higher `collapse` first.
       const order = groups
         .map((g, i) => ({ i, c: g.collapse }))
         .filter((x): x is { i: number; c: number } => x.c !== undefined)
         .sort((x, y) => y.c - x.c);
       for (const { i } of order) {
         if (room / total() >= MIN_FIT) break;
-        shown[i] = false;
+        tabHidden[i] = true;
       }
       let size = Math.min(1, room / total());
       // A hair under, so rounding in the text never pushes the last tab over the edge.
       size = size < 1 ? Math.max(MIN_FIT, Math.floor(size * 985) / 1000) : 1;
-      const next = groups.filter((_, i) => !shown[i]).map((g) => g.href);
+      const next = groups.filter((_, i) => tabHidden[i]).map((g) => g.href);
       setFolded((prev) => (prev.length === next.length && prev.every((h, k) => h === next[k]) ? prev : next));
       setFit(size);
       setFitted(true);
@@ -144,14 +149,13 @@ export function MegaHeader({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [groupsKey]);
 
-  // The tabs on the bar, and the last tab's list with the folded tabs put in front of its own items.
+  // The tabs on the bar, and "More" - there only while something is folded into it - with the folded tabs in its list.
   const bar = useMemo(() => {
-    const last = groups[groups.length - 1];
     const foldedGroups = groups.filter((g) => folded.includes(g.href));
     return groups
-      .filter((g) => !folded.includes(g.href))
+      .filter((g) => (g.overflow ? foldedGroups.length > 0 : !folded.includes(g.href)))
       .map((g): MegaNavGroup =>
-        g === last
+        g.overflow
           ? {
               ...g,
               items: [
@@ -244,7 +248,7 @@ export function MegaHeader({
             // The server HTML carries every tab, and only the measurement (client side) knows how many fit - until then
             // the row is clear, so a tab is never seen cut off at the edge for the moment before the page hydrates.
             className={cn(
-              "relative flex min-w-0 flex-1 items-start justify-between gap-x-[1em] overflow-x-clip text-[length:calc(13px*var(--nav-fit,1))] font-semibold text-[#ececee] transition-opacity duration-200 xl:gap-x-[1.16em] xl:ps-4 min-[1900px]:gap-x-[1.55em] min-[1900px]:ps-8 min-[1900px]:text-[length:calc(14px*var(--nav-fit,1))]",
+              "relative flex min-w-0 flex-1 items-start justify-between gap-x-[1em] overflow-x-clip text-[length:calc(15px*var(--nav-fit,1))] font-semibold text-[#ececee] transition-opacity duration-200 xl:gap-x-[1.16em] xl:ps-4 min-[1900px]:gap-x-[1.55em] min-[1900px]:ps-8 min-[1900px]:text-[length:calc(16px*var(--nav-fit,1))]",
               !fitted && "opacity-0"
             )}
             style={fit < 1 ? ({ "--nav-fit": fit } as CSSProperties) : undefined}
@@ -253,7 +257,7 @@ export function MegaHeader({
             <div
               ref={rulerRef}
               aria-hidden
-              className="pointer-events-none invisible absolute top-0 left-0 flex w-max items-start gap-x-[1em] whitespace-nowrap text-[length:calc(13px*var(--nav-fit))] [--nav-fit:1] xl:gap-x-[1.16em] min-[1900px]:gap-x-[1.55em] min-[1900px]:text-[length:calc(14px*var(--nav-fit))]"
+              className="pointer-events-none invisible absolute top-0 left-0 flex w-max items-start gap-x-[1em] whitespace-nowrap text-[length:calc(15px*var(--nav-fit))] [--nav-fit:1] xl:gap-x-[1.16em] min-[1900px]:gap-x-[1.55em] min-[1900px]:text-[length:calc(16px*var(--nav-fit))]"
             >
               {groups.map((group) => (
                 <div key={group.href} className="flex shrink-0 flex-row">
@@ -286,6 +290,16 @@ export function MegaHeader({
                           >
                             {group.label}
                           </Link>
+                        ) : group.overflow ? (
+                          <button
+                            type="button"
+                            aria-haspopup="menu"
+                            aria-expanded={isOpen}
+                            onClick={() => (isOpen ? setOpenKey(null) : show(group.href))}
+                            className="group/link relative inline-block cursor-pointer whitespace-nowrap outline-none transition-transform duration-200 ease-out hover:translate-x-0.5"
+                          >
+                            <span className={INK}>{group.label}</span>
+                          </button>
                         ) : (
                           <MegaLink href={group.href}>{group.label}</MegaLink>
                         )}

@@ -222,10 +222,10 @@ export function SiteHeader() {
 
   // The English mega menu's tabs, in the client's order and groups (split by thin lines): Home | the big glowing
   // "Explore Videos" button - a list of every video category, each opening the portfolio filtered to it - | About Us,
-  // Customers, Pricing, Careers | More, the one other tab that drops down, holding the rest of the site. All of them stay
-  // on the bar, set a little smaller when the screen is short of room (`MegaHeader`); only when even that is not enough
-  // do tabs fold into "More" - the `collapse` number says in what order (Careers first, then About Us and Customers, Home
-  // last; the big button and Pricing never).
+  // Customers, Pricing, Careers | Investor Relations. All of them stay on the bar, set a little smaller when the screen
+  // is short of room (`MegaHeader`); only when even that is not enough do tabs fold into "More", which then appears at
+  // the end - the `collapse` number says in what order (Careers first, then About Us and Customers, Home last; the
+  // glowing tab, Pricing and Investor Relations never).
   const portfolioCategory = (key: string) => `${portfolioPath(language)}?category=${key}`;
   const categoryNames = t.packages.items as Record<string, { title: string; line: string }>;
   const categoryItems = PORTFOLIO_KEYS.map((key) => ({
@@ -247,16 +247,9 @@ export function SiteHeader() {
     { label: t.header.projects, href: projectsPath(language), items: [], collapse: 7 },
     { label: t.header.pricingPage, href: pricingPath(language), items: [] },
     { label: t.footer.careers, href: careersPath(language), items: [], collapse: 9 },
-    {
-      label: t.header.nav.other,
-      href: servicesPath(language),
-      divideBefore: true,
-      items: [
-        { label: t.header.services, href: servicesPath(language) },
-        { label: t.header.nav.brandMascots, href: servicePath(language, "brand-mascots") },
-        { label: t.header.investors, href: investorsPath(language) },
-      ],
-    },
+    { label: t.header.investors, href: investorsPath(language), items: [], divideBefore: true },
+    // "More" is only on the bar while tabs are folded into it (a narrow window).
+    { label: t.header.nav.other, href: "#more", overflow: true, divideBefore: true, items: [] },
   ];
 
   const desktopControls = (
