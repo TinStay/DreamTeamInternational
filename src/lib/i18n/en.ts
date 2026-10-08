@@ -598,7 +598,6 @@ export const en = {
       toolbar: {
         search: "Search projects",
         filterLabel: "Show",
-        filterAll: "All projects",
         filters: { all: "All", active: "In progress", review: "Needs your review", delivered: "Delivered" },
         sortLabel: "Sort by",
         sort: { newest: "Newest first", oldest: "Oldest first", due: "Due date", name: "Name (A-Z)" },
@@ -753,7 +752,6 @@ export const en = {
     },
     hiring: {
       eyebrow: "Join our team",
-      badge: "Coming soon",
       title: "We're hiring soon",
       text: "We're growing. Roles for AI video producers, editors and creative directors will appear here - check back soon.",
       cta: "Check upcoming options"
@@ -776,7 +774,6 @@ export const en = {
     title1: "Build the future of",
     title2: "AI video with us",
     lead: "We're growing and opening new roles soon. Here is what's coming - register your interest and we'll write to you the moment a role opens.",
-    badge: "Opening soon",
     tag: "Fully remote",
     apply: "Register your interest",
     applySubject: "Career interest: {role}",

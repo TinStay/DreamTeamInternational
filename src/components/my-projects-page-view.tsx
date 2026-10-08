@@ -124,12 +124,12 @@ export function MyProjectsPageView({ projects: saved, sample = false, purchased 
               <Input value={query} onChange={(e) => setQuery(e.target.value)} placeholder={tb.search} aria-label={tb.search} className="h-11 rounded-full border-white/12 bg-black/30 pl-10" />
             </div>
             <PillSelect
-              className="min-[1720px]:hidden"
+              className="max-sm:min-w-0 max-sm:flex-1 min-[1720px]:hidden"
               value={filter}
               onChange={setFilter}
               label={tb.filterLabel}
               icon={<IconFilterFilled className="size-4 text-[#ff8a1f]" aria-hidden />}
-              options={FILTERS.map((key) => ({ value: key, label: `${key === "all" ? tb.filterAll : tb.filters[key]} · ${counts[key]}` }))}
+              options={FILTERS.map((key) => ({ value: key, label: `${tb.filters[key]} · ${counts[key]}` }))}
             />
             <div role="group" aria-label={tb.filterLabel} className="hidden flex-1 items-center gap-1.5 min-[1720px]:flex">
               {FILTERS.map((key) => (
@@ -149,7 +149,7 @@ export function MyProjectsPageView({ projects: saved, sample = false, purchased 
               ))}
             </div>
             {/* Sorting: just the field, at the end of the same line. */}
-            <PillSelect className="ms-auto shrink-0" value={sort} onChange={setSort} label={tb.sortLabel} options={(Object.keys(SORTS) as Sort[]).map((key) => ({ value: key, label: tb.sort[key] }))} />
+            <PillSelect className="ms-auto shrink-0 max-sm:min-w-0 max-sm:shrink max-sm:flex-1" value={sort} onChange={setSort} label={tb.sortLabel} options={(Object.keys(SORTS) as Sort[]).map((key) => ({ value: key, label: tb.sort[key] }))} />
           </div>
 
           {shown.length === 0 ? <p className={`${ACCOUNT_CARD} mt-8 p-10 text-center text-white/55`}>{tb.noMatch}</p> : null}
@@ -220,8 +220,8 @@ function ProjectCard({ project, statusLabel, href, onPlay }: { project: ClientPr
         <span className="mt-4 h-1.5 overflow-hidden rounded-full bg-white/10" aria-hidden>
           <span className={cn("block h-full rounded-full", PEARL_BAR)} style={{ width: `${progress}%` }} />
         </span>
-        {/* The due date (the status is the chip on the picture). The review CTA sits at the left of this row, outside the link. */}
-        <span className="mt-3 flex min-h-9 items-center justify-end gap-3 text-sm text-white/55">
+        {/* The due date on the left (the status is the chip on the picture); the review CTA sits at the right of this row, outside the link. */}
+        <span className="mt-3 flex min-h-9 items-center justify-start gap-3 text-sm text-white/55">
           {project.dueDate ? (
             <span className="inline-flex items-center gap-1.5">
               <IconCalendarFilled className="size-4 text-[#ff8a1f]/80" aria-hidden />
@@ -235,7 +235,7 @@ function ProjectCard({ project, statusLabel, href, onPlay }: { project: ClientPr
       {needsReview ? (
         <Link
           href={`${href}#review`}
-          className="group/review absolute bottom-6 left-6 inline-flex h-9 cursor-pointer items-center gap-1.5 rounded-full border border-emerald-400/45 bg-emerald-500/10 px-3.5 text-[13px] font-semibold text-emerald-200 transition-[transform,background-color,border-color,box-shadow] duration-200 ease-out hover:-translate-y-0.5 hover:border-emerald-300 hover:bg-emerald-500/20 hover:shadow-[0_10px_26px_-12px_rgba(52,211,153,0.7)] xl:bottom-7 xl:left-7"
+          className="group/review absolute right-6 bottom-6 inline-flex h-9 cursor-pointer items-center gap-1.5 rounded-full border border-emerald-400/45 bg-emerald-500/10 px-3.5 text-[13px] font-semibold text-emerald-200 transition-[transform,background-color,border-color,box-shadow] duration-200 ease-out hover:-translate-y-0.5 hover:border-emerald-300 hover:bg-emerald-500/20 hover:shadow-[0_10px_26px_-12px_rgba(52,211,153,0.7)] xl:right-7 xl:bottom-7"
         >
           <IconStarFilled className="size-4 text-amber-300 transition-transform duration-200 group-hover/review:rotate-[72deg] group-hover/review:scale-110" aria-hidden />
           {t.account.projectsPage.rating.cta}

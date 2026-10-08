@@ -40,7 +40,7 @@ export function PillSelect<T extends string>({
         )}
       >
         {icon ?? <IconArrowsSort className="size-4 text-[#ff8a1f]" aria-hidden />}
-        <SelectPrimitive.Value>{() => current?.label ?? ""}</SelectPrimitive.Value>
+        <SelectPrimitive.Value className="min-w-0 flex-1 truncate text-left">{() => current?.label ?? ""}</SelectPrimitive.Value>
         <IconChevronDown className="size-4 text-white/50 transition-transform duration-200 ease-out group-data-[popup-open]:rotate-180 group-data-[popup-open]:text-[#ff8a1f]" aria-hidden />
       </SelectPrimitive.Trigger>
       <SelectPrimitive.Portal>

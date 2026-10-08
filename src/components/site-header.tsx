@@ -218,18 +218,21 @@ export function SiteHeader() {
     ),
   }));
 
-  // The English mega menu's tabs, in the client's order and groups (split by thin lines): Explore (the home page) |
-  // the video services - each on the closest page there is today (a service page or a portfolio category) until it has
-  // its own | Pricing | Custom Services, the one tab that drops down, holding the rest of the site. Below 1280px the bar
-  // is short of room: Explore (the logo is the home link too) and Corporate Videos hide there, and Product Videos below
-  // 1400px.
+  // The English mega menu's tabs, in the client's order and groups (split by thin lines): Explore - the home page,
+  // dropping down the video types (each on its portfolio category until it has its own page) | About · Case studies ·
+  // Pricing · Careers | Custom Services, dropping down the rest of the site.
   const portfolioCategory = (key: string) => `${portfolioPath(language)}?category=${key}`;
   const megaGroups: MegaNavGroup[] = [
-    { label: t.header.nav.explore, href: homeHref, items: [], showFrom: "wide" },
-    { label: t.header.nav.socialAds, href: portfolioCategory("socialAds"), items: [], divideBefore: "wide" },
-    { label: t.header.nav.corporate, href: portfolioCategory("corporate"), items: [], showFrom: "ultra" },
-    { label: t.header.nav.tvAds, href: portfolioCategory("tvAds"), items: [], showFrom: "wide" },
-    { label: t.header.nav.productVideos, href: portfolioCategory("productVideos"), items: [], showFrom: "ultra" },
+    {
+      label: t.header.nav.explore,
+      href: homeHref,
+      items: [
+        { label: t.header.nav.socialAds, href: portfolioCategory("socialAds") },
+        { label: t.header.nav.corporate, href: portfolioCategory("corporate") },
+        { label: t.header.nav.tvAds, href: portfolioCategory("tvAds") },
+        { label: t.header.nav.productVideos, href: portfolioCategory("productVideos") },
+      ],
+    },
     { label: t.header.about, href: aboutPath(language), items: [], divideBefore: true },
     { label: t.header.projects, href: projectsPath(language), items: [] },
     { label: t.header.pricingPage, href: pricingPath(language), items: [] },
@@ -239,8 +242,6 @@ export function SiteHeader() {
       href: servicesPath(language),
       divideBefore: true,
       items: [
-        { label: t.header.nav.corporate, href: portfolioCategory("corporate") },
-        { label: t.header.nav.tvAds, href: portfolioCategory("tvAds") },
         { label: t.header.portfolio, href: portfolioPath(language) },
         { label: t.header.services, href: servicesPath(language) },
         { label: t.header.nav.brandMascots, href: servicePath(language, "brand-mascots") },
