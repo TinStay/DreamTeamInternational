@@ -68,6 +68,8 @@ export function MegaHeader({
   const rulerRef = useRef<HTMLDivElement>(null);
   /** The hrefs of the tabs folded into the last tab's drop-down at the current width. */
   const [folded, setFolded] = useState<string[]>([]);
+  /** False in the server HTML and until the first measurement: the tabs are not shown before they are fitted. */
+  const [fitted, setFitted] = useState(false);
   const groupsKey = groups.map((g) => `${g.href}|${g.label}|${g.collapse ?? ""}`).join("~");
 
   // Fit the tabs to the room there is: an invisible copy of the whole row (`ruler`) gives every tab's natural width;
@@ -98,6 +100,7 @@ export function MegaHeader({
       }
       const next = groups.filter((_, i) => !shown[i]).map((g) => g.href);
       setFolded((prev) => (prev.length === next.length && prev.every((h, k) => h === next[k]) ? prev : next));
+      setFitted(true);
     };
     fit();
     const ro = new ResizeObserver(fit);
@@ -208,7 +211,12 @@ export function MegaHeader({
               links and close it. */}
           <nav
             ref={navRef}
-            className="relative flex min-w-0 flex-1 items-start justify-start gap-x-3 overflow-x-clip ps-4 text-[13px] font-semibold text-[#ececee] xl:gap-x-3.5 2xl:gap-x-5 2xl:ps-8 2xl:text-sm"
+            // The server HTML carries every tab, and only the measurement (client side) knows how many fit - until then
+            // the row is clear, so a tab is never seen cut off at the edge for the moment before the page hydrates.
+            className={cn(
+              "relative flex min-w-0 flex-1 items-start justify-start gap-x-3 overflow-x-clip ps-4 text-[13px] font-semibold text-[#ececee] transition-opacity duration-200 xl:gap-x-3.5 2xl:gap-x-5 2xl:ps-8 2xl:text-sm",
+              !fitted && "opacity-0"
+            )}
           >
             {/* The ruler: an invisible copy of the whole row (the last tab with its long label), only for measuring. */}
             <div
