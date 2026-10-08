@@ -222,19 +222,19 @@ export function SiteHeader() {
   // the video categories (each opens the portfolio filtered to it) | About Us, Customers, Pricing, Careers | Custom
   // Services, the one tab that drops down, holding the rest of the site. All of them stay on the bar, set a little
   // smaller when the screen is short of room (`MegaHeader`); only when even that is not enough do tabs fold into the
-  // last tab - renamed "More" while it holds them - the `collapse` number says in what order (Explore first - the logo
-  // is the home link too - then Careers, About Us and Customers, the video categories last; Pricing never).
+  // last tab - renamed "More" while it holds them - the `collapse` number says in what order (Careers first, then About Us and Customers, Explore
+  // after them, the video categories last; Pricing never).
   const portfolioCategory = (key: string) => `${portfolioPath(language)}?category=${key}`;
   const megaGroups: MegaNavGroup[] = [
-    { label: t.header.nav.explore, href: homeHref, items: [], collapse: 9 },
+    { label: t.header.nav.explore, href: homeHref, items: [], collapse: 6 },
     { label: t.header.nav.socialAds, href: portfolioCategory("socialAds"), items: [], divideBefore: true, core: true, collapse: 1 },
     { label: t.header.nav.corporate, href: portfolioCategory("corporate"), items: [], core: true, collapse: 4 },
     { label: t.header.nav.tvAds, href: portfolioCategory("tvAds"), items: [], core: true, collapse: 3 },
     { label: t.header.nav.productVideos, href: portfolioCategory("productVideos"), items: [], core: true, collapse: 5 },
-    { label: t.header.about, href: aboutPath(language), items: [], divideBefore: true, collapse: 7 },
-    { label: t.header.projects, href: projectsPath(language), items: [], collapse: 6 },
+    { label: t.header.about, href: aboutPath(language), items: [], divideBefore: true, collapse: 8 },
+    { label: t.header.projects, href: projectsPath(language), items: [], collapse: 7 },
     { label: t.header.pricingPage, href: pricingPath(language), items: [] },
-    { label: t.footer.careers, href: careersPath(language), items: [], collapse: 8 },
+    { label: t.footer.careers, href: careersPath(language), items: [], collapse: 9 },
     {
       label: t.header.nav.other,
       foldedLabel: t.header.nav.more,

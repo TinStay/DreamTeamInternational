@@ -42,7 +42,7 @@ export function AccountControls() {
           <button
             type="button"
             onClick={openLogin}
-            className="inline-flex h-11 cursor-pointer items-center rounded-full px-4 text-[15px] font-semibold text-white/85 transition-[transform,background-color,color] duration-200 ease-out hover:-translate-y-px hover:bg-white/[0.08] hover:text-white"
+            className="inline-flex h-11 cursor-pointer items-center rounded-full px-4 max-[1699px]:px-3 text-[15px] font-semibold text-white/85 transition-[transform,background-color,color] duration-200 ease-out hover:-translate-y-px hover:bg-white/[0.08] hover:text-white"
           >
             {t.header.login}
           </button>

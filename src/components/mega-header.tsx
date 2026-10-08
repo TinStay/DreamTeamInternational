@@ -203,10 +203,10 @@ export function MegaHeader({
       {/* The whole width of the screen, edge to edge, in smoked glass (`.smoke-bar`, globals.css). */}
       <div
         className={cn(
-          "smoke-bar px-[clamp(1.5rem,3vw,3.5rem)] text-white"
+          "smoke-bar px-[clamp(1rem,2.2vw,3.5rem)] text-white"
         )}
       >
-        <div className="flex w-full items-start justify-between gap-3 xl:gap-6">
+        <div className="flex w-full items-start justify-between gap-3 xl:gap-4 min-[1700px]:gap-6">
           {/* The KeplerBay logo (planet + name, white and orange - made for the dark bar, so no inversion). */}
           <Link href={logoHref} className="group flex h-[4.25rem] min-w-0 shrink-0 items-center pr-1 xl:pr-3">
             <Image
@@ -216,7 +216,7 @@ export function MegaHeader({
               height={logo.height}
               sizes="160px"
               priority
-              className="h-5 w-auto xl:h-7"
+              className="h-5 w-auto xl:h-6 min-[1700px]:h-7"
             />
           </Link>
 
@@ -228,7 +228,7 @@ export function MegaHeader({
             // The server HTML carries every tab, and only the measurement (client side) knows how many fit - until then
             // the row is clear, so a tab is never seen cut off at the edge for the moment before the page hydrates.
             className={cn(
-              "relative flex min-w-0 flex-1 items-start justify-start gap-x-[1em] overflow-x-clip text-[length:calc(13px*var(--nav-fit,1))] font-semibold text-[#ececee] transition-opacity duration-200 xl:gap-x-[1.16em] xl:ps-4 min-[1900px]:gap-x-[1.55em] min-[1900px]:ps-8 min-[1900px]:text-[length:calc(14px*var(--nav-fit,1))]",
+              "relative flex min-w-0 flex-1 items-start justify-start gap-x-[1em] overflow-x-clip text-[length:calc(13px*var(--nav-fit,1))] font-semibold text-[#ececee] transition-opacity duration-200 xl:gap-x-[1.16em] min-[1700px]:ps-4 min-[1900px]:gap-x-[1.55em] min-[1900px]:ps-8 min-[1900px]:text-[length:calc(14px*var(--nav-fit,1))]",
               !fitted && "opacity-0"
             )}
             style={fit < 1 ? ({ "--nav-fit": fit } as CSSProperties) : undefined}
