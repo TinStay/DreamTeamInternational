@@ -1,5 +1,7 @@
 "use client";
 
+// The account area's side menu: video time available, then the account pages.
+
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { IconChevronRight, IconCoinFilled, IconFolderFilled, IconLayoutDashboardFilled, IconUserFilled } from "@tabler/icons-react";
