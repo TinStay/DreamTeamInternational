@@ -45,7 +45,7 @@ export async function POST(request: Request) {
         price_data: {
           currency: "usd",
           unit_amount: spec.amountCents,
-          product_data: { name: spec.oneTime ? `IzI Video - ${name} (${spec.seconds} seconds)` : `IzI Video - ${name}`, description: `${spec.seconds} seconds of AI video` },
+          product_data: { name: spec.oneTime ? `KeplerBay - ${name} (${spec.seconds} seconds)` : `KeplerBay - ${name}`, description: `${spec.seconds} seconds of AI video` },
           ...(spec.oneTime ? {} : { recurring: { interval: spec.interval } }),
         },
       },

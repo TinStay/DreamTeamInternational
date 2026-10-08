@@ -190,7 +190,7 @@ export function MegaHeader({
         )}
       >
         <div className="flex w-full items-start justify-between gap-6">
-          {/* The IzI Video logo in white on the smoked bar (the file is dark ink, so always inverted). */}
+          {/* The KeplerBay logo (planet + name, white and orange - made for the dark bar, so no inversion). */}
           <Link href={logoHref} className="group flex h-[4.25rem] min-w-0 shrink-0 items-center pr-3">
             <Image
               src={logo.src}
@@ -199,7 +199,7 @@ export function MegaHeader({
               height={logo.height}
               sizes="160px"
               priority
-              className="h-7 w-auto invert xl:h-8"
+              className="h-6 w-auto xl:h-7"
             />
           </Link>
 

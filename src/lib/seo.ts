@@ -58,11 +58,11 @@ export function openGraphFor(
 ) {
   return {
     type: "website" as const,
-    siteName: "DreamTeam",
+    siteName: "KeplerBay",
     locale: OG_LOCALE[lang],
     title: page.title,
     description: page.description,
     url: absoluteUrl(page.path),
-    images: [page.image ?? { url: OG_IMAGE_PATH, width: 1200, height: 630, alt: "DreamTeam — AI Video Production" }],
+    images: [page.image ?? { url: OG_IMAGE_PATH, width: 1200, height: 630, alt: "KeplerBay — AI Video Production" }],
   };
 }

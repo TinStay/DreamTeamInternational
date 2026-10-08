@@ -120,13 +120,13 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
     metadataBase: new URL(SITE_URL),
     title: t.seo.home.title,
     description: t.seo.home.description,
-    applicationName: "DreamTeam",
+    applicationName: "KeplerBay",
     alternates: { languages: localeAlternates() },
     openGraph: {
       type: "website",
-      siteName: "DreamTeam",
+      siteName: "KeplerBay",
       locale: OG_LOCALE[locale],
-      images: [{ url: OG_IMAGE_PATH, width: 1200, height: 630, alt: "DreamTeam — AI Video Production" }],
+      images: [{ url: OG_IMAGE_PATH, width: 1200, height: 630, alt: "KeplerBay — AI Video Production" }],
     },
     twitter: { card: "summary_large_image" },
     robots: {
@@ -135,7 +135,7 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
       googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1, "max-video-preview": -1 },
     },
     icons: {
-      icon: "/logo/logo_short_black.png",
+      icon: "/keplerbay-logo-mark.png",
     },
   };
 }

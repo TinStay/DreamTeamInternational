@@ -54,7 +54,7 @@ export function Footer() {
                 width={logo.width}
                 height={logo.height}
                 sizes="140px"
-                className={cn("w-auto grayscale transition-all dark:invert", language === "en" ? "h-6" : "h-8")}
+                className={cn("w-auto", language === "en" ? "h-7" : "h-8 grayscale transition-all dark:invert")}
               />
             </Link>
             <p className="max-w-xs text-sm text-muted-foreground">{f.desc}</p>

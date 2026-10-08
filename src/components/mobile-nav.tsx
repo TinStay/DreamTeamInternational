@@ -154,7 +154,7 @@ export function MobileNav() {
                   width={logo.width}
                   height={logo.height}
                   sizes="240px"
-                  className={cn("mb-6 w-auto grayscale dark:invert", language === "en" ? "h-10" : "h-18")}
+                  className={cn("mb-6 w-auto", language === "en" ? "h-9" : "h-18 grayscale dark:invert")}
                 />
                 <div className="flex items-center gap-4">
                   {/* English has one theme (`forcedTheme` in the layout), so no toggle there. */}

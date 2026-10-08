@@ -283,8 +283,8 @@ export function SiteHeader() {
               height={logo.height}
               sizes="160px"
               className={cn(
-                "w-auto grayscale transition-all group-hover:grayscale-0 dark:invert",
-                language === "en" ? "h-7" : "h-10"
+                "w-auto",
+                language === "en" ? "h-5" : "h-10 grayscale transition-all group-hover:grayscale-0 dark:invert"
               )}
             />
           </Link>
@@ -332,7 +332,7 @@ export function SiteHeader() {
             <Link href={homeHref} className="group flex min-w-0 items-center justify-self-start py-1 pr-3">
               <Image
                 src="/logo-1.png"
-                alt="DreamTeam"
+                alt="KeplerBay"
                 width={1024}
                 height={416}
                 sizes="130px"

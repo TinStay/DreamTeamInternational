@@ -2,7 +2,7 @@ export function TermsEnglishContent() {
   return (
     <>
       <p className="not-prose text-[0.9375rem] leading-relaxed text-muted-foreground">
-        These Terms and Conditions govern the relationship between &ldquo;DreamTeam&rdquo;
+        These Terms and Conditions govern the relationship between &ldquo;KeplerBay&rdquo;
         (hereinafter referred to as the &ldquo;Contractor&rdquo;) and clients (hereinafter referred
         to as the &ldquo;Client&rdquo;), in connection with the provision of services for generating
         and editing video content using artificial intelligence (AI).
