@@ -1,5 +1,6 @@
 "use client";
 
+import { PillSelect } from "@/components/ui/pill-select";
 import { useMemo, useState } from "react";
 import { IconAlertTriangle, IconChevronRight, IconClock, IconMessageCircle, IconPaperclip, IconSearch } from "@tabler/icons-react";
 import { AccountShell, ACCOUNT_CARD } from "@/components/account-shell";
@@ -11,7 +12,7 @@ import { Input } from "@/components/ui/input";
 import { useLanguage } from "@/lib/i18n/language-context";
 import { formatDateDisplay } from "@/lib/dates";
 import { formatVideoTime } from "@/lib/account-info";
-import { PROJECT_STATUSES, type ClientProject, type ProjectStatus } from "@/lib/client-projects";
+import { isApproved, PROJECT_STATUSES, statusLabelOf, type ClientProject, type ProjectStatus } from "@/lib/client-projects";
 import { cn } from "@/lib/utils";
 
 type Filter = "all" | ProjectStatus;
@@ -152,14 +153,7 @@ export function TeamDashboardView({ projects: initial, clients, sample }: { proj
             </button>
           ))}
         </div>
-        <label className="ml-auto flex items-center gap-2 text-sm text-white/55">
-          {d.sortBy}
-          <select value={sort} onChange={(e) => setSort(e.target.value as Sort)} className="h-10 cursor-pointer rounded-full border border-white/12 bg-black/30 px-3 text-sm text-white outline-none focus:border-[#ff8a1f]/70">
-            <option value="newest">{d.sort.newest}</option>
-            <option value="due">{d.sort.due}</option>
-            <option value="client">{d.sort.client}</option>
-          </select>
-        </label>
+        <PillSelect className="ml-auto" value={sort} onChange={setSort} label={d.sortBy} options={(["newest", "due", "client"] as Sort[]).map((key) => ({ value: key, label: d.sort[key] }))} />
       </div>
 
       {/* The projects. */}
@@ -200,7 +194,7 @@ export function TeamDashboardView({ projects: initial, clients, sample }: { proj
                       <span className="block truncate text-xs text-white/45">{p.clientEmail ?? ""}</span>
                     </span>
                     <span>
-                      <StatusChip status={p.status} label={statusLabels[p.status]} />
+                      <StatusChip status={p.status} label={statusLabelOf(p, statusLabels)} approved={isApproved(p)} />
                     </span>
                     <span className={cn("flex items-center gap-1.5 text-sm", late ? "font-semibold text-red-300" : "text-white/70")}>
                       {late ? <IconAlertTriangle className="size-4" aria-hidden /> : <IconClock className="size-4 text-white/35" aria-hidden />}

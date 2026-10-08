@@ -390,7 +390,7 @@ export const en = {
       ends: "Ends on",
       bought: "Bought on",
       videoTime: "Video time",
-      videoTimeMonthly: "{volume} {unit} every month",
+      videoTimeMonthly: "{volume} {unit}",
       videoTimeOneTime: "{n} of video",
       included: "What's included",
       notIncluded: "Not included",
@@ -402,7 +402,20 @@ export const en = {
       compare: "Compare plans",
       orderAnother: "Order another video",
       seePlans: "See plans",
-      close: "Close"
+      close: "Close",
+      // Cancelling (at the end of the paid period) and taking it back.
+      cancel: "Cancel subscription",
+      cancelTitle: "Cancel your subscription?",
+      cancelText: "Your plan stays active until {date} and your video time stays yours. After that you won't be charged again.",
+      cancelTextNoDate: "Your plan stays active until the end of the period you have paid for, and your video time stays yours. After that you won't be charged again.",
+      cancelConfirm: "Yes, cancel",
+      cancelKeep: "Keep my plan",
+      cancelling: "Cancelling...",
+      cancelledNote: "Your subscription is cancelled and ends on {date}. You won't be charged again.",
+      cancelledNoteNoDate: "Your subscription is cancelled and ends with the current period. You won't be charged again.",
+      resume: "Resume subscription",
+      resuming: "Resuming...",
+      cancelError: "That didn't work. Please try again, or write to us and we'll do it for you."
     },
     // The account page's list of orders (`orders`).
     orders: {
@@ -459,7 +472,9 @@ export const en = {
         scripting: "Scripting",
         production: "In production",
         review: "In review",
-        delivered: "Delivered"
+        delivered: "Delivered",
+        // After Delivered, once the client has approved the film.
+        approved: "Approved"
       },
       due: "Due",
       length: "Length",
@@ -467,9 +482,123 @@ export const en = {
       started: "Started",
       backToAll: "All projects",
       // Your Projects' search, filter and sort.
+      // Changes to a project while it is being made (supabase/changes.sql, lib/project-changes.ts).
+      changes: {
+        title: "Change this project",
+        intro: "Need something different? Send a request - we confirm it within a working day. Seconds are taken from your video time when you send it and given back if we can't do it.",
+        closed: "This project is finished, so it can't be changed any more. Need something new? Submit a new project.",
+        sampleNote: "Sample project - requests here are only a preview, nothing is charged.",
+        open: "Requested",
+        unavailable: "Not available at this stage",
+        kinds: {
+          deadline: { title: "Change the deadline", line: "$50 for each day sooner · later is free", button: "Change deadline" },
+          duration: { title: "Make it longer", line: "Paid with seconds from your video time", button: "Add length" },
+          format: { title: "Add a format", line: "Costs the film's length in seconds", button: "Add format" },
+          revision: { title: "Add a revision", line: "$49 for one more round", button: "Add revision" }
+        },
+        deadline: {
+          title: "Change the deadline",
+          text: "Pick the new date. Moving it sooner means we put more people on your film, so each day earlier costs $50. Moving it later is free.",
+          current: "Now",
+          next: "New date",
+          none: "Not set",
+          dateLabel: "New deadline",
+          minNote: "The soonest we can deliver is {date}.",
+          earlier: "{n} days sooner",
+          earlierOne: "1 day sooner",
+          later: "Later - free",
+          same: "Pick a different date",
+          perDay: "$50 × {n} days"
+        },
+        duration: {
+          title: "Make the video longer",
+          text: "Add seconds to the film. They come from your video time - and if you need more than you have, buy the missing seconds right here.",
+          now: "Now",
+          after: "New length",
+          add: "Add",
+          balanceNote: "Video time left: {balance}",
+          maxNote: "Up to 10 minutes in total.",
+          noRoom: "This video is already 10 minutes long - the most we make.",
+          fromBalance: "From your video time",
+          bought: "Extra seconds you buy",
+          topupTitle: "You need {n} more than you have",
+          topupText: "Buy the missing seconds with this request at the one-time price ({price} a second) - or upgrade your plan and get more video time every month.",
+          upgrade: "Upgrade plan",
+          seeOptions: "See plans"
+        },
+        format: {
+          title: "Add a format",
+          text: "Get the same film cut for another screen. Each new format costs as many seconds as the film is long.",
+          included: "Included",
+          pick: "Pick a format",
+          more: "More formats",
+          names: { vertical: "Vertical", horizontal: "Landscape", classic: "Classic", portrait: "Portrait", square: "Square", cinema: "Cinema" },
+          uses: { vertical: "Reels, TikTok, Shorts", horizontal: "YouTube, website, TV", classic: "Presentations, screens", portrait: "Tablets, feed posts", square: "Feed posts", cinema: "Banners, cinematic" }
+        },
+        revision: {
+          title: "Add a revision",
+          text: "One more round of changes after the ones included. Pay once and we add it to this project as soon as it's confirmed.",
+          now: "{used} of {total} used",
+          after: "{total} revisions in total"
+        },
+        cost: "Cost",
+        costSeconds: "{n} from your video time",
+        costMixed: "{n} from your video time + {amount}",
+        edit: "Change",
+        costMoney: "{amount}",
+        free: "Free",
+        balanceAfter: "Video time after: {balance}",
+        send: "Send request",
+        pay: "Pay {amount} and send",
+        sending: "Sending...",
+        cancel: "Cancel",
+        close: "Close",
+        withdraw: "Withdraw",
+        payNow: "Pay {amount}",
+        listTitle: "Your requests",
+        status: { awaiting_payment: "Waiting for payment", requested: "Waiting for us", approved: "Done", declined: "Declined", cancelled: "Withdrawn" } as Record<string, string>,
+        summary: {
+          deadline: "Deadline to {to}",
+          duration: "Length +{extra}",
+          format: "Extra format: {format}",
+          revision: "One more revision"
+        },
+        sent: "Request sent - we'll confirm it within a working day.",
+        paid: "Payment received - your request is with us now.",
+        payCancelled: "Payment cancelled - your request is waiting for payment.",
+        errors: {
+          insufficient_credits: "Not enough video time for this request.",
+          over_max_length: "A video can be up to 10 minutes long.",
+          invalid_date: "Pick a date at least 2 days from today, and different from the current one.",
+          format_included: "This format is already part of the project.",
+          request_open: "There's already a request like this waiting - we'll answer it first.",
+          project_closed: "This project is finished, so it can't be changed.",
+          not_allowed_now: "This change isn't possible at this stage.",
+          generic: "That didn't work. Please try again."
+        } as Record<string, string>
+      },
+      // The client's rating of a finished project (project_reviews).
+      rating: {
+        cta: "Leave a review",
+        title: "How did we do?",
+        text: "Your film is approved. Rate us on three things - it takes ten seconds and helps us get better.",
+        aspects: { quality: "Quality", speed: "Speed", attitude: "Attitude" },
+        hints: { quality: "How good is the film?", speed: "Did we deliver on time?", attitude: "How was working with us?" },
+        stars: "{n} of 5 stars",
+        comment: "Anything else? (optional)",
+        commentPlaceholder: "What did you like, what could be better?",
+        submit: "Send review",
+        saving: "Sending...",
+        thanks: "Thank you for your review!",
+        yours: "Your review",
+        edit: "Edit",
+        overall: "Overall",
+        error: "We couldn't save your review. Please try again."
+      },
       toolbar: {
         search: "Search projects",
         filterLabel: "Show",
+        filterAll: "All projects",
         filters: { all: "All", active: "In progress", review: "Needs your review", delivered: "Delivered" },
         sortLabel: "Sort by",
         sort: { newest: "Newest first", oldest: "Oldest first", due: "Due date", name: "Name (A-Z)" },
@@ -510,10 +639,14 @@ export const en = {
         send: "Send revision request",
         cancel: "Cancel",
         noneLeft: "You've used all the revisions included in this project. Message us in the comments and we'll find a way.",
+        moved: "This project has already moved on (it may be approved already). Refresh the page to see where it stands.",
         approvedNotice: "Thank you - the video is approved. Your files are ready in the Files tab.",
         revisionNotice: "Got it - your revision request is with the team. We'll keep this project updated.",
         error: "That didn't go through. Please try again.",
-        approvedOn: "Approved on {date}"
+        approvedOn: "Approved on {date}",
+        // After a revision request, while the team reworks the film: the client may still approve the version they have.
+        reworkTitle: "Happy with it as it is?",
+        reworkText: "We're working on the revision you asked for. Changed your mind? Approve the current version and we'll deliver it as it is."
       },
       panelDescription: "Details, brief, revisions and timeline of this project.",
       comments: {
@@ -770,6 +903,19 @@ export const en = {
     manageTitle: "Manage this project",
     manageHint: "Changes save to the client's Your Projects page right away.",
     stage: "Stage",
+    approvedLocked: "The client approved this film on {date}, so the stage stays at Delivered.",
+    // The client's change requests and rating, in the project window.
+    requests: {
+      title: "Change requests",
+      none: "No change requests.",
+      approve: "Approve & apply",
+      decline: "Decline",
+      notePlaceholder: "Note for the client (optional)",
+      paid: "paid",
+      refundNote: "Paid by card - declining does not refund it automatically: refund the payment in Stripe.",
+      review: "Client review",
+      error: "That didn't work. Please try again."
+    },
     nextStep: "Next step (the client sees this)",
     nextStepHint: "For example: We're generating the scenes. Nothing needed from you right now.",
     producer: "Producer",

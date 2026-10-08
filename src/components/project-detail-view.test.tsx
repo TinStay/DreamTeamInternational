@@ -47,4 +47,53 @@ describe("ProjectDetailView", () => {
     for (let i = 0; i < 40; i++) fireEvent.keyDown(edge, { key: "ArrowLeft" });
     expect(Number(edge.getAttribute("aria-valuenow"))).toBe(Number(edge.getAttribute("aria-valuemin")));
   });
+
+  it("shows an approved project as Approved - a green last step after Delivered - with no way to ask for a revision", () => {
+    const base = SAMPLE_PROJECTS[0];
+    const approved = { ...base, status: "delivered" as const, approvedAt: "2026-10-06T10:00:00Z", timeline: null };
+    render(
+      <LanguageProvider>
+        <ProjectDetailView project={approved} sample />
+      </LanguageProvider>
+    );
+    expect(screen.getAllByText(p.status.approved).length).toBeGreaterThan(0);
+    expect(screen.getAllByText("06-10-2026").length).toBeGreaterThan(0);
+    expect(screen.queryByRole("button", { name: p.requestRevision })).toBeNull();
+    expect(screen.queryByRole("button", { name: p.review.approve })).toBeNull();
+  });
+
+  it("offers Approve and Request a revision only while the film is in review", () => {
+    const inReview = { ...SAMPLE_PROJECTS[0], status: "review" as const, approvedAt: null, revisionsTotal: 2, revisionsUsed: 0 };
+    render(
+      <LanguageProvider>
+        <ProjectDetailView project={inReview} sample />
+      </LanguageProvider>
+    );
+    expect(screen.getByRole("button", { name: p.review.approve })).toBeTruthy();
+    expect(screen.getAllByRole("button", { name: p.review.revision }).length).toBeGreaterThan(0);
+    expect(screen.queryByText(p.status.approved)).toBeNull();
+  });
+
+  it("opens a change request from the drawer's facts - the deadline, from the Due card", () => {
+    const making = { ...SAMPLE_PROJECTS[0], status: "production" as const, approvedAt: null, dueDate: "2099-01-20", timeline: null };
+    render(
+      <LanguageProvider>
+        <ProjectDetailView project={making} sample />
+      </LanguageProvider>
+    );
+    fireEvent.click(screen.getByRole("button", { name: new RegExp(`^${p.changes.edit}: ${p.due}`) }));
+    expect(screen.getByRole("dialog", { name: p.changes.deadline.title })).toBeTruthy();
+  });
+
+  it("still lets the client approve while a revision is being made - but not ask for another", () => {
+    const reworking = { ...SAMPLE_PROJECTS[0], status: "production" as const, approvedAt: null, revisionsTotal: 2, revisionsUsed: 1, timeline: null };
+    render(
+      <LanguageProvider>
+        <ProjectDetailView project={reworking} sample />
+      </LanguageProvider>
+    );
+    expect(screen.getByText(p.review.reworkTitle)).toBeTruthy();
+    expect(screen.getByRole("button", { name: p.review.approve })).toBeTruthy();
+    expect(screen.queryByRole("button", { name: p.review.revision })).toBeNull();
+  });
 });

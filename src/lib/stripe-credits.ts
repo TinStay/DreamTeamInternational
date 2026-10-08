@@ -31,6 +31,9 @@ export function purchaseFromMetadata(m: Stripe.Metadata | null | undefined, ref:
 const packOrNone = (p: Purchase | null): CreditDecision => (p ? { kind: "credit", purchase: p } : { kind: "none", reason: "not_a_pack" });
 
 export function creditDecision(event: Stripe.Event): CreditDecision {
+  // A paid change request (supabase/changes.sql) buys a change to a project, never video seconds.
+  const meta = (event.data.object as { metadata?: Stripe.Metadata | null }).metadata;
+  if (meta?.purchase_type === "project_request") return { kind: "none", reason: "not_a_pack" };
   switch (event.type) {
     // A one-time pack. Paid by card: `paid` right here. Paid by a bank debit: `unpaid` here, then one of the two
     // async events below - so `unpaid` must never be credited.

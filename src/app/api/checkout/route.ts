@@ -5,6 +5,10 @@ import { getStripe } from "@/lib/stripe";
 import { createClient } from "@/lib/supabase/server";
 import { hasLiveSubscription } from "@/lib/subscriptions";
 import { createPendingOrder, updateOrder } from "@/lib/orders";
+import { createRateLimiter, isCrossSite } from "@/lib/server/form-guards";
+
+// Every checkout writes an order and opens a Stripe session - a handful a minute per client is plenty.
+const isRateLimited = createRateLimiter(60_000, 10);
 
 /**
  * Starts buying a pack: for the signed-in client, creates a Stripe Checkout session for the chosen plan (price and seconds
@@ -14,12 +18,14 @@ import { createPendingOrder, updateOrder } from "@/lib/orders";
  * (`/api/stripe/webhook`) marks it paid and adds the seconds once Stripe confirms the payment.
  */
 export async function POST(request: Request) {
+  if (isCrossSite(request)) return NextResponse.json({ error: "forbidden" }, { status: 403 });
   const stripe = getStripe();
   if (!stripe) return NextResponse.json({ error: "not_configured" }, { status: 503 });
 
   const supabase = await createClient();
   const { data: auth } = await supabase.auth.getUser();
   if (!auth.user) return NextResponse.json({ error: "not_signed_in" }, { status: 401 });
+  if (isRateLimited(auth.user.id, Date.now())) return NextResponse.json({ error: "rate_limited" }, { status: 429 });
 
   const body = (await request.json().catch(() => ({}))) as { plan?: unknown; billing?: unknown; seconds?: unknown };
   const billing = isBilling(body.billing) ? body.billing : "monthly";

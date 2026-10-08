@@ -4,7 +4,6 @@ import { useCallback, useEffect, useRef, useState, type CSSProperties, type Keyb
 import Link from "next/link";
 import {
   IconArrowLeft,
-  IconAspectRatioFilled,
   IconCalendarFilled,
   IconCheck,
   IconCircleCheckFilled,
@@ -25,13 +24,17 @@ import { StatusChip } from "@/components/project-status-chip";
 import { ProjectComments, type ProjectComment } from "@/components/project-comments";
 import { ProjectReviewCard } from "@/components/project-review-card";
 import { FilmInTheMaking } from "@/components/film-in-the-making";
+import { FormatIcon } from "@/components/format-icon";
+import { ProjectChanges } from "@/components/project-changes";
+import { canRequest, type ChangeKind } from "@/lib/project-changes";
+import { ProjectRating } from "@/components/project-rating";
 import { MAIN_WITH_FIXED_PAGE_BG_CLASS } from "@/lib/page-shell";
 import { useLanguage } from "@/lib/i18n/language-context";
 import { formatDateDisplay } from "@/lib/dates";
 import { formatVideoTime } from "@/lib/account-info";
 import { myProjectsPath } from "@/lib/routes";
 import { scrollToElement } from "@/lib/smooth-scroll";
-import { DELIVERY_BUCKET, formatBytes, progressOf, projectFilm, projectPoster, timelineFor, type ClientProject, type ProjectFile, type ProjectStatus } from "@/lib/client-projects";
+import { DELIVERY_BUCKET, formatBytes, isApproved, progressOf, statusLabelOf, projectFilm, projectPoster, timelineFor, type ClientProject, type ProjectFile, type ProjectStatus } from "@/lib/client-projects";
 import { downloadPrivate, signedUrl } from "@/lib/supabase/storage";
 import { cn } from "@/lib/utils";
 
@@ -58,25 +61,42 @@ function SectionHead({ id, title, count, icon }: { id: string; title: string; co
   );
 }
 
-function Fact({ icon, label, value }: { icon: ReactNode; label: string; value: string }) {
+/** One of the drawer's key facts; with `onEdit` it is a button that opens the matching change request. */
+function Fact({ icon, label, value, onEdit, editLabel }: { icon: ReactNode; label: string; value: string; onEdit?: () => void; editLabel?: string }) {
+  const body = (
+    <>
+      <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-[#ff7a1a]/12 text-[#ff8a1f] transition-transform duration-200 ease-out group-hover:scale-105">{icon}</span>
+      <span className="min-w-0 flex-1">
+        <span className="block text-xs text-white/45">{label}</span>
+        <span className="block text-sm font-semibold break-words">{value}</span>
+      </span>
+    </>
+  );
+  const box = "flex items-center gap-3 rounded-xl border border-white/8 bg-white/[0.03] p-3 text-left";
+  if (!onEdit) return <div className={box}>{body}</div>;
   return (
-    <div className="flex items-center gap-3 rounded-xl border border-white/8 bg-white/[0.03] p-3">
-      <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-[#ff7a1a]/12 text-[#ff8a1f]">{icon}</span>
-      <div className="min-w-0">
-        <p className="text-xs text-white/45">{label}</p>
-        <p className="text-sm font-semibold break-words">{value}</p>
-      </div>
-    </div>
+    <button
+      type="button"
+      onClick={onEdit}
+      aria-label={`${editLabel ?? ""}: ${label} - ${value}`}
+      className={cn(box, "group cursor-pointer transition-[transform,border-color,background-color] duration-200 ease-out hover:-translate-y-0.5 hover:border-[#ff7a1a]/45 hover:bg-white/[0.06]")}
+    >
+      {body}
+    </button>
   );
 }
 
-/** A step's marker: filled and ticked when done, glowing with a pulse when current, an empty ring ahead. */
-function StepDot({ done, current }: { done: boolean; current: boolean }) {
+/** A step's marker: filled and ticked when done (green for the closing Approved step), glowing with a pulse when current, an empty ring ahead. */
+function StepDot({ done, current, approved = false }: { done: boolean; current: boolean; approved?: boolean }) {
   return (
     <span
       className={cn(
         "relative z-10 flex size-[27px] shrink-0 items-center justify-center rounded-full border",
-        done ? cn("border-transparent text-white", PEARL_DISC) : current ? "border-[#ff8a1f] bg-[#ff8a1f]/15 shadow-[0_0_14px_rgba(255,138,31,0.55)]" : "border-white/20 bg-[#141518]"
+        approved
+          ? "border-transparent bg-[linear-gradient(135deg,#34d399,#059669)] text-white shadow-[0_0_16px_rgba(52,211,153,0.55)]"
+          : done
+            ? cn("border-transparent text-white", PEARL_DISC)
+            : current ? "border-[#ff8a1f] bg-[#ff8a1f]/15 shadow-[0_0_14px_rgba(255,138,31,0.55)]" : "border-white/20 bg-[#141518]"
       )}
     >
       {done ? <IconCheck className="size-3.5" stroke={3} aria-hidden /> : current ? <span className="size-2 animate-pulse rounded-full bg-[#ff8a1f]" aria-hidden /> : null}
@@ -105,6 +125,9 @@ export function ProjectDetailView({ project: initial, sample = false, seedCommen
   const [project, setProject] = useState(initial);
   const [notice, setNotice] = useState<string | null>(null);
   const [revisionOpen, setRevisionOpen] = useState(false);
+  // The change-request window open (from the cards at the foot of the page, or a fact in the drawer).
+  const [changeOpen, setChangeOpen] = useState<ChangeKind | null>(null);
+  const editOf = (kind: ChangeKind) => (canRequest(project, kind) ? () => setChangeOpen(kind) : undefined);
   const [fileError, setFileError] = useState<string | null>(null);
   const [commentCount, setCommentCount] = useState<number | null>(null);
   const [prefill, setPrefill] = useState("");
@@ -210,18 +233,16 @@ export function ProjectDetailView({ project: initial, sample = false, seedCommen
 
   function applied(next: ClientProject, message: string) {
     setProject(next);
+    // Just approved: the rating card appears at the top - take the client there.
+    if (isApproved(next)) window.setTimeout(() => scrollToElement(document.getElementById("review"), { offset: HEADER_OFFSET }), 350);
     setNotice(message);
     setRevisionOpen(false);
   }
 
-  /** The drawer's "Request a revision": the review card's form on a video in review, a comment otherwise. */
+  /** The drawer's "Request a revision" (shown only in review): opens the review card's form under the film. */
   function requestRevision() {
-    if (project.status === "review") {
-      setRevisionOpen(true);
-      scrollToElement(reviewRef.current, { offset: HEADER_OFFSET });
-    } else {
-      goComments(p.comments.revisionPrefill);
-    }
+    setRevisionOpen(true);
+    scrollToElement(reviewRef.current, { offset: HEADER_OFFSET });
   }
 
   return (
@@ -247,11 +268,12 @@ export function ProjectDetailView({ project: initial, sample = false, seedCommen
           {/* The drawer: the most important things. Its width is the client's (drag its edge). */}
           <aside
             style={{ "--drawer": `${width}px` } as CSSProperties}
-            className="flex shrink-0 flex-col gap-6 rounded-3xl border border-white/10 bg-[linear-gradient(180deg,#17181c,#101114)] p-6 lg:w-[var(--drawer)] xl:p-7"
+            data-lenis-prevent
+            className="flex shrink-0 flex-col gap-6 rounded-3xl border border-white/10 bg-[linear-gradient(180deg,#17181c,#101114)] p-6 lg:sticky lg:top-28 lg:max-h-[calc(100svh-8rem)] lg:w-[var(--drawer)] lg:overflow-y-auto lg:overscroll-contain xl:p-7"
           >
             <div>
               <div className="flex flex-wrap items-center gap-2.5">
-                <StatusChip status={project.status} label={statusLabels[project.status]} />
+                <StatusChip status={project.status} label={statusLabelOf(project, statusLabels)} approved={isApproved(project)} />
                 <span className="text-xs font-semibold uppercase tracking-[0.14em] text-white/45">{project.kind}</span>
               </div>
               <h1 className="mt-3 font-heading text-[clamp(22px,2.2vw,30px)] leading-[1.02] font-black uppercase text-[#ff8a1f]">{project.title}</h1>
@@ -270,13 +292,15 @@ export function ProjectDetailView({ project: initial, sample = false, seedCommen
             </div>
 
             <div className="grid grid-cols-2 gap-2.5">
-              <Fact icon={<IconCalendarFilled className="size-6" aria-hidden />} label={p.due} value={project.dueDate ? formatDateDisplay(project.dueDate.slice(0, 10)) : p.tbd} />
-              <Fact icon={<IconClockFilled className="size-6" aria-hidden />} label={p.length} value={project.durationSeconds ? formatVideoTime(project.durationSeconds) : p.tbd} />
-              <Fact icon={<IconAspectRatioFilled className="size-6" aria-hidden />} label={p.format} value={project.format ?? p.tbd} />
+              <Fact icon={<IconCalendarFilled className="size-6" aria-hidden />} label={p.due} value={project.dueDate ? formatDateDisplay(project.dueDate.slice(0, 10)) : p.tbd} onEdit={editOf("deadline")} editLabel={p.changes.edit} />
+              <Fact icon={<IconClockFilled className="size-6" aria-hidden />} label={p.length} value={project.durationSeconds ? formatVideoTime(project.durationSeconds) : p.tbd} onEdit={editOf("duration")} editLabel={p.changes.edit} />
+              <Fact icon={<FormatIcon format={project.format} className="size-6" />} label={p.format} value={project.format ?? p.tbd} onEdit={editOf("format")} editLabel={p.changes.edit} />
               <Fact
                 icon={<IconCircleCheckFilled className="size-6" aria-hidden />}
                 label={p.revisionsLeft}
                 value={p.revisionsLeftValue.replace("{left}", String(left)).replace("{total}", String(project.revisionsTotal))}
+                onEdit={editOf("revision")}
+                editLabel={p.changes.edit}
               />
             </div>
 
@@ -334,7 +358,8 @@ export function ProjectDetailView({ project: initial, sample = false, seedCommen
                   ))
                 )}
               </ul>
-              {left > 0 && project.status !== "brief" && project.status !== "scripting" ? (
+              {/* A revision is asked for on a film in review only - never once it is approved, delivered or still being made. */}
+              {left > 0 && project.status === "review" ? (
                 <button
                   type="button"
                   onClick={requestRevision}
@@ -394,6 +419,9 @@ export function ProjectDetailView({ project: initial, sample = false, seedCommen
           {/* The content: laid out by its own width, so it follows the drawer. */}
           <div className="@container min-w-0 flex-1">
             <div className="flex flex-col gap-10">
+              {/* Approved: the client's rating of the project comes first (the list's "Leave a review" lands here). */}
+              {isApproved(project) ? <ProjectRating projectId={project.id} userId={project.userId} sample={sample} /> : null}
+
               {/* The timeline: across the content when there is room, down it when there is not. */}
               <section aria-labelledby="project-timeline">
                 <SectionHead id="project-timeline" title={p.tabs.timeline} icon={<IconCalendarFilled className="size-[17px]" aria-hidden />} />
@@ -403,10 +431,10 @@ export function ProjectDetailView({ project: initial, sample = false, seedCommen
                     {steps.map((step, i) => (
                       <li key={`${step.title}-${i}`} className="relative min-w-0 flex-1 pr-4">
                         {i < steps.length - 1 ? (
-                          <span aria-hidden className={cn("absolute top-[13px] left-[27px] h-px w-[calc(100%-27px)]", step.done ? "bg-[#ff8a1f]/60" : "bg-white/12")} />
+                          <span aria-hidden className={cn("absolute top-[13px] left-[27px] h-px w-[calc(100%-27px)]", steps[i + 1]?.approved ? "bg-emerald-400/60" : step.done ? "bg-[#ff8a1f]/60" : "bg-white/12")} />
                         ) : null}
-                        <StepDot done={step.done} current={step.current} />
-                        <p className={cn("mt-3 text-sm font-semibold", step.done || step.current ? "text-white" : "text-white/45")}>{step.title}</p>
+                        <StepDot done={step.done} current={step.current} approved={step.approved} />
+                        <p className={cn("mt-3 text-sm font-semibold", step.approved ? "text-emerald-300" : step.done || step.current ? "text-white" : "text-white/45")}>{step.title}</p>
                         {step.date ? <p className="mt-0.5 text-xs text-white/45">{formatDateDisplay(step.date.slice(0, 10))}</p> : null}
                         {step.note ? <p className="mt-1.5 line-clamp-3 text-xs leading-relaxed text-white/55">{step.note}</p> : null}
                       </li>
@@ -416,10 +444,10 @@ export function ProjectDetailView({ project: initial, sample = false, seedCommen
                   <ol className="@3xl:hidden">
                     {steps.map((step, i) => (
                       <li key={`${step.title}-${i}`} className="relative flex gap-4 pb-6 last:pb-0">
-                        {i < steps.length - 1 ? <span aria-hidden className={cn("absolute top-7 bottom-0 left-[13px] w-px", step.done ? "bg-[#ff8a1f]/60" : "bg-white/12")} /> : null}
-                        <StepDot done={step.done} current={step.current} />
+                        {i < steps.length - 1 ? <span aria-hidden className={cn("absolute top-7 bottom-0 left-[13px] w-px", steps[i + 1]?.approved ? "bg-emerald-400/60" : step.done ? "bg-[#ff8a1f]/60" : "bg-white/12")} /> : null}
+                        <StepDot done={step.done} current={step.current} approved={step.approved} />
                         <div className="min-w-0 pt-0.5">
-                          <p className={cn("text-base font-semibold", step.done || step.current ? "text-white" : "text-white/45")}>{step.title}</p>
+                          <p className={cn("text-base font-semibold", step.approved ? "text-emerald-300" : step.done || step.current ? "text-white" : "text-white/45")}>{step.title}</p>
                           {step.date ? <p className="mt-0.5 text-xs text-white/45">{formatDateDisplay(step.date.slice(0, 10))}</p> : null}
                           {step.note ? <p className="mt-1.5 text-sm leading-relaxed text-white/60">{step.note}</p> : null}
                         </div>
@@ -454,7 +482,7 @@ export function ProjectDetailView({ project: initial, sample = false, seedCommen
               ) : null}
 
               {/* Approve, or request a revision - right under the film. */}
-              {project.status === "review" ? (
+              {project.status === "review" || (project.status === "production" && project.revisionsUsed > 0 && !project.approvedAt) ? (
                 <div ref={reviewRef}>
                   <ProjectReviewCard project={project} sample={sample} revisionOpen={revisionOpen} onRevisionOpen={setRevisionOpen} onDone={applied} />
                 </div>
@@ -507,6 +535,9 @@ export function ProjectDetailView({ project: initial, sample = false, seedCommen
                   </ul>
                 )}
               </section>
+
+              {/* Change requests - deadline, length, format, revision - last. The drawer's facts open them too. */}
+              <ProjectChanges project={project} sample={sample} open={changeOpen} onOpenChange={setChangeOpen} />
             </div>
           </div>
         </div>

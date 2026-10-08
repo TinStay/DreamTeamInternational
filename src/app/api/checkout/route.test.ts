@@ -88,4 +88,17 @@ describe("/api/checkout", () => {
     await post({ plan: "personal" });
     expect(created().metadata.order_id).toBeUndefined();
   });
+
+  it("refuses a checkout started from another site (CSRF)", async () => {
+    const res = await POST(new Request("http://localhost:3000/api/checkout", { method: "POST", body: JSON.stringify({ plan: "creator" }), headers: { "Content-Type": "application/json", origin: "https://evil.example" } }));
+    expect(res.status).toBe(403);
+    expect(orders.createPendingOrder).not.toHaveBeenCalled();
+  });
+
+  it("blunts a burst of checkouts from one client", async () => {
+    state.user = { id: "burst", email: "burst@example.com" };
+    const statuses: number[] = [];
+    for (let i = 0; i < 11; i++) statuses.push((await post({ plan: "personal" })).status);
+    expect(statuses.at(-1)).toBe(429);
+  });
 });

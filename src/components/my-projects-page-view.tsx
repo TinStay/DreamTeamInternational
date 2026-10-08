@@ -6,8 +6,9 @@ import { useRouter } from "next/navigation";
 import { FilmInTheMaking } from "@/components/film-in-the-making";
 import { ProjectFilmLightbox } from "@/components/project-film-lightbox";
 import { StatusChip } from "@/components/project-status-chip";
-import { IconCalendarFilled, IconChevronRight, IconPlayerPlayFilled, IconPlus, IconSearch } from "@tabler/icons-react";
+import { IconCalendarFilled, IconChevronRight, IconPlayerPlayFilled, IconPlus, IconSearch, IconStarFilled, IconFilterFilled } from "@tabler/icons-react";
 import { Input } from "@/components/ui/input";
+import { PillSelect } from "@/components/ui/pill-select";
 import { SubmitProjectDialog } from "@/components/submit-project-dialog";
 import { notifyCreditsChanged } from "@/lib/supabase/use-credits";
 import { AccountShell, ACCOUNT_CARD } from "@/components/account-shell";
@@ -15,7 +16,7 @@ import { TigerCta } from "@/components/hero-tiger/tiger-cta";
 import { useLanguage } from "@/lib/i18n/language-context";
 import { myProjectsPath, pricingPath } from "@/lib/routes";
 import { formatDateDisplay } from "@/lib/dates";
-import { hasFilm, progressOf, projectPoster, type ClientProject, type ProjectStatus } from "@/lib/client-projects";
+import { hasFilm, isApproved, progressOf, statusLabelOf, projectPoster, type ClientProject, type ProjectStatus } from "@/lib/client-projects";
 import { cn } from "@/lib/utils";
 
 const PEARL_BAR = "bg-[linear-gradient(90deg,#ff5e00,#ffb066)]";
@@ -116,12 +117,21 @@ export function MyProjectsPageView({ projects: saved, sample = false, purchased 
           <p className="mt-4 max-w-[60ch] text-white/60">{p.subtitle}</p>
 
           {/* Search, filter by where the project stands, sort. */}
-          <div className="mt-8 flex flex-wrap items-center gap-3">
-            <div className="relative w-full sm:w-72">
+          {/* One line: search, then the filters - chips on a wide screen, one dropdown on a laptop or smaller - and the sort field. */}
+          <div className="mt-8 flex flex-wrap items-center gap-3 sm:flex-nowrap">
+            <div className="relative w-full sm:w-72 sm:min-w-0 sm:shrink">
               <IconSearch className="pointer-events-none absolute top-1/2 left-3.5 size-[18px] -translate-y-1/2 text-white/40" aria-hidden />
               <Input value={query} onChange={(e) => setQuery(e.target.value)} placeholder={tb.search} aria-label={tb.search} className="h-11 rounded-full border-white/12 bg-black/30 pl-10" />
             </div>
-            <div role="group" aria-label={tb.filterLabel} className="flex flex-wrap items-center gap-1.5">
+            <PillSelect
+              className="min-[1720px]:hidden"
+              value={filter}
+              onChange={setFilter}
+              label={tb.filterLabel}
+              icon={<IconFilterFilled className="size-4 text-[#ff8a1f]" aria-hidden />}
+              options={FILTERS.map((key) => ({ value: key, label: `${key === "all" ? tb.filterAll : tb.filters[key]} · ${counts[key]}` }))}
+            />
+            <div role="group" aria-label={tb.filterLabel} className="hidden flex-1 items-center gap-1.5 min-[1720px]:flex">
               {FILTERS.map((key) => (
                 <button
                   key={key}
@@ -138,23 +148,15 @@ export function MyProjectsPageView({ projects: saved, sample = false, purchased 
                 </button>
               ))}
             </div>
-            <label className="ml-auto flex items-center gap-2 text-sm text-white/55">
-              {tb.sortLabel}
-              <select value={sort} onChange={(e) => setSort(e.target.value as Sort)} className="h-10 cursor-pointer rounded-full border border-white/12 bg-black/30 px-3 text-sm text-white outline-none transition-colors duration-200 hover:border-white/30 focus:border-[#ff8a1f]/70">
-                {(Object.keys(SORTS) as Sort[]).map((key) => (
-                  <option key={key} value={key}>
-                    {tb.sort[key]}
-                  </option>
-                ))}
-              </select>
-            </label>
+            {/* Sorting: just the field, at the end of the same line. */}
+            <PillSelect className="ms-auto shrink-0" value={sort} onChange={setSort} label={tb.sortLabel} options={(Object.keys(SORTS) as Sort[]).map((key) => ({ value: key, label: tb.sort[key] }))} />
           </div>
 
           {shown.length === 0 ? <p className={`${ACCOUNT_CARD} mt-8 p-10 text-center text-white/55`}>{tb.noMatch}</p> : null}
           <ul className="mt-8 grid grid-cols-1 gap-6 md:grid-cols-2 xl:gap-8">
             {shown.map((project) => (
               <li key={project.id}>
-                <ProjectCard project={project} statusLabel={statusLabels[project.status]} href={projectHref(project.id)} onPlay={() => setPlaying(project)} />
+                <ProjectCard project={project} statusLabel={statusLabelOf(project, statusLabels)} href={projectHref(project.id)} onPlay={() => setPlaying(project)} />
               </li>
             ))}
           </ul>
@@ -185,6 +187,7 @@ export function MyProjectsPageView({ projects: saved, sample = false, purchased 
  * the link to the project's page.
  */
 function ProjectCard({ project, statusLabel, href, onPlay }: { project: ClientProject; statusLabel: string; href: string; onPlay: () => void }) {
+  const needsReview = isApproved(project) && !project.reviewed;
   const { t } = useLanguage();
   const poster = projectPoster(project);
   const film = hasFilm(project);
@@ -205,7 +208,7 @@ function ProjectCard({ project, statusLabel, href, onPlay }: { project: ClientPr
           </span>
         )}
         <span className="absolute top-3 left-3">
-          <StatusChip status={project.status} label={statusLabel} />
+          <StatusChip status={project.status} label={statusLabel} approved={isApproved(project)} />
         </span>
       </span>
       <span className="flex flex-1 flex-col p-6 xl:p-7">
@@ -217,8 +220,8 @@ function ProjectCard({ project, statusLabel, href, onPlay }: { project: ClientPr
         <span className="mt-4 h-1.5 overflow-hidden rounded-full bg-white/10" aria-hidden>
           <span className={cn("block h-full rounded-full", PEARL_BAR)} style={{ width: `${progress}%` }} />
         </span>
-        <span className="mt-3 flex items-center justify-between gap-3 text-sm text-white/55">
-          <span>{statusLabel}</span>
+        {/* The due date (the status is the chip on the picture). The review CTA sits at the left of this row, outside the link. */}
+        <span className="mt-3 flex min-h-9 items-center justify-end gap-3 text-sm text-white/55">
           {project.dueDate ? (
             <span className="inline-flex items-center gap-1.5">
               <IconCalendarFilled className="size-4 text-[#ff8a1f]/80" aria-hidden />
@@ -228,6 +231,16 @@ function ProjectCard({ project, statusLabel, href, onPlay }: { project: ClientPr
         </span>
       </span>
     </Link>
+      {/* An approved film not rated yet: the way to the rating card at the top of its page. */}
+      {needsReview ? (
+        <Link
+          href={`${href}#review`}
+          className="group/review absolute bottom-6 left-6 inline-flex h-9 cursor-pointer items-center gap-1.5 rounded-full border border-emerald-400/45 bg-emerald-500/10 px-3.5 text-[13px] font-semibold text-emerald-200 transition-[transform,background-color,border-color,box-shadow] duration-200 ease-out hover:-translate-y-0.5 hover:border-emerald-300 hover:bg-emerald-500/20 hover:shadow-[0_10px_26px_-12px_rgba(52,211,153,0.7)] xl:bottom-7 xl:left-7"
+        >
+          <IconStarFilled className="size-4 text-amber-300 transition-transform duration-200 group-hover/review:rotate-[72deg] group-hover/review:scale-110" aria-hidden />
+          {t.account.projectsPage.rating.cta}
+        </Link>
+      ) : null}
       {/* Play: the film in a lightbox, without leaving the list. Over the picture (its 16:9 box), outside the link. */}
       {film ? (
         <div className="pointer-events-none absolute inset-x-px top-px aspect-video">

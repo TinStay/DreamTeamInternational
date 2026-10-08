@@ -12,5 +12,8 @@ export async function getMyProjects(): Promise<ClientProject[]> {
   // Only this account's own projects: a team member's account can read every client's, but Your Projects is theirs alone.
   const { data, error } = await supabase.from("projects").select("*").eq("user_id", auth.user.id).order("created_at", { ascending: false });
   if (error || !data) return [];
-  return data.map((row) => projectFromRow(row as Record<string, unknown>));
+  // Which ones the client has rated (supabase/changes.sql) - an approved film without a rating gets a "Leave a review" CTA.
+  const { data: reviews } = await supabase.from("project_reviews").select("project_id").eq("user_id", auth.user.id);
+  const rated = new Set((reviews ?? []).map((r) => String(r.project_id)));
+  return data.map((row) => ({ ...projectFromRow(row as Record<string, unknown>), reviewed: rated.has(String(row.id)) }));
 }

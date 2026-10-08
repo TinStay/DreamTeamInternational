@@ -4,7 +4,10 @@ import { bunny, bunnyMp4Url, bunnyThumbnailUrl } from "@/lib/bunny-stream";
 export const PROJECT_STATUSES = ["brief", "scripting", "production", "review", "delivered"] as const;
 export type ProjectStatus = (typeof PROJECT_STATUSES)[number];
 
-export type TimelineStep = { title: string; date: string | null; note: string | null; done: boolean };
+export type TimelineStep = { title: string; date: string | null; note: string | null; done: boolean; /** The closing "Approved" step (green). */ approved?: boolean };
+
+/** The labels a timeline is drawn with: one per stage, plus the closing "Approved". */
+export type StageLabels = Record<ProjectStatus, string> & { approved?: string };
 
 export type BriefAnswer = { label: string; value: string };
 /**
@@ -53,6 +56,8 @@ export type ClientProject = {
   clientEmail: string | null;
   /** The files the client attached when submitting. */
   briefFiles: BriefFile[];
+  /** Whether the client has rated the project (`project_reviews`) - set by the list's loader. */
+  reviewed?: boolean;
   /** Team dashboard only: how many comments the thread has, and whether the client wrote last (needs a reply). */
   commentCount?: number;
   awaitingReply?: boolean;
@@ -136,20 +141,40 @@ function deliveryFrom(v: unknown): DeliveryVideo | null {
   };
 }
 
-/** The timeline to draw: the row's own, or the five standard stages with the finished ones ticked off. */
-export function timelineFor(project: ClientProject, labels: Record<ProjectStatus, string>): (TimelineStep & { current: boolean })[] {
+/**
+ * Whether the client has approved the film: it is delivered and carries the approval's date. From then on the project is
+ * closed - no revision can be asked for (the database refuses it too: client_project_action() and the approval guard in
+ * supabase/approval.sql).
+ */
+export function isApproved(project: Pick<ClientProject, "status" | "approvedAt">): boolean {
+  return project.status === "delivered" && Boolean(project.approvedAt);
+}
+
+/** The project's status as the client reads it: its stage, or "Approved" once they have approved the film. */
+export function statusLabelOf(project: Pick<ClientProject, "status" | "approvedAt">, labels: StageLabels): string {
+  return isApproved(project) && labels.approved ? labels.approved : labels[project.status];
+}
+
+/**
+ * The timeline to draw: the row's own, or the five standard stages with the finished ones ticked off - and, once the
+ * client has approved the film, a closing green **Approved** step dated with the approval.
+ */
+export function timelineFor(project: ClientProject, labels: StageLabels): (TimelineStep & { current: boolean })[] {
   const steps: TimelineStep[] =
     project.timeline ??
     PROJECT_STATUSES.map((status, index) => {
       const at = PROJECT_STATUSES.indexOf(project.status);
       return {
         title: labels[status],
-        // Only dates that happened: when the brief came in, and when the client approved the video - never the deadline.
-        date: index === 0 ? project.createdAt.slice(0, 10) : status === "delivered" ? (project.approvedAt?.slice(0, 10) ?? null) : null,
+        // Only dates that happened: when the brief came in (the approval's date is on the Approved step) - never the deadline.
+        date: index === 0 ? project.createdAt.slice(0, 10) : null,
         note: null,
         done: index < at || (project.status === "delivered" && index === at),
       };
     });
+  if (isApproved(project) && !steps.some((s) => s.approved)) {
+    steps.push({ title: labels.approved ?? "Approved", date: project.approvedAt!.slice(0, 10), note: null, done: true, approved: true });
+  }
   const currentIndex = steps.findIndex((s) => !s.done);
   return steps.map((s, i) => ({ ...s, current: i === currentIndex }));
 }

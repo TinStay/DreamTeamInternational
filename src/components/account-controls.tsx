@@ -1,6 +1,6 @@
 "use client";
 
-import { IconFolder } from "@tabler/icons-react";
+import { IconFolderFilled } from "@tabler/icons-react";
 import { AccountMenu } from "@/components/account-menu";
 import { WaterButton } from "@/components/water-button";
 import { TigerCta } from "@/components/hero-tiger/tiger-cta";
@@ -24,7 +24,7 @@ export function AccountControls() {
       {user ? (
         <>
           <WaterButton href={myProjectsPath(language)}>
-            <IconFolder className="size-[18px]" stroke={1.8} aria-hidden />
+            <IconFolderFilled className="size-[18px]" aria-hidden />
             {t.account.projectsButton}
           </WaterButton>
           <span className="ml-1">
@@ -34,7 +34,7 @@ export function AccountControls() {
       ) : (
         <>
           <WaterButton onClick={openLogin}>
-            <IconFolder className="size-[18px]" stroke={1.8} aria-hidden />
+            <IconFolderFilled className="size-[18px]" aria-hidden />
             {t.account.projectsButton}
           </WaterButton>
           <button

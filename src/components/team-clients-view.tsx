@@ -1,5 +1,6 @@
 "use client";
 
+import { PillSelect } from "@/components/ui/pill-select";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { Dialog as DialogPrimitive } from "@base-ui/react/dialog";
 import { IconCheck, IconChevronRight, IconLoader2, IconMail, IconSearch, IconTrash, IconX } from "@tabler/icons-react";
@@ -11,7 +12,7 @@ import { useLanguage } from "@/lib/i18n/language-context";
 import { formatDateDisplay } from "@/lib/dates";
 import { formatVideoTime } from "@/lib/account-info";
 import { MODAL_BACKDROP_Z, MODAL_CONTENT_Z, MODAL_CONTROL_Z } from "@/lib/modal-layer";
-import type { ClientProject, ProjectStatus } from "@/lib/client-projects";
+import { isApproved, statusLabelOf, type ClientProject, type ProjectStatus } from "@/lib/client-projects";
 import {
   clientLabel,
   ledgerFromRow,
@@ -80,14 +81,7 @@ export function TeamClientsView({
           <IconSearch className="pointer-events-none absolute top-1/2 left-3.5 size-[18px] -translate-y-1/2 text-white/40" aria-hidden />
           <Input value={query} onChange={(e) => setQuery(e.target.value)} placeholder={c.search} aria-label={c.search} className="h-11 rounded-full border-white/12 bg-black/30 pl-10" />
         </div>
-        <label className="ml-auto flex items-center gap-2 text-sm text-white/55">
-          {c.sortBy}
-          <select value={sort} onChange={(e) => setSort(e.target.value as Sort)} className="h-10 cursor-pointer rounded-full border border-white/12 bg-black/30 px-3 text-sm text-white outline-none focus:border-[#ff8a1f]/70">
-            <option value="activity">{c.sort.activity}</option>
-            <option value="name">{c.sort.name}</option>
-            <option value="balance">{c.sort.balance}</option>
-          </select>
-        </label>
+        <PillSelect className="ml-auto" value={sort} onChange={setSort} label={c.sortBy} options={(["activity", "name", "balance"] as Sort[]).map((key) => ({ value: key, label: c.sort[key] }))} />
       </div>
 
       <section className={cn(ACCOUNT_CARD, "mt-6 overflow-hidden")}>
@@ -485,7 +479,7 @@ function ClientBody({
                         <span className="block truncate font-semibold transition-colors duration-200 group-hover:text-[#ff8a1f]">{p.title}</span>
                         <span className="text-xs text-white/45">{date(p.createdAt)}</span>
                       </span>
-                      <StatusChip status={p.status} label={statusLabels[p.status]} />
+                      <StatusChip status={p.status} label={statusLabelOf(p, statusLabels)} approved={isApproved(p)} />
                       <IconChevronRight className="size-5 text-white/30 transition-[transform,color] duration-200 group-hover:translate-x-0.5 group-hover:text-[#ff8a1f]" aria-hidden />
                     </button>
                   </li>
