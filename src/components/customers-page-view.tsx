@@ -31,20 +31,91 @@ const EXTRA_LOGOS = [
   { file: "hanstaiger", name: "Hanstaiger" },
 ];
 
-type Logo = { key: string; name: string; src: string };
+/** The case-study windows on this page: every project except the ones taken off it (their own pages still exist). */
+const CASE_STUDY_HIDDEN = new Set(["boleron", "plasico"]);
+const CASE_STUDY_WINDOWS = PROJECTS.filter((project) => !CASE_STUDY_HIDDEN.has(project.id));
+
+/** Partners left off the logo wall (they stay in the home page's strip and elsewhere). */
+const HIDDEN_FROM_WALL = new Set(["vidos", "plasico", "smartpharmacy", "imotalert"]);
+
+type Logo = {
+  key: string;
+  name: string;
+  /** The colour logo (a transparent PNG); at rest it is drawn white, on hover it comes into its own colours. */
+  src: string;
+  /** Only a white-ink file exists (no colour version yet): it stays white and its tile does not change. */
+  whiteOnly?: boolean;
+  /** The client's own ground, a CSS background that fades in under the (static) white logo on hover. */
+  ground?: string;
+  /** The logo file is a dark cut-out that has to be turned white at rest (Boleron's). */
+  cutout?: boolean;
+  /** On hover the (white) logo turns black on a white ground. */
+  blackOnHover?: boolean;
+  /** A separate white version for the resting state, the same size and box as `src` (PointRN: its plus is cut out of the pin). */
+  restSrc?: string;
+};
+
+/** Clients whose natural look is a coloured ground under a white logo (sampled from their own pictures). */
+const GROUNDS: Record<string, string> = {
+  mindguard: "#122030",
+  iceheart: "#11273a",
+  pointrn: "#3176ad",
+  senko: "#ffffff",
+  sinisco: "#fff200",
+  chargecloud: "#1770f0",
+  raibranch: "linear-gradient(100deg,#04283c 0%,#041a2c 45%,#030c1b 100%)",
+  boleron: "linear-gradient(100deg,#16beec 0%,#0f9ae0 28%,#2f78d8 50%,#6d5bd7 74%,#9d3fd5 100%)",
+};
+
+/** Extra clients we do have a dark/colour logo for (the file the white one is made from at rest, so nothing shifts on hover). */
+const COLOUR_EXTRA: Record<string, string> = {
+  pointrn: "/customers/pointrn.png",
+  hanstaiger: "/customers/hanstaiger.png",
+  valtcan: "/customers/valtcan-black.png",
+  sneedspeed: "/customers/sneedspeed.png",
+  "together-local": "/customers/together-local.png?v=2",
+  "streetlight-taco": "/customers/streetlight-taco.png",
+  sinisco: "/customers/sinisco.png",
+};
+
+/** Clients whose white resting version is its own file (same size as the colour one, laid over it, so nothing shifts). */
+/** White-only logos that read as black on white on hover. */
+const BLACK_ON_HOVER = new Set(["senko"]);
+
+const REST_VERSIONS: Record<string, string> = { pointrn: "/customers/pointrn-white.png" };
+
+/** The English Emblema wordmark (copper) in place of the Bulgarian one; Boleron's English logo is the client's picture. */
+const COLOUR_FILE_OVERRIDES: Record<string, string> = { emblema: "emblema_logo_light_en.png" };
 
 function allLogos(): Logo[] {
-  const fromPartners = PARTNERS.flatMap((p: Partner) => {
-    const file = p.light ?? p.dark;
-    return file ? [{ key: p.id, name: p.ariaLabel, src: `${PARTNER_ICON_BASE}${file}` }] : [];
+  const fromPartners = PARTNERS.flatMap((p: Partner): Logo[] => {
+    if (HIDDEN_FROM_WALL.has(p.id)) return [];
+    if (p.id === "boleron") return [{ key: p.id, name: p.ariaLabel, src: "/customers/boleron-black.png", cutout: true, ground: GROUNDS.boleron }];
+    const colour = COLOUR_FILE_OVERRIDES[p.id] ?? p.light;
+    const file = colour ?? p.dark;
+    return file ? [{ key: p.id, name: p.ariaLabel, src: `${PARTNER_ICON_BASE}${file}`, whiteOnly: !colour, ground: GROUNDS[p.id] }] : [];
   });
-  const extra = EXTRA_LOGOS.map((l) => ({ key: l.file, name: l.name, src: `/hero-tiger/logos/${l.file}.png` }));
+  const extra = EXTRA_LOGOS.map((l) => {
+    const colour = COLOUR_EXTRA[l.file];
+    return {
+      key: l.file,
+      name: l.name,
+      src: colour ?? `/hero-tiger/logos/${l.file}.png`,
+      whiteOnly: !colour,
+      ground: GROUNDS[l.file],
+      restSrc: REST_VERSIONS[l.file],
+      blackOnHover: BLACK_ON_HOVER.has(l.file),
+    };
+  });
   return [...fromPartners, ...extra];
 }
 
 /**
- * Every client's mark as one white silhouette on a dark tile (`brightness-0 invert` turns dark-ink and white-ink files
- * alike into the same white, so the wall reads as one), dim until hovered.
+ * The client wall: graphite tiles with every mark in white, still. Nothing moves on hover - the tile simply changes to the
+ * client's natural look: a white ground under the logo in its own colours, or the client's own ground under its white logo
+ * (Mindguard's navy, Boleron's gradient) - the logo never moves or resizes. A logo we only have in white has no colour to show,
+ * so its tile stays as it is (Senkō's turns black on white). On a touch screen, which has
+ * no hover, the colour logos simply show in colour.
  */
 function LogoWall() {
   const logos = allLogos();
@@ -57,10 +128,57 @@ function LogoWall() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.3 }}
           transition={{ duration: 0.5, delay: Math.min(i % 6, 5) * 0.05, ease: EASE }}
-          className="group flex h-24 items-center justify-center rounded-2xl border border-white/10 bg-[linear-gradient(160deg,#1c1d22_0%,#121316_70%)] px-6 transition-[transform,border-color,box-shadow] duration-300 ease-out hover:-translate-y-1 hover:border-[#ff7a1a]/45 hover:shadow-[0_20px_40px_-24px_rgba(255,106,20,0.5)]"
+          className="group relative flex h-24 items-center justify-center overflow-hidden rounded-2xl border border-white/10 bg-[linear-gradient(160deg,#1c1d22_0%,#121316_70%)] px-5 transition-[border-color] duration-500 ease-out hover:border-white/30"
         >
-          {/* eslint-disable-next-line @next/next/no-img-element -- small brand marks in mixed formats, shown as one white silhouette */}
-          <img src={logo.src} alt={logo.name} loading="lazy" className="max-h-10 w-auto max-w-[8.5rem] object-contain opacity-65 brightness-0 invert transition-opacity duration-300 group-hover:opacity-100" />
+          {/* The natural ground: the client's own colour where it has one, else white under a colour logo. It fades in
+              under the logo, which stays exactly where it is (a white logo has nothing to change). */}
+          {logo.ground ? (
+            <span
+              aria-hidden
+              style={{ background: logo.ground }}
+              className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 ease-out group-hover:opacity-100 [@media(hover:none)]:opacity-100"
+            />
+          ) : !logo.whiteOnly ? (
+            <span
+              aria-hidden
+              className="pointer-events-none absolute inset-0 bg-white opacity-0 transition-opacity duration-500 ease-out group-hover:opacity-100 [@media(hover:none)]:opacity-100"
+            />
+          ) : null}
+          {logo.restSrc ? (
+            // Two pictures of one size in one box: the white one at rest, the colour one on hover (they cross-fade in place).
+            <span className="relative flex max-h-10 max-w-full">
+              {/* eslint-disable-next-line @next/next/no-img-element -- brand marks in mixed formats */}
+              <img
+                src={logo.src}
+                alt={logo.name}
+                loading="lazy"
+                className="max-h-10 w-auto max-w-full object-contain opacity-0 transition-opacity duration-500 ease-out group-hover:opacity-100 [@media(hover:none)]:opacity-100"
+              />
+              {/* eslint-disable-next-line @next/next/no-img-element -- brand marks in mixed formats */}
+              <img
+                src={logo.restSrc}
+                alt=""
+                aria-hidden
+                loading="lazy"
+                className="absolute inset-0 size-full object-contain opacity-70 transition-opacity duration-500 ease-out group-hover:opacity-0 [@media(hover:none)]:opacity-0"
+              />
+            </span>
+          ) : (
+            // eslint-disable-next-line @next/next/no-img-element -- small brand marks in mixed formats
+            <img
+              src={logo.src}
+              alt={logo.name}
+              loading="lazy"
+              className={cn(
+                "relative max-h-10 w-auto max-w-full object-contain opacity-70 transition-[filter,opacity] duration-500 ease-out group-hover:opacity-100",
+                logo.cutout && "[filter:brightness(0)_invert(1)]",
+                logo.blackOnHover && "group-hover:[filter:brightness(0)]",
+                !logo.cutout &&
+                  !logo.whiteOnly &&
+                  "[filter:brightness(0)_invert(1)] group-hover:[filter:none] [@media(hover:none)]:opacity-100 [@media(hover:none)]:[filter:none]"
+              )}
+            />
+          )}
         </motion.li>
       ))}
     </ul>
@@ -146,7 +264,7 @@ export function CustomersPageView() {
   const c = t.projects.customers;
 
   return (
-    <AccountShell wide>
+    <AccountShell>
       <p className="mt-6 text-xs font-semibold uppercase tracking-[0.18em] text-[#ff8a1f]">{c.eyebrow}</p>
       <h1 className="mt-3 font-heading text-[clamp(30px,4vw,56px)] leading-[0.98] font-black uppercase text-balance">
         {c.title1} <span className="text-section-accent">{c.title2}</span>
@@ -163,7 +281,7 @@ export function CustomersPageView() {
       <p className="mt-3 max-w-[60ch] text-white/60">{c.studiesSubtitle}</p>
 
       <ul className="mt-10 grid grid-cols-1 gap-x-6 gap-y-12 md:grid-cols-2 xl:grid-cols-3">
-        {PROJECTS.map((project, index) => (
+        {CASE_STUDY_WINDOWS.map((project, index) => (
           <CaseStudyWindow key={project.id} project={project} index={index} />
         ))}
       </ul>

@@ -37,8 +37,12 @@ export function accountInfoFromUser(user: User): AccountInfo {
   };
 }
 
-/** Video time as minutes AND seconds, always both: 95 -> "1 min 35 sec", 120 -> "2 min 0 sec", 15 -> "0 min 15 sec". */
+/**
+ * Video time: under a minute in seconds only (15 -> "15 sec", 0 -> "0 sec"); from a minute up, minutes AND seconds, always
+ * both (95 -> "1 min 35 sec", 120 -> "2 min 0 sec").
+ */
 export function formatVideoTime(seconds: number): string {
   const s = Math.max(0, Math.round(seconds));
+  if (s < 60) return `${s} sec`;
   return `${Math.floor(s / 60)} min ${s % 60} sec`;
 }

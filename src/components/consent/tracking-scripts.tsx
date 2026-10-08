@@ -1,7 +1,7 @@
 "use client";
 
 import Script from "next/script";
-import { useConsent } from "@/lib/consent";
+import { globalPrivacyControl, useConsent } from "@/lib/consent";
 
 /*
  * The marketing tags, mounted only once the visitor has allowed marketing
@@ -18,7 +18,9 @@ const OPENAI_PIXEL_ID = "9vxEQCFdaKzy9yXADo8cMC";
 
 export function TrackingScripts() {
   const consent = useConsent();
-  if (!consent?.marketing) return null;
+  // A Global Privacy Control signal is an opt-out of targeted advertising under US state law - it overrides "Accept".
+  // (`consent` is undefined on the server and while hydrating, so `navigator` is only read on the client.)
+  if (!consent?.marketing || globalPrivacyControl()) return null;
   const analyticsStorage = consent.analytics ? "granted" : "denied";
   return (
     <>

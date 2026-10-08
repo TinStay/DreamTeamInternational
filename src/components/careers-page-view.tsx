@@ -29,7 +29,7 @@ export function CareersPageView() {
   const c = t.careers;
 
   return (
-    <AccountShell wide>
+    <AccountShell>
       <header className="mt-8 max-w-4xl sm:mt-12">
         <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#ff8a1f]">{c.eyebrow}</p>
         <h1 className="mt-3 font-heading text-[clamp(38px,6vw,96px)] leading-[0.94] font-black uppercase tracking-[-0.015em] text-balance">

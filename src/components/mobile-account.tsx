@@ -2,10 +2,10 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { IconFolder, IconLayoutDashboard, IconLogout, IconSettings, IconUser } from "@tabler/icons-react";
+import { IconFolder, IconLayoutDashboard, IconLogout, IconUser } from "@tabler/icons-react";
 import { AccountMenu } from "@/components/account-menu";
 import { useLanguage } from "@/lib/i18n/language-context";
-import { accountPath, homePath, myProjectsPath, profilePath, teamPath } from "@/lib/routes";
+import { accountPath, homePath, myProjectsPath, teamPath } from "@/lib/routes";
 import { openLogin, openSignup } from "@/lib/signup-dialog";
 import { createClient } from "@/lib/supabase/client";
 import { useAuthUser } from "@/lib/supabase/use-auth-user";
@@ -102,12 +102,8 @@ export function MobileMenuAccount({ onNavigate }: { onNavigate: () => void }) {
         <IconFolder className="size-6 shrink-0" aria-hidden />
         {a.yourProjects}
       </Link>
-      <Link href={profilePath(language)} onClick={onNavigate} className={ROW}>
-        <IconUser className="size-6 shrink-0" aria-hidden />
-        {a.viewProfile}
-      </Link>
       <Link href={accountPath(language)} onClick={onNavigate} className={ROW}>
-        <IconSettings className="size-6 shrink-0" aria-hidden />
+        <IconUser className="size-6 shrink-0" aria-hidden />
         {a.manageAccount}
       </Link>
       {isTeamUser(user) ? (

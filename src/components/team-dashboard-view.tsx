@@ -5,6 +5,8 @@ import { IconAlertTriangle, IconChevronRight, IconClock, IconMessageCircle, Icon
 import { AccountShell, ACCOUNT_CARD } from "@/components/account-shell";
 import { StatusChip } from "@/components/project-status-chip";
 import { TeamProjectPopup } from "@/components/team-project-popup";
+import { TeamClientsView } from "@/components/team-clients-view";
+import type { ClientOverview } from "@/lib/clients";
 import { Input } from "@/components/ui/input";
 import { useLanguage } from "@/lib/i18n/language-context";
 import { formatDateDisplay } from "@/lib/dates";
@@ -21,9 +23,10 @@ const isOverdue = (p: ClientProject) => p.status !== "delivered" && !!p.dueDate 
 /**
  * The team dashboard: numbers on top (how many projects, how many are new, in work, in review, delivered, overdue), a search
  * and status filter, then every client's project as a row - client, stage, due date, length, files attached - and a click
- * opens it full screen with everything the client filled in, their files, and the controls to move it along.
+ * opens it full screen with everything the client filled in, their files, and the controls to move it along. The Clients
+ * tab (`team-clients-view.tsx`) lists every client - profile, private notes, video time history, projects.
  */
-export function TeamDashboardView({ projects: initial, sample }: { projects: ClientProject[]; sample: boolean }) {
+export function TeamDashboardView({ projects: initial, clients, sample }: { projects: ClientProject[]; clients: ClientOverview[] | null; sample: boolean }) {
   const { t } = useLanguage();
   const d = t.team;
   const statusLabels = t.account.projectsPage.status as Record<ProjectStatus, string>;
@@ -32,6 +35,7 @@ export function TeamDashboardView({ projects: initial, sample }: { projects: Cli
   const [sort, setSort] = useState<Sort>("newest");
   const [query, setQuery] = useState("");
   const [openId, setOpenId] = useState<string | null>(null);
+  const [tab, setTab] = useState<"projects" | "clients">("projects");
 
   const counts = useMemo(() => {
     const c: Record<ProjectStatus, number> = { brief: 0, scripting: 0, production: 0, review: 0, delivered: 0 };
@@ -65,7 +69,7 @@ export function TeamDashboardView({ projects: initial, sample }: { projects: Cli
   );
 
   return (
-    <AccountShell wide>
+    <AccountShell>
       <p className="mt-6 text-xs font-semibold uppercase tracking-[0.18em] text-[#ff8a1f]">{d.eyebrow}</p>
       <h1 className="mt-3 font-heading text-[clamp(30px,4vw,56px)] leading-[0.98] font-black uppercase text-balance">
         {d.title} <span className="text-section-accent">{d.title2}</span>
@@ -92,6 +96,38 @@ export function TeamDashboardView({ projects: initial, sample }: { projects: Cli
         </p>
       ) : null}
 
+      {/* Projects | Clients. */}
+      <div className="mt-8 inline-flex gap-1 rounded-full border border-white/12 bg-black/30 p-1" role="tablist" aria-label={d.title2}>
+        {(["projects", "clients"] as const).map((key) => (
+          <button
+            key={key}
+            type="button"
+            role="tab"
+            aria-selected={tab === key}
+            onClick={() => setTab(key)}
+            className={cn(
+              "cursor-pointer rounded-full px-5 py-2 text-sm font-semibold transition-[background-color,color,transform] duration-200 ease-out hover:-translate-y-px",
+              tab === key ? "bg-[linear-gradient(115deg,#ff5e00,#ff9a3c)] text-white" : "text-white/60 hover:bg-white/8 hover:text-white"
+            )}
+          >
+            {d.tabs[key]}
+            <span className="ml-1.5 text-xs opacity-70">{key === "projects" ? projects.length : (clients?.length ?? 0)}</span>
+          </button>
+        ))}
+      </div>
+
+      {tab === "clients" ? (
+        <TeamClientsView
+          clients={clients}
+          projects={projects}
+          sample={sample}
+          onOpenProject={(id) => {
+            setTab("projects");
+            setOpenId(id);
+          }}
+        />
+      ) : (
+      <>
       {/* Search, stage filter, sort. */}
       <div className="mt-8 flex flex-wrap items-center gap-3">
         <div className="relative min-w-[16rem] flex-1 md:max-w-sm">
@@ -188,6 +224,8 @@ export function TeamDashboardView({ projects: initial, sample }: { projects: Cli
           </ul>
         )}
       </section>
+      </>
+      )}
 
       <TeamProjectPopup
         project={selected}

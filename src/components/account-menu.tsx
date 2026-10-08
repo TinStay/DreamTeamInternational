@@ -5,13 +5,13 @@ import { createPortal } from "react-dom";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { User } from "@supabase/supabase-js";
-import { IconChevronRight, IconLayoutDashboard, IconLogout, IconSettings, IconUser } from "@tabler/icons-react";
+import { IconChevronRight, IconLayoutDashboard, IconLogout, IconUser } from "@tabler/icons-react";
 import { isTeamUser } from "@/lib/team";
 import { AccountAvatar } from "@/components/account-avatar";
 import { AccountPlanCard } from "@/components/account-plan-card";
 import { useLanguage } from "@/lib/i18n/language-context";
 import { accountInfoFromUser } from "@/lib/account-info";
-import { accountPath, homePath, myProjectsPath, profilePath, teamPath } from "@/lib/routes";
+import { accountPath, homePath, myProjectsPath, teamPath } from "@/lib/routes";
 import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
 
@@ -119,12 +119,8 @@ export function AccountMenu({ user }: { user: User }) {
             <span className="flex-1">{a.yourProjects}</span>
             <IconChevronRight className="size-4 transition-transform duration-200 ease-out group-hover:translate-x-0.5" aria-hidden />
           </Link>
-          <Link href={profilePath(language)} role="menuitem" onClick={close} className={ITEM}>
-            <IconUser className="size-[18px] text-white/50 group-hover:text-[#ffb066]" aria-hidden />
-            {a.viewProfile}
-          </Link>
           <Link href={accountPath(language)} role="menuitem" onClick={close} className={ITEM}>
-            <IconSettings className="size-[18px] text-white/50 group-hover:text-[#ffb066]" aria-hidden />
+            <IconUser className="size-[18px] text-white/50 group-hover:text-[#ffb066]" aria-hidden />
             {a.manageAccount}
           </Link>
           {isTeamUser(user) ? (

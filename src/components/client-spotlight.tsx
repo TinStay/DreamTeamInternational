@@ -4,18 +4,15 @@ import Image from "next/image";
 import { motion } from "motion/react";
 import { useLanguage } from "@/lib/i18n/language-context";
 import { PARTNER_ICON_BASE } from "@/lib/partners";
+import { QuoteMark } from "@/components/ui/testimonial";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
-
-/** The orange pearl, as ink (the quote marks). */
-const PEARL_INK =
-  "bg-[linear-gradient(115deg,#ff5e00_0%,#ff8a1f_30%,#ffd2a1_48%,#ff9a3c_62%,#ff5e00_100%)] bg-clip-text text-transparent";
 
 /**
  * The English home page's client spotlight, at the top of "What our clients say": MindGuard's two testimonials (the
  * founders' words from its case study, `projects.stories.mindguard.testimonials`) in one dark card in the site's dress -
  * the MindGuard mark (its white-ink file) with a small orange eyebrow on the left, the two quotes on the right, each
- * under a big orange-pearl quote mark with the name and role below. A pearl hairline runs along the card's top and a
+ * under the review cards' soft quote mark (`QuoteMark`, in flow here) with the name and role below. A pearl hairline runs along the card's top and a
  * warm light sits in its corner; the card and then each quote rise in as it scrolls into view.
  */
 export function ClientSpotlight() {
@@ -59,16 +56,15 @@ export function ClientSpotlight() {
           {quotes.map((q, index) => (
             <motion.blockquote
               key={q.name}
-              className="flex flex-col"
+              className="relative flex flex-col"
               initial={{ opacity: 0, y: 18 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.4 }}
               transition={{ duration: 0.6, delay: 0.15 + 0.15 * index, ease: EASE }}
             >
-              <span aria-hidden className={`font-heading text-6xl leading-[0.7] font-black ${PEARL_INK}`}>
-                &ldquo;
-              </span>
-              <p className="mt-4 text-[clamp(17px,1.35vw,21px)] leading-relaxed font-medium text-white/90">{q.quote}</p>
+              {/* The review cards' quote mark (same glyph and tint), in flow above the quote - the text fills the column. */}
+              <QuoteMark className="relative block h-12 text-[6.5rem] leading-[0.9]" />
+              <p className="relative mt-2 text-[clamp(17px,1.35vw,21px)] leading-relaxed font-medium text-white/90">{q.quote}</p>
               <footer className="mt-auto pt-6 text-sm">
                 <span className="font-semibold text-white">{q.name}</span>
                 <span className="text-white/50"> — {q.role}</span>

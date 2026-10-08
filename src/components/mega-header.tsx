@@ -21,12 +21,11 @@ export type MegaNavGroup = {
   divideBefore?: boolean | "xl" | "wide";
 };
 
-/** A link's ink: the brand's red → violet gradient under the letters, showing as the colour fades out on hover. The
- * resting colour must be opaque, or the gradient shows through it. */
+/** A link's ink: it turns the site's orange primary on hover / keyboard focus. */
 const INK =
-  "bg-gradient-to-r from-[var(--primary-gradient-start)] to-[var(--primary-gradient-end)] bg-clip-text transition-colors duration-200 ease-out group-hover/link:text-transparent group-focus-visible/link:text-transparent";
+  "transition-colors duration-200 ease-out group-hover/link:text-primary group-focus-visible/link:text-primary";
 
-/** A menu link: the label, its ink turning to the brand gradient on hover. */
+/** A menu link: the label, its ink turning the orange primary on hover. */
 function MegaLink({ href, className, children }: { href: string; className?: string; children: ReactNode }) {
   return (
     <Link
@@ -185,7 +184,7 @@ export function MegaHeader({
                           <li key={item.href}>
                             <Link
                               href={item.href}
-                              className="block cursor-pointer rounded-xl px-3.5 py-2.5 whitespace-nowrap transition-[background-color,color,transform] duration-200 ease-out hover:translate-x-0.5 hover:bg-white/[0.08] hover:text-white focus-visible:bg-white/[0.08] focus-visible:text-white focus-visible:outline-none"
+                              className="block cursor-pointer rounded-xl px-3.5 py-2.5 whitespace-nowrap transition-[background-color,color,transform] duration-200 ease-out hover:translate-x-0.5 hover:bg-primary/10 hover:text-primary focus-visible:bg-primary/10 focus-visible:text-primary focus-visible:outline-none"
                             >
                               {item.label}
                             </Link>

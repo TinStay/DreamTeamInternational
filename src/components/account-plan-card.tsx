@@ -6,6 +6,8 @@ import { useLanguage } from "@/lib/i18n/language-context";
 import { pricingPath } from "@/lib/routes";
 import { formatVideoTime } from "@/lib/account-info";
 import { useCredits } from "@/lib/supabase/use-credits";
+import { useMyPlan } from "@/lib/supabase/use-my-plan";
+import { PLANS } from "@/lib/pricing";
 import { cn } from "@/lib/utils";
 
 /**
@@ -20,7 +22,12 @@ export function AccountPlanCard({ className, onNavigate }: { className?: string;
   const added = credits?.added ?? 0;
   const hasTime = added > 0;
   const share = hasTime ? Math.min(100, Math.round((balance / added) * 100)) : 0;
-  const planName = credits?.planKey ? (t.plans.tiers as Record<string, { name: string }>)[credits.planKey]?.name : null;
+  // The plan exactly as bought (the live subscription, else the last one-time video) - not just the last pack credited.
+  const plan = useMyPlan();
+  const planKey = plan && plan.kind !== "none" ? plan.planKey : null;
+  const planName = planKey ? ((t.plans.tiers as Record<string, { name: string }>)[planKey]?.name ?? planKey) : null;
+  // Upgrade shows the plans of the client's own audience (a business plan's client sees the business plans).
+  const audience = planKey && PLANS.business.some((x) => x.key === planKey) ? "business" : "individual";
 
   return (
     <div className={cn("rounded-2xl border border-white/10 bg-white/[0.04] p-4", className)}>
@@ -42,7 +49,7 @@ export function AccountPlanCard({ className, onNavigate }: { className?: string;
       {!hasTime ? <p className="mt-2 text-xs leading-relaxed text-white/45">{a.noTime}</p> : null}
 
       <Link
-        href={`${pricingPath(language)}?for=individual`}
+        href={`${pricingPath(language)}?for=${audience}`}
         onClick={onNavigate}
         className="group mt-4 inline-flex h-10 w-full cursor-pointer items-center justify-center gap-1.5 rounded-xl bg-[linear-gradient(115deg,#ff5e00_0%,#ff8a1f_45%,#ffb066_100%)] text-sm font-bold text-white shadow-[0_12px_28px_-14px_rgba(255,106,20,0.9)] transition-[transform,box-shadow] duration-200 ease-out hover:-translate-y-0.5 hover:shadow-[0_16px_34px_-12px_rgba(255,106,20,1)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
       >
