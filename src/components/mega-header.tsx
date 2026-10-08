@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from "react";
+import { Fragment, useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import { motion } from "motion/react";
 import { cn } from "@/lib/utils";
 import { brandLogo } from "@/lib/brand-logo";
@@ -99,7 +99,24 @@ export function MegaHeader({
       const gap = parseFloat(getComputedStyle(ruler).columnGap) || 0;
       const room = nav.clientWidth - (parseFloat(getComputedStyle(nav).paddingInlineStart) || 0);
       const shown = widths.map(() => true);
-      const total = () => widths.reduce((sum, w, i) => (shown[i] ? sum + w + gap : sum), -gap);
+      // The least room the row needs: the shown tabs, each thin line between two groups (an item of its own, 1px wide)
+      // and a gap between every two items. The tabs are then spread over whatever room is left (`justify-between`).
+      const total = () => {
+        let sum = 0;
+        let items = 0;
+        let shownCount = 0;
+        groups.forEach((g, i) => {
+          if (!shown[i]) return;
+          if (g.divideBefore && shownCount > 0) {
+            sum += 1;
+            items += 1;
+          }
+          sum += widths[i];
+          items += 1;
+          shownCount += 1;
+        });
+        return sum + gap * Math.max(0, items - 1);
+      };
       // Every tab stays on the bar, set smaller to fit - down to `MIN_FIT`. Only when even that is not enough do tabs
       // fold into the last one, the higher `collapse` first.
       const order = groups
@@ -227,7 +244,7 @@ export function MegaHeader({
             // The server HTML carries every tab, and only the measurement (client side) knows how many fit - until then
             // the row is clear, so a tab is never seen cut off at the edge for the moment before the page hydrates.
             className={cn(
-              "relative flex min-w-0 flex-1 items-start justify-start gap-x-[1em] overflow-x-clip text-[length:calc(13px*var(--nav-fit,1))] font-semibold text-[#ececee] transition-opacity duration-200 xl:gap-x-[1.16em] xl:ps-4 min-[1900px]:gap-x-[1.55em] min-[1900px]:ps-8 min-[1900px]:text-[length:calc(14px*var(--nav-fit,1))]",
+              "relative flex min-w-0 flex-1 items-start justify-between gap-x-[1em] overflow-x-clip text-[length:calc(13px*var(--nav-fit,1))] font-semibold text-[#ececee] transition-opacity duration-200 xl:gap-x-[1.16em] xl:ps-4 min-[1900px]:gap-x-[1.55em] min-[1900px]:ps-8 min-[1900px]:text-[length:calc(14px*var(--nav-fit,1))]",
               !fitted && "opacity-0"
             )}
             style={fit < 1 ? ({ "--nav-fit": fit } as CSSProperties) : undefined}
@@ -240,7 +257,6 @@ export function MegaHeader({
             >
               {groups.map((group) => (
                 <div key={group.href} className="flex shrink-0 flex-row">
-                  {group.divideBefore ? <span className="me-[1em] h-4 w-px xl:me-[1.33em] min-[1900px]:me-[1.85em]" /> : null}
                   <span className="flex h-[4.25rem] items-center">
                     {group.cta ? <span className={CTA_TEXT}>{group.label}</span> : group.label}
                   </span>
@@ -252,76 +268,76 @@ export function MegaHeader({
               const isOpen = openKey === group.href;
               const isLast = barIndex === bar.length - 1;
               return (
-                // Each tab as wide as its title (or its list, if wider) - never narrower, so titles never overlap.
-                <div
-                  key={group.href}
-                  className="flex shrink-0 flex-row"
-                  onMouseEnter={group.items.length ? () => show(group.href) : hide}
-                  onFocus={group.items.length ? () => show(group.href) : () => setOpenKey(null)}
-                >
-                  {group.divideBefore && barIndex > 0 ? (
-                    <span aria-hidden className="me-[1em] mt-[1.625rem] h-4 w-px bg-white/20 xl:me-[1.33em] min-[1900px]:me-[1.85em]" />
-                  ) : null}
-                  <div className="relative flex flex-col">
-                    <div className="flex h-[4.25rem] items-center">
-                      {group.cta ? (
-                        <Link
-                          href={group.href}
-                          className={cn(CTA_TEXT, "cursor-pointer outline-none transition-transform duration-200 ease-out hover:translate-x-0.5")}
-                        >
-                          {group.label}
-                        </Link>
-                      ) : (
-                        <MegaLink href={group.href}>{group.label}</MegaLink>
-                      )}
-                    </div>
-                    {group.items.length ? (
-                      // The drop-down: a floating glass card under this tab alone (the bar itself stays as it is), right-aligned
-                      // under the last tab so it never runs off the screen.
-                      <motion.div
-                        initial={false}
-                        animate={isOpen ? { opacity: 1, y: 0 } : { opacity: 0, y: -8 }}
-                        transition={{ duration: isOpen ? 0.24 : 0.16, ease: EASE }}
-                        inert={!isOpen}
-                        className={cn(
-                          "absolute top-full z-10 rounded-2xl border border-white/10 bg-[linear-gradient(180deg,rgba(24,24,28,0.96)_0%,rgba(10,10,13,0.96)_100%)] p-2 shadow-[0_30px_70px_-20px_rgba(0,0,0,0.85)] backdrop-blur-xl",
-                          group.cta ? "w-[min(38rem,calc(100vw-3rem))] p-3" : "min-w-[15rem]",
-                          isLast ? "right-0" : "left-0",
-                          !isOpen && "pointer-events-none"
+                <Fragment key={group.href}>
+                  {/* A thin line between two groups: an item of its own, so the spread-out tabs sit evenly around it. */}
+                  {group.divideBefore && barIndex > 0 ? <span aria-hidden className="mt-[1.625rem] h-4 w-px shrink-0 bg-white/20" /> : null}
+                  {/* Each tab as wide as its title (or its list, if wider) - never narrower, so titles never overlap. */}
+                  <div
+                    className="flex shrink-0 flex-row"
+                    onMouseEnter={group.items.length ? () => show(group.href) : hide}
+                    onFocus={group.items.length ? () => show(group.href) : () => setOpenKey(null)}
+                  >
+                    <div className="relative flex flex-col">
+                      <div className="flex h-[4.25rem] items-center">
+                        {group.cta ? (
+                          <Link
+                            href={group.href}
+                            className={cn(CTA_TEXT, "cursor-pointer outline-none transition-transform duration-200 ease-out hover:translate-x-0.5")}
+                          >
+                            {group.label}
+                          </Link>
+                        ) : (
+                          <MegaLink href={group.href}>{group.label}</MegaLink>
                         )}
-                      >
-                        <ul
-                          aria-label={group.label}
+                      </div>
+                      {group.items.length ? (
+                        // The drop-down: a floating glass card under this tab alone (the bar itself stays as it is), right-aligned
+                        // under the last tab so it never runs off the screen.
+                        <motion.div
+                          initial={false}
+                          animate={isOpen ? { opacity: 1, y: 0 } : { opacity: 0, y: -8 }}
+                          transition={{ duration: isOpen ? 0.24 : 0.16, ease: EASE }}
+                          inert={!isOpen}
                           className={cn(
-                            "text-[0.9375rem] font-medium text-[#c9ccd2]",
-                            group.cta ? "grid grid-cols-2 gap-x-1" : "flex flex-col"
+                            "absolute top-full z-10 rounded-2xl border border-white/10 bg-[linear-gradient(180deg,rgba(24,24,28,0.96)_0%,rgba(10,10,13,0.96)_100%)] p-2 shadow-[0_30px_70px_-20px_rgba(0,0,0,0.85)] backdrop-blur-xl",
+                            group.cta ? "w-[min(38rem,calc(100vw-3rem))] p-3" : "min-w-[15rem]",
+                            isLast ? "right-0" : "left-0",
+                            !isOpen && "pointer-events-none"
                           )}
                         >
-                          {group.items.map((item) => (
-                            <li key={item.href}>
-                              <Link
-                                href={item.href}
-                                className="block cursor-pointer rounded-xl px-3.5 py-2.5 transition-[background-color,color,transform] duration-200 ease-out hover:translate-x-0.5 hover:bg-primary/10 hover:text-primary focus-visible:bg-primary/10 focus-visible:text-primary focus-visible:outline-none"
-                              >
-                                <span className={cn("block", !group.cta && "whitespace-nowrap")}>{item.label}</span>
-                                {item.hint ? <span className="mt-0.5 block text-[0.8125rem] leading-snug font-normal text-white/45">{item.hint}</span> : null}
-                              </Link>
-                            </li>
-                          ))}
-                        </ul>
-                        {group.footerLink ? (
-                          <Link
-                            href={group.footerLink.href}
-                            className="mt-2 flex cursor-pointer items-center justify-between rounded-xl border-t border-white/10 px-3.5 pt-3 pb-1.5 text-[0.9375rem] font-semibold text-[#ffb066] transition-colors duration-200 hover:text-primary focus-visible:text-primary focus-visible:outline-none"
+                          <ul
+                            aria-label={group.label}
+                            className={cn(
+                              "text-[0.9375rem] font-medium text-[#c9ccd2]",
+                              group.cta ? "grid grid-cols-2 gap-x-1" : "flex flex-col"
+                            )}
                           >
-                            {group.footerLink.label}
-                            <span aria-hidden>→</span>
-                          </Link>
-                        ) : null}
-                      </motion.div>
-                    ) : null}
+                            {group.items.map((item) => (
+                              <li key={item.href}>
+                                <Link
+                                  href={item.href}
+                                  className="block cursor-pointer rounded-xl px-3.5 py-2.5 transition-[background-color,color,transform] duration-200 ease-out hover:translate-x-0.5 hover:bg-primary/10 hover:text-primary focus-visible:bg-primary/10 focus-visible:text-primary focus-visible:outline-none"
+                                >
+                                  <span className={cn("block", !group.cta && "whitespace-nowrap")}>{item.label}</span>
+                                  {item.hint ? <span className="mt-0.5 block text-[0.8125rem] leading-snug font-normal text-white/45">{item.hint}</span> : null}
+                                </Link>
+                              </li>
+                            ))}
+                          </ul>
+                          {group.footerLink ? (
+                            <Link
+                              href={group.footerLink.href}
+                              className="mt-2 flex cursor-pointer items-center justify-between rounded-xl border-t border-white/10 px-3.5 pt-3 pb-1.5 text-[0.9375rem] font-semibold text-[#ffb066] transition-colors duration-200 hover:text-primary focus-visible:text-primary focus-visible:outline-none"
+                            >
+                              {group.footerLink.label}
+                              <span aria-hidden>→</span>
+                            </Link>
+                          ) : null}
+                        </motion.div>
+                      ) : null}
+                    </div>
                   </div>
-                </div>
+                </Fragment>
               );
             })}
           </nav>
