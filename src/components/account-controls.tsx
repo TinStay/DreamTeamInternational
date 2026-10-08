@@ -25,7 +25,8 @@ export function AccountControls() {
         <>
           <WaterButton href={myProjectsPath(language)}>
             <IconFolder className="size-[18px]" stroke={1.8} aria-hidden />
-            {t.account.projectsButton}
+            <span className="max-2xl:hidden">{t.account.projectsButton}</span>
+            <span className="2xl:hidden">{t.account.projectsButtonShort}</span>
           </WaterButton>
           <span className="ml-1">
             <AccountMenu user={user} />
@@ -35,7 +36,8 @@ export function AccountControls() {
         <>
           <WaterButton onClick={openLogin}>
             <IconFolder className="size-[18px]" stroke={1.8} aria-hidden />
-            {t.account.projectsButton}
+            <span className="max-2xl:hidden">{t.account.projectsButton}</span>
+            <span className="2xl:hidden">{t.account.projectsButtonShort}</span>
           </WaterButton>
           <button
             type="button"

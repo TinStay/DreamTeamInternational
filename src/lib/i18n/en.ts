@@ -18,7 +18,8 @@ export const en = {
       tvAds: "TV Ads",
       productVideos: "Product Videos",
       brandMascots: "Brand Mascots",
-      other: "Custom Services"
+      other: "Custom Services",
+      more: "More"
     },
     login: "Log in",
     signup: "Sign up",
@@ -356,6 +357,7 @@ export const en = {
     providers: { google: "Google", azure: "Microsoft", email: "Email link" },
     // The header's Your Projects button and the /my-projects page.
     projectsButton: "Your Projects",
+    projectsButtonShort: "Projects",
     projectsPage: {
       trySample: "Want to see how it will look? Preview with sample projects",
       purchased: "Payment received - thank you! Your video seconds are being added to your account and will show in the menu in a few seconds. You can submit your first project now.",
