@@ -9,27 +9,21 @@ import { brandLogo } from "@/lib/brand-logo";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
-/** How far the tabs may be set smaller to fit (1 = their size): below this a main tab folds into the last one. */
+/** How far the tabs may be set smaller to fit (1 = their size): below this the not-main tabs fold into the last one. */
 const MIN_FIT = 0.8;
-/** A bar only a little too wide is set this much smaller (at most 8%) to keep every tab, before any tab is folded. */
-const SOFT_FIT = 0.92;
 
 export type MegaNavGroup = {
   label: string;
   href: string;
   items: { label: string; href: string }[];
   /**
-   * When the bar runs out of room (a smaller laptop, a narrow window) tabs fold into the last tab's drop-down, the
-   * higher number first; no number = the tab never folds. What folds is measured, so nothing is ever cut off.
+   * Every tab is kept on the bar, set smaller to fit; when even that is not enough (a narrow window) tabs fold into
+   * the last tab's drop-down, the higher number first (the `core` ones after the rest); no number = the tab never
+   * folds. What folds is measured, so nothing is ever cut off.
    */
   collapse?: number;
-  /**
-   * A main tab: when the bar is short of room the other tabs fold away first, and then these are set a little smaller
-   * (down to `MIN_FIT` of their size) to stay on the bar; only when even that is not enough do they fold too.
-   */
+  /** A main tab: it folds only after every not-main tab has. */
   core?: boolean;
-  /** Kept off the bar below this width (`ultra` = 1800px): the tab is then reached through the last tab's list. */
-  showFrom?: "ultra";
   /** A thin vertical line before this tab, starting a new group. */
   divideBefore?: boolean;
   /** On the last tab: its label while other tabs are folded into it ("More"). */
@@ -100,37 +94,21 @@ export function MegaHeader({
       const gap = parseFloat(getComputedStyle(ruler).columnGap) || 0;
       const room = nav.clientWidth - (parseFloat(getComputedStyle(nav).paddingInlineStart) || 0);
       const shown = widths.map(() => true);
-      // A tab kept off the bar at this width (`showFrom`) measures 0: no room, no gap.
-      const present = widths.map((w) => w > 0);
       const total = () => {
-        const anyFolded = shown.some((v, i) => !v && present[i]);
-        let sum = 0;
-        let count = 0;
-        widths.forEach((w, i) => {
-          if (!shown[i] || !present[i]) return;
-          sum += anyFolded && i === widths.length - 1 ? foldedLast : w;
-          count += 1;
-        });
-        return sum + gap * Math.max(0, count - 1);
+        const anyFolded = shown.some((v) => !v);
+        return widths.reduce((sum, w, i) => (shown[i] ? sum + (anyFolded && i === widths.length - 1 ? foldedLast : w) + gap : sum), -gap);
       };
-      // A row only a little too wide is set smaller (`SOFT_FIT`). Otherwise the not-main tabs fold first (the higher
-      // `collapse` first); then, if the main ones are still too wide, they are set smaller - down to `MIN_FIT` - and
-      // only below that does a main tab fold as well.
+      // Every tab stays on the bar, set smaller to fit - down to `MIN_FIT`. Only when even that is not enough do tabs
+      // fold into the last one: the not-main ones first (the higher `collapse` first), then the main ones.
       const order = groups
         .map((g, i) => ({ i, c: g.collapse, core: Boolean(g.core) }))
-        .filter((x): x is { i: number; c: number; core: boolean } => x.c !== undefined && present[x.i])
+        .filter((x): x is { i: number; c: number; core: boolean } => x.c !== undefined)
         .sort((x, y) => Number(x.core) - Number(y.core) || y.c - x.c);
-      let size = 1;
-      for (const { i, core } of order) {
-        const wanted = room / total();
-        if (wanted >= 1) break;
-        if (wanted >= SOFT_FIT || (core && wanted >= MIN_FIT)) {
-          size = wanted;
-          break;
-        }
+      for (const { i } of order) {
+        if (room / total() >= MIN_FIT) break;
         shown[i] = false;
       }
-      if (size === 1) size = Math.max(MIN_FIT, Math.min(1, room / total()));
+      let size = Math.min(1, room / total());
       // A hair under, so rounding in the text never pushes the last tab over the edge.
       size = size < 1 ? Math.max(MIN_FIT, Math.floor(size * 985) / 1000) : 1;
       const next = groups.filter((_, i) => !shown[i]).map((g) => g.href);
@@ -250,7 +228,7 @@ export function MegaHeader({
             // The server HTML carries every tab, and only the measurement (client side) knows how many fit - until then
             // the row is clear, so a tab is never seen cut off at the edge for the moment before the page hydrates.
             className={cn(
-              "relative flex min-w-0 flex-1 items-start justify-start gap-x-[1em] overflow-x-clip text-[length:calc(13px*var(--nav-fit,1))] font-semibold text-[#ececee] transition-opacity duration-200 xl:gap-x-[1.16em] xl:ps-4 2xl:gap-x-[1.55em] 2xl:ps-8 2xl:text-[length:calc(14px*var(--nav-fit,1))]",
+              "relative flex min-w-0 flex-1 items-start justify-start gap-x-[1em] overflow-x-clip text-[length:calc(13px*var(--nav-fit,1))] font-semibold text-[#ececee] transition-opacity duration-200 xl:gap-x-[1.16em] xl:ps-4 min-[1900px]:gap-x-[1.55em] min-[1900px]:ps-8 min-[1900px]:text-[length:calc(14px*var(--nav-fit,1))]",
               !fitted && "opacity-0"
             )}
             style={fit < 1 ? ({ "--nav-fit": fit } as CSSProperties) : undefined}
@@ -259,18 +237,18 @@ export function MegaHeader({
             <div
               ref={rulerRef}
               aria-hidden
-              className="pointer-events-none invisible absolute top-0 left-0 flex w-max items-start gap-x-[1em] whitespace-nowrap text-[length:calc(13px*var(--nav-fit))] [--nav-fit:1] xl:gap-x-[1.16em] 2xl:gap-x-[1.55em] 2xl:text-[length:calc(14px*var(--nav-fit))]"
+              className="pointer-events-none invisible absolute top-0 left-0 flex w-max items-start gap-x-[1em] whitespace-nowrap text-[length:calc(13px*var(--nav-fit))] [--nav-fit:1] xl:gap-x-[1.16em] min-[1900px]:gap-x-[1.55em] min-[1900px]:text-[length:calc(14px*var(--nav-fit))]"
             >
               {groups.map((group) => (
-                <div key={group.href} className={cn("shrink-0 flex-row", group.showFrom === "ultra" ? "hidden min-[1800px]:flex" : "flex")}>
-                  {group.divideBefore ? <span className="me-[1em] h-4 w-px xl:me-[1.33em] 2xl:me-[1.85em]" /> : null}
+                <div key={group.href} className="flex shrink-0 flex-row">
+                  {group.divideBefore ? <span className="me-[1em] h-4 w-px xl:me-[1.33em] min-[1900px]:me-[1.85em]" /> : null}
                   <span className="flex h-[4.25rem] items-center">{group.label}</span>
                 </div>
               ))}
               {/* ... and the last tab as it reads once something is folded into it. */}
               {groups[groups.length - 1]?.foldedLabel ? (
                 <div className="flex shrink-0 flex-row">
-                  {groups[groups.length - 1].divideBefore ? <span className="me-[1em] h-4 w-px xl:me-[1.33em] 2xl:me-[1.85em]" /> : null}
+                  {groups[groups.length - 1].divideBefore ? <span className="me-[1em] h-4 w-px xl:me-[1.33em] min-[1900px]:me-[1.85em]" /> : null}
                   <span className="flex h-[4.25rem] items-center">{groups[groups.length - 1].foldedLabel}</span>
                 </div>
               ) : null}
@@ -280,12 +258,12 @@ export function MegaHeader({
               // Each tab as wide as its title (or its list, if wider) - never narrower, so titles never overlap.
               <div
                 key={group.href}
-                className={cn("shrink-0 flex-row", group.showFrom === "ultra" ? "hidden min-[1800px]:flex" : "flex")}
+                className="flex shrink-0 flex-row"
                 onMouseEnter={group.items.length ? show : hide}
                 onFocus={group.items.length ? show : () => setOpen(false)}
               >
                 {group.divideBefore && barIndex > 0 ? (
-                  <span aria-hidden className="me-[1em] mt-[1.625rem] h-4 w-px bg-white/20 xl:me-[1.33em] 2xl:me-[1.85em]" />
+                  <span aria-hidden className="me-[1em] mt-[1.625rem] h-4 w-px bg-white/20 xl:me-[1.33em] min-[1900px]:me-[1.85em]" />
                 ) : null}
                 <div className="relative flex flex-col">
                   <div className="flex h-[4.25rem] items-center">
