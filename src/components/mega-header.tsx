@@ -11,6 +11,8 @@ const EASE = [0.22, 1, 0.36, 1] as const;
 
 /** How far the tabs may be set smaller to fit (1 = their size): below this a main tab folds into the last one. */
 const MIN_FIT = 0.8;
+/** A bar only a little too wide is set this much smaller (at most 8%) to keep every tab, before any tab is folded. */
+const SOFT_FIT = 0.92;
 
 export type MegaNavGroup = {
   label: string;
@@ -26,6 +28,8 @@ export type MegaNavGroup = {
    * (down to `MIN_FIT` of their size) to stay on the bar; only when even that is not enough do they fold too.
    */
   core?: boolean;
+  /** Kept off the bar below this width (`ultra` = 1800px): the tab is then reached through the last tab's list. */
+  showFrom?: "ultra";
   /** A thin vertical line before this tab, starting a new group. */
   divideBefore?: boolean;
   /** On the last tab: its label while other tabs are folded into it ("More"). */
@@ -96,21 +100,31 @@ export function MegaHeader({
       const gap = parseFloat(getComputedStyle(ruler).columnGap) || 0;
       const room = nav.clientWidth - (parseFloat(getComputedStyle(nav).paddingInlineStart) || 0);
       const shown = widths.map(() => true);
+      // A tab kept off the bar at this width (`showFrom`) measures 0: no room, no gap.
+      const present = widths.map((w) => w > 0);
       const total = () => {
-        const anyFolded = shown.some((v) => !v);
-        return widths.reduce((sum, w, i) => (shown[i] ? sum + (anyFolded && i === widths.length - 1 ? foldedLast : w) + gap : sum), -gap);
+        const anyFolded = shown.some((v, i) => !v && present[i]);
+        let sum = 0;
+        let count = 0;
+        widths.forEach((w, i) => {
+          if (!shown[i] || !present[i]) return;
+          sum += anyFolded && i === widths.length - 1 ? foldedLast : w;
+          count += 1;
+        });
+        return sum + gap * Math.max(0, count - 1);
       };
-      // Not-main tabs fold first (the higher `collapse` first); then, if the main ones are still too wide, they are set
-      // smaller - down to `MIN_FIT` - and only below that does a main tab fold as well.
+      // A row only a little too wide is set smaller (`SOFT_FIT`). Otherwise the not-main tabs fold first (the higher
+      // `collapse` first); then, if the main ones are still too wide, they are set smaller - down to `MIN_FIT` - and
+      // only below that does a main tab fold as well.
       const order = groups
         .map((g, i) => ({ i, c: g.collapse, core: Boolean(g.core) }))
-        .filter((x): x is { i: number; c: number; core: boolean } => x.c !== undefined)
+        .filter((x): x is { i: number; c: number; core: boolean } => x.c !== undefined && present[x.i])
         .sort((x, y) => Number(x.core) - Number(y.core) || y.c - x.c);
       let size = 1;
       for (const { i, core } of order) {
         const wanted = room / total();
         if (wanted >= 1) break;
-        if (core && wanted >= MIN_FIT) {
+        if (wanted >= SOFT_FIT || (core && wanted >= MIN_FIT)) {
           size = wanted;
           break;
         }
@@ -248,7 +262,7 @@ export function MegaHeader({
               className="pointer-events-none invisible absolute top-0 left-0 flex w-max items-start gap-x-[1em] whitespace-nowrap text-[length:calc(13px*var(--nav-fit))] [--nav-fit:1] xl:gap-x-[1.16em] 2xl:gap-x-[1.55em] 2xl:text-[length:calc(14px*var(--nav-fit))]"
             >
               {groups.map((group) => (
-                <div key={group.href} className="flex shrink-0 flex-row">
+                <div key={group.href} className={cn("shrink-0 flex-row", group.showFrom === "ultra" ? "hidden min-[1800px]:flex" : "flex")}>
                   {group.divideBefore ? <span className="me-[1em] h-4 w-px xl:me-[1.33em] 2xl:me-[1.85em]" /> : null}
                   <span className="flex h-[4.25rem] items-center">{group.label}</span>
                 </div>
@@ -266,7 +280,7 @@ export function MegaHeader({
               // Each tab as wide as its title (or its list, if wider) - never narrower, so titles never overlap.
               <div
                 key={group.href}
-                className="flex shrink-0 flex-row"
+                className={cn("shrink-0 flex-row", group.showFrom === "ultra" ? "hidden min-[1800px]:flex" : "flex")}
                 onMouseEnter={group.items.length ? show : hide}
                 onFocus={group.items.length ? show : () => setOpen(false)}
               >
