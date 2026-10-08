@@ -10,6 +10,11 @@ export function contactProcessPath(language: Language) {
   return `/${language}/contact`;
 }
 
+/** Localized investor relations page (it took the place of the contact page). */
+export function investorsPath(language: Language) {
+  return `/${language}/investors`;
+}
+
 /** Localized training hub path. */
 export function trainingPath(language: Language) {
   return `/${language}/training`;

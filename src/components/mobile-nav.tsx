@@ -13,6 +13,8 @@ import {
   IconInfoCircle,
   IconMail,
   IconMenu2,
+  IconSparkles,
+  IconTrendingUp,
   IconVideo,
 } from "@tabler/icons-react";
 import { MobileMenuAccount } from "@/components/mobile-account";
@@ -29,6 +31,7 @@ import {
   careersPath,
   contactProcessPath,
   homePath,
+  investorsPath,
   myProjectsPath,
   portfolioPath,
   pricingPath,
@@ -55,16 +58,16 @@ export function MobileNav() {
   const pathname = usePathname();
   // The page you are on reads in orange (the dock and the English menu).
   const isActive = (href: string) => pathname === href;
-  // The English menu: the same links as the desktop mega menu, in its order.
+  // The English menu: the same links as the desktop mega menu, in its order (the big "Explore Videos" button leads the
+  // list on its own, below).
   const englishLinks = [
     { label: t.header.nav.explore, href: homeHref, Icon: IconHome },
     { label: t.header.about, href: aboutPath(language), Icon: IconInfoCircle },
     { label: t.header.projects, href: projectsHref, Icon: IconFolder },
     { label: t.header.pricingPage, href: pricingPath(language), Icon: IconCoins },
     { label: t.footer.careers, href: careersPath(language), Icon: IconBriefcase },
-    { label: t.header.portfolio, href: portfolioHref, Icon: IconVideo },
-    { label: t.header.training, href: trainingHref, Icon: IconBook },
-    { label: t.header.contact, href: contactHref, Icon: IconMail },
+    { label: t.header.services, href: servicesHref, Icon: IconSparkles },
+    { label: t.header.investors, href: investorsPath(language), Icon: IconTrendingUp },
   ];
   const dockItem = "group flex flex-1 cursor-pointer select-none flex-col items-center justify-center gap-1 text-muted-foreground transition-colors duration-200 ease-out hover:text-primary";
   const dockIcon = "h-[22px] w-[22px] text-neutral-800 transition-[transform,color] duration-200 ease-out group-hover:scale-110 group-hover:text-primary dark:text-neutral-200";
@@ -164,6 +167,15 @@ export function MobileNav() {
 
               {english ? (
                 <div className="flex flex-col gap-5 text-lg font-heading font-semibold">
+                  {/* The big glowing button, as in the desktop bar: opens the portfolio (its chips are every category). */}
+                  <Link
+                    href={portfolioHref}
+                    onClick={() => setIsOpen(false)}
+                    className="nav-explore mb-1 flex h-14 w-full cursor-pointer select-none items-center justify-center gap-2.5 rounded-full text-lg font-extrabold text-[#1f0b00]"
+                  >
+                    <IconVideo className="relative z-[2] size-6" stroke={2.2} aria-hidden />
+                    <span className="relative z-[2]">{t.header.nav.exploreVideos}</span>
+                  </Link>
                   {englishLinks.map(({ label, href, Icon }) => (
                     <Link
                       key={href + label}

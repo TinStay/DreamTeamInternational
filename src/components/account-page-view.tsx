@@ -11,7 +11,7 @@ import { PlanDetailsDialog } from "@/components/plan-details-dialog";
 import { useMyPlan } from "@/lib/supabase/use-my-plan";
 import { useLanguage } from "@/lib/i18n/language-context";
 import { formatDateDisplay } from "@/lib/dates";
-import { contactProcessPath, pricingPath } from "@/lib/routes";
+import { pricingPath } from "@/lib/routes";
 import type { AccountInfo } from "@/lib/account-info";
 import type { ProfileFields } from "@/lib/clients";
 import { EMAIL_PRIMARY } from "@/lib/contact-info";
@@ -171,9 +171,6 @@ export function AccountPageView({ info, fields, subscription, orders = [] }: { i
           >
             {a.deleteAccount.cta}
           </a>
-          <Link href={contactProcessPath(language)} className="text-sm text-white/55 underline decoration-white/25 underline-offset-2 transition-colors duration-200 hover:text-primary">
-            {a.deleteAccount.form}
-          </Link>
         </div>
       </section>
       <PlanDetailsDialog plan={myPlan} open={planOpen} onOpenChange={setPlanOpen} />

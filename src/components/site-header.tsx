@@ -19,11 +19,13 @@ import { MobileTopControls } from "@/components/mobile-account";
 import { AuthDialog } from "@/components/auth-dialog";
 import { PARTNERS, PARTNER_ICON_BASE } from "@/lib/partners";
 import { PROJECTS } from "@/lib/projects";
+import { PORTFOLIO_KEYS } from "@/lib/portfolio-grid";
 import { getServiceSlug } from "@/lib/services/constants";
 import {
   aboutPath,
   careersPath,
   contactProcessPath,
+  investorsPath,
   homePath,
   portfolioPath,
   pricingPath,
@@ -218,15 +220,28 @@ export function SiteHeader() {
     ),
   }));
 
-  // The English mega menu's tabs, in the client's order and groups (split by thin lines): Explore (the home page) |
-  // the video categories (each opens the portfolio filtered to it) | About Us, Customers, Pricing, Careers | Custom
-  // Services, the one tab that drops down, holding the rest of the site. All of them stay on the bar, set a little
-  // smaller when the screen is short of room (`MegaHeader`); only when even that is not enough do tabs fold into the
-  // last tab - renamed "More" while it holds them - the `collapse` number says in what order (Careers first, then About Us and Customers, Explore
-  // after them, the video categories last; Pricing never).
+  // The English mega menu's tabs, in the client's order and groups (split by thin lines): Home, the big glowing
+  // "Explore Videos" button (a list of every video category, each opening the portfolio filtered to it) | the four
+  // main video categories | About Us, Customers, Pricing, Careers | More, the one tab that drops down, holding the rest of
+  // the site. All of them stay on the bar, set a little smaller when the screen is short of room (`MegaHeader`); only
+  // when even that is not enough do tabs fold into the last tab - the `collapse` number says in what order (Careers
+  // first, then About Us and Customers, Home after them, the video categories last; the big button and Pricing never).
   const portfolioCategory = (key: string) => `${portfolioPath(language)}?category=${key}`;
+  const categoryNames = t.packages.items as Record<string, { title: string; line: string }>;
+  const categoryItems = PORTFOLIO_KEYS.map((key) => ({
+    label: categoryNames[key].title,
+    hint: categoryNames[key].line,
+    href: portfolioCategory(key),
+  }));
   const megaGroups: MegaNavGroup[] = [
     { label: t.header.nav.explore, href: homeHref, items: [], collapse: 6 },
+    {
+      label: t.header.nav.exploreVideos,
+      href: portfolioPath(language),
+      cta: true,
+      items: categoryItems,
+      footerLink: { label: t.header.nav.exploreAll, href: portfolioPath(language) },
+    },
     { label: t.header.nav.socialAds, href: portfolioCategory("socialAds"), items: [], divideBefore: true, core: true, collapse: 1 },
     { label: t.header.nav.corporate, href: portfolioCategory("corporate"), items: [], core: true, collapse: 4 },
     { label: t.header.nav.tvAds, href: portfolioCategory("tvAds"), items: [], core: true, collapse: 3 },
@@ -237,15 +252,12 @@ export function SiteHeader() {
     { label: t.footer.careers, href: careersPath(language), items: [], collapse: 9 },
     {
       label: t.header.nav.other,
-      foldedLabel: t.header.nav.more,
       href: servicesPath(language),
       divideBefore: true,
       items: [
-        { label: t.header.portfolio, href: portfolioPath(language) },
         { label: t.header.services, href: servicesPath(language) },
         { label: t.header.nav.brandMascots, href: servicePath(language, "brand-mascots") },
-        { label: t.header.training, href: trainingPath(language) },
-        { label: t.header.contact, href: contactProcessPath(language) },
+        { label: t.header.investors, href: investorsPath(language) },
       ],
     },
   ];

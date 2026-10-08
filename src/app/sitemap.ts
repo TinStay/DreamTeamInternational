@@ -22,15 +22,11 @@ const PATHS: readonly string[] = [
   "/projects",
   ...PROJECTS.map((project) => `/projects/${project.id}`),
   "/portfolio",
-  "/training",
-  "/training/individual",
-  // Skool training temporarily hidden.
-  // "/training/skool",
-  "/training/team",
+  // Training is off the site's menus for now (its pages are not indexed): /training, /training/individual, /training/team.
   "/pricing",
   "/about",
   "/careers",
-  "/contact",
+  "/investors",
   "/privacy",
   "/terms",
 ];
@@ -38,8 +34,8 @@ const PATHS: readonly string[] = [
 function priorityFor(path: string) {
   if (path === "") return 1;
   if (path.startsWith("/services") || path.startsWith("/projects")) return 0.9;
-  if (path === "/portfolio" || path.startsWith("/training")) return 0.8;
-  if (path === "/contact") return 0.7;
+  if (path === "/portfolio") return 0.8;
+  if (path === "/investors") return 0.5;
   return 0.4;
 }
 

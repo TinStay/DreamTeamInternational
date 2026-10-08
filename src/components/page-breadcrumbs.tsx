@@ -31,8 +31,8 @@ function segmentToLabel(
       return t.header.portfolio;
     case "projects":
       return t.header.projects;
-    case "contact":
-      return t.header.contact;
+    case "investors":
+      return t.header.investors;
     case "training":
       return t.header.training;
     case "services":

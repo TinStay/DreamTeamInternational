@@ -13,7 +13,7 @@ import { useLanguage } from "@/lib/i18n/language-context";
 import { ANNUAL_PERCENT, PLANS, type Audience, type Billing, type Plan } from "@/lib/pricing";
 import { openSignup } from "@/lib/signup-dialog";
 import { useAuthUser } from "@/lib/supabase/use-auth-user";
-import { contactProcessPath } from "@/lib/routes";
+import { emailHref } from "@/lib/contact-info";
 
 const AUDIENCES: Audience[] = ["individual", "business"];
 const BILLINGS: Billing[] = ["monthly", "annual"];
@@ -35,9 +35,9 @@ function segButton(active: boolean) {
  * client with a live subscription is not sold a second one), the Enterprise one the contact page.
  */
 export function PricingPageView({ initialAudience = "business" }: { initialAudience?: Audience }) {
-  const { t, language } = useLanguage();
+  const { t } = useLanguage();
   const p = t.plans;
-  const contactHref = contactProcessPath(language);
+  const contactHref = emailHref();
   const [audience, setAudience] = useState<Audience>(initialAudience);
   const [billing, setBilling] = useState<Billing>("monthly");
   const user = useAuthUser();
