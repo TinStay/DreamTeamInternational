@@ -10,7 +10,7 @@ import { brandLogo } from "@/lib/brand-logo";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
-/** How far the tabs may be set smaller to fit (1 = their size): below this the not-main tabs fold into the last one. */
+/** How far the tabs may be set smaller to fit (1 = their size): below this tabs fold into the last one. */
 const MIN_FIT = 0.8;
 
 export type MegaNavItem = { label: string; href: string; /** A short line under the label (the big button's list). */ hint?: string };
@@ -21,12 +21,10 @@ export type MegaNavGroup = {
   items: MegaNavItem[];
   /**
    * Every tab is kept on the bar, set smaller to fit; when even that is not enough (a narrow window) tabs fold into
-   * the last tab's drop-down, the higher number first (the `core` ones after the rest); no number = the tab never
-   * folds. What folds is measured, so nothing is ever cut off.
+   * the last tab's drop-down, the higher number first; no number = the tab never folds. What folds is measured, so
+   * nothing is ever cut off.
    */
   collapse?: number;
-  /** A main tab: it folds only after every not-main tab has. */
-  core?: boolean;
   /** A thin vertical line before this tab, starting a new group. */
   divideBefore?: boolean;
   /** The big glowing button ("Explore Videos"): never folds, and its list opens as a wide card under it. */
@@ -75,7 +73,7 @@ function CtaContent({ label, open }: { label: string; open?: boolean }) {
 /**
  * The English site's desktop header: a glass bar across the whole width of the screen, sliding away as the page
  * scrolls down and back as soon as it scrolls up. One row of tabs beside the logo - Home, the big glowing "Explore
- * Videos" button, the video categories, About Us, Customers, Pricing, Careers and "More". The big button and "More" hold
+ * Videos" button, About Us, Customers, Pricing, Careers and "More". The big button and "More" hold
  * a list: hovering or tabbing into one drops a floating card under it - the bar does not unfold, the other tabs are
  * plain links - and it folds away as the pointer leaves. The logo and the right-hand controls stay on the top row.
  * `/bg` keeps `SiteHeader`'s own desktop header.
@@ -103,7 +101,7 @@ export function MegaHeader({
   const [fit, setFit] = useState(1);
   /** False in the server HTML and until the first measurement: the tabs are not shown before they are fitted. */
   const [fitted, setFitted] = useState(false);
-  const groupsKey = groups.map((g) => `${g.href}|${g.label}|${g.collapse ?? ""}${g.core ? "c" : ""}${g.cta ? "b" : ""}`).join("~");
+  const groupsKey = groups.map((g) => `${g.href}|${g.label}|${g.collapse ?? ""}${g.cta ? "b" : ""}`).join("~");
 
   // Fit the tabs to the room there is: an invisible copy of the whole row (`ruler`) gives every tab's natural width;
   // while the row is wider than the nav, the not-main tabs fold into the last tab's list and the main ones shrink.
@@ -118,11 +116,11 @@ export function MegaHeader({
       const shown = widths.map(() => true);
       const total = () => widths.reduce((sum, w, i) => (shown[i] ? sum + w + gap : sum), -gap);
       // Every tab stays on the bar, set smaller to fit - down to `MIN_FIT`. Only when even that is not enough do tabs
-      // fold into the last one: the not-main ones first (the higher `collapse` first), then the main ones.
+      // fold into the last one, the higher `collapse` first.
       const order = groups
-        .map((g, i) => ({ i, c: g.collapse, core: Boolean(g.core) }))
-        .filter((x): x is { i: number; c: number; core: boolean } => x.c !== undefined)
-        .sort((x, y) => Number(x.core) - Number(y.core) || y.c - x.c);
+        .map((g, i) => ({ i, c: g.collapse }))
+        .filter((x): x is { i: number; c: number } => x.c !== undefined)
+        .sort((x, y) => y.c - x.c);
       for (const { i } of order) {
         if (room / total() >= MIN_FIT) break;
         shown[i] = false;
@@ -232,7 +230,7 @@ export function MegaHeader({
               height={logo.height}
               sizes="160px"
               priority
-              className="h-5 w-auto xl:h-6 min-[1700px]:h-7"
+              className="h-5 w-auto xl:h-7"
             />
           </Link>
 
@@ -244,7 +242,7 @@ export function MegaHeader({
             // The server HTML carries every tab, and only the measurement (client side) knows how many fit - until then
             // the row is clear, so a tab is never seen cut off at the edge for the moment before the page hydrates.
             className={cn(
-              "relative flex min-w-0 flex-1 items-start justify-start gap-x-[1em] overflow-x-clip text-[length:calc(13px*var(--nav-fit,1))] font-semibold text-[#ececee] transition-opacity duration-200 xl:gap-x-[1.16em] min-[1700px]:ps-4 min-[1900px]:gap-x-[1.55em] min-[1900px]:ps-8 min-[1900px]:text-[length:calc(14px*var(--nav-fit,1))]",
+              "relative flex min-w-0 flex-1 items-start justify-start gap-x-[1em] overflow-x-clip text-[length:calc(13px*var(--nav-fit,1))] font-semibold text-[#ececee] transition-opacity duration-200 xl:gap-x-[1.16em] xl:ps-4 min-[1900px]:gap-x-[1.55em] min-[1900px]:ps-8 min-[1900px]:text-[length:calc(14px*var(--nav-fit,1))]",
               !fitted && "opacity-0"
             )}
             style={fit < 1 ? ({ "--nav-fit": fit } as CSSProperties) : undefined}

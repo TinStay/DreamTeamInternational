@@ -220,12 +220,12 @@ export function SiteHeader() {
     ),
   }));
 
-  // The English mega menu's tabs, in the client's order and groups (split by thin lines): Home, the big glowing
-  // "Explore Videos" button (a list of every video category, each opening the portfolio filtered to it) | the four
-  // main video categories | About Us, Customers, Pricing, Careers | More, the one tab that drops down, holding the rest of
-  // the site. All of them stay on the bar, set a little smaller when the screen is short of room (`MegaHeader`); only
-  // when even that is not enough do tabs fold into the last tab - the `collapse` number says in what order (Careers
-  // first, then About Us and Customers, Home after them, the video categories last; the big button and Pricing never).
+  // The English mega menu's tabs, in the client's order and groups (split by thin lines): Home | the big glowing
+  // "Explore Videos" button - a list of every video category, each opening the portfolio filtered to it - | About Us,
+  // Customers, Pricing, Careers | More, the one other tab that drops down, holding the rest of the site. All of them stay
+  // on the bar, set a little smaller when the screen is short of room (`MegaHeader`); only when even that is not enough
+  // do tabs fold into "More" - the `collapse` number says in what order (Careers first, then About Us and Customers, Home
+  // last; the big button and Pricing never).
   const portfolioCategory = (key: string) => `${portfolioPath(language)}?category=${key}`;
   const categoryNames = t.packages.items as Record<string, { title: string; line: string }>;
   const categoryItems = PORTFOLIO_KEYS.map((key) => ({
@@ -239,13 +239,10 @@ export function SiteHeader() {
       label: t.header.nav.exploreVideos,
       href: portfolioPath(language),
       cta: true,
+      divideBefore: true,
       items: categoryItems,
       footerLink: { label: t.header.nav.exploreAll, href: portfolioPath(language) },
     },
-    { label: t.header.nav.socialAds, href: portfolioCategory("socialAds"), items: [], divideBefore: true, core: true, collapse: 1 },
-    { label: t.header.nav.corporate, href: portfolioCategory("corporate"), items: [], core: true, collapse: 4 },
-    { label: t.header.nav.tvAds, href: portfolioCategory("tvAds"), items: [], core: true, collapse: 3 },
-    { label: t.header.nav.productVideos, href: portfolioCategory("productVideos"), items: [], core: true, collapse: 5 },
     { label: t.header.about, href: aboutPath(language), items: [], divideBefore: true, collapse: 8 },
     { label: t.header.projects, href: projectsPath(language), items: [], collapse: 7 },
     { label: t.header.pricingPage, href: pricingPath(language), items: [] },
