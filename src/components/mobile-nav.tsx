@@ -3,7 +3,6 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import Image from "next/image";
 import {
   IconBook,
   IconBriefcase,
@@ -20,7 +19,7 @@ import { openLogin } from "@/lib/signup-dialog";
 import { useAuthUser } from "@/lib/supabase/use-auth-user";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
 import { useLanguage } from "@/lib/i18n/language-context";
-import { brandLogo } from "@/lib/brand-logo";
+import { BrandWordmark } from "@/components/ui/brand-wordmark";
 import { primaryGradientInteractiveClassName } from "@/components/ui/button";
 import { ButtonWithIcon } from "@/components/ui/button-with-icon";
 import { GlassShell } from "@/components/ui/glass-shell";
@@ -42,7 +41,6 @@ import { ThemeToggle } from "./theme-toggle";
 export function MobileNav() {
   const [isOpen, setIsOpen] = useState(false);
   const { t, language } = useLanguage();
-  const logo = brandLogo(language);
   const homeHref = homePath(language);
   const trainingHref = trainingPath(language);
   const contactHref = contactProcessPath(language);
@@ -148,14 +146,7 @@ export function MobileNav() {
             <div className="absolute top-4 left-1/2 -translate-x-1/2 w-12 h-1.5 bg-border/40 rounded-full" />
             <div className="flex flex-col h-full pt-16 pb-8 px-6 overflow-y-auto">
               <div className="flex flex-col items-center mb-8 pb-8 border-b border-border/20">
-                <Image
-                  src={logo.src}
-                  alt={logo.alt}
-                  width={logo.width}
-                  height={logo.height}
-                  sizes="240px"
-                  className={cn("mb-6 w-auto grayscale dark:invert", language === "en" ? "h-10" : "h-18")}
-                />
+                <BrandWordmark className="mb-6 text-4xl text-foreground" />
                 <div className="flex items-center gap-4">
                   {/* English has one theme (`forcedTheme` in the layout), so no toggle there. */}
                   {language === "en" ? null : <ThemeToggle className="shrink-0" />}

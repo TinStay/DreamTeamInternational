@@ -40,14 +40,14 @@ function initialsOf(name: string) {
  * `/about` (English site): the big "We make AI video" title with what you never need - no learning curve, no prompts -
  * struck through in red under it, the San Francisco skyline in a rounded frame, one text on who we are and what we do,
  * the team (name, role, a line, LinkedIn), the latest update - we are launching in the US, with the 20% first-order
- * discount - and "Join our team - coming soon". Copy in the dictionary under `about`, the people in `lib/team-members.ts`.
+ * discount - and "Join our team". Copy in the dictionary under `about`, the people in `lib/team-members.ts`.
  */
 export function AboutPageView() {
   const { t, language } = useLanguage();
   const a = t.about;
 
   return (
-    <AccountShell>
+    <AccountShell sideNav={false}>
       {/* Title */}
       <header className="mt-8 sm:mt-12">
         <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#ff8a1f]">{a.eyebrow}</p>
@@ -218,9 +218,6 @@ export function AboutPageView() {
             <p className="mt-2 max-w-[62ch] text-sm leading-relaxed text-white/65 sm:text-base">{a.hiring.text}</p>
           </div>
           <div className="flex shrink-0 flex-col items-start gap-3 sm:items-end">
-            <span className="inline-flex w-fit items-center rounded-full border border-[#ff8a1f]/50 bg-[#ff8a1f]/10 px-4 py-1.5 text-xs font-bold uppercase tracking-[0.14em] text-[#ffb066]">
-              {a.hiring.badge}
-            </span>
             <Link
               href={careersPath(language)}
               className="inline-flex h-12 cursor-pointer items-center justify-center rounded-full px-6 text-[15px] font-bold text-white shadow-[0_14px_34px_-14px_rgba(255,106,20,0.85)] transition-[transform,box-shadow] duration-200 ease-out hover:-translate-y-0.5 hover:shadow-[0_18px_40px_-12px_rgba(255,106,20,0.95)]"

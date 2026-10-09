@@ -264,7 +264,7 @@ export function CustomersPageView() {
   const c = t.projects.customers;
 
   return (
-    <AccountShell>
+    <AccountShell sideNav={false}>
       <p className="mt-6 text-xs font-semibold uppercase tracking-[0.18em] text-[#ff8a1f]">{c.eyebrow}</p>
       <h1 className="mt-3 font-heading text-[clamp(30px,4vw,56px)] leading-[0.98] font-black uppercase text-balance">
         {c.title1} <span className="text-section-accent">{c.title2}</span>

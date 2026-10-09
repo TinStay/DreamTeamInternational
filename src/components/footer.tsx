@@ -1,13 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { Sphere } from "./iridescent-shapes";
 import { IconMapPin, IconPhone } from "@tabler/icons-react";
 import { openConsentSettings } from "@/lib/consent";
 import { PHONE_US } from "@/lib/contact-info";
 import { useLanguage } from "@/lib/i18n/language-context";
-import { brandLogo } from "@/lib/brand-logo";
+import { BrandWordmark } from "@/components/ui/brand-wordmark";
 import { aboutPath, careersPath, homePath, portfolioPath, pricingPath, privacyPath, projectsPath, termsPath } from "@/lib/routes";
 import { SOCIAL_LINKS } from "@/lib/social-links";
 import { cn } from "@/lib/utils";
@@ -35,7 +34,6 @@ const PACKS = [
 export function Footer() {
   const { t, language } = useLanguage();
   const f = t.footer;
-  const logo = brandLogo(language);
   const homeHref = homePath(language);
   const pricing = pricingPath(language);
   const styles = t.packages.items as Record<string, { title: string }>;
@@ -48,14 +46,7 @@ export function Footer() {
           {/* Brand column */}
           <div className="flex flex-col items-center gap-4 sm:items-start">
             <Link href={homeHref} className="font-heading text-2xl font-bold tracking-tight">
-              <Image
-                src={logo.src}
-                alt={logo.alt}
-                width={logo.width}
-                height={logo.height}
-                sizes="140px"
-                className={cn("w-auto grayscale transition-all dark:invert", language === "en" ? "h-6" : "h-8")}
-              />
+              <BrandWordmark className="text-2xl text-foreground" />
             </Link>
             <p className="max-w-xs text-sm text-muted-foreground">{f.desc}</p>
             <div className="flex flex-col items-center gap-2.5 text-sm sm:items-start">

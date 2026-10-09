@@ -8,7 +8,18 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
  */
 const inserts: Record<string, unknown>[] = [];
 const db = { insertError: null as null | { code: string } };
-const admin = { from: vi.fn(() => ({ insert: vi.fn(async (row: Record<string, unknown>) => (inserts.push(row), { error: db.insertError })) })) };
+const updates: { table: string; patch: Record<string, unknown>; filters: [string, unknown][] }[] = [];
+const admin = {
+  from: vi.fn((table: string) => ({
+    insert: vi.fn(async (row: Record<string, unknown>) => (inserts.push(row), { error: db.insertError })),
+    update: (patch: Record<string, unknown>) => {
+      const entry = { table, patch, filters: [] as [string, unknown][] };
+      updates.push(entry);
+      const chain = { eq: (col: string, val: unknown) => (entry.filters.push([col, val]), chain), then: (resolve: (v: unknown) => void) => resolve({ error: null }) };
+      return chain;
+    },
+  })),
+};
 
 const stripe = {
   webhooks: {
@@ -38,6 +49,7 @@ const session = (over: Record<string, unknown> = {}) => ({ id: "cs_1", mode: "pa
 
 beforeEach(() => {
   inserts.length = 0;
+  updates.length = 0;
   db.insertError = null;
   orders.updateOrder.mockClear();
   subs.saveSubscription.mockClear().mockResolvedValue(true);
@@ -104,5 +116,18 @@ describe("/api/stripe/webhook", () => {
     expect(subs.saveSubscription).toHaveBeenCalledWith(expect.objectContaining({ id: "sub_1" }));
     subs.saveSubscription.mockResolvedValueOnce(false);
     expect((await send("customer.subscription.deleted", { id: "sub_1", status: "canceled", metadata: { user_id: "u1" } })).status).toBe(500);
+  });
+
+  it("settles a paid change request for the team - and never turns it into video seconds", async () => {
+    const meta = { user_id: "u1", request_id: "req-1", project_id: "p1", purchase_type: "project_request", kind: "deadline" };
+    expect((await send("checkout.session.completed", session({ id: "cs_req", metadata: meta }))).status).toBe(200);
+    expect(inserts).toHaveLength(0);
+    expect(updates).toEqual([
+      { table: "project_requests", patch: expect.objectContaining({ status: "requested", stripe_session_id: "cs_req" }), filters: [["id", "req-1"], ["user_id", "u1"], ["status", "awaiting_payment"]] },
+    ]);
+    // An unpaid (bank debit) completion settles nothing yet.
+    updates.length = 0;
+    await send("checkout.session.completed", session({ id: "cs_req", payment_status: "unpaid", metadata: meta }));
+    expect(updates).toHaveLength(0);
   });
 });

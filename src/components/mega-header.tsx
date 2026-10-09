@@ -1,11 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { motion } from "motion/react";
+import { IconChevronDown } from "@tabler/icons-react";
 import { cn } from "@/lib/utils";
-import { brandLogo } from "@/lib/brand-logo";
+import { BrandWordmark } from "@/components/ui/brand-wordmark";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
@@ -43,7 +43,7 @@ function MegaLink({ href, className, children }: { href: string; className?: str
 /**
  * The English site's desktop header (the client's "FMI" reference): a glass bar across the whole width of the screen,
  * sliding away as the page scrolls down and back as soon as it scrolls up; hovering
- * the one tab that holds a list (Custom Services) drops a floating card under itself - the bar does not unfold, the
+ * a tab that holds a list (Explore - the video types - and Custom Services) drops a floating card under itself - the bar does not unfold, the
  * other tabs are plain links - and it folds away as the pointer leaves. The logo and the right-hand controls stay on
  * the top row. `/bg` keeps `SiteHeader`'s own desktop header.
  */
@@ -57,8 +57,9 @@ export function MegaHeader({
   /** The right-hand controls (theme toggle, copy buttons, quote pill). */
   controls: ReactNode;
 }) {
-  const logo = brandLogo("en");
-  const [open, setOpen] = useState(false);
+  // The tab whose list is open (its href), or none.
+  const [openTab, setOpenTab] = useState<string | null>(null);
+  const open = openTab !== null;
   const [hidden, setHidden] = useState(false);
   const closeTimer = useRef<number | null>(null);
 
@@ -81,14 +82,14 @@ export function MegaHeader({
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  const show = () => {
+  const show = (href: string) => {
     if (closeTimer.current) window.clearTimeout(closeTimer.current);
-    setOpen(true);
+    setOpenTab(href);
   };
   // A short delay so a pointer grazing the edge does not snap it shut.
   const hide = () => {
     if (closeTimer.current) window.clearTimeout(closeTimer.current);
-    closeTimer.current = window.setTimeout(() => setOpen(false), 140);
+    closeTimer.current = window.setTimeout(() => setOpenTab(null), 140);
   };
 
   useEffect(
@@ -110,10 +111,10 @@ export function MegaHeader({
       inert={hidden && !open}
       onMouseLeave={hide}
       onKeyDown={(event) => {
-        if (event.key === "Escape") setOpen(false);
+        if (event.key === "Escape") setOpenTab(null);
       }}
       onBlur={(event) => {
-        if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setOpen(false);
+        if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setOpenTab(null);
       }}
     >
       {/* The whole width of the screen, edge to edge, in smoked glass (`.smoke-bar`, globals.css). */}
@@ -123,17 +124,9 @@ export function MegaHeader({
         )}
       >
         <div className="flex w-full items-start justify-between gap-6">
-          {/* The IzI Video logo in white on the smoked bar (the file is dark ink, so always inverted). */}
+          {/* The Keplerbay wordmark in white on the smoked bar. */}
           <Link href={logoHref} className="group flex h-[4.25rem] min-w-0 shrink-0 items-center pr-3">
-            <Image
-              src={logo.src}
-              alt={logo.alt}
-              width={logo.width}
-              height={logo.height}
-              sizes="160px"
-              priority
-              className="h-7 w-auto invert xl:h-8"
-            />
+            <BrandWordmark className="text-[1.65rem] text-white xl:text-[1.85rem]" />
           </Link>
 
           {/* Left-aligned beside the logo, one row of tabs at an even gap, the groups split by thin vertical lines. Only a
@@ -148,8 +141,8 @@ export function MegaHeader({
                   "shrink-0 flex-row",
                   group.showFrom === "ultra" ? "hidden min-[1800px]:flex" : group.showFrom === "wide" ? "hidden min-[1400px]:flex" : group.showFrom === "xl" ? "hidden xl:flex" : "flex"
                 )}
-                onMouseEnter={group.items.length ? show : hide}
-                onFocus={group.items.length ? show : () => setOpen(false)}
+                onMouseEnter={group.items.length ? () => show(group.href) : hide}
+                onFocus={group.items.length ? () => show(group.href) : () => setOpenTab(null)}
               >
                 {group.divideBefore ? (
                   <span
@@ -163,20 +156,23 @@ export function MegaHeader({
                 ) : null}
                 <div className="relative flex flex-col">
                   <div className="flex h-[4.25rem] items-center">
-                    <MegaLink href={group.href}>{group.label}</MegaLink>
+                    <MegaLink href={group.href}>
+                      {group.label}
+                      {group.items.length ? <IconChevronDown className={cn("ms-1 inline size-3.5 transition-transform duration-200", openTab === group.href && "rotate-180")} aria-hidden /> : null}
+                    </MegaLink>
                   </div>
                   {group.items.length ? (
                     // The drop-down: a floating glass card under this tab alone (the bar itself stays as it is), right-aligned
                     // under the last tab so it never runs off the screen.
                     <motion.div
                       initial={false}
-                      animate={open ? { opacity: 1, y: 0 } : { opacity: 0, y: -8 }}
-                      transition={{ duration: open ? 0.24 : 0.16, ease: EASE }}
-                      inert={!open}
+                      animate={openTab === group.href ? { opacity: 1, y: 0 } : { opacity: 0, y: -8 }}
+                      transition={{ duration: openTab === group.href ? 0.24 : 0.16, ease: EASE }}
+                      inert={openTab !== group.href}
                       className={cn(
                         "absolute top-full z-10 min-w-[15rem] rounded-2xl border border-white/10 bg-[linear-gradient(180deg,rgba(24,24,28,0.94)_0%,rgba(10,10,13,0.94)_100%)] p-2 shadow-[0_30px_70px_-20px_rgba(0,0,0,0.85)] backdrop-blur-xl",
                         groupIndex === groups.length - 1 ? "right-0" : "left-0",
-                        !open && "pointer-events-none"
+                        openTab !== group.href && "pointer-events-none"
                       )}
                     >
                       <ul aria-label={group.label} className="flex flex-col text-[0.9375rem] font-medium text-[#c9ccd2]">

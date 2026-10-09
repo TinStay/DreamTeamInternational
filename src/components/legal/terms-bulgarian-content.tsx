@@ -2,7 +2,7 @@ export function TermsBulgarianContent() {
   return (
     <>
       <p className="not-prose text-[0.9375rem] leading-relaxed text-muted-foreground">
-        Настоящите Общи условия уреждат отношенията между &ldquo;DreamTeam&rdquo; (наричан по-долу
+        Настоящите Общи условия уреждат отношенията между &ldquo;ДТ А И&rdquo;, търговска марка Keplerbay (наричан по-долу
         &ldquo;Изпълнител&rdquo;) и клиенти (наричани по-долу &ldquo;Клиент&rdquo;) във връзка с
         предоставянето на услуги за генериране и монтаж на видео съдържание с помощта на изкуствен интелект (AI).
       </p>

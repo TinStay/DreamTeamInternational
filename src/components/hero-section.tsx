@@ -63,7 +63,7 @@ export function HeroSection() {
             <iframe
               className="absolute left-1/2 top-1/2 h-[100svh] w-[177.78svh] min-h-[56.25vw] min-w-[100vw] -translate-x-1/2 -translate-y-1/2"
               src={bunnyBackgroundEmbedSrc(HERO_VIDEO)}
-              title="DreamTeam hero video"
+              title="Keplerbay hero video"
               tabIndex={-1}
               allow={YOUTUBE_IFRAME_ALLOW}
               allowFullScreen={false}

@@ -2,10 +2,10 @@
  * The English privacy policy, written to the US standard (the California CCPA / CPRA and the other state privacy laws -
  * Colorado, Connecticut, Virginia, Utah, Texas, Oregon and the rest: categories collected, sources, purposes, who it is
  * disclosed to, "sale" / "sharing", the rights and how to use them, Global Privacy Control, retention, children) while
- * keeping the EU GDPR rights, since DreamTeam is based in Bulgaria. Every vendor, cookie and duration here must match
+ * keeping the EU GDPR rights, since Keplerbay is based in Bulgaria. Every vendor, cookie and duration here must match
  * the code - `lib/consent.ts`, the banner copy (`consent.categories.*`) and `PROJECT_GUIDE.md`'s consent row.
  */
-const MAIL = "info@dreamteam.technology";
+const MAIL = "info@keplerbay.com";
 
 function Mail({ subject }: { subject?: string }) {
   return <a href={`mailto:${MAIL}${subject ? `?subject=${encodeURIComponent(subject)}` : ""}`}>{MAIL}</a>;
@@ -15,10 +15,10 @@ export function PrivacyEnglishContent() {
   return (
     <>
       <p className="not-prose text-[0.9375rem] leading-relaxed text-muted-foreground">
-        This Privacy Policy explains how DreamTeam (&ldquo;DreamTeam&rdquo;, &ldquo;we&rdquo;, &ldquo;us&rdquo;) collects, uses,
+        This Privacy Policy explains how DT A I, trading as Keplerbay (&ldquo;Keplerbay&rdquo;, &ldquo;we&rdquo;, &ldquo;us&rdquo;) collects, uses,
         shares and protects personal information when you visit{" "}
-        <a href="https://www.dreamteamvideo.com" className="text-primary underline-offset-4 hover:underline">
-          https://www.dreamteamvideo.com
+        <a href="https://keplerbay.com" className="text-primary underline-offset-4 hover:underline">
+          https://keplerbay.com
         </a>{" "}
         or use our AI video service, including your account, video packs and subscriptions, and your projects (together, the
         &ldquo;Service&rdquo;). It describes the rights you have under US state privacy laws, including the California
@@ -29,14 +29,14 @@ export function PrivacyEnglishContent() {
       <h2>1. Who we are</h2>
       <ul>
         <li>
-          <strong>Company:</strong> DreamTeam, an AI video production company based in Sofia, Bulgaria
+          <strong>Company:</strong> DT A I, trading as Keplerbay - an AI video production company registered in Sofia, Bulgaria
         </li>
         <li>
           <strong>Privacy and support contact:</strong> <Mail />
         </li>
       </ul>
       <p>
-        For the GDPR, DreamTeam is the controller of your personal information. For the CCPA, DreamTeam is the business
+        For the GDPR, Keplerbay is the controller of your personal information. For the CCPA, Keplerbay is the business
         responsible for it.
       </p>
 
@@ -125,7 +125,7 @@ export function PrivacyEnglishContent() {
           protect our rights, our users or the public.
         </li>
         <li>
-          <strong>Business transfers:</strong> a buyer or successor if DreamTeam is involved in a merger, acquisition or sale
+          <strong>Business transfers:</strong> a buyer or successor if Keplerbay is involved in a merger, acquisition or sale
           of assets, under this policy&rsquo;s protections.
         </li>
       </ul>
@@ -260,7 +260,7 @@ export function PrivacyEnglishContent() {
       <p>
         All traffic to the Service is encrypted (HTTPS). Your project files and delivered videos are stored privately, and
         you open them through links that expire within minutes or, to watch a video, an hour. Only you and our production
-        team can access them; within DreamTeam, client data is open only to the team members who produce and support
+        team can access them; within Keplerbay, client data is open only to the team members who produce and support
         projects. No
         system is completely secure, but we work to protect your information and will notify you as the law requires if a
         breach affects it.
@@ -268,7 +268,7 @@ export function PrivacyEnglishContent() {
 
       <h2>10. International transfers</h2>
       <p>
-        DreamTeam is based in the European Union (Bulgaria), and our service providers may store and process information in
+        Keplerbay is based in the European Union (Bulgaria), and our service providers may store and process information in
         the United States, the EU and other countries. When personal information of people in the EU or UK is transferred
         abroad, our providers protect it with recognized safeguards, such as the EU Standard Contractual Clauses or the EU-US
         Data Privacy Framework.

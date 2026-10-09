@@ -15,9 +15,9 @@ const LAST_UPDATED = "February 20, 2026";
 
 const META: Record<Language, { title: string; description: string }> = {
   en: {
-    title: "Terms and Conditions | DreamTeam",
+    title: "Terms and Conditions | Keplerbay",
     description:
-      "Terms and conditions for DreamTeam AI video production services, payments, revisions, and portfolio use.",
+      "Terms and conditions for Keplerbay AI video production services, payments, revisions, and portfolio use.",
   },
 };
 

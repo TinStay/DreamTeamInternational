@@ -525,6 +525,44 @@
       scroll-behavior: smooth;
     }
   }
+  /*
+   * Scrollbars, site-wide (the page, dialogs, menus, side panels): thin, no arrow buttons, a soft rounded thumb in the
+   * ink of the theme on a transparent track. `scrollbar-color` inherits, so the theme sets it once on <html> and a
+   * theme-locked block (.theme-light / .theme-dark) re-sets it; `scrollbar-width` does not inherit, hence `*`.
+   * Engines without the standard properties (older Safari) get the same look through the -webkit- pseudo-elements.
+   */
+  html,
+  .theme-light {
+    scrollbar-color: rgba(15, 23, 42, 0.26) transparent;
+  }
+  html.dark,
+  .theme-dark {
+    scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+  }
+  * {
+    scrollbar-width: thin;
+  }
+  @supports not (scrollbar-color: auto) {
+    ::-webkit-scrollbar {
+      width: 10px;
+      height: 10px;
+    }
+    ::-webkit-scrollbar-track,
+    ::-webkit-scrollbar-corner {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-button {
+      display: none;
+    }
+    ::-webkit-scrollbar-thumb {
+      border: 3px solid transparent;
+      border-radius: 9999px;
+      background: rgba(128, 128, 128, 0.45) padding-box;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background-color: rgba(128, 128, 128, 0.7);
+    }
+  }
 }
 
 /*

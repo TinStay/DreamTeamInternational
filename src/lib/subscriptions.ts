@@ -65,3 +65,50 @@ export async function hasLiveSubscription(stripe: Stripe, userId: string): Promi
     return false;
   }
 }
+
+/**
+ * Test subscriptions the team adds by hand (`sub_mock_<name>` - a real Stripe id never carries a second underscore).
+ * They exist only in the mirror, so cancelling one changes the row alone. Clients cannot write `subscriptions`
+ * (supabase/hardening.sql), so such a row can only come from the team.
+ */
+export const MOCK_SUBSCRIPTION_PREFIX = "sub_mock_";
+
+export type CancelResult =
+  | { ok: true; cancelAtPeriodEnd: boolean; periodEnd: string | null }
+  | { ok: false; error: "no_subscription" | "not_configured" | "failed" };
+
+/**
+ * Cancels the client's live subscription at the end of the period they have paid for (`cancel = true`) - they keep
+ * the plan and their video time until then and are never charged again - or takes that back (`cancel = false`).
+ * Only the signed-in client's own subscription: the id comes from the mirror by `user_id`, and Stripe's copy must carry
+ * the same `user_id` before anything changes. The mirror is updated at once (the webhook confirms it later).
+ */
+export async function setCancelAtPeriodEnd(stripe: Stripe | null, userId: string, cancel: boolean): Promise<CancelResult> {
+  const admin = createAdminClient();
+  if (!admin) return { ok: false, error: "not_configured" };
+  const { data, error } = await admin.from("subscriptions").select("id, status, current_period_end").eq("user_id", userId).order("updated_at", { ascending: false });
+  if (error) return { ok: false, error: "failed" };
+  const live = (data ?? []).find((r) => isLiveStatus(String(r.status)));
+  if (!live) return { ok: false, error: "no_subscription" };
+  const id = String(live.id);
+
+  if (id.startsWith(MOCK_SUBSCRIPTION_PREFIX)) {
+    const { error: updateError } = await admin
+      .from("subscriptions")
+      .update({ cancel_at_period_end: cancel, updated_at: new Date().toISOString() })
+      .eq("id", id)
+      .eq("user_id", userId);
+    return updateError ? { ok: false, error: "failed" } : { ok: true, cancelAtPeriodEnd: cancel, periodEnd: (live.current_period_end as string | null) ?? null };
+  }
+
+  if (!stripe) return { ok: false, error: "not_configured" };
+  try {
+    const current = await stripe.subscriptions.retrieve(id);
+    if (current.metadata?.user_id !== userId) return { ok: false, error: "no_subscription" };
+    const updated = await stripe.subscriptions.update(id, { cancel_at_period_end: cancel });
+    await saveSubscription(updated);
+    return { ok: true, cancelAtPeriodEnd: Boolean(updated.cancel_at_period_end), periodEnd: subscriptionRow(updated)?.current_period_end ?? null };
+  } catch {
+    return { ok: false, error: "failed" };
+  }
+}

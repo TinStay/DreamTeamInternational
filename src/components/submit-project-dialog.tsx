@@ -38,7 +38,7 @@ const SAMPLE_CREDITS: CreditSummary = { balance: 120, added: 120, planKey: "crea
 const sumBytes = (files: File[]) => files.reduce((n, f) => n + f.size, 0);
 
 /**
- * "Submit a project": the video order form in a popup - the same four steps as the Dream Team site's form (script, goal,
+ * "Submit a project": the video order form in a popup - the same four steps as the Keplerbay site's form (script, goal,
  * video details, distribution and timing) with a progress bar, ending in Submit instead of the contact screen. Submitting
  * creates the project in the client's account right away (Supabase `projects`, status "Brief received", with everything they
  * answered) and lets our team know by email (with any files they attached). In sample mode nothing is saved: the project is
@@ -115,7 +115,7 @@ export function SubmitProjectDialog({
     if (data.platforms.length) rows.push({ label: a.platforms, value: data.platforms.map((p) => q.details.platforms[p]).join(", ") });
     if (data.refLinks.trim()) rows.push({ label: a.examples, value: data.refLinks.trim() });
     rows.push({ label: a.deadline, value: data.deadlineFlexible || !data.deadline ? q.details.noDeadline : formatDateDisplay(data.deadline) });
-    if (data.notes.trim()) rows.push({ label: a.notes, value: data.notes.trim() });
+    if (data.notes.trim()) rows.push({ label: a.notes, value: data.notes.trim().slice(0, 4000) });
     const attached = scriptFiles.length + refFiles.length;
     if (attached) rows.push({ label: a.files, value: [...scriptFiles, ...refFiles].map((f) => f.name).join(", ") });
     return rows;
@@ -134,7 +134,7 @@ export function SubmitProjectDialog({
       const row = {
         title: autoTitle(),
         kind: s.kind,
-        brief: data.scriptText.trim() || null,
+        brief: data.scriptText.trim().slice(0, 10000) || null,
         format: formatLabel(),
         duration_seconds: needed,
         due_date: data.deadlineFlexible || !data.deadline ? null : data.deadline,

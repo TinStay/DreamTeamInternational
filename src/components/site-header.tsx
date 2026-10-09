@@ -12,7 +12,7 @@ import { GlassShell } from "@/components/ui/glass-shell";
 import { MegaHeader, type MegaNavGroup } from "@/components/mega-header";
 import { useTrainingCards } from "@/components/training/use-training-cards";
 import { cn } from "@/lib/utils";
-import { brandLogo } from "@/lib/brand-logo";
+import { BrandWordmark } from "@/components/ui/brand-wordmark";
 import { useLanguage } from "@/lib/i18n/language-context";
 import { AccountControls } from "@/components/account-controls";
 import { MobileTopControls } from "@/components/mobile-account";
@@ -154,7 +154,6 @@ export function SiteHeader() {
   const { t, language } = useLanguage();
   const homeHref = homePath(language);
   const trainingCards = useTrainingCards();
-  const logo = brandLogo(language);
 
   useEffect(() => {
     // State only when the flag flips - a set on every scroll event scheduled React work per event for nothing.
@@ -218,18 +217,21 @@ export function SiteHeader() {
     ),
   }));
 
-  // The English mega menu's tabs, in the client's order and groups (split by thin lines): Explore (the home page) |
-  // the video services - each on the closest page there is today (a service page or a portfolio category) until it has
-  // its own | Pricing | Custom Services, the one tab that drops down, holding the rest of the site. Below 1280px the bar
-  // is short of room: Explore (the logo is the home link too) and Corporate Videos hide there, and Product Videos below
-  // 1400px.
+  // The English mega menu's tabs, in the client's order and groups (split by thin lines): Explore - the home page,
+  // dropping down the video types (each on its portfolio category until it has its own page) | About · Case studies ·
+  // Pricing · Careers | Custom Services, dropping down the rest of the site.
   const portfolioCategory = (key: string) => `${portfolioPath(language)}?category=${key}`;
   const megaGroups: MegaNavGroup[] = [
-    { label: t.header.nav.explore, href: homeHref, items: [], showFrom: "wide" },
-    { label: t.header.nav.socialAds, href: portfolioCategory("socialAds"), items: [], divideBefore: "wide" },
-    { label: t.header.nav.corporate, href: portfolioCategory("corporate"), items: [], showFrom: "ultra" },
-    { label: t.header.nav.tvAds, href: portfolioCategory("tvAds"), items: [], showFrom: "wide" },
-    { label: t.header.nav.productVideos, href: portfolioCategory("productVideos"), items: [], showFrom: "ultra" },
+    {
+      label: t.header.nav.explore,
+      href: homeHref,
+      items: [
+        { label: t.header.nav.socialAds, href: portfolioCategory("socialAds") },
+        { label: t.header.nav.corporate, href: portfolioCategory("corporate") },
+        { label: t.header.nav.tvAds, href: portfolioCategory("tvAds") },
+        { label: t.header.nav.productVideos, href: portfolioCategory("productVideos") },
+      ],
+    },
     { label: t.header.about, href: aboutPath(language), items: [], divideBefore: true },
     { label: t.header.projects, href: projectsPath(language), items: [] },
     { label: t.header.pricingPage, href: pricingPath(language), items: [] },
@@ -239,8 +241,6 @@ export function SiteHeader() {
       href: servicesPath(language),
       divideBefore: true,
       items: [
-        { label: t.header.nav.corporate, href: portfolioCategory("corporate") },
-        { label: t.header.nav.tvAds, href: portfolioCategory("tvAds") },
         { label: t.header.portfolio, href: portfolioPath(language) },
         { label: t.header.services, href: servicesPath(language) },
         { label: t.header.nav.brandMascots, href: servicePath(language, "brand-mascots") },
@@ -277,17 +277,7 @@ export function SiteHeader() {
       >
         <GlassShell className="flex items-center justify-between gap-3 px-5 py-2.5">
           <Link href={homeHref} className="group flex min-w-0 shrink items-center py-1 pr-2">
-            <Image
-              src={logo.src}
-              alt={logo.alt}
-              width={logo.width}
-              height={logo.height}
-              sizes="160px"
-              className={cn(
-                "w-auto grayscale transition-all group-hover:grayscale-0 dark:invert",
-                language === "en" ? "h-7" : "h-10"
-              )}
-            />
+            <BrandWordmark className="text-[1.75rem] text-foreground" />
           </Link>
           {language === "en" ? (
             // English: Log in + Sign up (or the account icon once signed in), like the desktop bar.
@@ -331,15 +321,7 @@ export function SiteHeader() {
           <div className="relative flex w-full items-center justify-between gap-4 py-2.5 lg:gap-6">
             {/* Logo — breathing room via padding so it never touches the bar edges. */}
             <Link href={homeHref} className="group flex min-w-0 items-center justify-self-start py-1 pr-3">
-              <Image
-                src="/logo-1.png"
-                alt="DreamTeam"
-                width={1024}
-                height={416}
-                sizes="130px"
-                priority
-                className="h-10 w-auto grayscale transition-all group-hover:grayscale-0 dark:invert md:h-11"
-              />
+              <BrandWordmark className="text-3xl text-foreground md:text-[2rem]" />
             </Link>
 
             {/* Absolutely centred from xl up; below that it flows from the left.

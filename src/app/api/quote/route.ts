@@ -293,8 +293,8 @@ export async function POST(req: Request) {
   const text = buildQuoteEmailText(emailInput);
   const html = buildQuoteEmailHtml(emailInput);
 
-  const from = process.env.RESEND_FROM ?? "info@dreamteam.technology";
-  const to = ["info@dreamteam.technology"];
+  const from = process.env.RESEND_FROM ?? "info@keplerbay.com";
+  const to = ["info@keplerbay.com"];
   const attachments = [...scriptFiles, ...refFiles].map((f) => ({
     filename: f.filename,
     content: f.content,

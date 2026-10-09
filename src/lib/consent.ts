@@ -138,7 +138,7 @@ export function deniedCategories(choice: ConsentChoice): ConsentCategory[] {
 /**
  * Deletes the given categories' vendor cookies and browser storage. A cookie is deleted with the attributes it
  * was set with, so every domain a tag may have used is tried (the Google tag sets `_gcl_au` on the registrable
- * domain, `dreamteamvideo.com`, not the `www` host). The site's own entries (`dt_consent`, `app-lang`, `theme`) stay.
+ * domain, `keplerbay.com`, as well as the host). The site's own entries (`dt_consent`, `app-lang`, `theme`) stay.
  */
 export function purgeVendorStorage(categories: ConsentCategory[] = OPTIONAL_CATEGORIES): void {
   if (typeof document === "undefined") return;

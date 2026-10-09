@@ -13,9 +13,10 @@ import { useLanguage } from "@/lib/i18n/language-context";
 import { formatDateDisplay } from "@/lib/dates";
 import { formatVideoTime } from "@/lib/account-info";
 import { MODAL_BACKDROP_Z, MODAL_CONTENT_Z, MODAL_CONTROL_Z } from "@/lib/modal-layer";
-import { formatBytes, PROJECT_STATUSES, timelineFor, type BriefFile, type ClientProject, type ProjectStatus, type RevisionEntry, type TimelineStep } from "@/lib/client-projects";
+import { formatBytes, isApproved, projectFromRow, PROJECT_STATUSES, statusLabelOf, timelineFor, type BriefFile, type ClientProject, type ProjectStatus, type RevisionEntry, type TimelineStep } from "@/lib/client-projects";
 import { createClient } from "@/lib/supabase/client";
 import { TeamDeliveryPanel } from "@/components/team-delivery-panel";
+import { TeamProjectRequests } from "@/components/team-project-requests";
 import { TeamCreditAdjuster } from "@/components/team-credit-adjuster";
 import { RevisionLogEditor, TimelineEditor } from "@/components/team-project-editors";
 import { cn } from "@/lib/utils";
@@ -72,6 +73,8 @@ function Body({ project, sample, statusLabels, onSaved }: { project: ClientProje
   const p = t.account.projectsPage;
 
   const [status, setStatus] = useState<ProjectStatus>(project.status);
+  // An approved film closes the project: its stage stays Delivered (the database refuses anything else too).
+  const locked = isApproved(project);
   const [nextStep, setNextStep] = useState(project.nextStep ?? "");
   const [manager, setManager] = useState(project.managerName ?? "");
   const [due, setDue] = useState(project.dueDate?.slice(0, 10) ?? "");
@@ -99,6 +102,15 @@ function Body({ project, sample, statusLabels, onSaved }: { project: ClientProje
       alive = false;
     };
   }, [sample, project.userId]);
+
+  /** An approved change request changed the project in the database: read it again (and the date field with it). */
+  async function reload() {
+    const { data } = await createClient().from("projects").select("*").eq("id", project.id).maybeSingle();
+    if (!data) return;
+    const next = { ...project, ...projectFromRow(data as Record<string, unknown>), commentCount: project.commentCount, awaitingReply: project.awaitingReply };
+    setDue(next.dueDate?.slice(0, 10) ?? "");
+    onSaved(next);
+  }
 
   const dirty =
     status !== project.status ||
@@ -181,7 +193,7 @@ function Body({ project, sample, statusLabels, onSaved }: { project: ClientProje
       <aside className="flex shrink-0 flex-col gap-6 overflow-y-auto border-b border-white/10 bg-[linear-gradient(180deg,#17181c,#101114)] p-6 lg:w-[24rem] lg:border-r lg:border-b-0 xl:w-[27rem] xl:p-8">
         <div>
           <div className="flex flex-wrap items-center gap-2.5 pr-12 lg:pr-0">
-            <StatusChip status={project.status} label={statusLabels[project.status]} />
+            <StatusChip status={project.status} label={statusLabelOf(project, statusLabels)} approved={isApproved(project)} />
             <span className="text-xs font-semibold uppercase tracking-[0.14em] text-white/45">{project.kind}</span>
           </div>
           <DialogPrimitive.Title className="mt-3 font-heading text-[clamp(22px,2.2vw,30px)] leading-[1.02] font-black uppercase text-[#ff8a1f]">{project.title}</DialogPrimitive.Title>
@@ -324,11 +336,19 @@ function Body({ project, sample, statusLabels, onSaved }: { project: ClientProje
             <TeamDeliveryPanel project={project} sample={sample} onChange={(patch) => onSaved({ ...project, ...patch })} />
           </div>
 
+          {/* The client's change requests (approve applies them) and their rating. */}
+          <TeamProjectRequests projectId={project.id} sample={sample} onApplied={() => void reload()} />
+
           <div>
             <SideTitle>{d.manageTitle}</SideTitle>
             <p className="mt-1.5 text-sm text-white/50">{d.manageHint}</p>
 
             <p className={cn(label, "mt-5")}>{d.stage}</p>
+            {locked ? (
+              <p role="note" className="mb-2.5 rounded-xl border border-emerald-400/30 bg-emerald-500/10 px-3.5 py-2.5 text-sm text-emerald-200">
+                {d.approvedLocked.replace("{date}", formatDateDisplay(project.approvedAt!.slice(0, 10)))}
+              </p>
+            ) : null}
             <div className="flex flex-wrap gap-2" role="radiogroup" aria-label={d.stage}>
               {PROJECT_STATUSES.map((s) => (
                 <button
@@ -336,9 +356,10 @@ function Body({ project, sample, statusLabels, onSaved }: { project: ClientProje
                   type="button"
                   role="radio"
                   aria-checked={status === s}
+                  disabled={locked && s !== status}
                   onClick={() => setStatus(s)}
                   className={cn(
-                    "cursor-pointer rounded-full border px-4 py-2 text-sm font-semibold transition-[background-color,color,border-color,transform] duration-200 ease-out hover:-translate-y-0.5",
+                    "cursor-pointer rounded-full border px-4 py-2 text-sm font-semibold transition-[background-color,color,border-color,transform] duration-200 ease-out hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:translate-y-0",
                     status === s ? "border-transparent bg-[linear-gradient(115deg,#ff5e00,#ff9a3c)] text-white" : "border-white/15 text-white/65 hover:border-white/40 hover:text-white"
                   )}
                 >

@@ -43,7 +43,7 @@ export const en = {
     titleGlow: "imagination",
     titleAfter: "is the limit.",
     seoHeading:
-      "DreamTeam - AI video production and AI-powered video ads for brands in Bulgaria and worldwide",
+      "Keplerbay - AI video production and AI-powered video ads for brands in Bulgaria and worldwide",
     subtitle: "If you can imagine it, we can deliver it - AI video and media production for your brand.",
     cta1: "Request a quote",
     cta2: "View Our Work",
@@ -69,7 +69,7 @@ export const en = {
   // The plans page (`/pricing`, `components/pricing/`) - the client's "AI Video Subscription Plans" file; the numbers are
   // in `lib/pricing.ts`. `{x}` placeholders are filled in by the cards.
   plans: {
-    metaTitle: "AI Video Subscription Plans & Pricing | DreamTeam",
+    metaTitle: "AI Video Subscription Plans & Pricing | Keplerbay",
     metaDescription:
       "AI video subscription plans for creators and businesses - from a one-time $299 video to monthly plans with voiceover, subtitles, sound design and revisions included. No filming needed.",
     eyebrow: "AI video subscription",
@@ -292,7 +292,7 @@ export const en = {
   // The English home page's "find the package" grid (`packages-section.tsx`), in place of the services + quote wizard.
   // The sign-up / log-in popup (`auth-dialog.tsx`), opened by the header's Sign up and Log in.
   signup: {
-    tag: "IzI Video",
+    tag: "Keplerbay",
     filmTitle1: "Your next video",
     filmTitle2: "starts here",
     signupCopy: {
@@ -308,11 +308,11 @@ export const en = {
     loginCopy: {
       title1: "Welcome",
       title2: "back",
-      subtitle: "Log in to your IzI Video account.",
+      subtitle: "Log in to your Keplerbay account.",
       google: "Log in with Google",
       microsoft: "Log in with Microsoft",
       email: "Log in with email",
-      switchLead: "New to IzI Video?",
+      switchLead: "New to Keplerbay?",
       switchAction: "Sign up"
     },
     google: "Google",
@@ -339,9 +339,9 @@ export const en = {
   account: {
     menu: "Account menu",
     logout: "Sign out",
-    metaTitle: "Account & subscription | IzI Video",
-    profileMetaTitle: "Account & subscription | IzI Video",
-    projectsMetaTitle: "Your Projects | IzI Video",
+    metaTitle: "Account & subscription | Keplerbay",
+    profileMetaTitle: "Account & subscription | Keplerbay",
+    projectsMetaTitle: "Your Projects | Keplerbay",
     eyebrow: "Your account",
     manageTitle1: "Your",
     manageTitle2: "account",
@@ -390,7 +390,7 @@ export const en = {
       ends: "Ends on",
       bought: "Bought on",
       videoTime: "Video time",
-      videoTimeMonthly: "{volume} {unit} every month",
+      videoTimeMonthly: "{volume} {unit}",
       videoTimeOneTime: "{n} of video",
       included: "What's included",
       notIncluded: "Not included",
@@ -402,7 +402,20 @@ export const en = {
       compare: "Compare plans",
       orderAnother: "Order another video",
       seePlans: "See plans",
-      close: "Close"
+      close: "Close",
+      // Cancelling (at the end of the paid period) and taking it back.
+      cancel: "Cancel subscription",
+      cancelTitle: "Cancel your subscription?",
+      cancelText: "Your plan stays active until {date} and your video time stays yours. After that you won't be charged again.",
+      cancelTextNoDate: "Your plan stays active until the end of the period you have paid for, and your video time stays yours. After that you won't be charged again.",
+      cancelConfirm: "Yes, cancel",
+      cancelKeep: "Keep my plan",
+      cancelling: "Cancelling...",
+      cancelledNote: "Your subscription is cancelled and ends on {date}. You won't be charged again.",
+      cancelledNoteNoDate: "Your subscription is cancelled and ends with the current period. You won't be charged again.",
+      resume: "Resume subscription",
+      resuming: "Resuming...",
+      cancelError: "That didn't work. Please try again, or write to us and we'll do it for you."
     },
     // The account page's list of orders (`orders`).
     orders: {
@@ -413,6 +426,17 @@ export const en = {
       billing: { monthly: "monthly", annual: "annual" } as Record<string, string>,
       cols: { date: "Date", order: "Order", length: "Video time", amount: "Amount", status: "Status" },
       status: { pending: "Pending", paid: "Paid", failed: "Failed", expired: "Not completed" } as Record<string, string>
+    },
+    invoices: {
+      title: "Invoices & receipts",
+      hint: "Every invoice for your purchases and custom work - open one to see it in full, download the PDF, or pay one that is due. Invoices are issued by DT A I, the company behind Keplerbay.",
+      empty: "No invoices yet. One appears here for every payment.",
+      cols: { number: "Invoice", date: "Date", amount: "Total", tax: "Tax", status: "Status" },
+      status: { open: "Due", paid: "Paid", void: "Voided", uncollectible: "Unpaid", draft: "Draft" } as Record<string, string>,
+      due: "Due {date}",
+      view: "View",
+      pay: "Pay now",
+      pdf: "PDF"
     },
     currentPlan: "Current plan",
     timeLeft: "Video time left",
@@ -459,7 +483,9 @@ export const en = {
         scripting: "Scripting",
         production: "In production",
         review: "In review",
-        delivered: "Delivered"
+        delivered: "Delivered",
+        // After Delivered, once the client has approved the film.
+        approved: "Approved"
       },
       due: "Due",
       length: "Length",
@@ -467,6 +493,119 @@ export const en = {
       started: "Started",
       backToAll: "All projects",
       // Your Projects' search, filter and sort.
+      // Changes to a project while it is being made (supabase/changes.sql, lib/project-changes.ts).
+      changes: {
+        title: "Change this project",
+        intro: "Need something different? Send a request - we confirm it within a working day. Seconds are taken from your video time when you send it and given back if we can't do it.",
+        closed: "This project is finished, so it can't be changed any more. Need something new? Submit a new project.",
+        sampleNote: "Sample project - requests here are only a preview, nothing is charged.",
+        open: "Requested",
+        unavailable: "Not available at this stage",
+        kinds: {
+          deadline: { title: "Change the deadline", line: "$50 for each day sooner · later is free", button: "Change deadline" },
+          duration: { title: "Make it longer", line: "Paid with seconds from your video time", button: "Add length" },
+          format: { title: "Add a format", line: "Costs the film's length in seconds", button: "Add format" },
+          revision: { title: "Add a revision", line: "$49 for one more round", button: "Add revision" }
+        },
+        deadline: {
+          title: "Change the deadline",
+          text: "Pick the new date. Moving it sooner means we put more people on your film, so each day earlier costs $50. Moving it later is free.",
+          current: "Now",
+          next: "New date",
+          none: "Not set",
+          dateLabel: "New deadline",
+          minNote: "The soonest we can deliver is {date}.",
+          earlier: "{n} days sooner",
+          earlierOne: "1 day sooner",
+          later: "Later - free",
+          same: "Pick a different date",
+          perDay: "$50 × {n} days"
+        },
+        duration: {
+          title: "Make the video longer",
+          text: "Add seconds to the film. They come from your video time - and if you need more than you have, buy the missing seconds right here.",
+          now: "Now",
+          after: "New length",
+          add: "Add",
+          balanceNote: "Video time left: {balance}",
+          maxNote: "Up to 10 minutes in total.",
+          noRoom: "This video is already 10 minutes long - the most we make.",
+          fromBalance: "From your video time",
+          bought: "Extra seconds you buy",
+          topupTitle: "You need {n} more than you have",
+          topupText: "Buy the missing seconds with this request at the one-time price ({price} a second) - or upgrade your plan and get more video time every month.",
+          upgrade: "Upgrade plan",
+          seeOptions: "See plans"
+        },
+        format: {
+          title: "Add a format",
+          text: "Get the same film cut for another screen. Each new format costs as many seconds as the film is long.",
+          included: "Included",
+          pick: "Pick a format",
+          more: "More formats",
+          names: { vertical: "Vertical", horizontal: "Landscape", classic: "Classic", portrait: "Portrait", square: "Square", cinema: "Cinema" },
+          uses: { vertical: "Reels, TikTok, Shorts", horizontal: "YouTube, website, TV", classic: "Presentations, screens", portrait: "Tablets, feed posts", square: "Feed posts", cinema: "Banners, cinematic" }
+        },
+        revision: {
+          title: "Add a revision",
+          text: "One more round of changes after the ones included. Pay once and we add it to this project as soon as it's confirmed.",
+          now: "{used} of {total} used",
+          after: "{total} revisions in total"
+        },
+        cost: "Cost",
+        costSeconds: "{n} from your video time",
+        costMixed: "{n} from your video time + {amount}",
+        edit: "Change",
+        costMoney: "{amount}",
+        free: "Free",
+        balanceAfter: "Video time after: {balance}",
+        send: "Send request",
+        pay: "Pay {amount} and send",
+        sending: "Sending...",
+        cancel: "Cancel",
+        close: "Close",
+        withdraw: "Withdraw",
+        payNow: "Pay {amount}",
+        listTitle: "Your requests",
+        status: { awaiting_payment: "Waiting for payment", requested: "Waiting for us", approved: "Done", declined: "Declined", cancelled: "Withdrawn" } as Record<string, string>,
+        summary: {
+          deadline: "Deadline to {to}",
+          duration: "Length +{extra}",
+          format: "Extra format: {format}",
+          revision: "One more revision"
+        },
+        sent: "Request sent - we'll confirm it within a working day.",
+        paid: "Payment received - your request is with us now.",
+        payCancelled: "Payment cancelled - your request is waiting for payment.",
+        errors: {
+          insufficient_credits: "Not enough video time for this request.",
+          over_max_length: "A video can be up to 10 minutes long.",
+          invalid_date: "Pick a date at least 2 days from today, and different from the current one.",
+          format_included: "This format is already part of the project.",
+          request_open: "There's already a request like this waiting - we'll answer it first.",
+          project_closed: "This project is finished, so it can't be changed.",
+          not_allowed_now: "This change isn't possible at this stage.",
+          generic: "That didn't work. Please try again."
+        } as Record<string, string>
+      },
+      // The client's rating of a finished project (project_reviews).
+      rating: {
+        cta: "Leave a review",
+        title: "How did we do?",
+        text: "Your film is approved. Rate us on three things - it takes ten seconds and helps us get better.",
+        aspects: { quality: "Quality", speed: "Speed", attitude: "Attitude" },
+        hints: { quality: "How good is the film?", speed: "Did we deliver on time?", attitude: "How was working with us?" },
+        stars: "{n} of 5 stars",
+        comment: "Anything else? (optional)",
+        commentPlaceholder: "What did you like, what could be better?",
+        submit: "Send review",
+        saving: "Sending...",
+        thanks: "Thank you for your review!",
+        yours: "Your review",
+        edit: "Edit",
+        overall: "Overall",
+        error: "We couldn't save your review. Please try again."
+      },
       toolbar: {
         search: "Search projects",
         filterLabel: "Show",
@@ -488,7 +627,7 @@ export const en = {
       noRevisions: "No revisions requested yet.",
       requestRevision: "Request a revision",
       producer: "Your producer",
-      teamName: "The IzI Video team",
+      teamName: "The Keplerbay team",
       producerLine: "Questions? We reply within a working day.",
       messageUs: "Message us",
       whereWeAre: "Where we are",
@@ -510,10 +649,14 @@ export const en = {
         send: "Send revision request",
         cancel: "Cancel",
         noneLeft: "You've used all the revisions included in this project. Message us in the comments and we'll find a way.",
+        moved: "This project has already moved on (it may be approved already). Refresh the page to see where it stands.",
         approvedNotice: "Thank you - the video is approved. Your files are ready in the Files tab.",
         revisionNotice: "Got it - your revision request is with the team. We'll keep this project updated.",
         error: "That didn't go through. Please try again.",
-        approvedOn: "Approved on {date}"
+        approvedOn: "Approved on {date}",
+        // After a revision request, while the team reworks the film: the client may still approve the version they have.
+        reworkTitle: "Happy with it as it is?",
+        reworkText: "We're working on the revision you asked for. Changed your mind? Approve the current version and we'll deliver it as it is."
       },
       panelDescription: "Details, brief, revisions and timeline of this project.",
       comments: {
@@ -528,7 +671,7 @@ export const en = {
         error: "We couldn't post your comment. Please try again.",
         you: "You",
         client: "Client",
-        teamName: "IzI Video team",
+        teamName: "Keplerbay team",
         teamBadge: "Team",
         revisionPrefill: "Revision request: "
       },
@@ -541,7 +684,7 @@ export const en = {
         close: "Close",
         error: "We couldn't save your project. Please check your connection and try again.",
         done: "Thank you - your project is in. We're reviewing your brief and will confirm the details within a few working days.",
-        doneNoFiles: "Your project is saved, but we couldn't send your attached files. Please email them to info@dreamteam.technology and mention the project name.",
+        doneNoFiles: "Your project is saved, but we couldn't send your attached files. Please email them to info@keplerbay.com and mention the project name.",
         nextStep: "We're reviewing your brief and will confirm the details within a few working days.",
         available: "Video time available",
         cost: "This project uses {needed} of your {available}.",
@@ -585,16 +728,16 @@ export const en = {
     ctaShort: "Claim"
   },
   about: {
-    metaTitle: "About us | IzI Video",
+    metaTitle: "About us | Keplerbay",
     metaDescription:
-      "IzI Video is an AI video production company: we write, direct and produce your video with the best AI tools - for brands and creators in the USA, Europe and worldwide.",
+      "Keplerbay is an AI video production company: we write, direct and produce your video with the best AI tools - for brands and creators in the USA, Europe and worldwide.",
     eyebrow: "About us",
     title1: "We make",
     title2: "AI video",
     crossed: ["no learning curve", "no prompts"],
     imageAlt: "The San Francisco skyline at dusk under the Bay Bridge",
     story:
-      "We're a team of AI video professionals from across the world, with roots in entrepreneurship, IT, video production, filmmaking and editing. At IzI Video, we take your idea, write it, direct it and produce the finished film with the best AI tools - so you don't need to write a single prompt, learn any software or hire a crew. Social media ads, corporate videos, TV ads, product videos, brand mascots, launch and explainer videos, UGC-style ads, real estate and music videos: all made fully online, for brands and creators in the USA, Europe and worldwide. Choose a pack, send your brief, and get your video in 3-10 days - yours to use anywhere. Our team is ready to make your next video.",
+      "We're a team of AI video professionals from across the world, with roots in entrepreneurship, IT, video production, filmmaking and editing. At Keplerbay, we take your idea, write it, direct it and produce the finished film with the best AI tools - so you don't need to write a single prompt, learn any software or hire a crew. Social media ads, corporate videos, TV ads, product videos, brand mascots, launch and explainer videos, UGC-style ads, real estate and music videos: all made fully online, for brands and creators in the USA, Europe and worldwide. Choose a pack, send your brief, and get your video in 3-10 days - yours to use anywhere. Our team is ready to make your next video.",
     team: {
       eyebrow: "Our team",
       title1: "The people behind",
@@ -615,12 +758,11 @@ export const en = {
       eyebrow: "Latest updates",
       tag: "New",
       title: "We're launching in the US",
-      text: "IzI Video is opening to clients across the United States. Create your account now and take 20% off your first order.",
+      text: "Keplerbay is opening to clients across the United States. Create your account now and take 20% off your first order.",
       cta: "Claim your 20% discount on your first order"
     },
     hiring: {
       eyebrow: "Join our team",
-      badge: "Coming soon",
       title: "We're hiring soon",
       text: "We're growing. Roles for AI video producers, editors and creative directors will appear here - check back soon.",
       cta: "Check upcoming options"
@@ -636,21 +778,20 @@ export const en = {
   // /careers: the roles we will open soon (`components/careers-page-view.tsx`).
   careers: {
     title: "Careers",
-    metaTitle: "Careers | IzI Video",
+    metaTitle: "Careers | Keplerbay",
     metaDescription:
-      "Join IzI Video: upcoming roles for a Partnership Manager, AI Video Filmmaker, Marketing Manager and Sales Manager. Fully remote, working with clients in the USA, Europe and worldwide.",
+      "Join Keplerbay: upcoming roles for a Partnership Manager, AI Video Filmmaker, Marketing Manager and Sales Manager. Fully remote, working with clients in the USA, Europe and worldwide.",
     eyebrow: "Careers",
     title1: "Build the future of",
     title2: "AI video with us",
     lead: "We're growing and opening new roles soon. Here is what's coming - register your interest and we'll write to you the moment a role opens.",
-    badge: "Opening soon",
     tag: "Fully remote",
     apply: "Register your interest",
     applySubject: "Career interest: {role}",
     roles: [
       {
         title: "Partnership Manager",
-        summary: "Build and grow the relationships with agencies, platforms and brands that bring IzI Video to more people.",
+        summary: "Build and grow the relationships with agencies, platforms and brands that bring Keplerbay to more people.",
         points: ["Find, pitch and sign new partners", "Plan joint campaigns and co-marketing", "Keep every partnership growing and healthy"]
       },
       {
@@ -660,7 +801,7 @@ export const en = {
       },
       {
         title: "Marketing Manager",
-        summary: "Grow the IzI Video brand across the USA and Europe with content, campaigns and community.",
+        summary: "Grow the Keplerbay brand across the USA and Europe with content, campaigns and community.",
         points: ["Plan and run campaigns across channels", "Create content that shows what AI video can do", "Track what works and do more of it"]
       },
       {
@@ -676,7 +817,7 @@ export const en = {
   },
   // The team dashboard (/team): every client's projects and the files they submitted.
   team: {
-    metaTitle: "Team dashboard | IzI Video",
+    metaTitle: "Team dashboard | Keplerbay",
     eyebrow: "Internal",
     title: "Team",
     title2: "dashboard",
@@ -727,7 +868,36 @@ export const en = {
       kinds: { purchase: "Purchase", spend: "Project", refund: "Taken back", adjustment: "Added by team" } as Record<string, string>,
       projectsTitle: "Projects",
       noProjects: "No projects yet.",
-      loading: "Loading…"
+      loading: "Loading…",
+      invoices: {
+        title: "Invoices",
+        hint: "Bill a custom quote. Stripe emails the invoice to the client, adds any tax from their billing address, and they pay it on Stripe's page.",
+        none: "No invoices yet.",
+        newInvoice: "New invoice",
+        cancel: "Cancel",
+        line: "Description",
+        linePlaceholder: "e.g. 60-second product film, 16:9 + 9:16",
+        amount: "Amount (USD, before tax)",
+        addLine: "Add a line",
+        removeLine: "Remove line",
+        dueIn: "Due in (days)",
+        memo: "Note on the invoice (optional)",
+        address: "Billing address",
+        addressHint: "Needed to work out tax. Leave it empty if the client already has one on file.",
+        addressFields: { line1: "Address", line2: "Apartment, suite (optional)", city: "City", state: "State / region", postal_code: "ZIP / postal code", country: "Country code (e.g. US)" },
+        subtotal: "Subtotal before tax",
+        send: "Send invoice",
+        sending: "Sending…",
+        sent: "Invoice sent to the client.",
+        errors: {
+          invalid: "Check the lines: each needs a description and an amount of at least $1.",
+          address_required: "Add the client's billing address - Stripe needs it to work out the tax.",
+          invalid_address: "The address is incomplete. A US address needs the street, city, state and ZIP.",
+          not_configured: "Stripe isn't set up on this site yet.",
+          stripe: "Stripe refused the invoice: {message}",
+          generic: "We couldn't send the invoice. Please try again."
+        } as Record<string, string>
+      }
     },
     stats: { total: "All projects", new: "New briefs", inWork: "In work", inReview: "In review", delivered: "Delivered", overdue: "Overdue" },
     search: "Search project or client",
@@ -770,6 +940,19 @@ export const en = {
     manageTitle: "Manage this project",
     manageHint: "Changes save to the client's Your Projects page right away.",
     stage: "Stage",
+    approvedLocked: "The client approved this film on {date}, so the stage stays at Delivered.",
+    // The client's change requests and rating, in the project window.
+    requests: {
+      title: "Change requests",
+      none: "No change requests.",
+      approve: "Approve & apply",
+      decline: "Decline",
+      notePlaceholder: "Note for the client (optional)",
+      paid: "paid",
+      refundNote: "Paid by card - declining does not refund it automatically: refund the payment in Stripe.",
+      review: "Client review",
+      error: "That didn't work. Please try again."
+    },
     nextStep: "Next step (the client sees this)",
     nextStepHint: "For example: We're generating the scenes. Nothing needed from you right now.",
     producer: "Producer",
@@ -845,15 +1028,15 @@ export const en = {
     }
   },
   contactPage: {
-    metaTitle: "Contact & Process | DreamTeam",
+    metaTitle: "Contact & Process | Keplerbay",
     metaDescription:
-      "How we work from brief to delivery, and how to reach DreamTeam for AI video production.",
+      "How we work from brief to delivery, and how to reach Keplerbay for AI video production.",
   },
   // The SEO copy: the home page's title / description / keywords (the layout's defaults too), the organization's
   // description for the structured data and `llms.txt`, the address split for the schema, the topics it knows.
   seo: {
     home: {
-      title: "AI Video Production Company in Bulgaria | DreamTeam",
+      title: "AI Video Production Company in Bulgaria | Keplerbay",
       description:
         "AI video production company in Sofia, Bulgaria: AI-generated video ads, product videos, brand mascots and AI avatars for brands in Bulgaria, Europe and the US. Delivered in 5–12 working days, with full commercial rights.",
       keywords: [
@@ -867,11 +1050,11 @@ export const en = {
         "AI avatars",
         "social media video",
         "corporate video",
-        "DreamTeam",
+        "Keplerbay",
       ],
     },
     organizationDescription:
-      "DreamTeam is an AI video production company based in Sofia, Bulgaria. It creates AI-generated advertising and brand video - TV and social media ads, product videos, brand mascots, explainer videos and AI avatars - for clients in Bulgaria, across Europe and in the United States, and trains individuals and teams in AI video production.",
+      "Keplerbay is an AI video production company based in Sofia, Bulgaria. It creates AI-generated advertising and brand video - TV and social media ads, product videos, brand mascots, explainer videos and AI avatars - for clients in Bulgaria, across Europe and in the United States, and trains individuals and teams in AI video production.",
     streetAddress: "27–29 Nikola Kopernik St., Floor 2, Office 17",
     city: "Sofia",
     country: "Bulgaria",
@@ -935,9 +1118,9 @@ export const en = {
     ]
   },
   portfolio: {
-    metaTitle: "AI Video Portfolio | DreamTeam",
+    metaTitle: "AI Video Portfolio | Keplerbay",
     metaDescription:
-      "Watch AI videos by IzI Video: social media ads, corporate videos, TV ads, product videos, brand mascots, motion graphics, launch and explainer videos, UGC ads, real estate and music videos.",
+      "Watch AI videos by Keplerbay: social media ads, corporate videos, TV ads, product videos, brand mascots, motion graphics, launch and explainer videos, UGC ads, real estate and music videos.",
     eyebrow: "Portfolio",
     title1: "Our",
     title2: "work",
@@ -984,9 +1167,9 @@ export const en = {
     title: "Trusted By"
   },
   projects: {
-    metaTitle: "Customers & Case Studies | DreamTeam",
+    metaTitle: "Customers & Case Studies | Keplerbay",
     metaDescription:
-      "The brands DreamTeam makes AI video for, and case studies of campaigns we produced for clients in software, products and construction - goals, results and where each video ran.",
+      "The brands Keplerbay makes AI video for, and case studies of campaigns we produced for clients in software, products and construction - goals, results and where each video ran.",
     title1: "Our",
     title2: "Customers",
     // The Customers page (/projects): the logo wall, then the case studies as windows.
@@ -1504,7 +1687,7 @@ export const en = {
             { num: "3", suffix: " days", label: "from the brief to the broadcast on TV channel 1+1" },
             { num: "1", suffix: "M+", label: "views on air and before key figures" }
           ],
-          closing: "MindGuard's videos were shown to Klaus Schwab, to the President of Switzerland, Guy Parmelin, and to the viewers of Ukraine's most-watched TV channel. Three different audiences, one recognisable visual language - created with artificial intelligence and delivered professionally on short deadlines by Dream Team."
+          closing: "MindGuard's videos were shown to Klaus Schwab, to the President of Switzerland, Guy Parmelin, and to the viewers of Ukraine's most-watched TV channel. Three different audiences, one recognisable visual language - created with artificial intelligence and delivered professionally on short deadlines by Keplerbay."
         },
         testimonials: {
           eyebrow: "Client testimonial",
@@ -1543,7 +1726,7 @@ export const en = {
       deliverable: "Deliverable"
     },
     detail: {
-      metaTitle: "Case study | DreamTeam",
+      metaTitle: "Case study | Keplerbay",
       eyebrow: "Case study",
       ctaTitle: "Want a project like this for your brand?",
       ctaQuote: "Request a quote",
@@ -1650,7 +1833,7 @@ export const en = {
     subtitle: "End-to-end AI production - from video and mascots to stills and automated pipelines.",
     learnMore: "Learn more",
     quoteCta: "Request a quote",
-    metaTitle: "AI Video Services for Business | DreamTeam",
+    metaTitle: "AI Video Services for Business | Keplerbay",
     metaDescription:
       "AI video production, brand mascots, AI images, and automations. AI-powered video ads for brands in Bulgaria and worldwide.",
     ctaHeading: "Ready to get started?",
@@ -1666,7 +1849,7 @@ export const en = {
         title: "AI Video Production",
         imgSrc: "/services/icons/ai_video.png",
         imgAlt: "Video production studio equipment",
-        seoTitle: "AI Video Production | DreamTeam",
+        seoTitle: "AI Video Production | Keplerbay",
         seoDescription:
           "AI-powered video ads for TV, social media, product and corporate video. AI avatars and unique scenes on a smaller budget.",
         modal: {
@@ -1779,7 +1962,7 @@ export const en = {
         title: "Brand Mascot",
         imgSrc: "/services/icons/ai_mascot.png",
         imgAlt: "Colorful character illustration",
-        seoTitle: "AI Brand Mascots | DreamTeam",
+        seoTitle: "AI Brand Mascots | Keplerbay",
         seoDescription:
           "We create AI mascots that carry your brand message - animated or realistic, with male and female voice, for posts, stories, and video.",
         modal: {
@@ -1869,7 +2052,7 @@ export const en = {
         title: "AI Graphic Design",
         imgSrc: "/services/icons/ai_images.png",
         imgAlt: "Camera and photography setup",
-        seoTitle: "AI Images & Graphic Design | DreamTeam",
+        seoTitle: "AI Images & Graphic Design | Keplerbay",
         seoDescription:
           "AI images and AI graphic design for posts, stories, web, presentations, logos, and brand documents - matched to your brand style.",
         modal: {
@@ -1935,7 +2118,7 @@ export const en = {
         title: "Video & Image Automation",
         imgSrc: "/services/icons/ai_automation.png",
         imgAlt: "Robotics and automation concept",
-        seoTitle: "Video & Image Automation | DreamTeam",
+        seoTitle: "Video & Image Automation | Keplerbay",
         seoDescription:
           "A repeatable process for generating AI video and AI images in a uniform style - ideal for catalogs, social feeds, and seasonal campaigns.",
         modal: {
@@ -2174,7 +2357,7 @@ export const en = {
     ],
   },
   stats: {
-    title1: "DreamTeam",
+    title1: "Keplerbay",
     title2: "in numbers",
     subline:
       "The AI video production industry is evolving fast. Together with you, we are shaping its future.",
@@ -2193,7 +2376,7 @@ export const en = {
       idea: {
         title: "Do you have an idea or plot for the video?",
         yes: "Yes, I have an idea",
-        no: "No, let DreamTeam think of one",
+        no: "No, let Keplerbay think of one",
         placeholder: "Briefly describe your idea..."
       },
       details: {
@@ -2528,7 +2711,7 @@ export const en = {
     successCta: "Explore our other services",
   },
   footer: {
-    desc: "At DreamTeam, we handle end-to-end video production using the latest AI technologies.",
+    desc: "At Keplerbay, we handle end-to-end video production using the latest AI technologies.",
     orderVideo: "Order a video",
     pricing: "Pricing",
     company: "Company",
@@ -2545,7 +2728,7 @@ export const en = {
     address: "San Francisco, Silicon Valley, CA, USA",
     reviews: "Reviews",
     googleReviews: "reviews on Google",
-    copy: "DreamTeam. All rights reserved.",
+    copy: "Keplerbay. All rights reserved.",
     made: "Made with ♥ and AI."
   },
   legal: {
@@ -2591,11 +2774,11 @@ export const en = {
     },
   },
   training: {
-    metaTitle: "AI Video Training | DreamTeam",
+    metaTitle: "AI Video Training | Keplerbay",
     // Skool training temporarily hidden. Original:
-    // "Individual AI video consultations, Skool community courses, and team workshops from DreamTeam."
+    // "Individual AI video consultations, Skool community courses, and team workshops from Keplerbay."
     metaDescription:
-      "Individual AI video consultations and team workshops from DreamTeam.",
+      "Individual AI video consultations and team workshops from Keplerbay.",
     eyebrow: "Hands-on AI video training",
     title: "Training for AI production",
     title1: "Training",

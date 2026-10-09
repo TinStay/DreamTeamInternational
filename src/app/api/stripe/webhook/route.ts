@@ -43,6 +43,26 @@ async function settleOrder(event: Stripe.Event) {
 }
 
 /**
+ * A paid change request (an earlier deadline, an extra revision - supabase/changes.sql): once its money is in, it goes from
+ * `awaiting_payment` to `requested`, and the team sees it. Returns false on a real failure (Stripe retries).
+ */
+async function settleProjectRequest(event: Stripe.Event): Promise<boolean> {
+  if (event.type !== "checkout.session.completed" && event.type !== "checkout.session.async_payment_succeeded") return true;
+  const session = event.data.object as Stripe.Checkout.Session;
+  const requestId = session.metadata?.request_id;
+  if (session.metadata?.purchase_type !== "project_request" || !requestId || session.payment_status !== "paid") return true;
+  const admin = createAdminClient();
+  if (!admin) return false;
+  const { error } = await admin
+    .from("project_requests")
+    .update({ status: "requested", paid_at: new Date().toISOString(), stripe_session_id: session.id })
+    .eq("id", requestId)
+    .eq("user_id", session.metadata?.user_id ?? "")
+    .eq("status", "awaiting_payment");
+  return !error;
+}
+
+/**
  * Stripe tells us a payment happened; this adds the pack's video seconds to the client's account - **only once the money
  * is collected** (`creditDecision` in `lib/stripe-credits.ts`): a one-time pack when its checkout completes paid, or when
  * a delayed bank payment later succeeds (`checkout.session.async_payment_succeeded`); a subscription each time an invoice
@@ -73,6 +93,7 @@ export async function POST(request: Request) {
   }
 
   await settleOrder(event);
+  if (!(await settleProjectRequest(event))) return NextResponse.json({ error: "request_failed" }, { status: 500 });
 
   // Only money actually collected adds seconds - a failed, pending or unpaid payment never does (`creditDecision`).
   const decision = creditDecision(event);

@@ -99,9 +99,9 @@ export async function POST(req: Request) {
     );
   }
 
-  const from = process.env.RESEND_FROM ?? "info@dreamteam.technology";
+  const from = process.env.RESEND_FROM ?? "info@keplerbay.com";
   // Always deliver training/contact inquiries to the main inbox.
-  const to = ["info@dreamteam.technology"];
+  const to = ["info@keplerbay.com"];
 
   const subject = `Website contact${subjectField ? `: ${subjectField}` : ""}`;
   const text = [
@@ -141,7 +141,7 @@ export async function POST(req: Request) {
       <div style="max-width:720px;margin:0 auto;border-radius:22px;overflow:hidden;background:#ffffff;border:1px solid rgba(15,23,42,0.10);box-shadow:0 24px 70px rgba(15,23,42,0.12);">
         <div style="padding:22px 22px 18px;background:linear-gradient(135deg,#db4e4e 0%,#6b3f9a 100%);">
           <div style="font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial;letter-spacing:-0.02em;color:#ffffff;">
-            <div style="font-size:12px;opacity:0.92;font-weight:800;text-transform:uppercase;letter-spacing:0.14em;">DreamTeam Website</div>
+            <div style="font-size:12px;opacity:0.92;font-weight:800;text-transform:uppercase;letter-spacing:0.14em;">Keplerbay Website</div>
             <div style="margin-top:8px;font-size:22px;font-weight:900;line-height:1.2;">${escapeHtml(subject)}</div>
           </div>
         </div>

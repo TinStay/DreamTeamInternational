@@ -1,6 +1,6 @@
-# DreamTeam Web
+# Keplerbay Web
 
-Marketing site for **DreamTeam**, an AI video production company. Built with Next.js 16 (App Router) and React 19.
+Marketing site for **Keplerbay**, an AI video production company. Built with Next.js 16 (App Router) and React 19.
 
 ## Stack
 
@@ -25,7 +25,7 @@ Create a `.env.local` file:
 
 ```bash
 RESEND_API_KEY=...                      # required for the contact form to send mail
-RESEND_FROM=info@dreamteam.technology   # optional; defaults to this address
+RESEND_FROM=info@keplerbay.com   # optional; defaults to this address
 ```
 
 ## Scripts

@@ -10,9 +10,9 @@ import type { Language } from "@/lib/i18n/config";
  * breadcrumb list does not drag the whole catalogue into its bundle.
  */
 
-// The canonical host is the `www` one: `dreamteamvideo.com`, `dreamteam.video` and its `www` 308 to it (Vercel's
-// domain settings), so every canonical, sitemap entry and JSON-LD `@id` is minted on it.
-export const SITE_URL = "https://www.dreamteamvideo.com";
+// The canonical host is the bare `keplerbay.com`: `www.keplerbay.com` and the old DreamTeam domains 308 to it
+// (Vercel's domain settings), so every canonical, sitemap entry and JSON-LD `@id` is minted on it.
+export const SITE_URL = "https://keplerbay.com";
 /** The one `@id` every page's JSON-LD points its publisher / provider at. */
 export const ORGANIZATION_ID = `${SITE_URL}/#organization`;
 export const WEBSITE_ID = `${SITE_URL}/#website`;
@@ -58,11 +58,11 @@ export function openGraphFor(
 ) {
   return {
     type: "website" as const,
-    siteName: "DreamTeam",
+    siteName: "Keplerbay",
     locale: OG_LOCALE[lang],
     title: page.title,
     description: page.description,
     url: absoluteUrl(page.path),
-    images: [page.image ?? { url: OG_IMAGE_PATH, width: 1200, height: 630, alt: "DreamTeam — AI Video Production" }],
+    images: [page.image ?? { url: OG_IMAGE_PATH, width: 1200, height: 630, alt: "Keplerbay — AI Video Production" }],
   };
 }

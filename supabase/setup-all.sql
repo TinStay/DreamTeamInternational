@@ -1,5 +1,5 @@
--- ONE-FILE SETUP: projects + team + credits + delivery + profiles + orders, in the right order. Run this once in the Supabase SQL Editor.
--- (Same content as projects.sql, then team.sql, then credits.sql, then delivery.sql, then profiles.sql, then orders.sql. After it, make yourself an admin - see the snippet
+-- ONE-FILE SETUP: projects + team + credits + delivery + profiles + orders + hardening + approval + changes, in the right order. Run this once in the Supabase SQL Editor.
+-- (Same content as projects.sql, then team.sql, then credits.sql, then delivery.sql, then profiles.sql, then orders.sql, then hardening.sql, then approval.sql, then changes.sql. After it, make yourself an admin - see the snippet
 -- inside the team.sql part below, and read README.md.)
 
 -- ======================= 1/6  projects =======================
@@ -322,7 +322,9 @@ begin
   if not found then
     raise exception 'not_found';
   end if;
-  if proj.status <> 'review' then
+  -- In review: approve or ask for a revision. Being reworked after a revision: the client may still approve the version
+  -- they have (they changed their mind), but not ask for another revision.
+  if proj.status <> 'review' and not (p_action = 'approve' and proj.status = 'production' and proj.revisions_used > 0) then
     raise exception 'not_in_review';
   end if;
 
@@ -626,3 +628,512 @@ create index if not exists credit_ledger_order_idx on public.credit_ledger (orde
 alter table public.subscriptions add column if not exists billing text check (billing in ('monthly', 'annual'));
 alter table public.subscriptions add column if not exists amount_cents integer;
 alter table public.subscriptions add column if not exists currency text;
+
+-- ======================= 7/7  hardening =======================
+-- SECURITY HARDENING (7/9). Run once in the Supabase SQL Editor, AFTER every other file (safe to re-run).
+--
+-- Row level security already decides which rows a client sees; this file takes away the table privileges nobody uses,
+-- so a missing or mistaken policy can never open a table by accident:
+--   * signed-out visitors (`anon`) touch no table at all - every page with data needs an account;
+--   * nobody but the service role (the webhook, the server) writes subscriptions or orders;
+--   * the ledger and the comments are append-only for signed-in users (no update / delete grant);
+--   * TRUNCATE / TRIGGER / REFERENCES are gone for both API roles (TRUNCATE skips row level security);
+--   * the helper functions are not callable through the API.
+-- A NEW TABLE gets Supabase's default grants again - repeat the matching lines below for it.
+
+-- 1) Tables and the view.
+revoke all on public.projects, public.project_comments, public.credit_ledger, public.subscriptions, public.orders,
+              public.profiles, public.client_notes, public.client_overview from anon;
+revoke truncate, trigger, references on public.projects, public.project_comments, public.credit_ledger, public.subscriptions,
+              public.orders, public.profiles, public.client_notes, public.client_overview from authenticated;
+revoke insert, update, delete on public.subscriptions, public.orders, public.client_overview from authenticated;
+revoke update, delete on public.credit_ledger, public.project_comments from authenticated;
+revoke insert, delete on public.projects from authenticated;
+revoke update on public.client_notes from authenticated;
+
+-- A comment stays a comment, not a file dump.
+do $$ begin
+  alter table public.project_comments add constraint project_comments_body_length check (char_length(body) between 1 and 5000);
+exception when duplicate_object then null; end $$;
+
+-- 2) Functions: the event trigger and the updated_at trigger are not API endpoints.
+do $$ begin
+  revoke execute on function public.rls_auto_enable() from public, anon, authenticated;
+exception when undefined_function then null; end $$;
+revoke execute on function public.touch_updated_at() from public, anon, authenticated;
+revoke execute on function public.is_admin() from public, anon;
+grant execute on function public.is_admin() to authenticated;
+revoke execute on function public.client_project_action(uuid, text, text) from public, anon;
+
+-- 3) Submitting a project: the same as credits.sql, plus bounds on everything the browser sends - text lengths, the
+--    length of the film, how many answers and files - and every attached file must sit in this client's own folder for
+--    this project (`<user id>/<project id>/...`), so a brief can never point the team at someone else's upload.
+create or replace function public.submit_project(
+  p_id uuid,
+  p_title text,
+  p_kind text,
+  p_brief text,
+  p_format text,
+  p_duration integer,
+  p_due date,
+  p_answers jsonb,
+  p_next_step text,
+  p_files jsonb,
+  p_client_name text,
+  p_client_email text
+) returns jsonb
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  uid uuid := auth.uid();
+  balance integer;
+  created public.projects;
+  f jsonb;
+  prefix text;
+begin
+  if uid is null then
+    raise exception 'not_signed_in';
+  end if;
+  if p_id is null then
+    raise exception 'invalid_id';
+  end if;
+  if p_duration is null or p_duration <= 0 or p_duration > 3600 then
+    raise exception 'invalid_duration';
+  end if;
+  if char_length(btrim(coalesce(p_title, ''))) = 0 or char_length(p_title) > 200
+     or char_length(coalesce(p_kind, '')) > 100
+     or char_length(coalesce(p_brief, '')) > 10000
+     or char_length(coalesce(p_format, '')) > 60
+     or char_length(coalesce(p_next_step, '')) > 500
+     or char_length(coalesce(p_client_name, '')) > 200
+     or char_length(coalesce(p_client_email, '')) > 320 then
+    raise exception 'invalid_input';
+  end if;
+  if p_answers is not null and (jsonb_typeof(p_answers) <> 'array' or jsonb_array_length(p_answers) > 50 or char_length(p_answers::text) > 20000) then
+    raise exception 'invalid_input';
+  end if;
+  if p_files is not null then
+    if jsonb_typeof(p_files) <> 'array' or jsonb_array_length(p_files) > 30 then
+      raise exception 'invalid_files';
+    end if;
+    prefix := uid::text || '/' || p_id::text || '/';
+    for f in select * from jsonb_array_elements(p_files) loop
+      if jsonb_typeof(f) <> 'object' or left(coalesce(f ->> 'path', ''), char_length(prefix)) <> prefix
+         or position('..' in f ->> 'path') > 0 or char_length(coalesce(f ->> 'name', '')) > 300 then
+        raise exception 'invalid_files';
+      end if;
+    end loop;
+  end if;
+
+  -- One submission at a time per client, so two tabs cannot spend the same seconds twice.
+  perform pg_advisory_xact_lock(hashtext(uid::text));
+
+  select coalesce(sum(seconds), 0) into balance from public.credit_ledger where user_id = uid;
+  if balance < p_duration then
+    raise exception 'insufficient_credits';
+  end if;
+
+  insert into public.projects (id, user_id, title, kind, status, brief, format, duration_seconds, due_date, brief_answers, next_step, brief_files, client_name, client_email)
+  values (p_id, uid, btrim(p_title), p_kind, 'brief', p_brief, p_format, p_duration, p_due, coalesce(p_answers, '[]'::jsonb), p_next_step, coalesce(p_files, '[]'::jsonb), p_client_name, p_client_email)
+  returning * into created;
+
+  insert into public.credit_ledger (user_id, seconds, kind, project_id, note)
+  values (uid, -p_duration, 'spend', created.id, left(btrim(p_title), 200));
+
+  return to_jsonb(created);
+end;
+$$;
+
+revoke all on function public.submit_project(uuid, text, text, text, text, integer, date, jsonb, text, jsonb, text, text) from public, anon;
+grant execute on function public.submit_project(uuid, text, text, text, text, integer, date, jsonb, text, jsonb, text, text) to authenticated;
+
+-- ======================= 8/8  approval =======================
+-- APPROVAL IS FINAL (8/9). Run once in the Supabase SQL Editor, AFTER delivery.sql (safe to re-run).
+--
+-- The client's two moves on a film in review (client_project_action, delivery.sql):
+--   * Request a revision -> back to "production" (one revision used, the note added to the list);
+--   * Approve            -> "delivered", stamped with approved_at. The site shows a green "Approved" step after
+--                           Delivered from then on.
+-- An approved project is closed: no revision can be asked for, and its stage cannot be moved off Delivered - not by the
+-- client and not by mistake from the team dashboard. (To reopen one on purpose, clear approved_at in the same update.)
+
+-- 1) The client's action: refuses anything on an approved project, explicitly.
+create or replace function public.client_project_action(p_id uuid, p_action text, p_note text default null)
+returns jsonb
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  uid uuid := auth.uid();
+  proj public.projects;
+  note text := nullif(btrim(coalesce(p_note, '')), '');
+begin
+  if uid is null then
+    raise exception 'not_signed_in';
+  end if;
+
+  select * into proj from public.projects where id = p_id and user_id = uid for update;
+  if not found then
+    raise exception 'not_found';
+  end if;
+  if proj.approved_at is not null then
+    raise exception 'already_approved';
+  end if;
+  -- In review: approve or ask for a revision. Being reworked after a revision: the client may still approve the version
+  -- they have (they changed their mind), but not ask for another revision.
+  if proj.status <> 'review' and not (p_action = 'approve' and proj.status = 'production' and proj.revisions_used > 0) then
+    raise exception 'not_in_review';
+  end if;
+
+  if p_action = 'approve' then
+    update public.projects
+       set status = 'delivered', approved_at = now(), next_step = null
+     where id = p_id
+    returning * into proj;
+  elsif p_action = 'revision' then
+    if note is null then
+      raise exception 'note_required';
+    end if;
+    if proj.revisions_used >= proj.revisions_total then
+      raise exception 'no_revisions_left';
+    end if;
+    update public.projects
+       set status = 'production',
+           revisions_used = revisions_used + 1,
+           revisions = coalesce(revisions, '[]'::jsonb)
+                       || jsonb_build_array(jsonb_build_object('title', left(note, 2000), 'date', current_date, 'done', false)),
+           next_step = null
+     where id = p_id
+    returning * into proj;
+  else
+    raise exception 'invalid_action';
+  end if;
+
+  return to_jsonb(proj);
+end;
+$$;
+
+revoke all on function public.client_project_action(uuid, text, text) from public, anon;
+grant execute on function public.client_project_action(uuid, text, text) to authenticated;
+
+-- 2) The guard on every update: an approved project stays Delivered unless the approval itself is cleared.
+create or replace function public.guard_project_approval()
+returns trigger
+language plpgsql
+set search_path = public
+as $$
+begin
+  if old.approved_at is not null and new.approved_at is not null and new.status <> 'delivered' then
+    raise exception 'project_approved' using hint = 'An approved project stays Delivered. Clear approved_at to reopen it.';
+  end if;
+  return new;
+end;
+$$;
+
+revoke execute on function public.guard_project_approval() from public, anon, authenticated;
+
+drop trigger if exists projects_guard_approval on public.projects;
+create trigger projects_guard_approval
+  before update on public.projects
+  for each row execute function public.guard_project_approval();
+
+-- ======================= 9/9  change requests + reviews =======================
+-- CHANGE REQUESTS AND REVIEWS (9/9). Run once in the Supabase SQL Editor, AFTER approval.sql (safe to re-run).
+--
+-- 1) Change requests: while a project is being made the client can ask to
+--      * move the deadline  - $50 for every day it comes closer (later is free), never sooner than 2 days from today;
+--      * make the film longer - the extra seconds come from their video time; seconds they do not have are bought on the
+--                             spot at the one-time price ($11.90 a second), up to a 10-minute film;
+--      * add a format       - as many seconds as the film is long, from their video time (missing seconds bought alike);
+--      * add a revision     - $49 each.
+--    Every price is worked out HERE (request_project_change), never taken from the browser. Seconds are spent the moment
+--    the request is sent and given back if the team declines it; a paid request waits for its Stripe payment
+--    (`awaiting_payment`, settled by the webhook) before the team sees it. The team approves - which applies the change to
+--    the project - or declines (resolve_project_request). Prices live in src/lib/project-changes.ts too - keep in step.
+-- 2) Reviews: once the client has approved the film they can rate it - quality, speed and attitude, 1 to 5 - with an
+--    optional comment, and change their rating later.
+
+-- ---------------------------------------------------------------- requests
+create table if not exists public.project_requests (
+  id uuid primary key default gen_random_uuid(),
+  project_id uuid not null references public.projects(id) on delete cascade,
+  user_id uuid not null references public.profiles(id) on delete cascade,
+  kind text not null check (kind in ('deadline', 'duration', 'format', 'revision')),
+  details jsonb not null default '{}'::jsonb,
+  cost_seconds integer not null default 0 check (cost_seconds >= 0),
+  cost_cents integer not null default 0 check (cost_cents >= 0),
+  status text not null default 'requested' check (status in ('awaiting_payment', 'requested', 'approved', 'declined', 'cancelled')),
+  stripe_session_id text,
+  paid_at timestamptz,
+  team_note text check (char_length(team_note) <= 1000),
+  created_at timestamptz not null default now(),
+  resolved_at timestamptz
+);
+create index if not exists project_requests_project on public.project_requests (project_id, created_at desc);
+-- One open request of each kind per project.
+create unique index if not exists project_requests_one_open on public.project_requests (project_id, kind) where status in ('awaiting_payment', 'requested');
+
+alter table public.project_requests enable row level security;
+drop policy if exists "Clients read their own requests" on public.project_requests;
+create policy "Clients read their own requests" on public.project_requests for select to authenticated using ((select auth.uid()) = user_id or public.is_admin());
+revoke all on public.project_requests from anon;
+revoke insert, update, delete, truncate, trigger, references on public.project_requests from authenticated;
+grant select on public.project_requests to authenticated;
+
+-- The longest film a client's plan allows, in seconds: a live subscription's monthly seconds, else a one-time video's
+-- longest length (2 minutes). Mirrors planVideoCap() in src/lib/project-changes.ts.
+create or replace function public.plan_video_cap(p_user uuid)
+returns integer
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select coalesce(
+    (select case s.plan_key when 'creator' then 40 when 'pro' then 60 when 'local' then 90 when 'brand' then 180 when 'enterprise' then 600 end
+       from public.subscriptions s
+      where s.user_id = p_user and s.status in ('active', 'trialing', 'past_due', 'unpaid')
+      order by s.updated_at desc limit 1),
+    120);
+$$;
+revoke all on function public.plan_video_cap(uuid) from public, anon, authenticated;
+
+create or replace function public.request_project_change(p_project uuid, p_kind text, p_details jsonb default '{}'::jsonb)
+returns jsonb
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  uid uuid := auth.uid();
+  proj public.projects;
+  req public.project_requests;
+  balance integer;
+  cap integer;
+  new_due date;
+  extra integer;
+  fmt text;
+  days_earlier integer;
+  details jsonb;
+  cost_s integer := 0;
+  cost_c integer := 0;
+begin
+  if uid is null then
+    raise exception 'not_signed_in';
+  end if;
+  select * into proj from public.projects where id = p_project and user_id = uid for update;
+  if not found then
+    raise exception 'not_found';
+  end if;
+  if proj.approved_at is not null or proj.status = 'delivered' then
+    raise exception 'project_closed';
+  end if;
+
+  -- A request that was never paid for is replaced by the new one (any seconds it took go back first).
+  insert into public.credit_ledger (user_id, seconds, kind, project_id, note)
+  select uid, r.cost_seconds, 'refund', p_project, 'Change request replaced (' || p_kind || ')'
+    from public.project_requests r
+   where r.project_id = p_project and r.kind = p_kind and r.status = 'awaiting_payment' and r.cost_seconds > 0;
+  update public.project_requests set status = 'cancelled', resolved_at = now()
+   where project_id = p_project and kind = p_kind and status = 'awaiting_payment';
+  if exists (select 1 from public.project_requests where project_id = p_project and kind = p_kind and status = 'requested') then
+    raise exception 'request_open';
+  end if;
+
+  perform pg_advisory_xact_lock(hashtext(uid::text));
+  select coalesce(sum(seconds), 0) into balance from public.credit_ledger where user_id = uid;
+
+  if p_kind = 'deadline' then
+    if proj.status not in ('brief', 'scripting', 'production') then
+      raise exception 'not_allowed_now';
+    end if;
+    begin
+      new_due := (p_details ->> 'date')::date;
+    exception when others then
+      raise exception 'invalid_date';
+    end;
+    if new_due is null or new_due < current_date + 2 or new_due > current_date + 365 or new_due = proj.due_date then
+      raise exception 'invalid_date';
+    end if;
+    days_earlier := greatest(coalesce(proj.due_date - new_due, 0), 0);
+    cost_c := days_earlier * 5000;
+    details := jsonb_build_object('from', proj.due_date, 'to', new_due, 'days_earlier', days_earlier);
+
+  elsif p_kind = 'duration' then
+    if proj.status not in ('brief', 'scripting', 'production') then
+      raise exception 'not_allowed_now';
+    end if;
+    extra := nullif(p_details ->> 'seconds', '')::integer;
+    if extra is null or extra < 5 or extra % 5 <> 0 then
+      raise exception 'invalid_length';
+    end if;
+    if coalesce(proj.duration_seconds, 0) + extra > 600 then
+      raise exception 'over_max_length';
+    end if;
+    -- From the video time first; whatever is missing is bought at the one-time price.
+    cost_s := least(extra, greatest(balance, 0));
+    cost_c := (extra - cost_s) * 1190;
+    details := jsonb_build_object('from', coalesce(proj.duration_seconds, 0), 'to', coalesce(proj.duration_seconds, 0) + extra, 'extra', extra, 'bought', extra - cost_s);
+
+  elsif p_kind = 'format' then
+    if proj.status not in ('brief', 'scripting', 'production', 'review') then
+      raise exception 'not_allowed_now';
+    end if;
+    fmt := p_details ->> 'format';
+    if fmt is null or fmt not in ('9:16 vertical', '16:9 horizontal', '4:3 classic', '3:4 portrait', '1:1 square', '21:9 cinema') then
+      raise exception 'invalid_format';
+    end if;
+    if position(split_part(fmt, ' ', 1) in coalesce(proj.format, '')) > 0 then
+      raise exception 'format_included';
+    end if;
+    if coalesce(proj.duration_seconds, 0) <= 0 then
+      raise exception 'invalid_length';
+    end if;
+    cost_s := least(proj.duration_seconds, greatest(balance, 0));
+    cost_c := (proj.duration_seconds - cost_s) * 1190;
+    details := jsonb_build_object('format', fmt, 'bought', proj.duration_seconds - cost_s);
+
+  elsif p_kind = 'revision' then
+    if proj.status not in ('scripting', 'production', 'review') then
+      raise exception 'not_allowed_now';
+    end if;
+    cost_c := 4900;
+    details := jsonb_build_object('from', proj.revisions_total, 'to', proj.revisions_total + 1);
+
+  else
+    raise exception 'invalid_kind';
+  end if;
+
+  if cost_c = 0 and cost_s = 0 and p_kind <> 'deadline' then
+    raise exception 'invalid_request';
+  end if;
+
+  insert into public.project_requests (project_id, user_id, kind, details, cost_seconds, cost_cents, status)
+  values (p_project, uid, p_kind, details, cost_s, cost_c, case when cost_c > 0 then 'awaiting_payment' else 'requested' end)
+  returning * into req;
+
+  if cost_s > 0 then
+    insert into public.credit_ledger (user_id, seconds, kind, project_id, note)
+    values (uid, -cost_s, 'spend', p_project, 'Change request (' || p_kind || '): ' || left(proj.title, 150));
+  end if;
+
+  return to_jsonb(req);
+end;
+$$;
+revoke all on function public.request_project_change(uuid, text, jsonb) from public, anon;
+grant execute on function public.request_project_change(uuid, text, jsonb) to authenticated;
+
+-- The client withdraws a request the team has not answered yet: an unpaid one, or one paid in seconds (given back).
+-- A request paid with money stays with the team (refunds go through Stripe).
+create or replace function public.cancel_project_request(p_id uuid)
+returns jsonb
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  uid uuid := auth.uid();
+  req public.project_requests;
+begin
+  if uid is null then
+    raise exception 'not_signed_in';
+  end if;
+  select * into req from public.project_requests where id = p_id and user_id = uid for update;
+  if not found then
+    raise exception 'not_found';
+  end if;
+  if req.status = 'awaiting_payment' or (req.status = 'requested' and req.paid_at is null) then
+    update public.project_requests set status = 'cancelled', resolved_at = now() where id = p_id returning * into req;
+    if req.cost_seconds > 0 then
+      insert into public.credit_ledger (user_id, seconds, kind, project_id, note)
+      values (uid, req.cost_seconds, 'refund', req.project_id, 'Change request withdrawn (' || req.kind || ')');
+    end if;
+    return to_jsonb(req);
+  end if;
+  raise exception 'not_cancellable';
+end;
+$$;
+revoke all on function public.cancel_project_request(uuid) from public, anon;
+grant execute on function public.cancel_project_request(uuid) to authenticated;
+
+-- The team answers a request: approve applies it to the project, decline gives any seconds back.
+create or replace function public.resolve_project_request(p_id uuid, p_decision text, p_note text default null)
+returns jsonb
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  req public.project_requests;
+  note text := nullif(left(btrim(coalesce(p_note, '')), 1000), '');
+begin
+  if not public.is_admin() then
+    raise exception 'not_team';
+  end if;
+  select * into req from public.project_requests where id = p_id for update;
+  if not found then
+    raise exception 'not_found';
+  end if;
+  if req.status <> 'requested' then
+    raise exception 'not_open';
+  end if;
+
+  if p_decision = 'approve' then
+    if req.kind = 'deadline' then
+      update public.projects set due_date = (req.details ->> 'to')::date where id = req.project_id;
+    elsif req.kind = 'duration' then
+      update public.projects set duration_seconds = (req.details ->> 'to')::integer where id = req.project_id;
+    elsif req.kind = 'format' then
+      update public.projects
+         set format = case when coalesce(format, '') = '' then req.details ->> 'format' else format || ' + ' || (req.details ->> 'format') end
+       where id = req.project_id;
+    elsif req.kind = 'revision' then
+      update public.projects set revisions_total = revisions_total + 1 where id = req.project_id;
+    end if;
+    update public.project_requests set status = 'approved', team_note = note, resolved_at = now() where id = p_id returning * into req;
+  elsif p_decision = 'decline' then
+    update public.project_requests set status = 'declined', team_note = note, resolved_at = now() where id = p_id returning * into req;
+    if req.cost_seconds > 0 then
+      insert into public.credit_ledger (user_id, seconds, kind, project_id, note)
+      values (req.user_id, req.cost_seconds, 'refund', req.project_id, 'Change request declined (' || req.kind || ')');
+    end if;
+  else
+    raise exception 'invalid_decision';
+  end if;
+  return to_jsonb(req);
+end;
+$$;
+revoke all on function public.resolve_project_request(uuid, text, text) from public, anon;
+grant execute on function public.resolve_project_request(uuid, text, text) to authenticated;
+
+-- ---------------------------------------------------------------- reviews
+create table if not exists public.project_reviews (
+  project_id uuid primary key references public.projects(id) on delete cascade,
+  user_id uuid not null references public.profiles(id) on delete cascade,
+  quality smallint not null check (quality between 1 and 5),
+  speed smallint not null check (speed between 1 and 5),
+  attitude smallint not null check (attitude between 1 and 5),
+  comment text check (char_length(comment) <= 2000),
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+alter table public.project_reviews enable row level security;
+drop policy if exists "Read your reviews" on public.project_reviews;
+create policy "Read your reviews" on public.project_reviews for select to authenticated using ((select auth.uid()) = user_id or public.is_admin());
+-- Only for your own project, and only once you have approved its film.
+drop policy if exists "Review your approved projects" on public.project_reviews;
+create policy "Review your approved projects" on public.project_reviews for insert to authenticated
+  with check ((select auth.uid()) = user_id and exists (select 1 from public.projects p where p.id = project_id and p.user_id = (select auth.uid()) and p.approved_at is not null));
+drop policy if exists "Change your reviews" on public.project_reviews;
+create policy "Change your reviews" on public.project_reviews for update to authenticated
+  using ((select auth.uid()) = user_id)
+  with check ((select auth.uid()) = user_id and exists (select 1 from public.projects p where p.id = project_id and p.user_id = (select auth.uid()) and p.approved_at is not null));
+
+revoke all on public.project_reviews from anon;
+revoke all on public.project_reviews from authenticated;
+grant select, insert on public.project_reviews to authenticated;
+grant update (quality, speed, attitude, comment, updated_at) on public.project_reviews to authenticated;

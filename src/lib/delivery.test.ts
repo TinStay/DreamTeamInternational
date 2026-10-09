@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type Stripe from "stripe";
-import { formatBytes, progressOf, projectFromRow, timelineFor } from "@/lib/client-projects";
+import { formatBytes, isApproved, progressOf, projectFromRow, statusLabelOf, timelineFor } from "@/lib/client-projects";
 import { isLiveStatus, subscriptionRow } from "@/lib/subscriptions";
 import { safeFileName } from "@/lib/supabase/storage";
 
@@ -77,8 +77,46 @@ describe("progress and timeline", () => {
     expect(progressOf({ ...base, status: "delivered" })).toBe(100);
   });
 
-  it("never puts the deadline under Delivered - only the approval date once there is one", () => {
+  it("never puts the deadline under Delivered - only the approval date, on the Approved step", () => {
     expect(timelineFor(base, labels).at(-1)?.date).toBeNull();
-    expect(timelineFor({ ...base, status: "delivered", approvedAt: "2026-10-18T12:00:00Z" }, labels).at(-1)?.date).toBe("2026-10-18");
+    const approved = timelineFor({ ...base, status: "delivered", approvedAt: "2026-10-18T12:00:00Z" }, { ...labels, approved: "Approved" });
+    expect(approved.at(-2)).toMatchObject({ title: "Delivered", date: null, done: true });
+    expect(approved.at(-1)).toMatchObject({ title: "Approved", date: "2026-10-18", done: true, approved: true });
+  });
+
+  it("walks the stages in order: done before, current at, ahead after", () => {
+    const steps = timelineFor({ ...base, status: "production" }, labels);
+    expect(steps.map((s) => [s.title, s.done, s.current])).toEqual([
+      ["Brief", true, false],
+      ["Scripting", true, false],
+      ["Production", false, true],
+      ["Review", false, false],
+      ["Delivered", false, false],
+    ]);
+    // A revision sends a project back to production - the timeline follows it back.
+    expect(timelineFor({ ...base, status: "review" }, labels).find((s) => s.current)?.title).toBe("Review");
+  });
+
+  it("closes with a green Approved step only once the client has approved", () => {
+    const withApproved = { ...labels, approved: "Approved" };
+    // Delivered by the team without an approval: five steps, all done, no Approved.
+    const delivered = timelineFor({ ...base, status: "delivered" }, withApproved);
+    expect(delivered).toHaveLength(5);
+    expect(delivered.every((s) => s.done && !s.approved)).toBe(true);
+    // In review with an old approval date is not approved (the database never allows it, but the page must not claim it).
+    expect(timelineFor({ ...base, status: "review", approvedAt: "2026-10-18T12:00:00Z" }, withApproved)).toHaveLength(5);
+    // A custom timeline gets the Approved step too, once.
+    const custom = { ...base, status: "delivered" as const, approvedAt: "2026-10-18T12:00:00Z", timeline: [{ title: "Kick-off", date: null, note: null, done: true }] };
+    expect(timelineFor(custom, withApproved).map((s) => s.title)).toEqual(["Kick-off", "Approved"]);
+  });
+
+  it("reads Approved as the status once approved, and the stage otherwise", () => {
+    const withApproved = { ...labels, approved: "Approved" };
+    expect(isApproved({ status: "delivered", approvedAt: "2026-10-18T12:00:00Z" })).toBe(true);
+    expect(isApproved({ status: "delivered", approvedAt: null })).toBe(false);
+    expect(isApproved({ status: "production", approvedAt: "2026-10-18T12:00:00Z" })).toBe(false);
+    expect(statusLabelOf({ status: "delivered", approvedAt: "2026-10-18T12:00:00Z" }, withApproved)).toBe("Approved");
+    expect(statusLabelOf({ status: "delivered", approvedAt: null }, withApproved)).toBe("Delivered");
+    expect(statusLabelOf({ status: "production", approvedAt: null }, withApproved)).toBe("Production");
   });
 });

@@ -28,7 +28,7 @@ export const SAMPLE_PROJECTS: ClientProject[] = [
       { title: "Final files delivered", date: "2026-10-05", note: "9:16, 1:1 and 16:9 exports.", done: true },
     ],
     format: "9:16 vertical",
-    managerName: "Nikolay from IzI Video",
+    managerName: "Nikolay from Keplerbay",
     nextStep: "All done - your final files are ready to download.",
     briefAnswers: [
       { label: "Goal", value: "Boost summer sale sales" },
@@ -67,7 +67,7 @@ export const SAMPLE_PROJECTS: ClientProject[] = [
     createdAt: "2026-09-26T09:00:00Z",
     timeline: null,
     format: "16:9 broadcast",
-    managerName: "Nikolay from IzI Video",
+    managerName: "Nikolay from Keplerbay",
     nextStep: "Watch the cut and send your notes - you have 2 revisions included.",
     briefAnswers: [
       { label: "Goal", value: "Launch the titanium wok on TV" },
@@ -105,7 +105,7 @@ export const SAMPLE_PROJECTS: ClientProject[] = [
       { title: "Review and delivery", date: "2026-10-30", note: null, done: false },
     ],
     format: "16:9",
-    managerName: "Nikolay from IzI Video",
+    managerName: "Nikolay from Keplerbay",
     nextStep: "We are producing the scenes. Nothing needed from you right now.",
     briefAnswers: [
       { label: "Goal", value: "Tell our story to investors" },
@@ -139,7 +139,7 @@ export const SAMPLE_PROJECTS: ClientProject[] = [
     createdAt: "2026-10-01T09:00:00Z",
     timeline: null,
     format: "1:1 square",
-    managerName: "Nikolay from IzI Video",
+    managerName: "Nikolay from Keplerbay",
     nextStep: "We are writing the script. You will get it to approve in 2 days.",
     briefAnswers: [
       { label: "Product", value: "Wireless earbuds" },
