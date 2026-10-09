@@ -79,6 +79,37 @@ Also in Supabase:
    - Copy the **Signing secret** (`whsec_…`).
 4. To test on your computer, use the Stripe CLI: `stripe listen --forward-to localhost:3000/api/stripe/webhook`
    (it prints a `whsec_…` for local use). Test card: `4242 4242 4242 4242`, any future date, any CVC.
+5. In production use a **restricted key** (`rk_…`) rather than the full secret key: write access to Checkout Sessions,
+   Customers, Invoices, Invoice Items and Subscriptions, read access to Tax settings.
+
+## 2b. Invoices and tax (DT A I, Bulgaria → US clients)
+
+Keplerbay is the brand; the seller on every invoice and receipt is **DT A I**, a Bulgarian company. The code does its
+part (`src/lib/stripe-tax.ts`, `src/lib/invoices.ts`); the rest are account settings only you can set:
+
+1. **Settings → Business → Public details**: legal name **DT A I**, the Sofia address, support email
+   `info@keplerbay.com`, statement descriptor (e.g. `KEPLERBAY`). This is the header of every invoice.
+2. **Settings → Billing → Invoices**: the number prefix and sequential numbering, the default footer, and the Bulgarian
+   company / VAT numbers on the invoice (**Settings → Tax → Tax IDs**, or the template's custom fields). Ask your
+   accountant whether Stripe's invoices meet Bulgarian invoicing rules (ЗДДС - numbering, required fields, language) or
+   whether your accounting software must also issue its own invoice for each payment.
+3. **Tax → Settings**: head office address (Sofia, Bulgaria), default tax behavior **exclusive**, and a preset product
+   tax code. Pick the code with your tax advisor from Stripe's list (https://docs.stripe.com/tax/tax-codes, and
+   https://docs.stripe.com/tax/ai for AI services) - or set `STRIPE_TAX_CODE`.
+4. **Tax → Locations → Add registration**: record every registration you actually hold - Bulgarian VAT, and any US
+   state where your advisor says you must collect. Adding one in Stripe does not register you with the authority.
+   **Threshold monitoring** (Tax → Locations → Needs attention) warns as your US sales near a state's economic-nexus
+   threshold; in eligible states Stripe can register for you ("Register for me").
+5. Only then set `STRIPE_TAX_ENABLED=true`. With it on, every checkout and team invoice is taxed on the client's billing
+   address. Where there is no registration Stripe collects **zero, silently** - check a sandbox checkout's tax breakdown
+   first (`taxability_reason` must not be `not_collecting`).
+
+What the site does either way: every checkout uses the client's one Stripe customer, collects their billing address and
+lets a business enter its tax ID (without one, Stripe treats the buyer as a consumer); prices are quoted before tax; a
+one-time payment (a video, a change request) gets a Stripe **invoice** (subscriptions get one each period); `/account`
+lists every invoice with its tax, the hosted page and the PDF; and the team bills a **custom quote** from the Clients
+tab → client → Invoices (`/api/team/invoices`) - Stripe emails it and the client pays on Stripe's page. Turn on
+**Settings → Billing → Customer emails** for receipts and invoice emails.
 
 ## 3. Environment variables
 
@@ -90,6 +121,8 @@ NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=...
 SUPABASE_SERVICE_ROLE_KEY=...      # secret - server only, never NEXT_PUBLIC
 STRIPE_SECRET_KEY=sk_test_...
 STRIPE_WEBHOOK_SECRET=whsec_...
+STRIPE_TAX_ENABLED=false           # true only once Stripe Tax has a head office address and registrations (step 2b)
+STRIPE_TAX_CODE=                   # optional: the product tax code your tax advisor picks (else the account preset)
 RESEND_API_KEY=...                 # emails to the team when a project is submitted
 ```
 

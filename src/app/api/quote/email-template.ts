@@ -75,7 +75,7 @@ export function buildQuoteEmailHtml(input: QuoteEmailInput): string {
       <div style="max-width:720px;margin:0 auto;border-radius:22px;overflow:hidden;background:#ffffff;border:1px solid rgba(15,23,42,0.10);box-shadow:0 24px 70px rgba(15,23,42,0.12);">
         <div style="padding:24px 22px 20px;background:linear-gradient(135deg,#db4e4e 0%,#6b3f9a 100%);">
           <div style="font-family:${FONT};letter-spacing:-0.02em;color:#ffffff;">
-            <div style="font-size:12px;opacity:0.92;font-weight:800;text-transform:uppercase;letter-spacing:0.14em;">DreamTeam Website</div>
+            <div style="font-size:12px;opacity:0.92;font-weight:800;text-transform:uppercase;letter-spacing:0.14em;">Keplerbay Website</div>
             <div style="margin-top:10px;font-size:24px;font-weight:900;line-height:1.2;">${escapeHtml(input.title)}</div>
             <div style="margin-top:6px;font-size:14px;opacity:0.92;">${escapeHtml(input.subtitle)}</div>
           </div>

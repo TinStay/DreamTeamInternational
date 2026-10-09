@@ -14,6 +14,7 @@ const state = vi.hoisted(() => ({
 const create = vi.hoisted(() => vi.fn(async (...args: [Record<string, unknown>]) => (void args, { id: "cs_req", url: "https://checkout.stripe.com/c/cs_req" })));
 
 vi.mock("@/lib/stripe", () => ({ getStripe: () => ({ checkout: { sessions: { create } } }) }));
+vi.mock("@/lib/stripe-customers", () => ({ customerFor: vi.fn(async () => "cus_test_1") }));
 vi.mock("@/lib/supabase/server", () => ({ createClient: async () => ({ auth: { getUser: async () => ({ data: { user: state.user } }) } }) }));
 vi.mock("@/lib/supabase/admin", () => ({
   createAdminClient: () => ({

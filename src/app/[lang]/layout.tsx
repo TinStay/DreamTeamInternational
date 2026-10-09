@@ -120,13 +120,13 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
     metadataBase: new URL(SITE_URL),
     title: t.seo.home.title,
     description: t.seo.home.description,
-    applicationName: "DreamTeam",
+    applicationName: "Keplerbay",
     alternates: { languages: localeAlternates() },
     openGraph: {
       type: "website",
-      siteName: "DreamTeam",
+      siteName: "Keplerbay",
       locale: OG_LOCALE[locale],
-      images: [{ url: OG_IMAGE_PATH, width: 1200, height: 630, alt: "DreamTeam — AI Video Production" }],
+      images: [{ url: OG_IMAGE_PATH, width: 1200, height: 630, alt: "Keplerbay — AI Video Production" }],
     },
     twitter: { card: "summary_large_image" },
     robots: {

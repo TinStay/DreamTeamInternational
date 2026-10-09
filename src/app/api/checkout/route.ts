@@ -6,6 +6,8 @@ import { createClient } from "@/lib/supabase/server";
 import { hasLiveSubscription } from "@/lib/subscriptions";
 import { createPendingOrder, updateOrder } from "@/lib/orders";
 import { createRateLimiter, isCrossSite } from "@/lib/server/form-guards";
+import { customerFor } from "@/lib/stripe-customers";
+import { INTEGRATION_ID, checkoutTaxAndInvoice, lineTax } from "@/lib/stripe-tax";
 
 // Every checkout writes an order and opens a Stripe session - a handful a minute per client is plenty.
 const isRateLimited = createRateLimiter(60_000, 10);
@@ -38,20 +40,31 @@ export async function POST(request: Request) {
 
   const name = (getDictionary("en").plans.tiers as Record<string, { name: string }>)[spec.planKey]?.name ?? spec.planKey;
   const origin = new URL(request.url).origin;
+  // The client's one Stripe customer: their invoices, billing address and tax ID stay together across purchases.
+  const customer = await customerFor(stripe, auth.user.id, { email: auth.user.email });
+  if (!customer) return NextResponse.json({ error: "not_configured" }, { status: 503 });
   const orderId = await createPendingOrder(spec, auth.user.id, billing);
   const metadata = { user_id: auth.user.id, plan_key: spec.planKey, seconds: String(spec.seconds), purchase_type: spec.oneTime ? "one_time" : "subscription", ...(spec.oneTime ? {} : { billing }), ...(orderId ? { order_id: orderId } : {}) };
 
+  const mode = spec.oneTime ? "payment" : "subscription";
+  const productName = spec.oneTime ? `Keplerbay - ${name} (${spec.seconds} seconds)` : `Keplerbay - ${name}`;
+  const tax = lineTax();
+
   const session = await stripe.checkout.sessions.create({
-    mode: spec.oneTime ? "payment" : "subscription",
-    customer_email: auth.user.email ?? undefined,
+    mode,
+    customer,
     client_reference_id: auth.user.id,
+    integration_identifier: INTEGRATION_ID.packs,
+    // Stripe Tax on the billing address, the client's tax ID, and an invoice for a one-time payment (lib/stripe-tax.ts).
+    ...checkoutTaxAndInvoice(mode, metadata, productName),
     line_items: [
       {
         quantity: 1,
         price_data: {
           currency: "usd",
           unit_amount: spec.amountCents,
-          product_data: { name: spec.oneTime ? `IzI Video - ${name} (${spec.seconds} seconds)` : `IzI Video - ${name}`, description: `${spec.seconds} seconds of AI video` },
+          ...tax.taxBehavior,
+          product_data: { name: productName, description: `${spec.seconds} seconds of AI video`, ...tax.taxCode },
           ...(spec.oneTime ? {} : { recurring: { interval: spec.interval } }),
         },
       },

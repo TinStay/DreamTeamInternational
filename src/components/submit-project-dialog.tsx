@@ -38,7 +38,7 @@ const SAMPLE_CREDITS: CreditSummary = { balance: 120, added: 120, planKey: "crea
 const sumBytes = (files: File[]) => files.reduce((n, f) => n + f.size, 0);
 
 /**
- * "Submit a project": the video order form in a popup - the same four steps as the Dream Team site's form (script, goal,
+ * "Submit a project": the video order form in a popup - the same four steps as the Keplerbay site's form (script, goal,
  * video details, distribution and timing) with a progress bar, ending in Submit instead of the contact screen. Submitting
  * creates the project in the client's account right away (Supabase `projects`, status "Brief received", with everything they
  * answered) and lets our team know by email (with any files they attached). In sample mode nothing is saved: the project is

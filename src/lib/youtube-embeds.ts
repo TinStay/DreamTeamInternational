@@ -24,12 +24,12 @@ export const YOUTUBE_REFERRER_POLICY = "strict-origin-when-cross-origin" as cons
 // Portfolio defaults (used for categories without specific lists yet)
 export const PORTFOLIO_DEFAULT_WIDE: YouTubeEmbed = {
   src: "https://www.youtube-nocookie.com/embed/fznYCs6dvQI",
-  title: "DreamTeam portfolio wide video",
+  title: "Keplerbay portfolio wide video",
 };
 
 export const PORTFOLIO_DEFAULT_SHORT: YouTubeEmbed = {
   src: "https://www.youtube-nocookie.com/embed/ERFq46M0MJQ?si=RLc4e53ViJ_YqjN4",
-  title: "DreamTeam portfolio short video",
+  title: "Keplerbay portfolio short video",
 };
 
 // Construction category (16:9) - store exact embed src with si tokens as provided

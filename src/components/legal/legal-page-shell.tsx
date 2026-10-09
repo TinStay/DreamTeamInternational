@@ -64,7 +64,7 @@ export function LegalPageShell({
                 </p>
                 <span className="h-5 w-px bg-border/40" aria-hidden />
                 <span className="inline-flex items-center rounded-full border border-border/30 bg-background/60 px-2.5 py-1 text-xs text-muted-foreground backdrop-blur">
-                  DreamTeam
+                  Keplerbay
                 </span>
               </div>
             </header>

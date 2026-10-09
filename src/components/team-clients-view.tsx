@@ -7,6 +7,7 @@ import { IconCheck, IconChevronRight, IconLoader2, IconMail, IconSearch, IconTra
 import { ACCOUNT_CARD } from "@/components/account-shell";
 import { StatusChip } from "@/components/project-status-chip";
 import { TeamCreditAdjuster } from "@/components/team-credit-adjuster";
+import { TeamClientInvoices } from "@/components/team-client-invoices";
 import { Input } from "@/components/ui/input";
 import { useLanguage } from "@/lib/i18n/language-context";
 import { formatDateDisplay } from "@/lib/dates";
@@ -152,7 +153,7 @@ function SideTitle({ children }: { children: ReactNode }) {
   return <h3 className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#ff8a1f]">{children}</h3>;
 }
 
-/** One client, full screen: profile + facts on the left; private notes, video time history (+ adjust) and projects on the right. */
+/** One client, full screen: profile + facts on the left; private notes, invoices (bill a custom quote), video time history (+ adjust) and projects on the right. */
 function TeamClientPopup({
   client,
   projects,
@@ -424,6 +425,8 @@ function ClientBody({
               )}
             </ul>
           </div>
+
+          <TeamClientInvoices userId={client.id} sample={sample} />
 
           <div>
             <SideTitle>{c.historyTitle}</SideTitle>

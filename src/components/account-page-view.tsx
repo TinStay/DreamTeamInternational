@@ -17,6 +17,8 @@ import type { ProfileFields } from "@/lib/clients";
 import { EMAIL_PRIMARY } from "@/lib/contact-info";
 import { formatVideoTime } from "@/lib/account-info";
 import { formatPrice } from "@/lib/pricing";
+import { InvoiceList } from "@/components/invoice-list";
+import type { InvoiceSummary } from "@/lib/invoices";
 
 /** The client's latest subscription, as `/account` reads it from `subscriptions` (mirrored from Stripe). */
 export type AccountSubscription = { planKey: string | null; status: string; periodEnd: string | null; cancelAtPeriodEnd: boolean };
@@ -29,9 +31,21 @@ const SECTION_TITLE = "font-heading text-base font-black uppercase tracking-wide
 /**
  * `/account` - Account & subscription, one page (the old View profile is merged in): who is signed in, the account facts,
  * their editable details (`ProfileForm`), their plan and video time (`AccountPlanCard`) with the subscription - status,
- * renewal or end date - and how to delete the account. Sign out lives in the side menu.
+ * renewal or end date - their orders and Stripe invoices (`InvoiceList`), and how to delete the account. Sign out lives in the side menu.
  */
-export function AccountPageView({ info, fields, subscription, orders = [] }: { info: AccountInfo; fields: ProfileFields | null; subscription: AccountSubscription | null; orders?: AccountOrder[] }) {
+export function AccountPageView({
+  info,
+  fields,
+  subscription,
+  orders = [],
+  invoices = [],
+}: {
+  info: AccountInfo;
+  fields: ProfileFields | null;
+  subscription: AccountSubscription | null;
+  orders?: AccountOrder[];
+  invoices?: InvoiceSummary[];
+}) {
   const { t, language } = useLanguage();
   const a = t.account;
   const s = a.subscription;
@@ -158,6 +172,13 @@ export function AccountPageView({ info, fields, subscription, orders = [] }: { i
             </table>
           </div>
         )}
+      </section>
+
+      {/* Every Stripe invoice - one per payment and any the team sent - with its tax, the hosted page and the PDF. */}
+      <section className={`${ACCOUNT_CARD} mt-6 p-6`}>
+        <h2 className={SECTION_TITLE}>{a.invoices.title}</h2>
+        <p className="mt-1.5 max-w-[75ch] text-sm leading-relaxed text-white/50">{a.invoices.hint}</p>
+        <InvoiceList invoices={invoices} />
       </section>
 
       {/* Deleting an account is done by support (it also cancels the plan and removes the files) - see the privacy policy. */}

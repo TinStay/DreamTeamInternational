@@ -19,12 +19,12 @@ export const PHONE_US = {
 
 /** Public email (header copy button). Stays on the old domain - Resend-verified sender/recipient. */
 export const EMAIL_PRIMARY = {
-  href: "mailto:info@dreamteam.technology",
-  label: "info@dreamteam.technology",
+  href: "mailto:info@keplerbay.com",
+  label: "info@keplerbay.com",
 } as const;
 
 /**
- * DreamTeam's Google Business listing ("Dream Team - AI видео реклами и услуги", Sofia). The rating and the
+ * Keplerbay's Google Business listing ("Keplerbay - AI видео реклами и услуги", Sofia). The rating and the
  * review count are the listing's own numbers, read off the place page on 16-09-2026 - there is no key-less way to
  * fetch them live, so update them by hand now and then (TODO(content)).
  */
@@ -36,5 +36,5 @@ export const GOOGLE_REVIEWS = {
   count: 13,
 } as const;
 
-/** DreamTeam on Clutch - the id the official widget (`review-badges.tsx`) is keyed by. */
+/** Keplerbay on Clutch - the id the official widget (`review-badges.tsx`) is keyed by. */
 export const CLUTCH = { companyId: "2617358" } as const;

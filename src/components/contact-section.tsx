@@ -132,7 +132,7 @@ export function ContactSection({
           <JourneyItem index={1} from="right">
             <div className="mb-10 space-y-6">
               <MotionLink
-                href="mailto:info@dreamteam.technology"
+                href="mailto:info@keplerbay.com"
                 className="group flex origin-left cursor-pointer items-center gap-4"
                 whileHover={{ scale: 1.05, transition: HOVER_TRANSITION }}
                 whileTap={{ scale: 0.99, transition: TAP_TRANSITION }}
@@ -144,7 +144,7 @@ export function ContactSection({
                 <div>
                   <div className="text-sm text-muted-foreground">{t.contact.email}</div>
                   <div className="font-semibold text-foreground transition-colors group-hover:text-primary">
-                    info@dreamteam.technology
+                    info@keplerbay.com
                   </div>
                 </div>
               </MotionLink>

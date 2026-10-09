@@ -5,7 +5,7 @@
 
 with me as (select id from auth.users where email = 'you@example.com' limit 1)
 insert into public.projects (user_id, title, kind, status, brief, video_id, duration_seconds, due_date, revisions_total, revisions_used, timeline, format, manager_name, next_step, brief_answers, revisions)
-select me.id, v.title, v.kind, v.status, v.brief, v.video_id, v.duration_seconds, v.due_date::date, v.revisions_total, v.revisions_used, v.timeline::jsonb, v.format, 'Nikolay from IzI Video', v.next_step, v.brief_answers::jsonb, v.revisions::jsonb
+select me.id, v.title, v.kind, v.status, v.brief, v.video_id, v.duration_seconds, v.due_date::date, v.revisions_total, v.revisions_used, v.timeline::jsonb, v.format, 'Nikolay from Keplerbay', v.next_step, v.brief_answers::jsonb, v.revisions::jsonb
 from me, (values
   ('Summer Sale Reel', 'Social Media Ad', 'delivered',
    'A 15-second vertical ad for our summer sale. Bright, fast, product first, with our logo in the last two seconds.',

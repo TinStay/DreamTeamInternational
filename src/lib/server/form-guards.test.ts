@@ -5,7 +5,7 @@ import { EMAIL_RE, clean, cleanMultiline, clientIp, createRateLimiter, escapeHtm
  * The request hygiene every form and payment route leans on: no header injection through a field, no markup in an
  * email, bursts blunted, and no state change from another site riding the visitor's cookies.
  */
-const req = (headers: Record<string, string>, url = "https://www.dreamteamvideo.com/api/subscription") => new Request(url, { method: "POST", headers });
+const req = (headers: Record<string, string>, url = "https://keplerbay.com/api/subscription") => new Request(url, { method: "POST", headers });
 
 describe("clean / cleanMultiline", () => {
   it("strips line breaks and control characters (header injection), trims and caps", () => {
@@ -63,15 +63,15 @@ describe("createRateLimiter", () => {
 
 describe("isCrossSite", () => {
   it("lets our own pages through", () => {
-    expect(isCrossSite(req({ origin: "https://www.dreamteamvideo.com" }))).toBe(false);
+    expect(isCrossSite(req({ origin: "https://keplerbay.com" }))).toBe(false);
     expect(isCrossSite(req({ "sec-fetch-site": "same-origin" }))).toBe(false);
     expect(isCrossSite(req({ origin: "http://localhost:3001" }, "http://localhost:3001/api/checkout"))).toBe(false);
   });
 
   it("refuses another site, a look-alike host, plain http and a garbage origin", () => {
     expect(isCrossSite(req({ origin: "https://evil.example" }))).toBe(true);
-    expect(isCrossSite(req({ origin: "https://www.dreamteamvideo.com.evil.example" }))).toBe(true);
-    expect(isCrossSite(req({ origin: "http://www.dreamteamvideo.com" }))).toBe(true);
+    expect(isCrossSite(req({ origin: "https://keplerbay.com.evil.example" }))).toBe(true);
+    expect(isCrossSite(req({ origin: "http://keplerbay.com" }))).toBe(true);
     expect(isCrossSite(req({ origin: "null" }))).toBe(true);
     expect(isCrossSite(req({ "sec-fetch-site": "cross-site" }))).toBe(true);
     expect(isCrossSite(req({ "sec-fetch-site": "same-site" }))).toBe(true);

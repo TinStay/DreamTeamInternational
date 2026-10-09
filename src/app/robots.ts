@@ -6,7 +6,7 @@ import { SITE_URL } from "@/lib/seo";
  * engines are named as well, so their access is explicit and cannot be
  * lost to a copied blanket rule later: the convention is one plain bot per
  * operator for training, a "SearchBot" for its search index and a "User"
- * agent for live fetches on a person's behalf - all welcome, so DreamTeam
+ * agent for live fetches on a person's behalf - all welcome, so Keplerbay
  * can be found and cited in ChatGPT, Claude, Gemini, Perplexity, Copilot,
  * Meta AI, Apple Intelligence, Mistral and the rest. (Googlebot / Bingbot
  * fall under the "*" rule; `Google-Extended` / `Applebot-Extended` are

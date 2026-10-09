@@ -1,12 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { motion } from "motion/react";
 import { IconChevronDown } from "@tabler/icons-react";
 import { cn } from "@/lib/utils";
-import { brandLogo } from "@/lib/brand-logo";
+import { BrandWordmark } from "@/components/ui/brand-wordmark";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
@@ -58,7 +57,6 @@ export function MegaHeader({
   /** The right-hand controls (theme toggle, copy buttons, quote pill). */
   controls: ReactNode;
 }) {
-  const logo = brandLogo("en");
   // The tab whose list is open (its href), or none.
   const [openTab, setOpenTab] = useState<string | null>(null);
   const open = openTab !== null;
@@ -126,17 +124,9 @@ export function MegaHeader({
         )}
       >
         <div className="flex w-full items-start justify-between gap-6">
-          {/* The IzI Video logo in white on the smoked bar (the file is dark ink, so always inverted). */}
+          {/* The Keplerbay wordmark in white on the smoked bar. */}
           <Link href={logoHref} className="group flex h-[4.25rem] min-w-0 shrink-0 items-center pr-3">
-            <Image
-              src={logo.src}
-              alt={logo.alt}
-              width={logo.width}
-              height={logo.height}
-              sizes="160px"
-              priority
-              className="h-7 w-auto invert xl:h-8"
-            />
+            <BrandWordmark className="text-[1.65rem] text-white xl:text-[1.85rem]" />
           </Link>
 
           {/* Left-aligned beside the logo, one row of tabs at an even gap, the groups split by thin vertical lines. Only a

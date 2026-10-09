@@ -7,7 +7,7 @@ import { CLUTCH, GOOGLE_REVIEWS } from "@/lib/contact-info";
 import { cn } from "@/lib/utils";
 
 /*
- * The two review badges the footer shows: DreamTeam's Google rating (the
+ * The two review badges the footer shows: Keplerbay's Google rating (the
  * place's own numbers, kept by hand in `lib/contact-info.ts` - there is no
  * key-less way to read them live) linking to the reviews on Google, and the
  * official Clutch widget (their `widget.js` fills a `.clutch-widget` div with
@@ -33,7 +33,7 @@ function GoogleG({ className }: { className?: string }) {
   );
 }
 
-/** DreamTeam's Google rating: the G, the stars, the rating and the count, linking to the reviews. */
+/** Keplerbay's Google rating: the G, the stars, the rating and the count, linking to the reviews. */
 /** `mobileLarge`: a size up below sm - the contact sections' full-width card (the footer keeps the compact one). */
 export function GoogleReviewsBadge({
   label,
