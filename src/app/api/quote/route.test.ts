@@ -124,7 +124,7 @@ describe("POST /api/quote", () => {
     };
     expect(email.subject).toBe("Заявка за видео - Тест Тестов");
     expect(email.replyTo).toBe("test@example.com");
-    expect(email.to).toEqual(["info@keplerbay.com"]);
+    expect(email.to).toEqual(["info@dreamteamvideo.com"]);
     // Answers reach the email, with option keys resolved to Bulgarian labels.
     expect(email.text).toContain("Да, имам готов сюжет");
     expect(email.text).toContain("обучение на екипа");

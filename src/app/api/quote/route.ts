@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { teamInbox } from "@/lib/email/send";
 import { Resend } from "resend";
 
 // The site is English only, but the internal email to the team stays in Bulgarian - its labels come from the
@@ -294,7 +295,7 @@ export async function POST(req: Request) {
   const html = buildQuoteEmailHtml(emailInput);
 
   const from = process.env.RESEND_FROM ?? "info@keplerbay.com";
-  const to = ["info@keplerbay.com"];
+  const to = [teamInbox()];
   const attachments = [...scriptFiles, ...refFiles].map((f) => ({
     filename: f.filename,
     content: f.content,

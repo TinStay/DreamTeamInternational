@@ -46,7 +46,7 @@ export function Footer() {
           {/* Brand column */}
           <div className="flex flex-col items-center gap-4 sm:items-start">
             <Link href={homeHref} className="font-heading text-2xl font-bold tracking-tight">
-              <BrandWordmark className="text-2xl text-foreground" />
+              <BrandWordmark className="h-11" />
             </Link>
             <p className="max-w-xs text-sm text-muted-foreground">{f.desc}</p>
             <div className="flex flex-col items-center gap-2.5 text-sm sm:items-start">

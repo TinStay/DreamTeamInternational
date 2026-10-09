@@ -43,11 +43,16 @@ export function TeamClientsView({
   projects,
   sample,
   onOpenProject,
+  openClientId,
+  onOpenClient,
 }: {
   clients: ClientOverview[] | null;
   projects: ClientProject[];
   sample: boolean;
   onOpenProject: (id: string) => void;
+  /** Which client's window is open, when the page drives it (the admin dashboard's payment alert); the view's own otherwise. */
+  openClientId?: string | null;
+  onOpenClient?: (id: string | null) => void;
 }) {
   const { t } = useLanguage();
   const c = t.team.clients;
@@ -55,7 +60,9 @@ export function TeamClientsView({
   const [clients, setClients] = useState(initial ?? []);
   const [query, setQuery] = useState("");
   const [sort, setSort] = useState<Sort>("activity");
-  const [openId, setOpenId] = useState<string | null>(null);
+  const [ownOpenId, setOwnOpenId] = useState<string | null>(null);
+  const openId = openClientId !== undefined ? openClientId : ownOpenId;
+  const setOpenId = onOpenClient ?? setOwnOpenId;
 
   const shown = useMemo(() => {
     const q = query.trim().toLowerCase();

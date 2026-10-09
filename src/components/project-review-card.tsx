@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { safeAvatarUrl } from "@/components/ui/initials-avatar";
+import { notifyProject } from "@/lib/notify-project";
 import { IconCheck, IconLoader2, IconPencil } from "@tabler/icons-react";
 import { useLanguage } from "@/lib/i18n/language-context";
 import { projectFromRow, type ClientProject } from "@/lib/client-projects";
@@ -67,11 +69,14 @@ export function ProjectReviewCard({
       // The request also goes into the thread, so the team sees a client comment waiting for a reply.
       const { data: auth } = await supabase.auth.getUser();
       if (auth.user) {
-        const meta = (auth.user.user_metadata ?? {}) as { full_name?: string; name?: string };
+        const meta = (auth.user.user_metadata ?? {}) as { full_name?: string; name?: string; avatar_url?: string; picture?: string };
+        const avatar = safeAvatarUrl(meta.avatar_url ?? meta.picture);
         const name = meta.full_name || meta.name || auth.user.email?.split("@")[0] || "";
-        await supabase.from("project_comments").insert({ project_id: project.id, user_id: auth.user.id, author_name: name, is_team: false, body: `${p.comments.revisionPrefill}${text}` });
+        await supabase.from("project_comments").insert({ project_id: project.id, user_id: auth.user.id, author_name: name, is_team: false, body: `${p.comments.revisionPrefill}${text}`, ...(avatar ? { author_avatar: avatar } : {}) });
       }
     }
+    // Approved: the client's thank-you (files + rating) and the team's alert; a revision: the team's alert with the note.
+    notifyProject(project.id, action === "approve" ? "approved" : "revision");
     setBusy(null);
     setNote("");
     onDone(projectFromRow(data as Record<string, unknown>), action === "approve" ? r.approvedNotice : r.revisionNotice);

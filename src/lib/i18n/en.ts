@@ -264,6 +264,9 @@ export const en = {
     preview: "Preview",
     subscribe: "Get a subscription",
     oneVideo: "Get one video",
+    carouselLabel: "The kinds of video we make - drag to explore, click to watch",
+    watch: "Watch the video",
+    close: "Close",
     previous: "Previous videos",
     next: "Next videos",
     items: {
@@ -350,7 +353,7 @@ export const en = {
       label: "Your account",
       projects: "Your projects",
       account: "Account & subscription",
-      team: "Team dashboard",
+      team: "Admin dashboard",
       buy: "Buy video time",
       signOut: "Sign out"
     },
@@ -763,9 +766,9 @@ export const en = {
     },
     hiring: {
       eyebrow: "Join our team",
-      title: "We're hiring soon",
-      text: "We're growing. Roles for AI video producers, editors and creative directors will appear here - check back soon.",
-      cta: "Check upcoming options"
+      title: "We're hiring",
+      text: "We're growing. We're looking for AI video filmmakers, marketing, sales and partnership people - see the open roles and apply.",
+      cta: "See open roles"
     }
   },
   // "Powered by the world's best AI" under the packages (`components/ai-partners-section.tsx`).
@@ -775,19 +778,19 @@ export const en = {
     title2: "we use",
     line: "Partnering with global industry leaders to create your videos."
   },
-  // /careers: the roles we will open soon (`components/careers-page-view.tsx`).
+  // /careers: the open roles (`components/careers-page-view.tsx`).
   careers: {
     title: "Careers",
     metaTitle: "Careers | Keplerbay",
     metaDescription:
-      "Join Keplerbay: upcoming roles for a Partnership Manager, AI Video Filmmaker, Marketing Manager and Sales Manager. Fully remote, working with clients in the USA, Europe and worldwide.",
+      "Join Keplerbay: open roles for a Partnership Manager, AI Video Filmmaker, Marketing Manager and Sales Manager. Fully remote, working with clients in the USA, Europe and worldwide.",
     eyebrow: "Careers",
     title1: "Build the future of",
     title2: "AI video with us",
-    lead: "We're growing and opening new roles soon. Here is what's coming - register your interest and we'll write to you the moment a role opens.",
+    lead: "We're growing and hiring now. Here are the open roles - apply and we'll get back to you.",
     tag: "Fully remote",
-    apply: "Register your interest",
-    applySubject: "Career interest: {role}",
+    apply: "Apply now",
+    applySubject: "Application: {role}",
     roles: [
       {
         title: "Partnership Manager",
@@ -817,11 +820,45 @@ export const en = {
   },
   // The team dashboard (/team): every client's projects and the files they submitted.
   team: {
-    metaTitle: "Team dashboard | Keplerbay",
+    metaTitle: "Admin dashboard | Keplerbay",
     eyebrow: "Internal",
     title: "Team",
     title2: "dashboard",
-    menu: "Team dashboard",
+    menu: "Admin dashboard",
+    // The admin area's own interface (`components/admin/`): one Dashboard page.
+    admin: {
+      badge: "Admin",
+      headerButton: "Admin",
+      switchLabel: "Switch dashboard",
+      switchAdmin: "Admin",
+      switchClient: "Client",
+      backToSite: "Back to site",
+      dashboardTitle: "Dashboard",
+      dashboardLead: "Everything that needs the team, at a glance.",
+      lists: { label: "Show", projects: "Projects", clients: "Clients" },
+      inbox: {
+        eyebrow: "Status",
+        live: "Live",
+        waiting: "Waiting for your reply",
+        waitingOne: "project with a client comment waiting for your reply",
+        waitingMany: "projects with a client comment waiting for your reply",
+        replyNow: "Reply now",
+        paymentOne: "Missing payment",
+        paymentMany: "Missing payments",
+        paymentText: "A client's subscription payment failed. Check their plan and get in touch before their video time is affected.",
+        reviewPayment: "Review payment",
+        clear: "All caught up",
+        clearText: "No missing payments and no client waiting for a reply. New activity appears here the moment it arrives.",
+        browseProjects: "Browse projects",
+        alertsTitle: "Alerts",
+        noAlerts: "No alerts - everything is on track.",
+        inReview: "{n} with the client for review",
+        due: "due",
+        tags: { payment: "Payment", reply: "Reply", overdue: "Overdue" },
+        quickTitle: "Quick actions",
+        actions: { payment: "Review the missing payment", reply: "Reply to the next client", projects: "All projects", clients: "All clients", asClient: "See the client view" }
+      }
+    },
     sampleBanner: "Sample data - made up, to preview this page.",
     tabs: { projects: "Projects", clients: "Clients" },
     clients: {
@@ -940,6 +977,14 @@ export const en = {
     manageTitle: "Manage this project",
     manageHint: "Changes save to the client's Your Projects page right away.",
     stage: "Stage",
+    stageHint: "Click a stage to move the project. The client is emailed about it when you save.",
+    currentStage: "Now",
+    detailsTitle: "Details",
+    unsaved: "Unsaved changes",
+    allSaved: "All changes saved",
+    editTimeline: "Edit the timeline",
+    jumpComments: "Comments",
+    jumpDelivery: "Delivery",
     approvedLocked: "The client approved this film on {date}, so the stage stays at Delivered.",
     // The client's change requests and rating, in the project window.
     requests: {
@@ -1011,7 +1056,7 @@ export const en = {
     subtitle: "Every kind of video your brand needs - scripted, produced and delivered by our team. Pick a format, then the plan that fits.",
     getPackage: "Get your package",
     seeExamples: "See examples",
-    compare: "Compare all packages",
+    compare: "Get a package",
     custom: "Need something else? Tell us about it",
     items: {
       socialAds: { title: "Social Media Ads", line: "Reels, TikToks and Shorts that stop the scroll" },
@@ -2916,4 +2961,165 @@ export const en = {
     toggleTheme: "Toggle color theme",
     menu: "Menu",
   },
+  // The emails a project sends (lib/email/project-emails.ts): the client hears about every step of their video, the
+  // team about everything the client does. Placeholders: {title} {name} {client} {left} {total} {date} {kind}.
+  emails: {
+    greeting: "Hi {name},",
+    greetingFallback: "Hi there,",
+    signoff: "The Keplerbay team",
+    preheaderSuffix: " - Keplerbay",
+    reason: "You're getting this email because you have a video project with Keplerbay.",
+    teamReason: "Sent to the Keplerbay team inbox by the project dashboard.",
+    help: "Questions? Reply to this email or write to us in the project's comments.",
+    facts: { project: "Project", stage: "Stage", due: "Due", length: "Length", format: "Format", revisions: "Revisions left", client: "Client", kind: "Request", cost: "Cost" },
+    stageNames: { brief: "Brief", scripting: "Script", production: "Production", review: "Ready for review", delivered: "Delivered" } as Record<string, string>,
+    progress: "Step {step} of 5",
+    buttons: {
+      open: "Open your project",
+      follow: "Follow the progress",
+      approve: "Review & approve",
+      download: "Download your video",
+      rate: "Rate the project",
+      reply: "Read & reply",
+      team: "Open in the team dashboard"
+    },
+    submitted: {
+      subject: "We've got your brief: {title}",
+      eyebrow: "Brief received",
+      title: "Your project is in",
+      intro: "Thanks for sending us {title}. Your brief is with our team now.",
+      body: "Next, we read everything you sent and write the script. You'll get an email from us at every step, and you can follow along in your project at any time."
+    },
+    status: {
+      scripting: {
+        subject: "We're writing the script for {title}",
+        eyebrow: "Script in progress",
+        title: "The script is underway",
+        intro: "We've read your brief for {title} and started writing the script.",
+        body: "We'll share it with you in the project as soon as it's ready. If there's anything you'd like to add, leave a comment on the project."
+      },
+      production: {
+        subject: "{title} is in production",
+        eyebrow: "In production",
+        title: "Your video is in production",
+        intro: "The script for {title} is locked and we're now producing your video.",
+        body: "This is where the visuals, voice and edit come together. We'll email you the moment it's ready for you to review."
+      },
+      reworking: {
+        subject: "We're working on your revision: {title}",
+        eyebrow: "Revision in progress",
+        title: "Your revision is in the works",
+        intro: "Thanks for your notes on {title}. We're making the changes now.",
+        body: "We'll send you the new cut to review as soon as it's ready."
+      },
+      review: {
+        subject: "Your video is ready to review: {title}",
+        eyebrow: "Ready for review",
+        title: "Your video is ready",
+        intro: "{title} is ready for you to watch.",
+        body: "Watch it in your project, then approve it - or tell us what to change. You have {left} of {total} revisions left.",
+        bodyNoRevisions: "Watch it in your project and approve it when you're happy. You've used all your included revisions; you can add another one from the project page."
+      },
+      delivered: {
+        subject: "{title} is delivered",
+        eyebrow: "Delivered",
+        title: "Your video is delivered",
+        intro: "The final files for {title} are ready.",
+        body: "Download them from your project at any time. They're yours to use - with full commercial rights."
+      }
+    },
+    approved: {
+      subject: "Approved - {title} is all yours",
+      eyebrow: "Approved",
+      title: "Thank you for approving",
+      intro: "You approved {title}. The final files are in your project, ready to download.",
+      body: "We'd love to know how it went - it takes less than a minute and helps us make your next video even better."
+    },
+    teamComment: {
+      subject: "New message about {title}",
+      eyebrow: "New message",
+      title: "{name} replied on your project",
+      intro: "There's a new message from the team about {title}:"
+    },
+    request: {
+      approved: {
+        subject: "Your change request was approved: {title}",
+        eyebrow: "Change approved",
+        title: "Your change is approved",
+        intro: "We've approved your request for {title}: {kind}.",
+        body: "The project is updated - you'll see the change on the project page."
+      },
+      declined: {
+        subject: "About your change request: {title}",
+        eyebrow: "Change request",
+        title: "We couldn't make this change",
+        intro: "We weren't able to approve your request for {title}: {kind}.",
+        body: "Any video time you spent on it is back in your account, and a card payment is refunded. Reply to this email if you'd like to talk it through."
+      },
+      note: "A note from the team",
+      kinds: { deadline: "an earlier deadline", duration: "a longer video", format: "another format", revision: "an extra revision" } as Record<string, string>
+    },
+    // A client's subscription (lib/email/subscription-emails.ts). Placeholders: {plan} {from} {date} {client}.
+    subscription: {
+      reason: "You're getting this email because you have a Keplerbay subscription.",
+      facts: { plan: "Plan", billing: "Billing", price: "Price", videoTime: "Video time", renews: "Renews on", endsOn: "Active until", previous: "Previous plan", client: "Client", stripe: "In Stripe" },
+      billing: { monthly: "Monthly", annual: "Annual" } as Record<string, string>,
+      perMonth: "{price} / month",
+      perYear: "{price} / year",
+      videoTimeMonthly: "{time} of video every month",
+      videoTimeAnnual: "{time} of video a year",
+      customPlan: "Custom plan",
+      buttons: { start: "Start a project", manage: "Manage your subscription", resume: "Resume your subscription", plans: "See plans", stripe: "Open in Stripe" },
+      started: {
+        subject: "Welcome to {plan} - your subscription is active",
+        eyebrow: "Subscription active",
+        title: "Welcome to {plan}",
+        intro: "Your {plan} subscription is active, and your video time is in your account.",
+        body: "Start a project whenever you're ready - send us a brief and we'll take it from there. Your video time renews with every billing period."
+      },
+      cancelled: {
+        subject: "Your subscription is cancelled",
+        eyebrow: "Subscription cancelled",
+        title: "Your subscription is cancelled",
+        intro: "We've cancelled your {plan} subscription, as you asked.",
+        body: "It stays active until {date}: you keep your plan and your video time until then, and nothing more will be charged. Changed your mind? You can resume it from your account before that date."
+      },
+      upgraded: {
+        subject: "You've upgraded to {plan}",
+        eyebrow: "Plan upgraded",
+        title: "You're on {plan} now",
+        intro: "Your subscription has moved from {from} to {plan}.",
+        body: "Your new video time applies from your next payment. Thanks for growing with us."
+      },
+      downgraded: {
+        subject: "Your plan has changed to {plan}",
+        eyebrow: "Plan changed",
+        title: "You're on {plan} now",
+        intro: "Your subscription has moved from {from} to {plan}.",
+        body: "The new plan and its video time apply from your next payment."
+      },
+      ended: {
+        subject: "Your subscription has ended",
+        eyebrow: "Subscription ended",
+        title: "Your subscription has ended",
+        intro: "Your {plan} subscription has ended.",
+        body: "Any projects you have with us carry on as before. Whenever you'd like more video, pick a plan or order a single video."
+      },
+      team: {
+        eyebrow: "Subscriptions",
+        started: { subject: "New subscription: {plan} ({client})", title: "{client} subscribed to {plan}" },
+        cancelled: { subject: "Subscription cancelled: {plan} ({client})", title: "{client} cancelled {plan}", note: "Active until {date}." },
+        upgraded: { subject: "Plan upgraded: {from} → {plan} ({client})", title: "{client} upgraded to {plan}" },
+        downgraded: { subject: "Plan downgraded: {from} → {plan} ({client})", title: "{client} moved down to {plan}" },
+        ended: { subject: "Subscription ended: {plan} ({client})", title: "{client}'s {plan} subscription ended" }
+      }
+    },
+    team: {
+      approved: { subject: "Approved: {title} ({client})", title: "{client} approved their video", intro: "{client} approved {title}. The project is now closed and delivered." },
+      revision: { subject: "Revision requested: {title} ({client})", title: "{client} asked for a revision", intro: "{client} asked for changes to {title}:" },
+      comment: { subject: "New comment: {title} ({client})", title: "{client} wrote a comment", intro: "{client} commented on {title}:" },
+      request: { subject: "Change request: {title} ({client})", title: "{client} asked for a change", intro: "{client} asked for {kind} on {title}." },
+      eyebrow: "Client activity"
+    }
+  }
 };

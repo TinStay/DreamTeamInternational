@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { teamInbox } from "@/lib/email/send";
 import { Resend } from "resend";
 
 import {
@@ -101,7 +102,7 @@ export async function POST(req: Request) {
 
   const from = process.env.RESEND_FROM ?? "info@keplerbay.com";
   // Always deliver training/contact inquiries to the main inbox.
-  const to = ["info@keplerbay.com"];
+  const to = [teamInbox()];
 
   const subject = `Website contact${subjectField ? `: ${subjectField}` : ""}`;
   const text = [

@@ -1,107 +1,65 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useMemo, useState } from "react";
 import Link from "next/link";
-import { motion } from "motion/react";
-import { IconArrowRight, IconChevronLeft, IconChevronRight } from "@tabler/icons-react";
+import { IconArrowRight, IconPlayerPlayFilled } from "@tabler/icons-react";
 import { TigerCta } from "@/components/hero-tiger/tiger-cta";
+import { TiltedGridHero, type TiltedGridItem } from "@/components/ui/tilted-grid-hero";
+import { ClipLightbox } from "@/components/projects/story/primitives";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/lib/i18n/language-context";
-import { bunnyMp4Url, bunnyThumbnailUrl, type BunnyVideo } from "@/lib/bunny-stream";
+import { bunnyThumbnailUrl } from "@/lib/bunny-stream";
 import { VIDEO_PACK } from "@/lib/video-pack";
 import { pricingPath } from "@/lib/routes";
+import { PHONE_QUERY, useMediaQuery } from "@/lib/use-media-query";
 
 /** The orange pearl, as ink (the headline). */
 const PEARL_INK =
   "bg-[linear-gradient(115deg,#ff5e00_0%,#ff8a1f_30%,#ffd2a1_48%,#ff9a3c_62%,#ff5e00_100%)] bg-clip-text text-transparent";
 
 /**
- * The English home page's first screen, above the tiger hero and one screen tall: the "Get your AI video pack now"
- * headline in the orange pearl (Archivo, like the hero's) and its line, then a rail of wide 16:9 windows - one per kind of
- * video (`lib/video-pack.ts`) - that scrolls sideways, by swipe / trackpad or the round arrows at its ends (after the
- * client's Higgsfield reference). Each window's film plays muted and looping only while the window is mostly on
- * screen (`PackWindow`) and pauses as soon as it leaves, so one or two play at a time. Under the rail, on the right,
- * the two ways in: "Get a subscription" (the orange pill) or "Get one video" (a plain text link).
+ * The English home page's first screen, above the tiger hero: the "Get your AI video pack now" headline in the orange
+ * pearl and its line, then the kinds of video we make (`lib/video-pack.ts`) as a **curved 3D carousel**
+ * (`ui/tilted-grid-hero.tsx`): the cards stream round the inside of a cylinder, flat in the middle and bending toward
+ * the viewer at the faded ends. It drifts on its own and slows under the pointer; a mouse drag or a swipe turns it (with
+ * a fling), and so does horizontal trackpad scrolling - the page's own vertical scrolling is untouched. A click on a card
+ * plays its film in the lightbox (`ClipLightbox`, with sound and controls); the row of category chips under it does the
+ * same, for the keyboard and screen readers (out of sight until focused). The heading and the two ways in - "Get a
+ * subscription" (the orange pill) or "Get one video" (a plain text link) - are centred above the carousel.
+ *
+ * The cards show each film's poster - every card is cut into 16 facets to curve, so a playing film there would be 16
+ * decoders; the film plays in the lightbox instead.
  */
 export function VideoPackSection() {
   const { t, language } = useLanguage();
   const p = t.videoPack;
-  const railRef = useRef<HTMLDivElement>(null);
-  const [edges, setEdges] = useState({ start: true, end: false });
+  const phone = useMediaQuery(PHONE_QUERY);
+  const [open, setOpen] = useState<number | null>(null);
 
-  // Which arrows make sense: none at the start / the end of the rail.
-  const measure = useCallback(() => {
-    const rail = railRef.current;
-    if (!rail) return;
-    const start = rail.scrollLeft <= 4;
-    const end = rail.scrollLeft + rail.clientWidth >= rail.scrollWidth - 4;
-    setEdges((prev) => (prev.start === start && prev.end === end ? prev : { start, end }));
-  }, []);
-
-  useEffect(() => {
-    const rail = railRef.current;
-    if (!rail) return;
-    const ro = new ResizeObserver(measure);
-    ro.observe(rail);
-    return () => ro.disconnect();
-  }, [measure]);
-
-  // One arrow press moves the rail by about one window.
-  const step = (direction: 1 | -1) => {
-    const rail = railRef.current;
-    if (!rail) return;
-    const card = rail.querySelector<HTMLElement>("[data-pack-window]");
-    const by = card ? card.offsetWidth + 20 : rail.clientWidth * 0.8;
-    rail.scrollBy({ left: direction * by, behavior: "smooth" });
-  };
+  const packs = useMemo(() => VIDEO_PACK.filter((item) => item.clip), []);
+  const items: TiltedGridItem[] = useMemo(
+    () =>
+      packs.map((item) => ({
+        src: bunnyThumbnailUrl(item.clip!),
+        alt: p.items[item.key].title,
+        caption: <PackCaption title={p.items[item.key].title} line={p.items[item.key].line} watch={p.watch} />,
+      })),
+    [packs, p],
+  );
+  const current = open !== null ? packs[open] : null;
 
   return (
-    // `--pack-w` - one window's width - is about half the screen (two windows side by side), and sized by the screen's
-    // height as well, so the whole section stays well within one screen; it starts right under the header.
-    <section
-      id="video-pack"
-      className="relative flex flex-col justify-start overflow-x-clip pt-[5.25rem] pb-10 text-white [--pack-w:min(46vw,38rem,calc((100svh-21rem)*8/9))] max-md:[--pack-w:78vw]"
-    >
-      {/* The heading on the left (centred on phones), its edge on the first window's - the same side margin as the rail. */}
-      <div className="flex w-full flex-col items-center px-[max(1.25rem,3vw)] text-center sm:items-start sm:text-left">
-        <h2
-          className={cn(
-            "font-heading text-[clamp(30px,3.8vw,60px)] font-black uppercase leading-[0.95] tracking-[-0.01em] text-balance",
-            PEARL_INK
-          )}
-        >
+    <section id="video-pack" className="relative flex flex-col justify-start overflow-x-clip pt-[6.75rem] pb-10 text-white sm:pt-[7.5rem]">
+      {/* The heading, centred. */}
+      <div className="flex w-full flex-col items-center px-[max(1.25rem,3vw)] text-center">
+        <h2 className={cn("font-heading text-[clamp(30px,3.8vw,60px)] font-black uppercase leading-[0.95] tracking-[-0.01em] text-balance", PEARL_INK)}>
           {p.title}
         </h2>
-        <p className="mt-3 max-w-[80ch] text-[clamp(13px,0.95vw,15px)] leading-normal text-white/65">{p.subtitle}</p>
+        <p className="mt-3 max-w-[72ch] text-[clamp(13px,0.95vw,15px)] leading-normal text-white/65">{p.subtitle}</p>
       </div>
 
-      <div className="relative mt-6 lg:mt-8">
-        <div
-          ref={railRef}
-          onScroll={measure}
-          // The rail scrolls sideways, which clips it vertically too: it carries room above and (generously) below the windows (and
-          // takes it back with negative margins) so a window lifting on hover and its glow are never cut off.
-          className="flex snap-x snap-proximity scroll-px-[max(1.25rem,3vw)] -mt-5 -mb-20 gap-5 overflow-x-auto scroll-smooth px-[max(1.25rem,3vw)] pt-5 pb-24 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-        >
-          {VIDEO_PACK.map((item, index) => (
-            <PackWindow
-              key={item.key}
-              index={index}
-              clip={item.clip}
-              title={p.items[item.key].title}
-              line={p.items[item.key].line}
-            />
-          ))}
-        </div>
-
-        {/* The arrows sit over the rail's ends, on the windows' middle (16:9 of the window's width). */}
-        <RailArrow side="left" hidden={edges.start} label={p.previous} onClick={() => step(-1)} />
-        <RailArrow side="right" hidden={edges.end} label={p.next} onClick={() => step(1)} />
-      </div>
-
-      {/* The two ways in, on the right under the rail: a subscription (the orange pill, the Business plans) or one video
-          (the one-time Personal order, a plain text link beside it - secondary, no pill). */}
-      <div className="relative z-10 mt-5 flex w-full flex-wrap items-center justify-center gap-x-6 gap-y-3 px-[max(1.25rem,3vw)] sm:justify-end">
+      {/* The two ways in, centred above the carousel: a subscription (the orange pill, the Business plans) or one video. */}
+      <div className="relative z-10 mt-5 flex w-full flex-wrap items-center justify-center gap-x-6 gap-y-3 px-[max(1.25rem,3vw)]">
         <TigerCta href={`${pricingPath(language)}?for=business`} label={p.subscribe} className="tiger-cta--orange" />
         <Link
           href={`${pricingPath(language)}?for=individual`}
@@ -111,156 +69,68 @@ export function VideoPackSection() {
           <IconArrowRight className="size-4 shrink-0 text-primary transition-transform duration-200 ease-out group-hover:translate-x-1" aria-hidden />
         </Link>
       </div>
+
+      {/* The curved row: as tall as the screen allows under the heading; a card is about half its height (a third of the
+          width at most), so three cards and the bending ends fit, and the swelling ends stay inside the band. */}
+      <TiltedGridHero
+        items={items}
+        onSelect={setOpen}
+        speed={9}
+        tileHeight={phone ? 66 : 66}
+        maxWidth={phone ? 84 : 42}
+        curve={phone ? 58 : 70}
+        fade={phone ? 6 : 8}
+        gap={8}
+        radius="1rem"
+        aria-label={p.carouselLabel}
+        className="mt-2 h-[clamp(16rem,50svh,26rem)] w-full md:mt-3 md:h-[clamp(22rem,calc(100svh-23rem),48rem)]"
+      />
+
+      {/* The kinds of video as buttons - each plays its film too. The keyboard's and screen readers' way in (the curved row
+          itself is a picture): out of sight, shown only while one of them has focus. */}
+      <ul aria-label={p.carouselLabel} className="sr-only flex-wrap items-center justify-center gap-2 px-[max(1.25rem,3vw)] focus-within:not-sr-only focus-within:mt-2 focus-within:flex">
+        {packs.map((item, index) => (
+          <li key={item.key}>
+            <button
+              type="button"
+              onClick={() => setOpen(index)}
+              className="group inline-flex h-9 cursor-pointer items-center gap-1.5 rounded-full border border-white/12 bg-white/[0.04] px-3.5 text-[13px] font-semibold text-white/70 transition-[transform,border-color,background-color,color] duration-200 ease-out hover:-translate-y-0.5 hover:border-[#ff8a1f]/55 hover:bg-[#ff7a1a]/10 hover:text-white"
+            >
+              <IconPlayerPlayFilled className="size-3 text-[#ff8a1f] transition-transform duration-200 group-hover:scale-125" aria-hidden />
+              {p.items[item.key].title}
+            </button>
+          </li>
+        ))}
+      </ul>
+
+      <ClipLightbox
+        panel={current?.clip ? { clip: current.clip, title: p.items[current.key].title } : null}
+        closeLabel={p.close}
+        onClose={() => setOpen(null)}
+      />
     </section>
   );
 }
 
-function RailArrow({
-  side,
-  hidden,
-  label,
-  onClick,
-}: {
-  side: "left" | "right";
-  hidden: boolean;
-  label: string;
-  onClick: () => void;
-}) {
-  const Icon = side === "left" ? IconChevronLeft : IconChevronRight;
-  return (
-    <button
-      type="button"
-      aria-label={label}
-      onClick={onClick}
-      tabIndex={hidden ? -1 : 0}
-      className={cn(
-        "absolute top-[calc(var(--pack-w)*0.28125)] z-10 hidden size-11 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border border-white/15 bg-black/60 text-white backdrop-blur-md transition-[opacity,transform,background-color] duration-200 ease-out hover:scale-110 hover:bg-black/80 md:flex",
-        side === "left" ? "left-4" : "right-4",
-        hidden && "pointer-events-none opacity-0"
-      )}
-    >
-      <Icon className="size-5" aria-hidden />
-    </button>
-  );
-}
-
 /**
- * One window: the film in a rounded 16:9 frame (its poster until it plays) with a Netflix-style caption on it - the title in Archivo uppercase (orange on hover) and its line, on a black gradient along the bottom.
- * The film is only fetched and played while the frame is at least 60% on screen (the rail's own clipping counts, so a
- * window scrolled off to the side stops too); it pauses where it was when it leaves.
+ * The caption over a card: a black gradient rising from the bottom with the title (Archivo uppercase, orange on hover) and
+ * its line, and a round play mark - sized off the carousel's height (`cqh`), since the card scales with it.
  */
-function PackWindow({
-  index,
-  clip,
-  title,
-  line,
-}: {
-  /** Position in the rail: the windows rise in one after another. */
-  index: number;
-  clip: BunnyVideo | null;
-  title: string;
-  line: string;
-}) {
-  const frameRef = useRef<HTMLDivElement>(null);
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const onScreen = useRef(false);
-  const [src, setSrc] = useState<string | null>(null);
-
-  useEffect(() => {
-    const frame = frameRef.current;
-    if (!frame || !clip) return;
-    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const io = new IntersectionObserver(
-      ([entry]) => {
-        const video = videoRef.current;
-        onScreen.current = entry.isIntersecting && !reduceMotion;
-        if (onScreen.current) {
-          // First time on screen: attach the film (nothing is downloaded before).
-          setSrc((current) => current ?? bunnyMp4Url(clip, 720));
-          void video?.play().catch(() => {});
-        } else {
-          video?.pause();
-        }
-      },
-      { threshold: 0.6 }
-    );
-    io.observe(frame);
-    // The browser pauses a video on a hidden page (another tab): pick it up again when the page comes back.
-    const onVisible = () => {
-      if (document.visibilityState === "visible" && onScreen.current) void videoRef.current?.play().catch(() => {});
-    };
-    document.addEventListener("visibilitychange", onVisible);
-    return () => {
-      io.disconnect();
-      document.removeEventListener("visibilitychange", onVisible);
-    };
-  }, [clip]);
-
-  // The film was just attached (the window came on screen): start it - `play()` is what makes a `preload="none"` video
-  // load at all.
-  useEffect(() => {
-    if (src && onScreen.current) void videoRef.current?.play().catch(() => {});
-  }, [src]);
-
+function PackCaption({ title, line, watch }: { title: string; line: string; watch: string }) {
   return (
-    // The windows rise and fade in one after another as the rail comes into view (once), then lift on hover with a long
-    // ease-out so nothing snaps: the frame rises and glows, the film inside eases a touch closer.
-    <motion.article
-      data-pack-window
-      className="group w-[var(--pack-w)] shrink-0 snap-start"
-      initial={{ opacity: 0, y: 32 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.2 }}
-      transition={{
-        duration: 0.9,
-        delay: Math.min(index, 3) * 0.12,
-        ease: [0.22, 1, 0.36, 1],
-      }}
-    >
-      {/* The hover glow is its own layer behind the frame, and only its opacity changes: the browser fades it on the
-          graphics card, where animating a big box-shadow repainted the frame (and the film in it) on every step. */}
-      <div className="relative isolate">
-        <span
-          aria-hidden
-          className="pointer-events-none absolute inset-x-8 -bottom-3 -z-10 h-2/3 rounded-full bg-[#ff6a14]/45 opacity-0 blur-2xl transition-opacity duration-[800ms] ease-out group-hover:opacity-100"
-        />
-        <div
-          ref={frameRef}
-          className="relative aspect-video transform-gpu overflow-hidden rounded-2xl border border-white/10 bg-[#141518] shadow-[0_24px_60px_-28px_rgba(0,0,0,0.9)] transition-[transform,border-color] duration-[800ms] ease-[cubic-bezier(0.16,1,0.3,1)] will-change-transform group-hover:-translate-y-1.5 group-hover:border-[#ff7a1a]/50"
-        >
-          {clip ? (
-            <video
-              ref={videoRef}
-              src={src ?? undefined}
-              poster={bunnyThumbnailUrl(clip)}
-              muted
-              loop
-              playsInline
-              preload="none"
-              // Whichever comes last - coming on screen or the film being ready - starts it (a play() fired while the
-              // file was still attaching could be lost on the first load).
-              onLoadedData={(event) => {
-                if (onScreen.current) void event.currentTarget.play().catch(() => {});
-              }}
-              className="absolute inset-0 size-full transform-gpu object-cover transition-transform duration-[1400ms] ease-[cubic-bezier(0.16,1,0.3,1)] will-change-transform group-hover:scale-[1.035]"
-            />
-          ) : (
-            <div className="absolute inset-0 bg-[radial-gradient(120%_90%_at_30%_20%,rgba(255,110,20,0.22),transparent_60%)]" />
-          )}
-
-          {/* Netflix-style caption over the film: a black, half-transparent gradient rising from the bottom, the title
-            and its line on it, bottom-left - the line slides up a touch and the title turns orange on hover. */}
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-3/5 bg-[linear-gradient(to_top,rgba(0,0,0,0.88)_0%,rgba(0,0,0,0.55)_45%,rgba(0,0,0,0)_100%)]" />
-          <div className="absolute inset-x-0 bottom-0 p-4 sm:p-5">
-            <h3 className="font-heading text-lg font-black uppercase leading-none tracking-tight transition-colors duration-200 group-hover:text-[#ff8a1f] sm:text-xl lg:text-2xl">
-              {title}
-            </h3>
-            <p className="mt-1.5 max-w-[46ch] text-xs text-white/80 transition-transform duration-300 ease-out group-hover:-translate-y-0.5 sm:text-[13px]">
-              {line}
-            </p>
-          </div>
-        </div>
+    <>
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-3/5 bg-[linear-gradient(to_top,rgba(0,0,0,0.88)_0%,rgba(0,0,0,0.5)_45%,rgba(0,0,0,0)_100%)]" />
+      <div className="pointer-events-none absolute inset-0 rounded-[inherit] ring-1 ring-white/10 ring-inset" />
+      <span className="pointer-events-none absolute top-[5%] right-[3.5%] flex size-[clamp(28px,8cqh,48px)] items-center justify-center rounded-full bg-black/45 text-white ring-1 ring-white/25 backdrop-blur-sm transition-[background-color,transform] duration-300 group-hover/tile:scale-110 group-hover/tile:bg-[#ff6a14]">
+        <IconPlayerPlayFilled className="size-[45%]" aria-hidden />
+        <span className="sr-only">{watch}</span>
+      </span>
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 p-[4%]">
+        <h3 className="font-heading text-[clamp(14px,5cqh,30px)] leading-none font-black tracking-tight uppercase transition-colors duration-200 group-hover/tile:text-[#ff8a1f]">
+          {title}
+        </h3>
+        <p className="mt-[1.2%] max-w-[46ch] text-[clamp(10px,2.1cqh,14px)] text-white/80">{line}</p>
       </div>
-    </motion.article>
+    </>
   );
 }

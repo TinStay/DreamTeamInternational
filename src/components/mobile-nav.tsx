@@ -146,7 +146,7 @@ export function MobileNav() {
             <div className="absolute top-4 left-1/2 -translate-x-1/2 w-12 h-1.5 bg-border/40 rounded-full" />
             <div className="flex flex-col h-full pt-16 pb-8 px-6 overflow-y-auto">
               <div className="flex flex-col items-center mb-8 pb-8 border-b border-border/20">
-                <BrandWordmark className="mb-6 text-4xl text-foreground" />
+                <BrandWordmark className="mb-6 h-12 sm:h-14" />
                 <div className="flex items-center gap-4">
                   {/* English has one theme (`forcedTheme` in the layout), so no toggle there. */}
                   {language === "en" ? null : <ThemeToggle className="shrink-0" />}

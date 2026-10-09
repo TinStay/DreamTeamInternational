@@ -1,9 +1,12 @@
 "use client";
 
 import { PillSelect } from "@/components/ui/pill-select";
-import { useMemo, useState } from "react";
-import { IconAlertTriangle, IconChevronRight, IconClock, IconMessageCircle, IconPaperclip, IconSearch } from "@tabler/icons-react";
-import { AccountShell, ACCOUNT_CARD } from "@/components/account-shell";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { motion } from "motion/react";
+import { IconAlertTriangle, IconChevronRight, IconClock, IconFolderFilled, IconMessageCircle, IconPaperclip, IconSearch, IconUsersGroup } from "@tabler/icons-react";
+import { ACCOUNT_CARD } from "@/components/account-shell";
+import { AdminShell } from "@/components/admin/admin-shell";
+import { InboxCard, hasMissingPayment } from "@/components/admin/inbox-card";
 import { StatusChip } from "@/components/project-status-chip";
 import { TeamProjectPopup } from "@/components/team-project-popup";
 import { TeamClientsView } from "@/components/team-clients-view";
@@ -12,39 +15,74 @@ import { Input } from "@/components/ui/input";
 import { useLanguage } from "@/lib/i18n/language-context";
 import { formatDateDisplay } from "@/lib/dates";
 import { formatVideoTime } from "@/lib/account-info";
+import { scrollToElement } from "@/lib/smooth-scroll";
 import { isApproved, PROJECT_STATUSES, statusLabelOf, type ClientProject, type ProjectStatus } from "@/lib/client-projects";
 import { cn } from "@/lib/utils";
 
 type Filter = "all" | ProjectStatus;
 type Sort = "newest" | "due" | "client";
+export type AdminList = "projects" | "clients";
 
 const today = () => new Date().toISOString().slice(0, 10);
 const isOverdue = (p: ClientProject) => p.status !== "delivered" && !!p.dueDate && p.dueDate.slice(0, 10) < today();
+const EASE = [0.22, 1, 0.36, 1] as const;
 
 /**
- * The team dashboard: numbers on top (how many projects, how many are new, in work, in review, delivered, overdue), a search
- * and status filter, then every client's project as a row - client, stage, due date, length, files attached - and a click
- * opens it full screen with everything the client filled in, their files, and the controls to move it along. The Clients
- * tab (`team-clients-view.tsx`) lists every client - profile, private notes, video time history, projects.
+ * The admin dashboard - one page in its own interface (`AdminShell`), across the whole window: the status card on top
+ * (`InboxCard`: a missing payment first, else the client comments waiting for a reply, with every alert and the quick
+ * actions on its right), the numbers, and then the lists - **Projects** or **Clients**, switched by a chip. Projects: a
+ * search, a stage filter and a sort, then every client's project as a row - client, stage, due date, length, files,
+ * comments - and a click opens it full screen with everything the client filled in and the controls to move it along.
+ * Clients (`team-clients-view.tsx`): every client - profile, private notes, invoices, video time history, projects.
  */
-export function TeamDashboardView({ projects: initial, clients, sample }: { projects: ClientProject[]; clients: ClientOverview[] | null; sample: boolean }) {
+export function TeamDashboardView({
+  projects: initial,
+  clients,
+  sample,
+  initialProjectId = null,
+  initialList = "projects",
+}: {
+  projects: ClientProject[];
+  clients: ClientOverview[] | null;
+  sample: boolean;
+  /** `?project=<id>` - a team alert email's button: the dashboard opens on that project's window. */
+  initialProjectId?: string | null;
+  /** `?view=clients` - which list shows first. */
+  initialList?: AdminList;
+}) {
   const { t } = useLanguage();
   const d = t.team;
+  const a = d.admin;
   const statusLabels = t.account.projectsPage.status as Record<ProjectStatus, string>;
   const [projects, setProjects] = useState(initial);
   const [filter, setFilter] = useState<Filter>("all");
   const [sort, setSort] = useState<Sort>("newest");
   const [query, setQuery] = useState("");
-  const [openId, setOpenId] = useState<string | null>(null);
-  const [tab, setTab] = useState<"projects" | "clients">("projects");
+  const [openId, setOpenId] = useState<string | null>(initialProjectId);
+  // Opened from a Reply button: the window opens on its reply box.
+  const [openFocus, setOpenFocus] = useState<"comments" | null>(null);
+  const [openClientId, setOpenClientId] = useState<string | null>(null);
+  const [list, setList] = useState<AdminList>(initialList);
+  const listRef = useRef<HTMLElement>(null);
+
+  // The list is in the address too, so a reload or a shared link opens it (`?view=clients`).
+  useEffect(() => {
+    const url = new URL(window.location.href);
+    if (list === "projects") url.searchParams.delete("view");
+    else url.searchParams.set("view", list);
+    url.searchParams.delete("project");
+    window.history.replaceState(window.history.state, "", url);
+  }, [list]);
 
   const counts = useMemo(() => {
     const c: Record<ProjectStatus, number> = { brief: 0, scripting: 0, production: 0, review: 0, delivered: 0 };
     for (const p of projects) c[p.status] += 1;
     return c;
   }, [projects]);
-  const overdue = useMemo(() => projects.filter(isOverdue).length, [projects]);
-  const awaiting = useMemo(() => projects.filter((p) => p.awaitingReply).length, [projects]);
+  const overdueList = useMemo(() => projects.filter(isOverdue), [projects]);
+  const overdue = overdueList.length;
+  const waiting = useMemo(() => projects.filter((p) => p.awaitingReply), [projects]);
+  const missing = useMemo(() => (clients ?? []).filter(hasMissingPayment), [clients]);
 
   const shown = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -62,27 +100,53 @@ export function TeamDashboardView({ projects: initial, clients, sample }: { proj
   }, [projects, filter, sort, query]);
 
   const selected = projects.find((p) => p.id === openId) ?? null;
+  const openProject = (id: string, focus: "comments" | null = null) => {
+    setOpenFocus(focus);
+    setOpenId(id);
+  };
+  const openClient = (id: string) => {
+    setList("clients");
+    setOpenClientId(id);
+  };
+  const showList = (next: AdminList) => {
+    setList(next);
+    window.setTimeout(() => scrollToElement(listRef.current, { offset: 88 }), 60);
+  };
+
+  // Overdue reads amber, never red - red is kept for a missing payment.
   const stat = (label: string, value: number, tone?: "warn") => (
-    <div className={cn(ACCOUNT_CARD, "p-5", tone === "warn" && value > 0 && "border-red-400/35")}>
+    <div className={cn(ACCOUNT_CARD, "p-5", tone === "warn" && value > 0 && "border-amber-300/35")}>
       <p className="text-xs font-semibold uppercase tracking-[0.14em] text-white/45">{label}</p>
-      <p className={cn("mt-2 font-heading text-4xl font-black", tone === "warn" && value > 0 ? "text-red-300" : "text-white")}>{value}</p>
+      <p className={cn("mt-2 font-heading text-4xl font-black", tone === "warn" && value > 0 ? "text-amber-200" : "text-white")}>{value}</p>
     </div>
   );
 
   return (
-    <AccountShell>
-      <p className="mt-6 text-xs font-semibold uppercase tracking-[0.18em] text-[#ff8a1f]">{d.eyebrow}</p>
-      <h1 className="mt-3 font-heading text-[clamp(30px,4vw,56px)] leading-[0.98] font-black uppercase text-balance">
-        {d.title} <span className="text-section-accent">{d.title2}</span>
-      </h1>
+    <AdminShell>
       {sample ? (
-        <p className="mt-5 inline-flex items-center gap-2 rounded-full border border-[#ff8a1f]/40 bg-[#ff7a1a]/10 px-4 py-1.5 text-sm text-[#ffb066]">
+        <p className="mb-6 inline-flex items-center gap-2 rounded-full border border-[#ff8a1f]/40 bg-[#ff7a1a]/10 px-4 py-1.5 text-sm text-[#ffb066]">
           <span className="size-1.5 rounded-full bg-[#ff8a1f]" aria-hidden />
           {d.sampleBanner}
         </p>
       ) : null}
 
-      <div className="mt-8 grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
+      <h1 className="font-heading text-[clamp(30px,4vw,56px)] leading-[0.98] font-black uppercase text-balance">{a.dashboardTitle}</h1>
+      <p className="mt-2 text-white/55">{a.dashboardLead}</p>
+
+      <div className="mt-8">
+        <InboxCard
+          waiting={waiting}
+          missing={missing}
+          overdue={overdueList}
+          inReview={counts.review}
+          onReply={(id) => openProject(id, "comments")}
+          onOpenProject={(id) => openProject(id)}
+          onOpenClient={openClient}
+          onShow={showList}
+        />
+      </div>
+
+      <div className="mt-6 grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
         {stat(d.stats.total, projects.length)}
         {stat(d.stats.new, counts.brief)}
         {stat(d.stats.inWork, counts.scripting + counts.production)}
@@ -90,45 +154,53 @@ export function TeamDashboardView({ projects: initial, clients, sample }: { proj
         {stat(d.stats.delivered, counts.delivered)}
         {stat(d.stats.overdue, overdue, "warn")}
       </div>
-      {awaiting > 0 ? (
-        <p className="mt-4 inline-flex items-center gap-2 rounded-full border border-[#ff8a1f]/40 bg-[#ff7a1a]/10 px-4 py-1.5 text-sm text-[#ffb066]">
-          <IconMessageCircle className="size-4" aria-hidden />
-          {d.awaiting.replace("{n}", String(awaiting))}
-        </p>
-      ) : null}
 
-      {/* Projects | Clients. */}
-      <div className="mt-8 inline-flex gap-1 rounded-full border border-white/12 bg-black/30 p-1" role="tablist" aria-label={d.title2}>
-        {(["projects", "clients"] as const).map((key) => (
-          <button
-            key={key}
-            type="button"
-            role="tab"
-            aria-selected={tab === key}
-            onClick={() => setTab(key)}
-            className={cn(
-              "cursor-pointer rounded-full px-5 py-2 text-sm font-semibold transition-[background-color,color,transform] duration-200 ease-out hover:-translate-y-px",
-              tab === key ? "bg-[linear-gradient(115deg,#ff5e00,#ff9a3c)] text-white" : "text-white/60 hover:bg-white/8 hover:text-white"
-            )}
-          >
-            {d.tabs[key]}
-            <span className="ml-1.5 text-xs opacity-70">{key === "projects" ? projects.length : (clients?.length ?? 0)}</span>
-          </button>
-        ))}
-      </div>
+      {/* The lists: Projects or Clients, switched by the chip (the light slides to the chosen one). */}
+      <section ref={listRef} className="mt-10 scroll-mt-24">
+        <div className="inline-flex gap-1 rounded-full border border-white/12 bg-black/40 p-1" role="tablist" aria-label={a.lists.label}>
+          {(["projects", "clients"] as const).map((key) => {
+            const on = list === key;
+            const Icon = key === "projects" ? IconFolderFilled : IconUsersGroup;
+            return (
+              <button
+                key={key}
+                type="button"
+                role="tab"
+                aria-selected={on}
+                onClick={() => setList(key)}
+                className={cn(
+                  "group relative inline-flex h-10 cursor-pointer items-center gap-2 rounded-full px-5 text-sm font-bold transition-[color,transform] duration-200 ease-out hover:-translate-y-px",
+                  on ? "text-white" : "text-white/60 hover:text-white",
+                )}
+              >
+                {on ? (
+                  <motion.span
+                    layoutId="admin-list-light"
+                    className="absolute inset-0 rounded-full bg-[linear-gradient(115deg,#ff5e00,#ff9a3c)] shadow-[0_8px_22px_-8px_rgba(255,106,20,0.9)]"
+                    transition={{ type: "spring", stiffness: 420, damping: 34 }}
+                  />
+                ) : null}
+                <Icon className="relative size-4 transition-transform duration-200 group-hover:scale-110" aria-hidden />
+                <span className="relative">{a.lists[key]}</span>
+                <span className="relative text-xs opacity-70">{key === "projects" ? projects.length : (clients?.length ?? 0)}</span>
+              </button>
+            );
+          })}
+        </div>
 
-      {tab === "clients" ? (
-        <TeamClientsView
-          clients={clients}
-          projects={projects}
-          sample={sample}
-          onOpenProject={(id) => {
-            setTab("projects");
-            setOpenId(id);
-          }}
-        />
-      ) : (
-      <>
+        {list === "clients" ? (
+          <motion.div key="clients" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45, ease: EASE }}>
+            <TeamClientsView
+              clients={clients}
+              projects={projects}
+              sample={sample}
+              onOpenProject={(id) => openProject(id)}
+              openClientId={openClientId}
+              onOpenClient={setOpenClientId}
+            />
+          </motion.div>
+        ) : (
+          <motion.div key="projects" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45, ease: EASE }}>
       {/* Search, stage filter, sort. */}
       <div className="mt-8 flex flex-wrap items-center gap-3">
         <div className="relative min-w-[16rem] flex-1 md:max-w-sm">
@@ -178,7 +250,7 @@ export function TeamDashboardView({ projects: initial, clients, sample }: { proj
                 <li key={p.id}>
                   <button
                     type="button"
-                    onClick={() => setOpenId(p.id)}
+                    onClick={() => openProject(p.id)}
                     className="group grid w-full cursor-pointer grid-cols-1 items-center gap-x-4 gap-y-2 px-5 py-4 text-left transition-colors duration-200 hover:bg-white/[0.04] focus-visible:bg-white/[0.06] focus-visible:outline-none lg:grid-cols-[minmax(0,2.2fr)_minmax(0,1.5fr)_10rem_7rem_7rem_4rem_6rem_2rem]"
                   >
                     <span className="min-w-0">
@@ -218,16 +290,21 @@ export function TeamDashboardView({ projects: initial, clients, sample }: { proj
           </ul>
         )}
       </section>
-      </>
-      )}
+          </motion.div>
+        )}
+      </section>
 
       <TeamProjectPopup
         project={selected}
         sample={sample}
         statusLabels={statusLabels}
-        onClose={() => setOpenId(null)}
+        focus={openFocus}
+        onClose={() => {
+          setOpenId(null);
+          setOpenFocus(null);
+        }}
         onSaved={(next) => setProjects((prev) => prev.map((p) => (p.id === next.id ? next : p)))}
       />
-    </AccountShell>
+    </AdminShell>
   );
 }

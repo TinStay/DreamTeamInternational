@@ -103,6 +103,9 @@ describe("/api/checkout", () => {
     expect(params.line_items[0].price_data.tax_behavior).toBe("exclusive");
     expect(params.invoice_creation.enabled).toBe(true);
     expect(params.invoice_creation.invoice_data.metadata).toEqual(params.metadata);
+    // The Checkout Studio settings: the hosted page, its identifier, promotion codes, consent; submit_type in payment mode only.
+    expect(params).toMatchObject({ ui_mode: "hosted_page", integration_identifier: "hosted_web_0001", origin_context: "web", allow_promotion_codes: true, phone_number_collection: { enabled: false }, consent_collection: { promotions: "auto" }, submit_type: "auto" });
+    expect(params.payment_method_collection).toBeUndefined();
   });
 
   it("turns Stripe Tax on with the flag and leaves the subscription's invoices to Billing", async () => {
@@ -111,6 +114,9 @@ describe("/api/checkout", () => {
     await post({ plan: "creator", billing: "monthly" });
     expect(created().automatic_tax).toEqual({ enabled: true });
     expect(created().invoice_creation).toBeUndefined();
+    // A subscription always saves a payment method for renewals; submit_type is a payment-mode setting.
+    expect(created().payment_method_collection).toBe("always");
+    expect(created().submit_type).toBeUndefined();
     vi.unstubAllEnvs();
   });
 

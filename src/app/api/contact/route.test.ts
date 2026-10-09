@@ -32,7 +32,7 @@ describe("/api/contact", () => {
     const res = await post(valid);
     expect(res.status).toBe(200);
     expect(await res.json()).toEqual({ ok: true, id: "email-1" });
-    expect(send.mock.calls[0][0]).toMatchObject({ to: ["info@keplerbay.com"], replyTo: "ann@example.com" });
+    expect(send.mock.calls[0][0]).toMatchObject({ to: ["info@dreamteamvideo.com"], replyTo: "ann@example.com" });
   });
 
   it("names the missing or invalid fields (422) and sends nothing", async () => {

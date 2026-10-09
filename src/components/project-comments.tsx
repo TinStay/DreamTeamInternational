@@ -1,13 +1,15 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { InitialsAvatar, safeAvatarUrl } from "@/components/ui/initials-avatar";
+import { notifyProject } from "@/lib/notify-project";
 import { IconLoader2, IconSend } from "@tabler/icons-react";
 import { useLanguage } from "@/lib/i18n/language-context";
 import { formatDateDisplay } from "@/lib/dates";
 import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
 
-export type ProjectComment = { id: string; authorName: string; isTeam: boolean; body: string; createdAt: string };
+export type ProjectComment = { id: string; authorName: string; isTeam: boolean; body: string; createdAt: string; /** The author's sign-in picture, if they have one. */ authorAvatar?: string | null };
 
 const fromRow = (r: Record<string, unknown>): ProjectComment => ({
   id: String(r.id),
@@ -15,6 +17,7 @@ const fromRow = (r: Record<string, unknown>): ProjectComment => ({
   isTeam: Boolean(r.is_team),
   body: String(r.body ?? ""),
   createdAt: String(r.created_at ?? ""),
+  authorAvatar: safeAvatarUrl(r.author_avatar),
 });
 
 const when = (iso: string) => `${formatDateDisplay(iso.slice(0, 10))} · ${iso.slice(11, 16)}`;
@@ -82,11 +85,13 @@ export function ProjectComments({
       setPosting(false);
       return;
     }
-    const meta = (auth.user.user_metadata ?? {}) as { full_name?: string; name?: string };
+    const meta = (auth.user.user_metadata ?? {}) as { full_name?: string; name?: string; avatar_url?: string; picture?: string };
     const name = meta.full_name || meta.name || auth.user.email?.split("@")[0] || "";
+    // Their sign-in picture rides along, so the thread shows who wrote it (initials otherwise).
+    const avatar = safeAvatarUrl(meta.avatar_url ?? meta.picture);
     const { data, error: insertError } = await supabase
       .from("project_comments")
-      .insert({ project_id: projectId, user_id: auth.user.id, author_name: name, is_team: asTeam, body: text })
+      .insert({ project_id: projectId, user_id: auth.user.id, author_name: name, is_team: asTeam, body: text, ...(avatar ? { author_avatar: avatar } : {}) })
       .select("*")
       .single();
     setPosting(false);
@@ -96,6 +101,8 @@ export function ProjectComments({
     }
     setComments((prev) => [...(prev ?? []), fromRow(data as Record<string, unknown>)]);
     setBody("");
+    // The team's reply is emailed to the client; the client's comment to the team inbox.
+    notifyProject(projectId, "comment", { commentId: String((data as { id: unknown }).id) });
   }
 
   return (
@@ -110,13 +117,17 @@ export function ProjectComments({
       ) : (
         <ol className="flex flex-col gap-3">
           {comments.map((m) => (
-            <li key={m.id} className={cn("rounded-2xl border p-4", m.isTeam ? "border-[#ff8a1f]/30 bg-[#ff7a1a]/[0.06]" : "border-white/10 bg-white/[0.03]")}>
-              <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1">
-                <span className="text-sm font-semibold">{m.authorName || (m.isTeam ? c.teamName : c.client)}</span>
-                {m.isTeam ? <span className="rounded-full bg-[linear-gradient(115deg,#ff5e00,#ff9a3c)] px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.1em] text-white">{c.teamBadge}</span> : null}
-                <span className="text-xs text-white/40">{when(m.createdAt)}</span>
+            <li key={m.id} className={cn("flex gap-3 rounded-2xl border p-4", m.isTeam ? "border-[#ff8a1f]/30 bg-[#ff7a1a]/[0.06]" : "border-white/10 bg-white/[0.03]")}>
+              {/* Who wrote it: their picture, or their initials. */}
+              <InitialsAvatar name={m.authorName || (m.isTeam ? c.teamName : c.client)} url={m.authorAvatar} tone={m.isTeam ? "team" : "client"} />
+              <div className="min-w-0 flex-1">
+                <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1">
+                  <span className="text-sm font-semibold">{m.authorName || (m.isTeam ? c.teamName : c.client)}</span>
+                  {m.isTeam ? <span className="rounded-full bg-[linear-gradient(115deg,#ff5e00,#ff9a3c)] px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.1em] text-white">{c.teamBadge}</span> : null}
+                  <span className="text-xs text-white/40">{when(m.createdAt)}</span>
+                </div>
+                <p className="mt-1.5 text-sm leading-relaxed whitespace-pre-line text-white/80">{m.body}</p>
               </div>
-              <p className="mt-2 text-sm leading-relaxed whitespace-pre-line text-white/80">{m.body}</p>
             </li>
           ))}
         </ol>

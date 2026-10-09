@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState, type ReactNode } from "react";
+import { notifyProject } from "@/lib/notify-project";
 import Link from "next/link";
 import { AnimatePresence, motion } from "motion/react";
 import {
@@ -126,6 +127,7 @@ export function ProjectChanges({ project, sample = false, open, onOpenChange }: 
     setRequests((prev) => [req, ...prev.filter((r) => !(r.kind === kind && r.status === "awaiting_payment"))]);
     if (req.costSeconds > 0) notifyCreditsChanged();
     if (req.status === "awaiting_payment") return (await pay(req.id)) ? null : c.errors.generic;
+    notifyProject(project.id, "change_request", { requestId: req.id });
     setNotice(c.sent);
     return null;
   }

@@ -126,7 +126,7 @@ export function MegaHeader({
         <div className="flex w-full items-start justify-between gap-6">
           {/* The Keplerbay wordmark in white on the smoked bar. */}
           <Link href={logoHref} className="group flex h-[4.25rem] min-w-0 shrink-0 items-center pr-3">
-            <BrandWordmark className="text-[1.65rem] text-white xl:text-[1.85rem]" />
+            <BrandWordmark priority className="h-7 sm:h-10 xl:h-11" />
           </Link>
 
           {/* Left-aligned beside the logo, one row of tabs at an even gap, the groups split by thin vertical lines. Only a

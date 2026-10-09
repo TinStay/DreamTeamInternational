@@ -23,7 +23,7 @@ const BUTTON =
   "inline-flex h-12 cursor-pointer items-center justify-center rounded-full px-6 text-[15px] font-bold text-white shadow-[0_14px_34px_-14px_rgba(255,106,20,0.85)] transition-[transform,box-shadow] duration-200 ease-out hover:-translate-y-0.5 hover:shadow-[0_18px_40px_-12px_rgba(255,106,20,0.95)]";
 const BUTTON_BG = { background: "linear-gradient(115deg,#ff5e00 0%,#ff8a1f 45%,#ffb066 100%)" };
 
-/** `/careers` - the roles we will open soon (copy in the dictionary under `careers`); each card's button writes to us. */
+/** `/careers` - the open roles (copy in the dictionary under `careers`); each card's button writes to us. */
 export function CareersPageView() {
   const { t } = useLanguage();
   const c = t.careers;

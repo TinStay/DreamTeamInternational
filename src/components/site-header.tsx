@@ -277,7 +277,7 @@ export function SiteHeader() {
       >
         <GlassShell className="flex items-center justify-between gap-3 px-5 py-2.5">
           <Link href={homeHref} className="group flex min-w-0 shrink items-center py-1 pr-2">
-            <BrandWordmark className="text-[1.75rem] text-foreground" />
+            <BrandWordmark priority className="h-7 sm:h-10" />
           </Link>
           {language === "en" ? (
             // English: Log in + Sign up (or the account icon once signed in), like the desktop bar.
@@ -321,7 +321,7 @@ export function SiteHeader() {
           <div className="relative flex w-full items-center justify-between gap-4 py-2.5 lg:gap-6">
             {/* Logo — breathing room via padding so it never touches the bar edges. */}
             <Link href={homeHref} className="group flex min-w-0 items-center justify-self-start py-1 pr-3">
-              <BrandWordmark className="text-3xl text-foreground md:text-[2rem]" />
+              <BrandWordmark priority className="h-10 md:h-11" />
             </Link>
 
             {/* Absolutely centred from xl up; below that it flows from the left.

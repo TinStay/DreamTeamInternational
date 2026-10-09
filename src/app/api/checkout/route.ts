@@ -7,7 +7,7 @@ import { hasLiveSubscription } from "@/lib/subscriptions";
 import { createPendingOrder, updateOrder } from "@/lib/orders";
 import { createRateLimiter, isCrossSite } from "@/lib/server/form-guards";
 import { customerFor } from "@/lib/stripe-customers";
-import { INTEGRATION_ID, checkoutTaxAndInvoice, lineTax } from "@/lib/stripe-tax";
+import { checkoutStudioParams, checkoutTaxAndInvoice, lineTax } from "@/lib/stripe-tax";
 
 // Every checkout writes an order and opens a Stripe session - a handful a minute per client is plenty.
 const isRateLimited = createRateLimiter(60_000, 10);
@@ -54,7 +54,8 @@ export async function POST(request: Request) {
     mode,
     customer,
     client_reference_id: auth.user.id,
-    integration_identifier: INTEGRATION_ID.packs,
+    // The hosted page as set in Checkout Studio (ui_mode, promotion codes, consent, …).
+    ...checkoutStudioParams(mode),
     // Stripe Tax on the billing address, the client's tax ID, and an invoice for a one-time payment (lib/stripe-tax.ts).
     ...checkoutTaxAndInvoice(mode, metadata, productName),
     line_items: [

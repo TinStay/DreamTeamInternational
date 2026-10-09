@@ -5,6 +5,8 @@ import { creditDecision, purchaseFromMetadata, type Purchase } from "@/lib/strip
 import { createAdminClient } from "@/lib/supabase/admin";
 import { saveSubscription } from "@/lib/subscriptions";
 import { updateOrder } from "@/lib/orders";
+import { notifyProjectEvent } from "@/lib/email/project-notifications";
+import { notifySubscriptionEvent } from "@/lib/email/subscription-notifications";
 
 export const runtime = "nodejs";
 
@@ -46,7 +48,7 @@ async function settleOrder(event: Stripe.Event) {
  * A paid change request (an earlier deadline, an extra revision - supabase/changes.sql): once its money is in, it goes from
  * `awaiting_payment` to `requested`, and the team sees it. Returns false on a real failure (Stripe retries).
  */
-async function settleProjectRequest(event: Stripe.Event): Promise<boolean> {
+async function settleProjectRequest(event: Stripe.Event, origin: string): Promise<boolean> {
   if (event.type !== "checkout.session.completed" && event.type !== "checkout.session.async_payment_succeeded") return true;
   const session = event.data.object as Stripe.Checkout.Session;
   const requestId = session.metadata?.request_id;
@@ -59,7 +61,12 @@ async function settleProjectRequest(event: Stripe.Event): Promise<boolean> {
     .eq("id", requestId)
     .eq("user_id", session.metadata?.user_id ?? "")
     .eq("status", "awaiting_payment");
-  return !error;
+  if (error) return false;
+  // Paid: the team hears about the request now (a free one was announced when the client sent it). Once only - the
+  // email's idempotency key is the request's id, so Stripe's retries send nothing new.
+  const projectId = session.metadata?.project_id;
+  if (projectId) await notifyProjectEvent({ id: "stripe-webhook", isTeam: false, system: true }, { projectId, event: "change_request", requestId }, origin);
+  return true;
 }
 
 /**
@@ -89,11 +96,14 @@ export async function POST(request: Request) {
   // The client's plan itself, mirrored so they are never sold a second one (see /api/checkout).
   if (event.type === "customer.subscription.created" || event.type === "customer.subscription.updated" || event.type === "customer.subscription.deleted") {
     const saved = await saveSubscription(event.data.object as Stripe.Subscription);
-    return saved ? NextResponse.json({ received: true }) : NextResponse.json({ error: "subscription_failed" }, { status: 500 });
+    if (!saved) return NextResponse.json({ error: "subscription_failed" }, { status: 500 });
+    // Bought, cancelled, upgraded / downgraded or ended: the client's email and the admin copy (once each; never throws).
+    await notifySubscriptionEvent(stripe, event, new URL(request.url).origin);
+    return NextResponse.json({ received: true });
   }
 
   await settleOrder(event);
-  if (!(await settleProjectRequest(event))) return NextResponse.json({ error: "request_failed" }, { status: 500 });
+  if (!(await settleProjectRequest(event, new URL(request.url).origin))) return NextResponse.json({ error: "request_failed" }, { status: 500 });
 
   // Only money actually collected adds seconds - a failed, pending or unpaid payment never does (`creditDecision`).
   const decision = creditDecision(event);

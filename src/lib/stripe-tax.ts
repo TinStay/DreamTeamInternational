@@ -31,10 +31,29 @@ export const TAX_BEHAVIOR = "exclusive" as const;
 export const INVOICE_FOOTER = `${LEGAL_ENTITY}, trading as ${BRAND_NAME} · Sofia, Bulgaria · ${EMAIL_PRIMARY.label}`;
 
 /**
- * Tags every session in the Dashboard, so the flows can be told apart (Stripe's `integration_identifier`, with a fixed
- * random suffix as Stripe asks).
+ * The hosted Checkout page as configured in Stripe's **Checkout Studio** - every session uses these (see
+ * `STRIPE_INTEGRATION_TODO.md`): the Stripe-hosted page (`hosted_page`, SDK 21+), the Studio's integration identifier,
+ * promotion codes allowed, promotional-email consent asked where the law requires it, no phone number. Two depend on the
+ * mode, as Stripe only accepts them there: `payment_method_collection` (subscriptions - always save a card for
+ * renewals) and `submit_type` (one-time payments). `billing_address_collection: "required"` is the Studio's too; it
+ * lives in `checkoutTaxAndInvoice`, beside the tax settings it also serves.
  */
-export const INTEGRATION_ID = { packs: "keplerbay-packs-qmtrwhzk", requests: "keplerbay-requests-qmtrwhzk" } as const;
+export function checkoutStudioParams(
+  mode: "payment" | "subscription",
+): Pick<
+  Stripe.Checkout.SessionCreateParams,
+  "ui_mode" | "integration_identifier" | "origin_context" | "allow_promotion_codes" | "phone_number_collection" | "consent_collection" | "payment_method_collection" | "submit_type"
+> {
+  return {
+    ui_mode: "hosted_page",
+    integration_identifier: "hosted_web_0001",
+    origin_context: "web",
+    allow_promotion_codes: true,
+    phone_number_collection: { enabled: false },
+    consent_collection: { promotions: "auto" },
+    ...(mode === "subscription" ? { payment_method_collection: "always" as const } : { submit_type: "auto" as const }),
+  };
+}
 
 /**
  * What a Checkout session needs for tax and a proper invoice, for an existing Stripe customer: the billing address is

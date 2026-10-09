@@ -1,12 +1,9 @@
 "use client";
 
-import { motion } from "motion/react";
 import { IconCheck } from "@tabler/icons-react";
 import { useLanguage } from "@/lib/i18n/language-context";
+import { ScrollItem, ScrollStagger } from "@/components/ui/scroll-reveal";
 
-const EASE = [0.22, 1, 0.36, 1] as const;
-/** A soft rise out of a slight blur - the heading's lines and the cards. */
-const REVEAL = { hidden: { opacity: 0, y: 22, filter: "blur(6px)" }, shown: { opacity: 1, y: 0, filter: "blur(0px)" } };
 
 /** One picture per step, in order (`public/process-steps/`): the package, the brief, the set, the screening room. */
 const STEP_IMAGES = ["/process-steps/step-1.jpg", "/process-steps/step-2.jpg", "/process-steps/step-3.jpg", "/process-steps/step-4.jpg"];
@@ -15,8 +12,9 @@ const STEP_IMAGES = ["/process-steps/step-1.jpg", "/process-steps/step-2.jpg", "
  * "How it works" in the English site's style (the home page, right after the packages, and the contact page): a
  * left-aligned heading on the page margin with an orange eyebrow, then the four steps (`process.steps`) as dark cards -
  * each with its own picture (very dark at rest), a big outlined number and the title large in Archivo over its line.
- * On hover a window opens out of the card's middle with the picture coming up and the whole step in it; the cards rise
- * in one after another. Replaces the 3D number badges of `process-section.tsx`.
+ * On hover a window opens out of the card's middle with the picture coming up and the whole step in it. With the
+ * scroll, the heading's lines and then the cards rise in one after another (`ScrollStagger` - transform and opacity
+ * only, no blur, so it stays smooth). Replaces the 3D number badges of `process-section.tsx`.
  */
 export function HowItWorksSection() {
   const { t } = useLanguage();
@@ -24,34 +22,37 @@ export function HowItWorksSection() {
 
   return (
     <section id="process" className="relative px-[max(1.25rem,3vw)] py-12 text-white sm:py-16">
-      {/* The heading settles in line by line - eyebrow, title, line - before the cards follow. */}
-      <motion.header className="max-w-3xl" initial="hidden" whileInView="shown" viewport={{ once: true, amount: 0.5 }} transition={{ staggerChildren: 0.1 }}>
-        <motion.p variants={REVEAL} transition={{ duration: 0.7, ease: EASE }} className="text-xs font-semibold uppercase tracking-[0.18em] text-[#ff8a1f]">
-          {p.eyebrow}
-        </motion.p>
-        <motion.h2 variants={REVEAL} transition={{ duration: 0.8, ease: EASE }} className="mt-3 font-heading text-[clamp(30px,3.8vw,60px)] font-black uppercase leading-[0.95] tracking-[-0.01em] text-balance">
-          {p.title1} <span className="text-section-accent">{p.title2}</span>
-        </motion.h2>
-        <motion.p variants={REVEAL} transition={{ duration: 0.8, ease: EASE }} className="mt-4 max-w-[62ch] text-[clamp(15px,1.15vw,18px)] leading-relaxed text-white/65">
-          {p.subtitle}
-        </motion.p>
-      </motion.header>
+      {/* The heading rises in line by line - eyebrow, title, line - with the scroll, before the cards follow. */}
+      <ScrollStagger start={1} until={0.55}>
+        <header className="max-w-3xl">
+          <ScrollItem index={0} count={3}>
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#ff8a1f]">{p.eyebrow}</p>
+          </ScrollItem>
+          <ScrollItem index={1} count={3}>
+            <h2 className="mt-3 font-heading text-[clamp(30px,3.8vw,60px)] font-black uppercase leading-[0.95] tracking-[-0.01em] text-balance">
+              {p.title1} <span className="text-section-accent">{p.title2}</span>
+            </h2>
+          </ScrollItem>
+          <ScrollItem index={2} count={3}>
+            <p className="mt-4 max-w-[62ch] text-[clamp(15px,1.15vw,18px)] leading-relaxed text-white/65">{p.subtitle}</p>
+          </ScrollItem>
+        </header>
+      </ScrollStagger>
 
-      <div className="relative mt-10 lg:mt-14">
+      <ScrollStagger className="relative mt-10 lg:mt-14" start={1} until={0.3}>
         <ol className="relative grid grid-cols-1 items-stretch gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {p.steps.map((step, index) => {
             return (
-              <motion.li
+              <ScrollItem
+                as="li"
+                index={index}
+                count={p.steps.length}
                 key={step.title}
                 // The card keeps its place and height (nothing below ever moves). On hover / focus a larger window grows
                 // out of its centre in every direction and comes to the front, over its neighbours, with the whole step in
                 // it. On a screen without hover the details are simply shown inside the card.
                 tabIndex={0}
                 className="group relative rounded-2xl outline-none hover:z-30 focus-visible:z-30 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#ff8a1f] focus-within:z-30"
-                initial={{ opacity: 0, y: 36, scale: 0.97, filter: "blur(8px)" }}
-                whileInView={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
-                viewport={{ once: true, amount: 0.25 }}
-                transition={{ duration: 0.9, delay: 0.14 * index, ease: EASE }}
               >
                 <div className="relative flex h-full flex-col overflow-hidden rounded-2xl border border-white/10 bg-[linear-gradient(160deg,#1c1d22_0%,#121316_60%)] p-6 shadow-[0_24px_50px_-30px_rgba(0,0,0,0.9)] lg:items-center lg:text-center">
                   {/* The step's picture, very dark at rest (it only hints at the scene) - it slips away as the window opens. */}
@@ -121,11 +122,11 @@ export function HowItWorksSection() {
                     ))}
                   </ul>
                 </div>
-              </motion.li>
+              </ScrollItem>
             );
           })}
         </ol>
-      </div>
+      </ScrollStagger>
     </section>
   );
 }

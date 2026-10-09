@@ -123,7 +123,8 @@ STRIPE_SECRET_KEY=sk_test_...
 STRIPE_WEBHOOK_SECRET=whsec_...
 STRIPE_TAX_ENABLED=false           # true only once Stripe Tax has a head office address and registrations (step 2b)
 STRIPE_TAX_CODE=                   # optional: the product tax code your tax advisor picks (else the account preset)
-RESEND_API_KEY=...                 # emails to the team when a project is submitted
+RESEND_API_KEY=...                 # project emails: the client hears every step, the team every client action
+TEAM_NOTIFY_EMAIL=                 # optional: where admin emails go (default info@dreamteamvideo.com while testing)
 ```
 
 Without the Stripe keys the pack buttons say payments aren't on yet; without the service key a paid purchase can't be

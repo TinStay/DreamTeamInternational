@@ -7,6 +7,7 @@ import { usePathname } from "next/navigation";
 import { IconChevronRight, IconCoinFilled, IconFolderFilled, IconLayoutDashboardFilled, IconUserFilled } from "@tabler/icons-react";
 import { useState, type ComponentType } from "react";
 import { PlanDetailsDialog } from "@/components/plan-details-dialog";
+import { DashboardSwitch } from "@/components/admin/dashboard-switch";
 import { useMyPlan } from "@/lib/supabase/use-my-plan";
 import { useLanguage } from "@/lib/i18n/language-context";
 import { formatVideoTime } from "@/lib/account-info";
@@ -56,6 +57,8 @@ export function AccountSideNav() {
 
   return (
     <nav aria-label={n.label} className="lg:sticky lg:top-28 lg:self-start">
+      {/* A team account: switch to the admin dashboard and back. */}
+      <DashboardSwitch active="client" className="mb-4" />
       {/* The video time available. */}
       {user ? (
         <button

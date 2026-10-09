@@ -1365,3 +1365,41 @@ html.site-deep .text-section-accent {
     animation: none;
   }
 }
+
+/* The admin Dashboard's inbox card (`components/admin/inbox-card.tsx`): a soft band of light sweeping across it. Literal values only -
+   a keyframe that reads var() never runs on the compositor (see Performance on phones in PROJECT_GUIDE). */
+@keyframes admin-scan {
+  from {
+    transform: translate3d(-120%, 0, 0);
+  }
+  to {
+    transform: translate3d(520%, 0, 0);
+  }
+}
+
+/* The planet loader (`components/ui/planet-loader.tsx`): the light running round the orbit (the dash travels one orbit,
+   2pi x 80), and the planet's bands drifting by one wave (40 units) - literal values only. */
+@keyframes orbit-run {
+  from {
+    stroke-dashoffset: 0;
+  }
+  to {
+    stroke-dashoffset: -502.65;
+  }
+}
+@keyframes orbit-run-head {
+  from {
+    stroke-dashoffset: -20;
+  }
+  to {
+    stroke-dashoffset: -522.65;
+  }
+}
+@keyframes planet-bands {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-40px, 0, 0);
+  }
+}

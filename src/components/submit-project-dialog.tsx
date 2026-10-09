@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useMemo, useState } from "react";
+import { notifyProject } from "@/lib/notify-project";
 import { motion } from "motion/react";
 import { Dialog as DialogPrimitive } from "@base-ui/react/dialog";
 import { IconAlertTriangle, IconArrowRight, IconChevronLeft, IconLoader2, IconSend, IconX } from "@tabler/icons-react";
@@ -191,6 +192,8 @@ export function SubmitProjectDialog({
         });
         if (insertError || !inserted) throw insertError ?? new Error("insert failed");
         project = projectFromRow(inserted as Record<string, unknown>);
+        // The client's "brief received" email.
+        notifyProject(project.id, "submitted");
 
         // Tell the team by email too (no attachments: the files are in the dashboard). The project is already saved,
         // so a failure here changes nothing for the client.

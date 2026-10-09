@@ -74,9 +74,13 @@ export function myProjectsPath(language: Language) {
   return `/${language}/my-projects`;
 }
 
-export function teamPath(language: Language) {
-  return `/${language}/team`;
+/** The admin dashboard (team accounts only) - it was `/team`, which now redirects here. */
+export function adminPath(language: Language) {
+  return `/${language}/admin`;
 }
+
+/** The admin dashboard, by its old name (emails, menus). */
+export const teamPath = adminPath;
 
 export function careersPath(language: Language) {
   return `/${language}/careers`;
@@ -84,4 +88,23 @@ export function careersPath(language: Language) {
 
 export function aboutPath(language: Language) {
   return `/${language}/about`;
+}
+
+/** One of the client's projects, on its own page. */
+export function myProjectPath(language: Language, id: string) {
+  return `/${language}/my-projects/${id}`;
+}
+
+/**
+ * A path to come back to after signing in (`?next=` on the home page, the auth callback): a path on this site only -
+ * starting with one `/`, no scheme, no backslash - or `null`, so the parameter can never bounce a visitor elsewhere.
+ */
+export function safeNextPath(raw: string | null | undefined): string | null {
+  if (!raw || raw.length > 300 || !raw.startsWith("/") || raw.startsWith("//") || raw.includes("\\") || /^\/[^/]*:/.test(raw)) return null;
+  return raw;
+}
+
+/** The home page with the log-in popup open, returning the visitor to `next` once signed in. */
+export function loginPath(language: Language, next: string) {
+  return `${homePath(language)}?login=1&next=${encodeURIComponent(next)}`;
 }

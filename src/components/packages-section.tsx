@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { ScrollItem, ScrollStagger } from "@/components/ui/scroll-reveal";
 import Image from "next/image";
 import Link from "next/link";
 import { IconArrowRight, IconArrowUpRight } from "@tabler/icons-react";
@@ -102,7 +103,8 @@ function PackageFilm({ clip }: { clip: BunnyVideo }) {
  * it plays over the picture while the card is on screen; on hover - or keyboard focus - the picture dims to half black, the
  * name rises and its line and two buttons slide in under it: get the package (the plans) or see examples (the
  * portfolio). On a touch screen, which has no hover, the details are always shown. Under the grid, the two ways on:
- * compare the packages (the orange pill) or ask for something custom.
+ * get a package (the orange pill) or ask for something custom. With the scroll, the cards tip up out of the floor one
+ * after another across the grid (`ScrollStagger` / `ScrollItem variant="flip"`).
  */
 export function PackagesSection() {
   const { t, language } = useLanguage();
@@ -112,18 +114,19 @@ export function PackagesSection() {
 
   return (
     <section id="packages" className="relative px-[max(1.25rem,3vw)] py-12 text-white sm:py-16">
-      <header className="max-w-3xl">
+      <header className="max-w-[min(100%,78rem)]">
         <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#ff8a1f]">{p.eyebrow}</p>
-        <h2 className="mt-3 font-heading text-[clamp(30px,3.8vw,60px)] font-black uppercase leading-[0.95] tracking-[-0.01em] text-balance">
+        <h2 className="mt-3 max-w-[24ch] font-heading text-[clamp(30px,3.8vw,60px)] font-black uppercase leading-[0.95] tracking-[-0.01em] text-balance">
           {p.title1} <span className="text-section-accent">{p.title2}</span>
         </h2>
-        <p className="mt-4 max-w-[62ch] text-[clamp(15px,1.15vw,18px)] leading-relaxed text-white/65">{p.subtitle}</p>
+        <p className="mt-4 max-w-[96ch] text-[clamp(15px,1.15vw,18px)] leading-relaxed text-white/65">{p.subtitle}</p>
       </header>
 
-      <ul className="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:mt-14 lg:grid-cols-3 xl:grid-cols-4">
-        {PACKAGES.map((key) => (
-          <li
-            key={key}
+      <ScrollStagger start={1.05} until={0.2}>
+      <ul className="mt-10 grid grid-cols-1 gap-4 [perspective:1400px] sm:grid-cols-2 lg:mt-14 lg:grid-cols-3 xl:grid-cols-4">
+        {PACKAGES.map((key, index) => (
+          <ScrollItem as="li" key={key} index={index} count={PACKAGES.length} variant="flip">
+          <div
             // Hover / focus-within drive everything inside through `group`; on a device without hover
             // (`[@media(hover:none)]`) the open state is simply the resting one.
             className="group @container relative aspect-video overflow-hidden rounded-2xl border border-white/10 bg-[#141518] shadow-[0_24px_50px_-30px_rgba(0,0,0,0.9)] transition-[transform,border-color,box-shadow] duration-500 ease-out hover:-translate-y-1 hover:border-[#ff7a1a]/45 hover:shadow-[0_30px_60px_-28px_rgba(255,106,20,0.35)] focus-within:border-[#ff7a1a]/45"
@@ -175,9 +178,11 @@ export function PackagesSection() {
                 </div>
               </div>
             </div>
-          </li>
+          </div>
+          </ScrollItem>
         ))}
       </ul>
+      </ScrollStagger>
 
       <div className="mt-10 flex flex-wrap items-center gap-x-6 gap-y-3">
         <TigerCta href={plansHref} label={p.compare} className="tiger-cta--orange" />

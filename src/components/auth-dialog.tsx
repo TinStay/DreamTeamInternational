@@ -5,9 +5,9 @@ import Link from "next/link";
 import { Dialog as DialogPrimitive } from "@base-ui/react/dialog";
 import { IconArrowRight, IconCheck, IconLoader2, IconMail, IconMailCheck, IconX } from "@tabler/icons-react";
 import { useLanguage } from "@/lib/i18n/language-context";
-import { AUTH_EVENT, type AuthMode } from "@/lib/signup-dialog";
+import { AUTH_EVENT, openLogin, type AuthMode } from "@/lib/signup-dialog";
 import { bunny, bunnyMp4Url, bunnyThumbnailUrl } from "@/lib/bunny-stream";
-import { myProjectsPath, privacyPath, termsPath } from "@/lib/routes";
+import { myProjectsPath, privacyPath, safeNextPath, termsPath } from "@/lib/routes";
 import { createClient } from "@/lib/supabase/client";
 import { supabaseConfigured } from "@/lib/supabase/config";
 import { useAuthUser } from "@/lib/supabase/use-auth-user";
@@ -78,12 +78,25 @@ export function AuthDialog() {
   const signup = mode === "signup";
   const copy = signup ? s.signupCopy : s.loginCopy;
 
+  // Where to land once signed in: Your Projects, or the page a signed-out visitor was sent from (`?login=1&next=` - a
+  // button in a project email, see `requireAccount`).
+  const nextRef = useRef<string | null>(null);
+
   useEffect(() => {
     const onOpen = (e: Event) => {
       setMode((e as CustomEvent<AuthMode>).detail === "login" ? "login" : "signup");
       setOpen(true);
     };
     window.addEventListener(AUTH_EVENT, onOpen);
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("login") === "1") {
+      nextRef.current = safeNextPath(params.get("next"));
+      params.delete("login");
+      params.delete("next");
+      const query = params.toString();
+      window.history.replaceState(window.history.state, "", `${window.location.pathname}${query ? `?${query}` : ""}${window.location.hash}`);
+      openLogin();
+    }
     return () => window.removeEventListener(AUTH_EVENT, onOpen);
   }, []);
 
@@ -118,7 +131,7 @@ export function AuthDialog() {
     }
     setStatus({ kind: "busy", provider });
     const supabase = createClient();
-    const redirectTo = `${window.location.origin}/auth/callback?next=${encodeURIComponent(myProjectsPath(language))}`;
+    const redirectTo = `${window.location.origin}/auth/callback?next=${encodeURIComponent(nextRef.current ?? myProjectsPath(language))}`;
 
     if (provider === "email") {
       const { error } = await supabase.auth.signInWithOtp({

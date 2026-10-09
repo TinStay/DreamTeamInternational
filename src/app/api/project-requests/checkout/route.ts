@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createRateLimiter, isCrossSite } from "@/lib/server/form-guards";
 import { customerFor } from "@/lib/stripe-customers";
-import { INTEGRATION_ID, checkoutTaxAndInvoice, lineTax } from "@/lib/stripe-tax";
+import { checkoutStudioParams, checkoutTaxAndInvoice, lineTax } from "@/lib/stripe-tax";
 
 const isRateLimited = createRateLimiter(60_000, 10);
 
@@ -55,7 +55,7 @@ export async function POST(request: Request) {
     mode: "payment",
     customer,
     client_reference_id: auth.user.id,
-    integration_identifier: INTEGRATION_ID.requests,
+    ...checkoutStudioParams("payment"),
     ...checkoutTaxAndInvoice("payment", metadata, productName),
     line_items: [
       {

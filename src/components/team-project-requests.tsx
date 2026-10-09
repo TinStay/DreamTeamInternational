@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { notifyProject } from "@/lib/notify-project";
 import { IconStarFilled } from "@tabler/icons-react";
 import { useLanguage } from "@/lib/i18n/language-context";
 import { formatDateDisplay } from "@/lib/dates";
@@ -54,6 +55,7 @@ export function TeamProjectRequests({ projectId, sample, onApplied }: { projectI
       return;
     }
     setRequests((prev) => (prev ?? []).map((x) => (x.id === req.id ? requestFromRow(data as Record<string, unknown>) : x)));
+    notifyProject(projectId, "request_resolved", { requestId: req.id });
     if (decision === "approve") onApplied();
   }
 
