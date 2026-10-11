@@ -260,11 +260,12 @@ export const en = {
   videoPack: {
     title: "Get your AI video pack now",
     subtitle:
-      "Professional AI videos made by our experienced team - in one click. No credits, no prompting, no learning curve: tell us what you need, and we deliver.",
+      "Professional AI videos made easy. No credits, no prompting, no learning curve. Tell us what you need, and we will deliver it.",
     preview: "Preview",
     subscribe: "Get a subscription",
     oneVideo: "Get one video",
     carouselLabel: "The kinds of video we make - drag to explore, click to watch",
+    vsl: { title: "See how Keplerbay works", length: "2 min", soon: "Video coming soon", play: "Play the video" },
     watch: "Watch the video",
     close: "Close",
     previous: "Previous videos",

@@ -72,7 +72,7 @@ export function organizationGraph(lang: Language) {
         legalName: "DT A I",
         alternateName: ["Keplerbay AI Video Production", "Keplerbay Video"],
         url: SITE_URL,
-        logo: absoluteUrl("/keplerbay-logo-v2.png"),
+        logo: absoluteUrl("/keplerbay-logo-v4.png"),
         image: absoluteUrl(OG_IMAGE_PATH),
         description: t.seo.organizationDescription,
         slogan: t.hero.subtitle,

@@ -33,7 +33,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
       <header className="sticky top-0 z-40 border-b border-white/8 bg-[#060608]/80 backdrop-blur-xl">
         <div className="flex h-16 items-center gap-4 px-[max(1.25rem,2.5vw)]">
           <Link href={homePath(language)} className="flex shrink-0 cursor-pointer items-center gap-3 transition-opacity duration-200 hover:opacity-85">
-            <BrandWordmark priority className="h-7 sm:h-9" />
+            <BrandWordmark priority className="h-8 sm:h-9" />
           </Link>
           <span className="inline-flex items-center gap-1.5 rounded-full border border-[#ff8a1f]/45 bg-[#ff7a1a]/10 px-2.5 py-1 text-[11px] font-black uppercase tracking-[0.18em] text-[#ffb066]">
             <span className="size-1.5 rounded-full bg-[#ff8a1f] shadow-[0_0_8px_#ff8a1f]" />

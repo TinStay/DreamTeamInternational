@@ -10,6 +10,13 @@ import { bunny, type BunnyVideo } from "@/lib/bunny-stream";
 export const VIDEO_PACK_KEYS = ["socialAds", "tvAds", "corporate", "brandCampaigns", "ugc"] as const;
 export type VideoPackKey = (typeof VIDEO_PACK_KEYS)[number];
 
+/**
+ * The video sales letter in the home page's first screen (top right, desktop): `null` shows a branded placeholder
+ * ("video coming soon"); set it to the Bunny clip - `bunny("<guid>")` - and the frame shows its poster and plays it in the
+ * lightbox with sound.
+ */
+export const HOME_VSL: BunnyVideo | null = null;
+
 export const VIDEO_PACK: { key: VideoPackKey; clip: BunnyVideo | null }[] = [
   { key: "socialAds", clip: bunny("b7bd4d28-a15f-46cc-a82e-800d9d4e3ee9") },
   { key: "tvAds", clip: bunny("5b06ab4b-b780-4e11-96fe-571b71dfa9aa") },

@@ -4,15 +4,14 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { IconChevronRight, IconCoinFilled, IconFolderFilled, IconLayoutDashboardFilled, IconUserFilled } from "@tabler/icons-react";
+import { IconChevronRight, IconCoinFilled, IconFolderFilled, IconUserFilled } from "@tabler/icons-react";
 import { useState, type ComponentType } from "react";
 import { PlanDetailsDialog } from "@/components/plan-details-dialog";
 import { DashboardSwitch } from "@/components/admin/dashboard-switch";
 import { useMyPlan } from "@/lib/supabase/use-my-plan";
 import { useLanguage } from "@/lib/i18n/language-context";
 import { formatVideoTime } from "@/lib/account-info";
-import { accountPath, myProjectsPath, pricingPath, teamPath } from "@/lib/routes";
-import { isTeamUser } from "@/lib/team";
+import { accountPath, myProjectsPath, pricingPath } from "@/lib/routes";
 import { useAuthUser } from "@/lib/supabase/use-auth-user";
 import { useCredits } from "@/lib/supabase/use-credits";
 import { cn } from "@/lib/utils";
@@ -21,7 +20,8 @@ type Item = { href: string; label: string; icon: ComponentType<{ className?: str
 
 /**
  * The account pages' side menu: the video time available up top (the balance, a bar against everything added, the
- * plan), then Your projects · Account & subscription · (Team dashboard, for the team) · Buy video time - Sign out lives
+ * plan), then Your projects · Account & subscription · Buy video time (the team reaches the admin dashboard through the
+ * Admin / Client switch on top and the header's Admin button) - Sign out lives
  * in the header's account menu. A sticky column from `lg`; below it, the card and then a row of pills that scrolls
  * sideways under the breadcrumbs. The current page is marked in the orange primary.
  */
@@ -45,7 +45,6 @@ export function AccountSideNav() {
   const items: Item[] = [
     { href: myProjectsPath(language), label: n.projects, icon: IconFolderFilled },
     { href: accountPath(language), label: n.account, icon: IconUserFilled },
-    ...(isTeamUser(user) ? [{ href: teamPath(language), label: n.team, icon: IconLayoutDashboardFilled }] : []),
     { href: pricingPath(language), label: n.buy, icon: IconCoinFilled },
   ];
 
