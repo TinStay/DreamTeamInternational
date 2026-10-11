@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { IconFolder, IconLayoutDashboard, IconLogout, IconUser } from "@tabler/icons-react";
+import { IconFolder, IconFolderFilled, IconLayoutDashboard, IconLogout, IconUser } from "@tabler/icons-react";
 import { AccountMenu } from "@/components/account-menu";
 import { useLanguage } from "@/lib/i18n/language-context";
 import { accountPath, homePath, myProjectsPath, teamPath } from "@/lib/routes";
@@ -29,7 +29,7 @@ export function MobileTopControls() {
             aria-label={t.account.yourProjects}
             className="flex size-10 shrink-0 items-center justify-center rounded-full border border-[#ff8a1f]/60 bg-[#ff7a1a]/[0.1] text-[#ff8a1f] transition-transform active:scale-95"
           >
-            <IconFolder className="size-5" stroke={1.8} aria-hidden />
+            <IconFolderFilled className="size-5" aria-hidden />
           </Link>
           <AccountMenu user={user} />
         </>

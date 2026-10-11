@@ -35,8 +35,8 @@ describe("/auth/callback", () => {
   });
 
   it("stays on the host it was reached on (localhost in development, the live domain in production)", async () => {
-    const res = await GET(new Request("https://www.dreamteamvideo.com/auth/callback?code=abc"));
-    expect(res.headers.get("location")).toBe("https://www.dreamteamvideo.com/en/my-projects");
+    const res = await GET(new Request("https://keplerbay.com/auth/callback?code=abc"));
+    expect(res.headers.get("location")).toBe("https://keplerbay.com/en/my-projects");
   });
 
   it("sends a failed or missing code home with ?auth=error", async () => {

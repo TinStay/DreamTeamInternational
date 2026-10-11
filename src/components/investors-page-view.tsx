@@ -184,7 +184,7 @@ function InterestForm() {
   );
 }
 
-/** `/investors` - investor relations (it took the contact page's place): why KeplerBay, who we would like to hear from,
+/** `/investors` - investor relations (it took the contact page's place): why Keplerbay, who we would like to hear from,
  * what happens next, and the short "I'm interested" form. Copy in the dictionary under `investors`. */
 export function InvestorsPageView() {
   const { t } = useLanguage();

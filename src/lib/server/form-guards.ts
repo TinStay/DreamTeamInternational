@@ -48,9 +48,32 @@ export function createRateLimiter(windowMs: number, max: number) {
   const recentHits = new Map<string, number[]>();
   return function isRateLimited(ip: string, now: number): boolean {
     const windowStart = now - windowMs;
+    // Forget sources that have gone quiet, so a long-lived instance cannot grow the map without end.
+    if (recentHits.size > 5000) {
+      for (const [key, ticks] of recentHits) if (!ticks.some((tick) => tick > windowStart)) recentHits.delete(key);
+    }
     const hits = (recentHits.get(ip) ?? []).filter((tick) => tick > windowStart);
     hits.push(now);
     recentHits.set(ip, hits);
     return hits.length > max;
   };
+}
+
+/**
+ * Whether a state-changing request comes from another site (CSRF). A browser always sends `Origin` on a cross-origin
+ * POST and `Sec-Fetch-Site` on modern engines; a request from our own pages carries our origin. A request with neither
+ * (a server-to-server call, curl) is not a browser riding the visitor's cookies, so it is let through - it still needs
+ * the session cookie to do anything.
+ */
+export function isCrossSite(req: Request): boolean {
+  const origin = req.headers.get("origin");
+  if (origin) {
+    try {
+      return new URL(origin).origin !== new URL(req.url).origin;
+    } catch {
+      return true;
+    }
+  }
+  const site = req.headers.get("sec-fetch-site");
+  return site !== null && site !== "same-origin" && site !== "none";
 }

@@ -2,9 +2,9 @@ export function PrivacyBulgarianContent() {
   return (
     <>
       <p className="not-prose text-[0.9375rem] leading-relaxed text-muted-foreground">
-        Ние от &ldquo;DreamTeam&rdquo;, достъпни на{" "}
-        <a href="https://www.dreamteamvideo.com" className="text-primary underline-offset-4 hover:underline">
-          https://www.dreamteamvideo.com
+        Ние от &ldquo;ДТ А И&rdquo; (търговска марка Keplerbay), достъпни на{" "}
+        <a href="https://keplerbay.com" className="text-primary underline-offset-4 hover:underline">
+          https://keplerbay.com
         </a>
         , уважаваме вашата поверителност и сме ангажирани с опазването на личните ви данни. Настоящата
         политика описва как обработваме информацията, събирана чрез нашия уебсайт.
@@ -14,11 +14,11 @@ export function PrivacyBulgarianContent() {
       <p>Администратор на личните данни, събирани чрез този уебсайт, е:</p>
       <ul>
         <li>
-          <strong>Компания:</strong> DreamTeam
+          <strong>Компания:</strong> ДТ А И (търговска марка Keplerbay), гр. София, България
         </li>
         <li>
           <strong>Имейл за контакт:</strong>{" "}
-          <a href="mailto:info@dreamteam.technology">info@dreamteam.technology</a>
+          <a href="mailto:info@keplerbay.com">info@keplerbay.com</a>
         </li>
         <li>
           <strong>Дейност:</strong> Компания за създаване на видео съдържание с помощта на изкуствен
@@ -119,7 +119,7 @@ export function PrivacyBulgarianContent() {
       <h2>Контакт</h2>
       <p>
         Ако имате въпроси относно тази политика, моля свържете се с нас на:{" "}
-        <a href="mailto:info@dreamteam.technology">info@dreamteam.technology</a>.
+        <a href="mailto:info@keplerbay.com">info@keplerbay.com</a>.
       </p>
     </>
   );

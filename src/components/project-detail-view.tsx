@@ -1,12 +1,10 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState, type CSSProperties, type KeyboardEvent as ReactKeyboardEvent, type PointerEvent as ReactPointerEvent, type ReactNode } from "react";
+import { useCallback, useEffect, useRef, useState, type CSSProperties, type KeyboardEvent as ReactKeyboardEvent, type PointerEvent as ReactPointerEvent } from "react";
 import Link from "next/link";
 import {
   IconArrowLeft,
-  IconAspectRatioFilled,
   IconCalendarFilled,
-  IconCheck,
   IconCircleCheckFilled,
   IconClockFilled,
   IconDownload,
@@ -22,67 +20,30 @@ import { Footer } from "@/components/footer";
 import { GradientBlurPageBg } from "@/components/ui/gradient-blur-bg";
 import { PageBreadcrumbs } from "@/components/page-breadcrumbs";
 import { StatusChip } from "@/components/project-status-chip";
+import { Fact, PEARL_BAR, PEARL_DISC, SectionHead, SideTitle, TimelineView } from "@/components/project-ui";
 import { ProjectComments, type ProjectComment } from "@/components/project-comments";
 import { ProjectReviewCard } from "@/components/project-review-card";
 import { FilmInTheMaking } from "@/components/film-in-the-making";
+import { FormatIcon } from "@/components/format-icon";
+import { ProjectChanges } from "@/components/project-changes";
+import { canRequest, type ChangeKind } from "@/lib/project-changes";
+import { ProjectRating } from "@/components/project-rating";
 import { MAIN_WITH_FIXED_PAGE_BG_CLASS } from "@/lib/page-shell";
 import { useLanguage } from "@/lib/i18n/language-context";
 import { formatDateDisplay } from "@/lib/dates";
 import { formatVideoTime } from "@/lib/account-info";
 import { myProjectsPath } from "@/lib/routes";
 import { scrollToElement } from "@/lib/smooth-scroll";
-import { DELIVERY_BUCKET, formatBytes, progressOf, projectFilm, projectPoster, timelineFor, type ClientProject, type ProjectFile, type ProjectStatus } from "@/lib/client-projects";
+import { DELIVERY_BUCKET, formatBytes, isApproved, progressOf, statusLabelOf, projectFilm, projectPoster, timelineFor, type ClientProject, type ProjectFile, type ProjectStatus } from "@/lib/client-projects";
 import { downloadPrivate, signedUrl } from "@/lib/supabase/storage";
 import { cn } from "@/lib/utils";
 
-const PEARL_BAR = "bg-[linear-gradient(90deg,#ff5e00,#ffb066)]";
-const PEARL_DISC = "bg-[linear-gradient(115deg,#ff5e00,#ff9a3c)]";
 /** The drawer's width: what it opens at, and how far it can be dragged (never more than half the window). */
 const DRAWER = { initial: 440, min: 320, max: 680, step: 24, storageKey: "izi:project-drawer-width" };
 /** Clearance under the floating header when the page scrolls to a section. */
 const HEADER_OFFSET = 112;
 
 const clampWidth = (w: number) => Math.round(Math.min(Math.max(w, DRAWER.min), Math.min(DRAWER.max, Math.floor(window.innerWidth * 0.5))));
-
-function SideTitle({ children }: { children: ReactNode }) {
-  return <h3 className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#ff8a1f]">{children}</h3>;
-}
-
-function SectionHead({ id, title, count, icon }: { id: string; title: string; count?: number; icon: ReactNode }) {
-  return (
-    <h2 id={id} className="mb-4 flex items-center gap-2.5 font-heading text-lg font-black uppercase">
-      <span className="flex size-8 items-center justify-center rounded-lg bg-[#ff7a1a]/12 text-[#ff8a1f]">{icon}</span>
-      {title}
-      {count ? <span className="text-sm font-semibold text-white/40">{count}</span> : null}
-    </h2>
-  );
-}
-
-function Fact({ icon, label, value }: { icon: ReactNode; label: string; value: string }) {
-  return (
-    <div className="flex items-center gap-3 rounded-xl border border-white/8 bg-white/[0.03] p-3">
-      <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-[#ff7a1a]/12 text-[#ff8a1f]">{icon}</span>
-      <div className="min-w-0">
-        <p className="text-xs text-white/45">{label}</p>
-        <p className="text-sm font-semibold break-words">{value}</p>
-      </div>
-    </div>
-  );
-}
-
-/** A step's marker: filled and ticked when done, glowing with a pulse when current, an empty ring ahead. */
-function StepDot({ done, current }: { done: boolean; current: boolean }) {
-  return (
-    <span
-      className={cn(
-        "relative z-10 flex size-[27px] shrink-0 items-center justify-center rounded-full border",
-        done ? cn("border-transparent text-white", PEARL_DISC) : current ? "border-[#ff8a1f] bg-[#ff8a1f]/15 shadow-[0_0_14px_rgba(255,138,31,0.55)]" : "border-white/20 bg-[#141518]"
-      )}
-    >
-      {done ? <IconCheck className="size-3.5" stroke={3} aria-hidden /> : current ? <span className="size-2 animate-pulse rounded-full bg-[#ff8a1f]" aria-hidden /> : null}
-    </span>
-  );
-}
 
 /**
  * One project on its own page (`/my-projects/[id]`), under the site's navbar, with a way back to all projects:
@@ -95,7 +56,18 @@ function StepDot({ done, current }: { done: boolean; current: boolean }) {
  *   comments and the files.
  * The finished film and the files live in private Storage and open through short-lived signed links.
  */
-export function ProjectDetailView({ project: initial, sample = false, seedComments = [] }: { project: ClientProject; sample?: boolean; seedComments?: ProjectComment[] }) {
+export function ProjectDetailView({
+  project: initial,
+  sample = false,
+  seedComments = [],
+  initialAction,
+}: {
+  project: ClientProject;
+  sample?: boolean;
+  seedComments?: ProjectComment[];
+  /** From a "ready for review" email: `revision` opens the revision form at once (`approve` only scrolls to the card). */
+  initialAction?: "approve" | "revision";
+}) {
   const { t, language } = useLanguage();
   const p = t.account.projectsPage;
   const statusLabels = p.status as Record<ProjectStatus, string>;
@@ -104,7 +76,10 @@ export function ProjectDetailView({ project: initial, sample = false, seedCommen
   // The client's own approval or revision request changes the project here before the page is reloaded.
   const [project, setProject] = useState(initial);
   const [notice, setNotice] = useState<string | null>(null);
-  const [revisionOpen, setRevisionOpen] = useState(false);
+  const [revisionOpen, setRevisionOpen] = useState(initialAction === "revision" && initial.status === "review");
+  // The change-request window open (from the cards at the foot of the page, or a fact in the drawer).
+  const [changeOpen, setChangeOpen] = useState<ChangeKind | null>(null);
+  const editOf = (kind: ChangeKind) => (canRequest(project, kind) ? () => setChangeOpen(kind) : undefined);
   const [fileError, setFileError] = useState<string | null>(null);
   const [commentCount, setCommentCount] = useState<number | null>(null);
   const [prefill, setPrefill] = useState("");
@@ -210,19 +185,24 @@ export function ProjectDetailView({ project: initial, sample = false, seedCommen
 
   function applied(next: ClientProject, message: string) {
     setProject(next);
+    // Just approved: the rating card appears at the top - take the client there.
+    if (isApproved(next)) window.setTimeout(() => scrollToElement(document.getElementById("review"), { offset: HEADER_OFFSET }), 350);
     setNotice(message);
     setRevisionOpen(false);
   }
 
-  /** The drawer's "Request a revision": the review card's form on a video in review, a comment otherwise. */
+  /** The drawer's "Request a revision" (shown only in review): opens the review card's form under the film. */
   function requestRevision() {
-    if (project.status === "review") {
-      setRevisionOpen(true);
-      scrollToElement(reviewRef.current, { offset: HEADER_OFFSET });
-    } else {
-      goComments(p.comments.revisionPrefill);
-    }
+    setRevisionOpen(true);
+    scrollToElement(reviewRef.current, { offset: HEADER_OFFSET });
   }
+
+  // Opened from an email's Approve / Request a revision button: bring the review card into view once laid out.
+  useEffect(() => {
+    if (!initialAction) return;
+    const id = window.setTimeout(() => scrollToElement(reviewRef.current, { offset: HEADER_OFFSET }), 400);
+    return () => window.clearTimeout(id);
+  }, [initialAction]);
 
   return (
     <main className={MAIN_WITH_FIXED_PAGE_BG_CLASS}>
@@ -247,14 +227,15 @@ export function ProjectDetailView({ project: initial, sample = false, seedCommen
           {/* The drawer: the most important things. Its width is the client's (drag its edge). */}
           <aside
             style={{ "--drawer": `${width}px` } as CSSProperties}
-            className="flex shrink-0 flex-col gap-6 rounded-3xl border border-white/10 bg-[linear-gradient(180deg,#17181c,#101114)] p-6 lg:w-[var(--drawer)] xl:p-7"
+            data-lenis-prevent
+            className="flex shrink-0 flex-col gap-6 rounded-3xl border border-white/10 bg-[linear-gradient(180deg,#17181c,#101114)] p-6 lg:sticky lg:top-28 lg:max-h-[calc(100svh-8rem)] lg:w-[var(--drawer)] lg:overflow-y-auto lg:overscroll-contain xl:p-7"
           >
             <div>
               <div className="flex flex-wrap items-center gap-2.5">
-                <StatusChip status={project.status} label={statusLabels[project.status]} />
-                <span className="text-xs font-semibold uppercase tracking-[0.14em] text-white/45">{project.kind}</span>
+                <StatusChip status={project.status} label={statusLabelOf(project, statusLabels)} approved={isApproved(project)} />
+                <span className="text-sm font-semibold uppercase tracking-[0.12em] text-white/50">{project.kind}</span>
               </div>
-              <h1 className="mt-3 font-heading text-[clamp(22px,2.2vw,30px)] leading-[1.02] font-black uppercase text-[#ff8a1f]">{project.title}</h1>
+              <h1 className="mt-3 font-heading text-[clamp(24px,2.4vw,34px)] leading-[1.02] font-black uppercase text-[#ff8a1f]">{project.title}</h1>
               {project.approvedAt ? (
                 <p className="mt-2 flex items-center gap-1.5 text-xs font-semibold text-emerald-300">
                   <IconCircleCheckFilled className="size-4" aria-hidden />
@@ -265,18 +246,20 @@ export function ProjectDetailView({ project: initial, sample = false, seedCommen
                 <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-white/10">
                   <div className={cn("h-full rounded-full", PEARL_BAR)} style={{ width: `${progress}%` }} />
                 </div>
-                <span className="text-xs font-semibold text-white/60">{progress}%</span>
+                <span className="text-sm font-semibold text-white/70">{progress}%</span>
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-2.5">
-              <Fact icon={<IconCalendarFilled className="size-6" aria-hidden />} label={p.due} value={project.dueDate ? formatDateDisplay(project.dueDate.slice(0, 10)) : p.tbd} />
-              <Fact icon={<IconClockFilled className="size-6" aria-hidden />} label={p.length} value={project.durationSeconds ? formatVideoTime(project.durationSeconds) : p.tbd} />
-              <Fact icon={<IconAspectRatioFilled className="size-6" aria-hidden />} label={p.format} value={project.format ?? p.tbd} />
+              <Fact icon={<IconCalendarFilled className="size-6" aria-hidden />} label={p.due} value={project.dueDate ? formatDateDisplay(project.dueDate.slice(0, 10)) : p.tbd} onEdit={editOf("deadline")} editLabel={p.changes.edit} />
+              <Fact icon={<IconClockFilled className="size-6" aria-hidden />} label={p.length} value={project.durationSeconds ? formatVideoTime(project.durationSeconds) : p.tbd} onEdit={editOf("duration")} editLabel={p.changes.edit} />
+              <Fact icon={<FormatIcon format={project.format} className="size-6" />} label={p.format} value={project.format ?? p.tbd} onEdit={editOf("format")} editLabel={p.changes.edit} />
               <Fact
                 icon={<IconCircleCheckFilled className="size-6" aria-hidden />}
                 label={p.revisionsLeft}
                 value={p.revisionsLeftValue.replace("{left}", String(left)).replace("{total}", String(project.revisionsTotal))}
+                onEdit={editOf("revision")}
+                editLabel={p.changes.edit}
               />
             </div>
 
@@ -284,12 +267,12 @@ export function ProjectDetailView({ project: initial, sample = false, seedCommen
             {project.briefAnswers.length > 0 || project.brief ? (
               <section>
                 <SideTitle>{p.askedFor}</SideTitle>
-                {project.brief ? <p className="mt-2.5 text-sm leading-relaxed whitespace-pre-line text-white/70">{project.brief}</p> : null}
+                {project.brief ? <p className="mt-2.5 text-[15px] leading-relaxed whitespace-pre-line text-white/75">{project.brief}</p> : null}
                 {project.briefAnswers.length > 0 ? (
                   <dl className="mt-3 divide-y divide-white/8 rounded-xl border border-white/8 bg-white/[0.02]">
                     {project.briefAnswers.map((a) => (
-                      <div key={a.label} className="flex items-start justify-between gap-4 px-3.5 py-2.5 text-sm">
-                        <dt className="shrink-0 text-white/45">{a.label}</dt>
+                      <div key={a.label} className="flex items-start justify-between gap-4 px-3.5 py-2.5 text-[15px]">
+                        <dt className="shrink-0 text-white/50">{a.label}</dt>
                         <dd className="text-right font-medium text-white/85">{a.value}</dd>
                       </div>
                     ))}
@@ -302,7 +285,7 @@ export function ProjectDetailView({ project: initial, sample = false, seedCommen
             <section>
               <div className="flex items-center justify-between">
                 <SideTitle>{p.revisionsTitle}</SideTitle>
-                <span className="text-xs font-semibold text-white/60">
+                <span className="text-sm font-semibold text-white/70">
                   {left} {p.left}
                 </span>
               </div>
@@ -311,7 +294,7 @@ export function ProjectDetailView({ project: initial, sample = false, seedCommen
                   <span
                     key={i}
                     className={cn(
-                      "flex size-6 items-center justify-center rounded-full border text-[11px] font-bold",
+                      "flex size-7 items-center justify-center rounded-full border text-xs font-bold",
                       i < project.revisionsUsed ? cn("border-transparent text-white", PEARL_DISC) : "border-white/25 text-white/40"
                     )}
                   >
@@ -321,10 +304,10 @@ export function ProjectDetailView({ project: initial, sample = false, seedCommen
               </div>
               <ul className="mt-3 flex flex-col gap-1.5">
                 {project.revisionHistory.length === 0 ? (
-                  <li className="text-sm text-white/45">{p.noRevisions}</li>
+                  <li className="text-[15px] text-white/50">{p.noRevisions}</li>
                 ) : (
                   project.revisionHistory.map((r, i) => (
-                    <li key={`${r.title}-${i}`} className="flex items-start gap-2 text-sm text-white/75">
+                    <li key={`${r.title}-${i}`} className="flex items-start gap-2 text-[15px] text-white/80">
                       <IconCircleCheckFilled className={cn("mt-0.5 size-4 shrink-0", r.done ? "text-[#ff8a1f]" : "text-white/25")} aria-hidden />
                       <span>
                         {r.title}
@@ -334,7 +317,8 @@ export function ProjectDetailView({ project: initial, sample = false, seedCommen
                   ))
                 )}
               </ul>
-              {left > 0 && project.status !== "brief" && project.status !== "scripting" ? (
+              {/* A revision is asked for on a film in review only - never once it is approved, delivered or still being made. */}
+              {left > 0 && project.status === "review" ? (
                 <button
                   type="button"
                   onClick={requestRevision}
@@ -353,8 +337,8 @@ export function ProjectDetailView({ project: initial, sample = false, seedCommen
                   <IconUserFilled className="size-[18px]" aria-hidden />
                 </span>
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-semibold">{project.managerName ?? p.teamName}</p>
-                  <p className="text-xs text-white/45">{p.producerLine}</p>
+                  <p className="truncate text-base font-semibold">{project.managerName ?? p.teamName}</p>
+                  <p className="text-sm text-white/50">{p.producerLine}</p>
                 </div>
                 <button
                   type="button"
@@ -394,45 +378,19 @@ export function ProjectDetailView({ project: initial, sample = false, seedCommen
           {/* The content: laid out by its own width, so it follows the drawer. */}
           <div className="@container min-w-0 flex-1">
             <div className="flex flex-col gap-10">
+              {/* Approved: the client's rating of the project comes first (the list's "Leave a review" lands here). */}
+              {isApproved(project) ? <ProjectRating projectId={project.id} userId={project.userId} sample={sample} /> : null}
+
               {/* The timeline: across the content when there is room, down it when there is not. */}
               <section aria-labelledby="project-timeline">
                 <SectionHead id="project-timeline" title={p.tabs.timeline} icon={<IconCalendarFilled className="size-[17px]" aria-hidden />} />
-                <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-5 @3xl:p-7">
-                  {/* Horizontal. */}
-                  <ol className="hidden @3xl:flex">
-                    {steps.map((step, i) => (
-                      <li key={`${step.title}-${i}`} className="relative min-w-0 flex-1 pr-4">
-                        {i < steps.length - 1 ? (
-                          <span aria-hidden className={cn("absolute top-[13px] left-[27px] h-px w-[calc(100%-27px)]", step.done ? "bg-[#ff8a1f]/60" : "bg-white/12")} />
-                        ) : null}
-                        <StepDot done={step.done} current={step.current} />
-                        <p className={cn("mt-3 text-sm font-semibold", step.done || step.current ? "text-white" : "text-white/45")}>{step.title}</p>
-                        {step.date ? <p className="mt-0.5 text-xs text-white/45">{formatDateDisplay(step.date.slice(0, 10))}</p> : null}
-                        {step.note ? <p className="mt-1.5 line-clamp-3 text-xs leading-relaxed text-white/55">{step.note}</p> : null}
-                      </li>
-                    ))}
-                  </ol>
-                  {/* Vertical. */}
-                  <ol className="@3xl:hidden">
-                    {steps.map((step, i) => (
-                      <li key={`${step.title}-${i}`} className="relative flex gap-4 pb-6 last:pb-0">
-                        {i < steps.length - 1 ? <span aria-hidden className={cn("absolute top-7 bottom-0 left-[13px] w-px", step.done ? "bg-[#ff8a1f]/60" : "bg-white/12")} /> : null}
-                        <StepDot done={step.done} current={step.current} />
-                        <div className="min-w-0 pt-0.5">
-                          <p className={cn("text-base font-semibold", step.done || step.current ? "text-white" : "text-white/45")}>{step.title}</p>
-                          {step.date ? <p className="mt-0.5 text-xs text-white/45">{formatDateDisplay(step.date.slice(0, 10))}</p> : null}
-                          {step.note ? <p className="mt-1.5 text-sm leading-relaxed text-white/60">{step.note}</p> : null}
-                        </div>
-                      </li>
-                    ))}
-                  </ol>
-                </div>
+                <TimelineView steps={steps} />
               </section>
 
               {/* What happens next (where we are is the timeline right above). */}
               <div className="rounded-2xl border border-[#ff8a1f]/30 bg-[#ff7a1a]/[0.06] p-5">
                 <SideTitle>{p.nextStep}</SideTitle>
-                <p className="mt-2 text-sm leading-relaxed text-white/85">{project.nextStep ?? p.nextStepDefault}</p>
+                <p className="mt-2 text-base leading-relaxed text-white/90">{project.nextStep ?? p.nextStepDefault}</p>
               </div>
 
               {/* The film - or, until it exists, a picture of it being made. */}
@@ -454,7 +412,7 @@ export function ProjectDetailView({ project: initial, sample = false, seedCommen
               ) : null}
 
               {/* Approve, or request a revision - right under the film. */}
-              {project.status === "review" ? (
+              {project.status === "review" || (project.status === "production" && project.revisionsUsed > 0 && !project.approvedAt) ? (
                 <div ref={reviewRef}>
                   <ProjectReviewCard project={project} sample={sample} revisionOpen={revisionOpen} onRevisionOpen={setRevisionOpen} onDone={applied} />
                 </div>
@@ -463,7 +421,7 @@ export function ProjectDetailView({ project: initial, sample = false, seedCommen
               {/* Comments, under the film. */}
               <section ref={commentsRef} aria-labelledby="project-comments">
                 <SectionHead id="project-comments" title={p.tabs.comments} count={commentCount ?? undefined} icon={<IconMessageFilled className="size-[17px]" aria-hidden />} />
-                <p className="-mt-2 mb-5 text-sm text-white/50">{p.comments.intro}</p>
+                <p className="-mt-2 mb-5 text-[15px] text-white/55">{p.comments.intro}</p>
                 <ProjectComments key={prefillKey} projectId={project.id} sample={sample} prefill={prefill} seed={seedComments} onCount={setCommentCount} />
               </section>
 
@@ -507,6 +465,9 @@ export function ProjectDetailView({ project: initial, sample = false, seedCommen
                   </ul>
                 )}
               </section>
+
+              {/* Change requests - deadline, length, format, revision - last. The drawer's facts open them too. */}
+              <ProjectChanges project={project} sample={sample} open={changeOpen} onOpenChange={setChangeOpen} />
             </div>
           </div>
         </div>

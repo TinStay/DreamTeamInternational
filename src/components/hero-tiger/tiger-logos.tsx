@@ -43,7 +43,7 @@ function Track({ copy = false }: { copy?: boolean }) {
 /** The US flag, simplified for 18px: thirteen stripes and the blue canton with a hint of stars. */
 function FlagUsa() {
   return (
-    <svg viewBox="0 0 19 10" className="h-3 w-auto rounded-[2px]" aria-hidden>
+    <svg viewBox="0 0 19 10" className="h-3.5 w-auto rounded-[2px]" aria-hidden>
       <rect width="19" height="10" fill="#b22234" />
       {[1, 3, 5, 7, 9, 11].map((i) => (
         <rect key={i} y={(i * 10) / 13} width="19" height={10 / 13} fill="#fff" />
@@ -57,7 +57,7 @@ function FlagUsa() {
 /** The EU flag: twelve gold stars in a ring on blue. */
 function FlagEurope() {
   return (
-    <svg viewBox="0 0 15 10" className="h-3 w-auto rounded-[2px]" aria-hidden>
+    <svg viewBox="0 0 15 10" className="h-3.5 w-auto rounded-[2px]" aria-hidden>
       <rect width="15" height="10" fill="#003399" />
       {Array.from({ length: 12 }, (_, i) => {
         const a = (i / 12) * Math.PI * 2;
@@ -70,7 +70,7 @@ function FlagEurope() {
 /** Worldwide: a globe in the orange pearl. */
 function FlagWorld() {
   return (
-    <svg viewBox="0 0 12 12" className="size-3" aria-hidden>
+    <svg viewBox="0 0 12 12" className="size-3.5" aria-hidden>
       <defs>
         <linearGradient id="pearl-globe" x1="0" y1="0" x2="1" y2="1">
           <stop offset="0" stopColor="#ff5e00" />
@@ -100,13 +100,13 @@ export function TigerLogos({
   return (
     <div className="relative pb-[clamp(22px,3.5vh,40px)] max-lg:pb-[5.5rem]" aria-label={label}>
       <p className="text-center text-[13px] tracking-[0.04em] text-white/55">{label}</p>
-      <ul className="mt-2.5 mb-5 flex flex-wrap items-center justify-center gap-2">
+      <ul className="mt-3 mb-5 flex flex-wrap items-center justify-center gap-2.5">
         {(Object.keys(REGION_FLAGS) as (keyof typeof REGION_FLAGS)[]).map((key) => {
           const Flag = REGION_FLAGS[key];
           return (
             <li
               key={key}
-              className="inline-flex items-center gap-1.5 rounded-full border border-white/12 bg-white/[0.05] px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-white/75 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-sm"
+              className="inline-flex items-center gap-2 rounded-full border border-white/12 bg-white/[0.05] px-3.5 py-1.5 text-[13px] font-semibold uppercase tracking-[0.08em] text-white/75 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-sm"
             >
               <Flag />
               {regions[key]}

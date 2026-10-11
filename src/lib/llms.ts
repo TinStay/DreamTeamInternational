@@ -16,7 +16,7 @@ import { SOCIAL_LINKS } from "@/lib/social-links";
 
 /*
  * `/llms.txt` and `/llms-full.txt` - the brief an AI assistant reads to
- * describe KeplerBay (the llms.txt convention: a Markdown index of what the
+ * describe Keplerbay (the llms.txt convention: a Markdown index of what the
  * site is and where its key pages are; the "full" file carries the content
  * itself). Both are rendered from the dictionaries and the project data, so
  * they can never fall behind the pages: the index is the company in one
@@ -33,7 +33,7 @@ const HEADINGS: Record<Language, Record<string, string>> = {
     facts: "Key facts",
     services: "Services",
     cases: "Client case studies",
-    numbers: "KeplerBay in numbers",
+    numbers: "Keplerbay in numbers",
     process: "How we work",
     faq: "Frequently asked questions",
     training: "Training",
@@ -113,7 +113,7 @@ function section(lang: Language, full: boolean) {
 
 function head() {
   return [
-    "# KeplerBay — AI Video Production",
+    "# Keplerbay — AI Video Production",
     "",
     `> ${getDictionary("en").seo.organizationDescription}`,
     "",

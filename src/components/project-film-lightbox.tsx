@@ -6,7 +6,7 @@ import { IconArrowRight, IconLoader2, IconX } from "@tabler/icons-react";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import { StatusChip } from "@/components/project-status-chip";
 import { useLanguage } from "@/lib/i18n/language-context";
-import { DELIVERY_BUCKET, projectFilm, projectPoster, type ClientProject, type ProjectStatus } from "@/lib/client-projects";
+import { DELIVERY_BUCKET, isApproved, projectFilm, statusLabelOf, projectPoster, type ClientProject, type ProjectStatus } from "@/lib/client-projects";
 import { signedUrl } from "@/lib/supabase/storage";
 
 /**
@@ -60,7 +60,7 @@ export function ProjectFilmLightbox({ project, href, sample, onClose }: { projec
             </div>
             <div className="flex flex-wrap items-center justify-between gap-4 p-5">
               <div className="min-w-0">
-                <StatusChip status={project.status} label={statusLabels[project.status]} />
+                <StatusChip status={project.status} label={statusLabelOf(project, statusLabels)} approved={isApproved(project)} />
                 <DialogTitle className="mt-2 font-heading text-lg font-black uppercase">{project.title}</DialogTitle>
                 <DialogDescription className="sr-only">{p.panelDescription}</DialogDescription>
               </div>

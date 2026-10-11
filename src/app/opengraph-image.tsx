@@ -2,7 +2,7 @@ import { ImageResponse } from "next/og";
 
 // Branded fallback social-share image, generated at build/request time.
 // Replaces the previously-referenced `/og-image.jpg`, which did not exist.
-export const alt = "KeplerBay — AI Video Production";
+export const alt = "Keplerbay — AI Video Production";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -17,7 +17,7 @@ export default function OpengraphImage() {
           flexDirection: "column",
           justifyContent: "center",
           padding: "80px",
-          background: "linear-gradient(135deg, #0d1012 0%, #2a1408 55%, #e4560c 130%)",
+          background: "linear-gradient(135deg, #db4e4e 0%, #6b3f9a 100%)",
           color: "#ffffff",
           fontFamily: "sans-serif",
         }}
@@ -31,7 +31,7 @@ export default function OpengraphImage() {
             opacity: 0.9,
           }}
         >
-          KeplerBay
+          Keplerbay
         </div>
         <div
           style={{

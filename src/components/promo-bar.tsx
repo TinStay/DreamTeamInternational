@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { usePathname } from "next/navigation";
 import { useLanguage } from "@/lib/i18n/language-context";
 import { openSignup } from "@/lib/signup-dialog";
 
@@ -9,13 +10,15 @@ import { openSignup } from "@/lib/signup-dialog";
  * the animated green "-20%" (a line of light sweeping through it, `.discount-badge`), the US launch line and a pill
  * that opens sign-up. It is fixed to the top of the screen and stays there while the page scrolls; an invisible
  * spacer of the same height keeps the page's content clear of it, and `--promo-h` (its height, set on `<html>`) is
- * what the fixed headers add to their `top` (0 where there is no bar).
+ * what the fixed headers add to their `top` (0 where there is no bar). Not in the admin area (`/admin`), which has an
+ * interface of its own.
  */
 export function PromoBar() {
   const { t } = useLanguage();
   const p = t.promo;
   const ref = useRef<HTMLDivElement>(null);
   const spacerRef = useRef<HTMLDivElement>(null);
+  const hidden = /^\/[a-z]{2}\/admin(\/|$)/.test(usePathname() ?? "");
 
   useEffect(() => {
     const bar = ref.current;
@@ -34,8 +37,9 @@ export function PromoBar() {
       ro.disconnect();
       root.style.removeProperty("--promo-h");
     };
-  }, []);
+  }, [hidden]);
 
+  if (hidden) return null;
   return (
     <>
     <div ref={spacerRef} aria-hidden className="h-11" />

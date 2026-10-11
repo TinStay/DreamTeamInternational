@@ -21,6 +21,12 @@ export type MyPlan =
   | { kind: "one_time"; planKey: string; seconds: number; amountCents: number; paidAt: string | null }
   | { kind: "none" };
 
+/** Fired after the client changes their plan (cancel / resume), so every plan card reads it again. */
+const PLAN_CHANGED_EVENT = "izi:plan-changed";
+export function notifyPlanChanged() {
+  window.dispatchEvent(new Event(PLAN_CHANGED_EVENT));
+}
+
 const billingOf = (v: unknown): Billing | null => (v === "monthly" || v === "annual" ? v : null);
 
 /**
@@ -30,6 +36,14 @@ const billingOf = (v: unknown): Billing | null => (v === "monthly" || v === "ann
  */
 export function useMyPlan(enabled = true, fallback?: MyPlan): MyPlan | null {
   const [plan, setPlan] = useState<MyPlan | null>(fallback ?? null);
+  const [version, setVersion] = useState(0);
+
+  useEffect(() => {
+    if (fallback || !enabled) return;
+    const reload = () => setVersion((v) => v + 1);
+    window.addEventListener(PLAN_CHANGED_EVENT, reload);
+    return () => window.removeEventListener(PLAN_CHANGED_EVENT, reload);
+  }, [enabled, fallback]);
 
   useEffect(() => {
     if (fallback || !enabled) return;
@@ -80,7 +94,7 @@ export function useMyPlan(enabled = true, fallback?: MyPlan): MyPlan | null {
     return () => {
       alive = false;
     };
-  }, [enabled, fallback]);
+  }, [enabled, fallback, version]);
 
   return plan;
 }

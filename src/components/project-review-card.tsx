@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { safeAvatarUrl } from "@/components/ui/initials-avatar";
+import { notifyProject } from "@/lib/notify-project";
 import { IconCheck, IconLoader2, IconPencil } from "@tabler/icons-react";
 import { useLanguage } from "@/lib/i18n/language-context";
 import { projectFromRow, type ClientProject } from "@/lib/client-projects";
@@ -33,6 +35,8 @@ export function ProjectReviewCard({
   const [busy, setBusy] = useState<"approve" | "revision" | null>(null);
   const [error, setError] = useState<string | null>(null);
   const left = Math.max(0, project.revisionsTotal - project.revisionsUsed);
+  // Being reworked after a revision request: only Approve (the version they have) - no second revision on top.
+  const reworking = project.status === "production";
 
   async function act(action: "approve" | "revision") {
     const text = note.trim();
@@ -55,7 +59,9 @@ export function ProjectReviewCard({
     const supabase = createClient();
     const { data, error: rpcError } = await supabase.rpc("client_project_action", { p_id: project.id, p_action: action, p_note: action === "revision" ? text : null });
     if (rpcError || !data) {
-      setError(rpcError?.message.includes("no_revisions_left") ? r.noneLeft : r.error);
+      const message = rpcError?.message ?? "";
+      // Approved already (here or in another tab), or no longer in review: the page is behind the project.
+      setError(message.includes("no_revisions_left") ? r.noneLeft : message.includes("already_approved") || message.includes("not_in_review") ? r.moved : r.error);
       setBusy(null);
       return;
     }
@@ -63,11 +69,14 @@ export function ProjectReviewCard({
       // The request also goes into the thread, so the team sees a client comment waiting for a reply.
       const { data: auth } = await supabase.auth.getUser();
       if (auth.user) {
-        const meta = (auth.user.user_metadata ?? {}) as { full_name?: string; name?: string };
+        const meta = (auth.user.user_metadata ?? {}) as { full_name?: string; name?: string; avatar_url?: string; picture?: string };
+        const avatar = safeAvatarUrl(meta.avatar_url ?? meta.picture);
         const name = meta.full_name || meta.name || auth.user.email?.split("@")[0] || "";
-        await supabase.from("project_comments").insert({ project_id: project.id, user_id: auth.user.id, author_name: name, is_team: false, body: `${p.comments.revisionPrefill}${text}` });
+        await supabase.from("project_comments").insert({ project_id: project.id, user_id: auth.user.id, author_name: name, is_team: false, body: `${p.comments.revisionPrefill}${text}`, ...(avatar ? { author_avatar: avatar } : {}) });
       }
     }
+    // Approved: the client's thank-you (files + rating) and the team's alert; a revision: the team's alert with the note.
+    notifyProject(project.id, action === "approve" ? "approved" : "revision");
     setBusy(null);
     setNote("");
     onDone(projectFromRow(data as Record<string, unknown>), action === "approve" ? r.approvedNotice : r.revisionNotice);
@@ -75,10 +84,10 @@ export function ProjectReviewCard({
 
   return (
     <div className="rounded-2xl border border-[#ff8a1f]/40 bg-[radial-gradient(120%_140%_at_0%_0%,rgba(255,110,20,0.16),transparent_60%),rgba(255,255,255,0.03)] p-5 shadow-[0_24px_60px_-34px_rgba(255,106,20,0.6)]">
-      <h3 className="font-heading text-lg font-black uppercase text-[#ff8a1f]">{r.title}</h3>
-      <p className="mt-1.5 text-sm leading-relaxed text-white/70">{r.text.replace("{left}", String(left))}</p>
+      <h3 className="font-heading text-lg font-black uppercase text-[#ff8a1f]">{reworking ? r.reworkTitle : r.title}</h3>
+      <p className="mt-1.5 text-sm leading-relaxed text-white/70">{reworking ? r.reworkText : r.text.replace("{left}", String(left))}</p>
 
-      {revisionOpen ? (
+      {revisionOpen && !reworking ? (
         <div className="mt-4">
           {left === 0 ? (
             <p className="text-sm text-[#ffb066]">{r.noneLeft}</p>
@@ -130,6 +139,7 @@ export function ProjectReviewCard({
             {busy === "approve" ? <IconLoader2 className="size-4 animate-spin" aria-hidden /> : <IconCheck className="size-4" stroke={3} aria-hidden />}
             {r.approve}
           </button>
+          {reworking ? null : (
           <button
             type="button"
             onClick={() => onRevisionOpen(true)}
@@ -141,6 +151,7 @@ export function ProjectReviewCard({
             <IconPencil className="size-4" aria-hidden />
             {r.revision}
           </button>
+          )}
         </div>
       )}
       {error ? (

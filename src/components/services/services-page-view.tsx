@@ -25,7 +25,7 @@ const BUTTON_BG = { background: "linear-gradient(115deg,#ff5e00 0%,#ff8a1f 45%,#
 const BUTTON_OUTLINE =
   "inline-flex h-12 cursor-pointer items-center justify-center gap-2 rounded-full border border-white/25 px-6 text-[15px] font-semibold text-white/90 transition-[transform,background-color,border-color] duration-200 ease-out hover:-translate-y-0.5 hover:border-white/60 hover:bg-white/10";
 
-/** `/services` - the four services as big KeplerBay cards (picture on one side, the story and the two buttons on the
+/** `/services` - the four services as big Keplerbay cards (picture on one side, the story and the two buttons on the
  * other, the sides alternating), then a closing band to the pricing and the videos. Copy in the dictionary under
  * `services`; every card opens its own service page, and "Request a quote" opens it on its quote wizard (`#quote`). */
 export function ServicesPageView() {

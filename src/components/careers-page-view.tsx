@@ -23,7 +23,7 @@ const BUTTON =
   "inline-flex h-12 cursor-pointer items-center justify-center rounded-full px-6 text-[15px] font-bold text-white shadow-[0_14px_34px_-14px_rgba(255,106,20,0.85)] transition-[transform,box-shadow] duration-200 ease-out hover:-translate-y-0.5 hover:shadow-[0_18px_40px_-12px_rgba(255,106,20,0.95)]";
 const BUTTON_BG = { background: "linear-gradient(115deg,#ff5e00 0%,#ff8a1f 45%,#ffb066 100%)" };
 
-/** `/careers` - the roles we will open soon (copy in the dictionary under `careers`); each card's button writes to us. */
+/** `/careers` - the open roles (copy in the dictionary under `careers`); each card's button writes to us. */
 export function CareersPageView() {
   const { t } = useLanguage();
   const c = t.careers;
@@ -55,9 +55,6 @@ export function CareersPageView() {
               {String(index + 1).padStart(2, "0")}
             </span>
             <div className="relative flex flex-wrap items-center gap-2">
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-[#ff8a1f]/50 bg-[#ff8a1f]/10 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.14em] text-[#ffb066]">
-                {c.badge}
-              </span>
               <span className="inline-flex items-center rounded-full border border-white/15 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-white/65">
                 {c.tag}
               </span>

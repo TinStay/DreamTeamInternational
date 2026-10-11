@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { supabaseConfigured } from "@/lib/supabase/config";
+import { safeNextPath } from "@/lib/routes";
 
 /**
  * Where Supabase sends the visitor back after Google / Apple / Microsoft or an email link: trades the `code` for a
@@ -10,8 +11,8 @@ import { supabaseConfigured } from "@/lib/supabase/config";
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get("code");
-  const requested = searchParams.get("next") ?? "/en/my-projects";
-  const next = requested.startsWith("/") && !requested.startsWith("//") ? requested : "/en/my-projects";
+  // `safeNextPath` also refuses `/\host`, which a browser reads as `//host`.
+  const next = safeNextPath(searchParams.get("next")) ?? "/en/my-projects";
 
   if (code && supabaseConfigured) {
     const supabase = await createClient();

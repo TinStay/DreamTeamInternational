@@ -6,6 +6,7 @@ import { requireAccount } from "@/lib/supabase/account-page";
 import { createClient } from "@/lib/supabase/server";
 import { projectFromRow } from "@/lib/client-projects";
 import { SAMPLE_COMMENTS, SAMPLE_PROJECTS } from "@/lib/client-projects-sample";
+import { myProjectPath } from "@/lib/routes";
 
 // Project ids come from the database, never from generateStaticParams - every one is rendered on request (the
 // `[lang]` layout's `dynamicParams = false` is for the locale only).
@@ -25,15 +26,26 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
  * the query is filtered to their id on top of row level security, so a team account sees its own here too, and
  * anything else is a 404. `?sample=1` opens a made-up project (the sample ids) to preview the page.
  */
-export default async function Page({ params, searchParams }: { params: Promise<{ lang: string; id: string }>; searchParams: Promise<{ sample?: string | string[] }> }) {
+export default async function Page({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ lang: string; id: string }>;
+  searchParams: Promise<{ sample?: string | string[]; action?: string | string[] }>;
+}) {
   const { lang, id } = await params;
   if (!isLocale(lang)) notFound();
-  await requireAccount(lang);
+  const query = await searchParams;
+  // `?action=approve|revision` - a button in a "ready for review" email: the page opens on the review card (or the
+  // revision form). It only opens them; approving still takes the client's own click here.
+  const action = query.action === "approve" || query.action === "revision" ? query.action : undefined;
+  // Signed out (an email opened in another browser): log in, then come straight back here.
+  await requireAccount(lang, `${myProjectPath(lang, id)}${action ? `?action=${action}` : ""}`);
 
-  if ((await searchParams).sample === "1") {
+  if (query.sample === "1") {
     const project = SAMPLE_PROJECTS.find((x) => x.id === id);
     if (!project) notFound();
-    return <ProjectDetailView project={project} sample seedComments={SAMPLE_COMMENTS[project.id] ?? []} />;
+    return <ProjectDetailView project={project} sample seedComments={SAMPLE_COMMENTS[project.id] ?? []} initialAction={action} />;
   }
 
   if (!UUID.test(id)) notFound();
@@ -41,5 +53,5 @@ export default async function Page({ params, searchParams }: { params: Promise<{
   const { data: auth } = await supabase.auth.getUser();
   const { data, error } = await supabase.from("projects").select("*").eq("id", id).eq("user_id", auth.user?.id ?? "").maybeSingle();
   if (error || !data) notFound();
-  return <ProjectDetailView project={projectFromRow(data as Record<string, unknown>)} />;
+  return <ProjectDetailView project={projectFromRow(data as Record<string, unknown>)} initialAction={action} />;
 }

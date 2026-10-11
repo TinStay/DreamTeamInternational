@@ -1,6 +1,8 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { IconArrowUpRight, IconCheck, IconDiamondFilled, IconX } from "@tabler/icons-react";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import { PEARL_TAG } from "@/components/pricing/pricing-card";
@@ -10,16 +12,19 @@ import { formatVideoTime } from "@/lib/account-info";
 import { EMAIL_PRIMARY } from "@/lib/contact-info";
 import { PLANS, formatPrice, planPricing } from "@/lib/pricing";
 import { pricingPath } from "@/lib/routes";
-import type { MyPlan } from "@/lib/supabase/use-my-plan";
+import { notifyPlanChanged, type MyPlan } from "@/lib/supabase/use-my-plan";
 import { cn } from "@/lib/utils";
 
 const ALL_PLANS = [...PLANS.individual, ...PLANS.business];
+const DISABLED = "disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0 disabled:hover:shadow-none";
 
 /**
  * The client's plan in full, like its card on the pricing page: the name and what kind of purchase it is (subscription,
  * monthly or annual - or a one-time video), the price as bought, the status and the renewal / end date, the video time
  * it gives, everything included and not, and what a revision is. Then the way up: **Upgrade plan** (to support, until
- * plan changes are self-serve) and Compare plans - or, without a subscription, See plans / Order another video.
+ * plan changes are self-serve) and Compare plans - or, without a subscription, See plans / Order another video. Under it,
+ * **Cancel subscription** (asked to confirm, then `/api/subscription`: it ends with the paid period, never refunds or
+ * cuts it short) and, once cancelled, **Resume subscription**.
  */
 export function PlanDetailsDialog({ plan, open, onOpenChange }: { plan: MyPlan | null; open: boolean; onOpenChange: (open: boolean) => void }) {
   const { t, language } = useLanguage();
@@ -30,6 +35,41 @@ export function PlanDetailsDialog({ plan, open, onOpenChange }: { plan: MyPlan |
   const copy = plan && plan.kind !== "none" ? tiers[plan.planKey] : null;
   const def = plan && plan.kind !== "none" ? ALL_PLANS.find((x) => x.key === plan.planKey) : undefined;
   const audience = def && PLANS.business.some((x) => x.key === def.key) ? "business" : "individual";
+
+  const router = useRouter();
+  // The cancellation as the server last confirmed it, until the plan is read again.
+  const [override, setOverride] = useState<boolean | null>(null);
+  const [confirming, setConfirming] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [failed, setFailed] = useState(false);
+  const cancelled = plan?.kind === "subscription" ? (override ?? plan.cancelAtPeriodEnd) : false;
+  const endDate = plan?.kind === "subscription" && plan.periodEnd ? formatDateDisplay(plan.periodEnd.slice(0, 10)) : null;
+
+  const close = (next: boolean) => {
+    if (!next) {
+      setConfirming(false);
+      setFailed(false);
+    }
+    onOpenChange(next);
+  };
+
+  const change = async (action: "cancel" | "resume") => {
+    setBusy(true);
+    setFailed(false);
+    try {
+      const res = await fetch("/api/subscription", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action }) });
+      if (!res.ok) throw new Error(String(res.status));
+      const data = (await res.json()) as { cancelAtPeriodEnd?: boolean };
+      setOverride(Boolean(data.cancelAtPeriodEnd));
+      setConfirming(false);
+      notifyPlanChanged();
+      router.refresh();
+    } catch {
+      setFailed(true);
+    } finally {
+      setBusy(false);
+    }
+  };
 
   // The price as bought - the mirrored amount, else the plan's list price for that billing.
   let price: string | null = null;
@@ -51,7 +91,7 @@ export function PlanDetailsDialog({ plan, open, onOpenChange }: { plan: MyPlan |
   const secondary = cn(pill, "border border-white/25 font-semibold text-white/85 hover:border-primary/70 hover:bg-white/10 hover:text-white");
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={close}>
       <DialogContent
         showCloseButton={false}
         data-lenis-prevent
@@ -59,7 +99,7 @@ export function PlanDetailsDialog({ plan, open, onOpenChange }: { plan: MyPlan |
       >
         <button
           type="button"
-          onClick={() => onOpenChange(false)}
+          onClick={() => close(false)}
           aria-label={d.close}
           className="absolute top-4 right-4 z-[1] flex size-10 cursor-pointer items-center justify-center rounded-full border border-white/20 bg-black/40 text-white/85 transition-[transform,background-color] duration-200 ease-out hover:scale-105 hover:bg-black/70"
         >
@@ -74,11 +114,11 @@ export function PlanDetailsDialog({ plan, open, onOpenChange }: { plan: MyPlan |
               <DialogTitle className="mt-2 font-heading text-3xl font-black uppercase">{d.noneTitle}</DialogTitle>
               <DialogDescription className="mt-2 text-sm leading-relaxed text-white/60">{d.noneText}</DialogDescription>
               <div className="mt-6 flex flex-wrap gap-3">
-                <Link href={`${pricingPath(language)}?for=business`} className={primary} onClick={() => onOpenChange(false)}>
+                <Link href={`${pricingPath(language)}?for=business`} className={primary} onClick={() => close(false)}>
                   {d.seePlans}
                   <IconArrowUpRight className="size-4 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" aria-hidden />
                 </Link>
-                <Link href={`${pricingPath(language)}?for=individual`} className={secondary} onClick={() => onOpenChange(false)}>
+                <Link href={`${pricingPath(language)}?for=individual`} className={secondary} onClick={() => close(false)}>
                   {d.orderAnother}
                 </Link>
               </div>
@@ -111,7 +151,7 @@ export function PlanDetailsDialog({ plan, open, onOpenChange }: { plan: MyPlan |
                   ? [
                       [d.status, statusLabels[plan.status] ?? plan.status],
                       [d.billingLabel, plan.billing ? d.billing[plan.billing] : "-"],
-                      ...(plan.periodEnd ? [[plan.cancelAtPeriodEnd ? d.ends : d.renews, formatDateDisplay(plan.periodEnd.slice(0, 10))]] : []),
+                      ...(plan.periodEnd ? [[cancelled ? d.ends : d.renews, formatDateDisplay(plan.periodEnd.slice(0, 10))]] : []),
                       [d.videoTime, d.videoTimeMonthly.replace("{volume}", copy.volume).replace("{unit}", copy.volumeUnit)],
                     ]
                   : [
@@ -159,23 +199,70 @@ export function PlanDetailsDialog({ plan, open, onOpenChange }: { plan: MyPlan |
                       {d.upgrade}
                       <IconArrowUpRight className="size-4 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" aria-hidden />
                     </a>
-                    <Link href={`${pricingPath(language)}?for=${audience}`} className={secondary} onClick={() => onOpenChange(false)}>
+                    <Link href={`${pricingPath(language)}?for=${audience}`} className={secondary} onClick={() => close(false)}>
                       {d.compare}
                     </Link>
                   </>
                 ) : (
                   <>
-                    <Link href={`${pricingPath(language)}?for=business`} className={primary} onClick={() => onOpenChange(false)}>
+                    <Link href={`${pricingPath(language)}?for=business`} className={primary} onClick={() => close(false)}>
                       {d.seePlans}
                       <IconArrowUpRight className="size-4 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" aria-hidden />
                     </Link>
-                    <Link href={`${pricingPath(language)}?for=individual`} className={secondary} onClick={() => onOpenChange(false)}>
+                    <Link href={`${pricingPath(language)}?for=individual`} className={secondary} onClick={() => close(false)}>
                       {d.orderAnother}
                     </Link>
                   </>
                 )}
               </div>
               {plan.kind === "subscription" ? <p className="mt-3 text-xs leading-relaxed text-white/45">{d.upgradeNote}</p> : null}
+
+              {/* Cancel at the end of the paid period - or take that back. */}
+              {plan.kind === "subscription" ? (
+                <div className="mt-6 border-t border-white/10 pt-5">
+                  {cancelled ? (
+                    <>
+                      <p className="text-sm leading-relaxed text-white/70">{endDate ? d.cancelledNote.replace("{date}", endDate) : d.cancelledNoteNoDate}</p>
+                      <button type="button" disabled={busy} onClick={() => change("resume")} className={cn(secondary, "mt-3", DISABLED)}>
+                        {busy ? d.resuming : d.resume}
+                      </button>
+                    </>
+                  ) : confirming ? (
+                    <div role="group" aria-labelledby="cancel-plan-title" className="rounded-2xl border border-red-400/25 bg-red-500/[0.07] p-4">
+                      <p id="cancel-plan-title" className="font-semibold">
+                        {d.cancelTitle}
+                      </p>
+                      <p className="mt-1 text-[13px] leading-relaxed text-white/65">{endDate ? d.cancelText.replace("{date}", endDate) : d.cancelTextNoDate}</p>
+                      <div className="mt-4 flex flex-wrap gap-3">
+                        <button
+                          type="button"
+                          disabled={busy}
+                          onClick={() => change("cancel")}
+                          className={cn(pill, "border border-red-400/50 font-semibold text-red-200 hover:border-red-400 hover:bg-red-500/15 hover:shadow-[0_10px_26px_-12px_rgba(248,113,113,0.7)]", DISABLED)}
+                        >
+                          {busy ? d.cancelling : d.cancelConfirm}
+                        </button>
+                        <button type="button" disabled={busy} onClick={() => setConfirming(false)} className={cn(secondary, DISABLED)}>
+                          {d.cancelKeep}
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => setConfirming(true)}
+                      className="cursor-pointer text-sm font-semibold text-white/55 underline-offset-4 transition-[transform,color] duration-200 ease-out hover:translate-x-0.5 hover:text-red-300 hover:underline"
+                    >
+                      {d.cancel}
+                    </button>
+                  )}
+                  {failed ? (
+                    <p role="alert" className="mt-3 text-sm text-red-300">
+                      {d.cancelError}
+                    </p>
+                  ) : null}
+                </div>
+              ) : null}
             </>
           )}
         </div>

@@ -1,11 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { Fragment, useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import { motion } from "motion/react";
 import { cn } from "@/lib/utils";
-import { brandLogo } from "@/lib/brand-logo";
+import { BrandWordmark } from "@/components/ui/brand-wordmark";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
@@ -75,7 +74,6 @@ export function MegaHeader({
   /** The right-hand controls (theme toggle, copy buttons, quote pill). */
   controls: ReactNode;
 }) {
-  const logo = brandLogo("en");
   /** The href of the group whose list is open, if any. */
   const [openKey, setOpenKey] = useState<string | null>(null);
   const [hidden, setHidden] = useState(false);
@@ -227,17 +225,9 @@ export function MegaHeader({
       {/* The whole width of the screen, edge to edge, in smoked glass (`.smoke-bar`, globals.css). */}
       <div className="smoke-bar px-[clamp(1rem,2.2vw,3.5rem)] text-white">
         <div className="flex w-full items-start justify-between gap-3 xl:gap-4 min-[1700px]:gap-6">
-          {/* The KeplerBay logo (planet + name, white and orange - made for the dark bar, so no inversion). */}
+          {/* The Keplerbay wordmark (white letters, the ringed planet and the orange BAY - made for the dark bar). */}
           <Link href={logoHref} className="group flex h-[4.25rem] min-w-0 shrink-0 items-center pr-1 xl:pr-3">
-            <Image
-              src={logo.src}
-              alt={logo.alt}
-              width={logo.width}
-              height={logo.height}
-              sizes="160px"
-              priority
-              className="h-5 w-auto xl:h-7"
-            />
+            <BrandWordmark priority className="h-8 xl:h-10" />
           </Link>
 
           {/* Left-aligned beside the logo, one row of tabs at an even gap, the groups split by thin vertical lines. The

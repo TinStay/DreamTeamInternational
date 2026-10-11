@@ -8,7 +8,18 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
  */
 const inserts: Record<string, unknown>[] = [];
 const db = { insertError: null as null | { code: string } };
-const admin = { from: vi.fn(() => ({ insert: vi.fn(async (row: Record<string, unknown>) => (inserts.push(row), { error: db.insertError })) })) };
+const updates: { table: string; patch: Record<string, unknown>; filters: [string, unknown][] }[] = [];
+const admin = {
+  from: vi.fn((table: string) => ({
+    insert: vi.fn(async (row: Record<string, unknown>) => (inserts.push(row), { error: db.insertError })),
+    update: (patch: Record<string, unknown>) => {
+      const entry = { table, patch, filters: [] as [string, unknown][] };
+      updates.push(entry);
+      const chain = { eq: (col: string, val: unknown) => (entry.filters.push([col, val]), chain), then: (resolve: (v: unknown) => void) => resolve({ error: null }) };
+      return chain;
+    },
+  })),
+};
 
 const stripe = {
   webhooks: {
@@ -26,6 +37,10 @@ const subs = vi.hoisted(() => ({ saveSubscription: vi.fn(async () => true) }));
 vi.mock("@/lib/subscriptions", () => subs);
 const orders = vi.hoisted(() => ({ updateOrder: vi.fn(async () => {}) }));
 vi.mock("@/lib/orders", () => orders);
+const notifications = vi.hoisted(() => ({ notifyProjectEvent: vi.fn(async () => ({ status: "sent", sent: 1 })) }));
+vi.mock("@/lib/email/project-notifications", () => notifications);
+const subNotify = vi.hoisted(() => ({ notifySubscriptionEvent: vi.fn(async () => {}) }));
+vi.mock("@/lib/email/subscription-notifications", () => subNotify);
 
 process.env.STRIPE_WEBHOOK_SECRET = "whsec_test";
 const { POST } = await import("./route");
@@ -38,6 +53,7 @@ const session = (over: Record<string, unknown> = {}) => ({ id: "cs_1", mode: "pa
 
 beforeEach(() => {
   inserts.length = 0;
+  updates.length = 0;
   db.insertError = null;
   orders.updateOrder.mockClear();
   subs.saveSubscription.mockClear().mockResolvedValue(true);
@@ -102,7 +118,29 @@ describe("/api/stripe/webhook", () => {
   it("mirrors subscription changes, and retries when the mirror cannot be written", async () => {
     expect((await send("customer.subscription.updated", { id: "sub_1", status: "active", metadata: { user_id: "u1" } })).status).toBe(200);
     expect(subs.saveSubscription).toHaveBeenCalledWith(expect.objectContaining({ id: "sub_1" }));
+    // Saved: the subscription emails get their turn (bought / cancelled / changed / ended - decided in the notifier).
+    expect(subNotify.notifySubscriptionEvent).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ type: "customer.subscription.updated" }), expect.any(String));
+    subNotify.notifySubscriptionEvent.mockClear();
     subs.saveSubscription.mockResolvedValueOnce(false);
     expect((await send("customer.subscription.deleted", { id: "sub_1", status: "canceled", metadata: { user_id: "u1" } })).status).toBe(500);
+    // Not saved: no email until Stripe's retry succeeds.
+    expect(subNotify.notifySubscriptionEvent).not.toHaveBeenCalled();
+  });
+
+  it("settles a paid change request for the team - and never turns it into video seconds", async () => {
+    const meta = { user_id: "u1", request_id: "req-1", project_id: "p1", purchase_type: "project_request", kind: "deadline" };
+    expect((await send("checkout.session.completed", session({ id: "cs_req", metadata: meta }))).status).toBe(200);
+    expect(inserts).toHaveLength(0);
+    expect(updates).toEqual([
+      { table: "project_requests", patch: expect.objectContaining({ status: "requested", stripe_session_id: "cs_req" }), filters: [["id", "req-1"], ["user_id", "u1"], ["status", "awaiting_payment"]] },
+    ]);
+    // Paid: the team is emailed about the request, as the server itself.
+    expect(notifications.notifyProjectEvent).toHaveBeenCalledWith(expect.objectContaining({ system: true }), { projectId: "p1", event: "change_request", requestId: "req-1" }, expect.any(String));
+    // An unpaid (bank debit) completion settles nothing yet.
+    notifications.notifyProjectEvent.mockClear();
+    updates.length = 0;
+    await send("checkout.session.completed", session({ id: "cs_req", payment_status: "unpaid", metadata: meta }));
+    expect(updates).toHaveLength(0);
+    expect(notifications.notifyProjectEvent).not.toHaveBeenCalled();
   });
 });

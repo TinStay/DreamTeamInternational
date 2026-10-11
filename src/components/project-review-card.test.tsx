@@ -94,4 +94,16 @@ describe("ProjectReviewCard", () => {
     expect(onDone).not.toHaveBeenCalled();
     expect(supabase.inserted).toHaveLength(0);
   });
+
+  it("explains when the project has already been approved (e.g. in another tab), and posts no comment", async () => {
+    supabase.rpc.mockResolvedValue({ data: null, error: { message: "already_approved" } });
+    const onDone = vi.fn();
+    render(<Harness value={project()} onDone={onDone} />);
+    fireEvent.click(screen.getByRole("button", { name: r.revision }));
+    fireEvent.change(screen.getByLabelText(r.revisionLabel), { target: { value: "Late change" } });
+    fireEvent.click(screen.getByRole("button", { name: r.send }));
+    await waitFor(() => expect(screen.getByRole("alert").textContent).toBe(r.moved));
+    expect(onDone).not.toHaveBeenCalled();
+    expect(supabase.inserted).toHaveLength(0);
+  });
 });

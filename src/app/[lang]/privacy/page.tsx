@@ -15,9 +15,9 @@ const LAST_UPDATED = "October 6, 2026";
 
 const META: Record<Language, { title: string; description: string }> = {
   en: {
-    title: "Privacy Policy | KeplerBay",
+    title: "Privacy Policy | Keplerbay",
     description:
-      "How KeplerBay collects, uses and shares personal information, cookies and Global Privacy Control, and your privacy rights under US state laws (CCPA / CPRA) and the GDPR.",
+      "How Keplerbay collects, uses and shares personal information, cookies and Global Privacy Control, and your privacy rights under US state laws (CCPA / CPRA) and the GDPR.",
   },
 };
 

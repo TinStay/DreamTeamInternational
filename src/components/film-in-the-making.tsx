@@ -1,13 +1,13 @@
-import { IconLoader2, IconPlayerPlayFilled } from "@tabler/icons-react";
+import { PlanetLoader } from "@/components/ui/planet-loader";
 import { cn } from "@/lib/utils";
 
 const PEARL_BAR = "bg-[linear-gradient(90deg,#ff5e00,#ffb066)]";
 
 /**
  * Where a project's film will play, before there is one: the poster (if any) dimmed under a warm light, a faint grid and
- * a film strip's sprocket holes, a glowing play disc in a slowly turning dashed ring, the stage it is in and how far
- * along. Fills its (positioned) parent. `compact` is the project cards' size: a smaller disc, the stage only.
- * CSS animations only, still under reduced motion.
+ * a film strip's sprocket holes, the **planet loader** (`ui/planet-loader.tsx` - the logo's planet with a light running
+ * round its white orbit), the stage it is in and how far along. Fills its (positioned) parent. `compact` is the project
+ * cards' size: a smaller planet, the stage only. CSS animations only, still under reduced motion.
  */
 export function FilmInTheMaking({
   poster = null,
@@ -36,22 +36,7 @@ export function FilmInTheMaking({
       <div aria-hidden className={cn(strip, "bottom-0", compact ? "h-3" : "h-5")} />
 
       <div className={cn("relative flex h-full flex-col items-center justify-center text-center", compact ? "gap-3 px-4" : "gap-5 px-8")}>
-        <div className={cn("relative flex items-center justify-center", compact ? "size-16" : "size-24 sm:size-28")}>
-          <span aria-hidden className="absolute inset-0 rounded-full border border-dashed border-[#ff8a1f]/45 motion-safe:animate-[spin_14s_linear_infinite]" />
-          <span aria-hidden className={cn("absolute rounded-full bg-[#ff7a1a]/10 motion-safe:animate-pulse", compact ? "inset-2" : "inset-3")} />
-          <span
-            className={cn(
-              "relative flex items-center justify-center rounded-full bg-[linear-gradient(115deg,#ff5e00,#ff9a3c)] shadow-[0_0_40px_rgba(255,122,26,0.55)]",
-              compact ? "size-9" : "size-14 sm:size-16"
-            )}
-          >
-            {loading ? (
-              <IconLoader2 className={cn("animate-spin text-white", compact ? "size-4" : "size-6")} aria-hidden />
-            ) : (
-              <IconPlayerPlayFilled className={cn("ml-0.5 text-white", compact ? "size-4" : "size-6")} aria-hidden />
-            )}
-          </span>
-        </div>
+        <PlanetLoader label={label ?? stage} className={compact ? "w-28" : "w-44 sm:w-52"} />
         <div>
           {stage && !loading ? <p className={cn("font-heading font-black uppercase tracking-[0.12em] text-[#ffb066]", compact ? "text-[11px]" : "text-sm")}>{stage}</p> : null}
           {label && !compact ? <p className="mt-1.5 max-w-[36ch] text-sm text-white/60">{label}</p> : null}

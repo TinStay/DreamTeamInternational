@@ -226,8 +226,7 @@ export function PortfolioGrid() {
       </Suspense>
 
       <header className="max-w-3xl">
-        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#ff8a1f]">{p.eyebrow}</p>
-        <h1 className="mt-3 font-heading text-[clamp(32px,4.6vw,72px)] leading-[0.95] font-black uppercase tracking-[-0.01em] text-balance">
+        <h1 className="font-heading text-[clamp(32px,4.6vw,72px)] leading-[0.95] font-black uppercase tracking-[-0.01em] text-balance">
           {p.title1} <span className="text-section-accent">{p.title2}</span>
         </h1>
         <p className="mt-4 max-w-[62ch] text-[clamp(15px,1.15vw,18px)] leading-relaxed text-white/65">{p.subtitle}</p>
