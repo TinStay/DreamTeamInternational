@@ -81,7 +81,9 @@ export function VideoPackSection() {
             </Link>
           </div>
         </div>
-        <VslFrame onPlay={HOME_VSL ? () => setOpen(-1) : undefined} copy={p.vsl} />
+        {/* Sized by the screen's height too (a wide, short screen would make it tall enough to push the carousel out of view):
+            at most as tall as the room left over the carousel, right-aligned in its column. */}
+        <VslFrame onPlay={HOME_VSL ? () => setOpen(-1) : undefined} copy={p.vsl} className="justify-self-end md:max-w-[max(20rem,calc((100svh-33rem)*16/9))]" />
       </div>
 
       {/* The curved row along the bottom, a band under the heading and the VSL. */}
@@ -96,7 +98,7 @@ export function VideoPackSection() {
         gap={8}
         radius="1rem"
         aria-label={p.carouselLabel}
-        className="mt-6 h-[clamp(16rem,50svh,26rem)] w-full md:mt-5 md:h-[clamp(15rem,calc(100svh-30rem),28rem)]"
+        className="mt-6 h-[clamp(16rem,50svh,26rem)] w-full md:mt-5 md:h-[clamp(13rem,calc(100svh-33rem),28rem)]"
       />
 
       {/* The kinds of video as buttons - each plays its film too. The keyboard's and screen readers' way in (the curved row
@@ -155,7 +157,7 @@ function PackCaption({ title, line, watch }: { title: string; line: string; watc
  * branded placeholder - "video coming soon", nothing to click; with a film it shows the poster and plays it in the
  * lightbox.
  */
-function VslFrame({ onPlay, copy }: { onPlay?: () => void; copy: { title: string; length: string; soon: string; play: string } }) {
+function VslFrame({ onPlay, copy, className }: { onPlay?: () => void; copy: { title: string; length: string; soon: string; play: string }; className?: string }) {
   const poster = HOME_VSL ? bunnyThumbnailUrl(HOME_VSL) : null;
   const body = (
     <>
@@ -191,11 +193,11 @@ function VslFrame({ onPlay, copy }: { onPlay?: () => void; copy: { title: string
   const frame =
     "group relative block aspect-video w-full overflow-hidden rounded-2xl border border-[#ff8a1f]/30 bg-[#0b0c0e] text-white shadow-[0_30px_80px_-30px_rgba(255,106,20,0.45),0_24px_60px_-30px_rgba(0,0,0,0.9)]";
   return onPlay ? (
-    <button type="button" onClick={onPlay} aria-label={`${copy.play}: ${copy.title}`} className={cn(frame, "cursor-pointer transition-[transform,border-color] duration-300 ease-out hover:-translate-y-1 hover:border-[#ff8a1f]/60")}>
+    <button type="button" onClick={onPlay} aria-label={`${copy.play}: ${copy.title}`} className={cn(frame, "cursor-pointer transition-[transform,border-color] duration-300 ease-out hover:-translate-y-1 hover:border-[#ff8a1f]/60", className)}>
       {body}
     </button>
   ) : (
-    <div role="img" aria-label={`${copy.title} - ${copy.soon}`} className={frame}>
+    <div role="img" aria-label={`${copy.title} - ${copy.soon}`} className={cn(frame, className)}>
       {body}
     </div>
   );
