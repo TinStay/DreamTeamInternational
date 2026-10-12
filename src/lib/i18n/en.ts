@@ -1087,34 +1087,34 @@ export const en = {
     title1: "Invest in the future of",
     title2: "AI video",
     lead:
-      "Keplerbay turns AI video into a service brands can rely on: professional films made by an experienced team, on a plan, with no prompting, no credits and no learning curve. If you share our view of where video is going, we would like to talk.",
+      "Keplerbay makes professional AI video a service brands can rely on: finished films from an experienced team, on a plan, with no filming crew and no prompting on the client's side. Video is the format every brand needs more of, and AI is changing what it costs and how fast it arrives. If you share that view, we would like to talk.",
     cta: "I'm interested",
     whyTitle: "Why Keplerbay",
     why: [
       {
-        title: "A market moving to AI",
-        text: "Every brand needs more video, in more formats, more often. The old production model cannot keep up on cost or on time - AI can.",
+        title: "Demand that keeps growing",
+        text: "Every brand needs more video, in more formats, more often. Traditional production cannot keep up on cost or on time. AI video can, and we build it into a service rather than a tool.",
       },
       {
-        title: "A product, not a project",
-        text: "Video packs and subscriptions across eleven formats, from social ads to TV spots, so revenue repeats instead of starting again with every brief.",
+        title: "A product, not a one-off project",
+        text: "Video packs and subscriptions across eleven formats, from social ads to TV spots. Clients come back for the next video, so revenue repeats instead of starting over with every brief.",
       },
       {
         title: "Proof with real brands",
-        text: "Work for brands such as MindGuard, Boleron, Emblema and OSMO, including a campaign with more than 75 million views.",
+        text: "Case studies with MindGuard, Boleron, Emblema, Plasico and OSMO, including a campaign with more than 75 million views.",
       },
       {
-        title: "A team that delivers",
-        text: "Hundreds of videos delivered for clients around the world, and a US launch under way.",
+        title: "Built to scale",
+        text: "A lean, mostly automated production workflow, so more clients mean more output without a matching rise in cost. We are launching in the United States, with Europe already served from Sofia.",
       },
     ],
     lookingTitle: "Who we would like to hear from",
     looking: ["Angel investors", "Venture funds", "Family offices", "Strategic partners in media, advertising and AI"],
     stepsTitle: "What happens next",
     steps: [
-      { title: "Tell us about you", text: "Send the short form below - who you are and what you are looking for." },
-      { title: "A first conversation", text: "We reply personally and set up a call to share the story, the product and where we are going." },
-      { title: "The details", text: "If there is a fit, we share the deck and the numbers - under NDA where needed." },
+      { title: "Tell us about you", text: "Send the short form below: who you are and what you are looking for." },
+      { title: "A first conversation", text: "We reply personally and set up a call to share the story, the product and the plan." },
+      { title: "The details", text: "If there is a fit, we share the deck and the numbers, under NDA where needed." },
     ],
     form: {
       title: "I'm interested",
