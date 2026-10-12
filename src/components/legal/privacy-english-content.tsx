@@ -57,9 +57,11 @@ export function PrivacyEnglishContent() {
         </li>
         <li>
           <strong>Commercial information:</strong> the packs and subscriptions you buy, your plan and its status, your
-          balance of video seconds and how it changed, and your payment history. Payments are processed by{" "}
-          <strong>Stripe</strong>. We never see or store your full card or bank account number. Stripe tells us whether a
-          payment succeeded, and we keep the transaction reference and the plan you bought.
+          balance of video seconds and how it changed, and your payment history. Online orders are sold and processed by{" "}
+          <strong>Paddle.com</strong>, our reseller and the merchant of record, which collects your payment, billing
+          address and any tax ID and handles sales tax under its own privacy notice. We never see or store your full card or
+          bank account number. Paddle tells us whether a payment succeeded, and we keep the transaction reference and the
+          plan you bought.
         </li>
         <li>
           <strong>Content you give us:</strong> your project briefs and answers, the scripts, images, videos, audio and other
@@ -84,7 +86,7 @@ export function PrivacyEnglishContent() {
       <h2>3. How we use it</h2>
       <ul>
         <li>To create and run your account and sign you in.</li>
-        <li>To sell you packs and subscriptions, take payment through Stripe, and add your video seconds once the payment is collected.</li>
+        <li>To sell you packs and subscriptions, take payment through Paddle, and add your video seconds once the payment is collected.</li>
         <li>To produce, review and deliver your videos, and to manage your projects, revisions and comments.</li>
         <li>To reply to your inquiries and give you support.</li>
         <li>To send you service messages, such as order, project and account notices.</li>
@@ -107,7 +109,7 @@ export function PrivacyEnglishContent() {
           <ul>
             <li>Vercel: hosting, and cookieless visit counts.</li>
             <li>Supabase: accounts, sign-in, our database, and private file storage for your projects and deliveries.</li>
-            <li>Stripe: payments and subscriptions.</li>
+            <li>Paddle.com: our reseller and merchant of record for online orders - checkout, payments, subscriptions, invoices and sales tax.</li>
             <li>Resend: email delivery.</li>
             <li>Bunny Stream and YouTube: video hosting for our own portfolio.</li>
             <li>The AI production tools we use to make your video.</li>

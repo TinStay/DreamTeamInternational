@@ -55,7 +55,7 @@ export function MyProjectsPageView({ projects: saved, sample = false, purchased 
   // Projects submitted on this page show up at once (before the page has refetched them); a saved one replaces its copy.
   const [added, setAdded] = useState<ClientProject[]>([]);
   const [notice, setNotice] = useState<string | null>(purchased ? p.purchased : null);
-  // Back from the payment page: the seconds arrive when Stripe's confirmation reaches us, a few seconds later - look again a few times.
+  // Back from the payment page: the seconds arrive when Paddle's confirmation reaches us, a few seconds later - look again a few times.
   useEffect(() => {
     if (!purchased) return;
     const timers = [1500, 4000, 8000, 15000].map((ms) => window.setTimeout(notifyCreditsChanged, ms));

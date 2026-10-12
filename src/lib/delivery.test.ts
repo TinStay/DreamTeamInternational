@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type Stripe from "stripe";
+import type { PaddleSubscription } from "@/lib/paddle";
 import { formatBytes, isApproved, progressOf, projectFromRow, statusLabelOf, timelineFor } from "@/lib/client-projects";
 import { isLiveStatus, subscriptionRow } from "@/lib/subscriptions";
 import { safeFileName } from "@/lib/supabase/storage";
@@ -54,17 +54,18 @@ describe("subscriptions", () => {
     expect(isLiveStatus("incomplete_expired")).toBe(false);
   });
 
-  it("mirrors a Stripe subscription, or skips one without a user", () => {
+  it("mirrors a Paddle subscription, or skips one without a user", () => {
     const sub = {
       id: "sub_1",
-      customer: "cus_1",
+      customer_id: "ctm_1",
       status: "active",
-      cancel_at_period_end: false,
-      metadata: { user_id: "u1", plan_key: "creator" },
-      items: { data: [{ current_period_end: 1_790_000_000, price: { unit_amount: 389000, currency: "usd", recurring: { interval: "year" } } }] },
-    } as unknown as Stripe.Subscription;
-    expect(subscriptionRow(sub)).toMatchObject({ id: "sub_1", user_id: "u1", customer_id: "cus_1", plan_key: "creator", status: "active", current_period_end: new Date(1_790_000_000 * 1000).toISOString(), billing: "annual", amount_cents: 389000, currency: "usd" });
-    expect(subscriptionRow({ ...sub, metadata: {} } as unknown as Stripe.Subscription)).toBeNull();
+      scheduled_change: null,
+      custom_data: { user_id: "u1", plan_key: "creator" },
+      current_billing_period: { starts_at: "2025-09-21T00:00:00Z", ends_at: "2026-09-21T00:00:00Z" },
+      items: [{ price: { unit_price: { amount: "389000", currency_code: "USD" }, billing_cycle: { interval: "year", frequency: 1 } } }],
+    } as PaddleSubscription;
+    expect(subscriptionRow(sub)).toMatchObject({ id: "sub_1", user_id: "u1", customer_id: "ctm_1", plan_key: "creator", status: "active", current_period_end: "2026-09-21T00:00:00Z", billing: "annual", amount_cents: 389000, currency: "usd", cancel_at_period_end: false });
+    expect(subscriptionRow({ ...sub, custom_data: {} })).toBeNull();
   });
 });
 

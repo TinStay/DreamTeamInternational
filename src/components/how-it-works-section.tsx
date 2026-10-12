@@ -3,6 +3,7 @@
 import { IconCheck } from "@tabler/icons-react";
 import { useLanguage } from "@/lib/i18n/language-context";
 import { ScrollItem, ScrollStagger } from "@/components/ui/scroll-reveal";
+import { VslPlayer } from "@/components/vsl-player";
 
 
 /** One picture per step, in order (`public/process-steps/`): the package, the brief, the set, the screening room. */
@@ -10,7 +11,8 @@ const STEP_IMAGES = ["/process-steps/step-1.jpg", "/process-steps/step-2.jpg", "
 
 /**
  * "How it works" in the English site's style (the home page, right after the packages, and the contact page): a
- * left-aligned heading on the page margin with an orange eyebrow, then the four steps (`process.steps`) as dark cards -
+ * left-aligned heading on the page margin with an orange eyebrow and, beside it (under it on phones), the **video sales
+ * letter** (`VslPlayer` - "Order to delivery" playing live, no overlay, a click opens it full size), then the four steps (`process.steps`) as dark cards -
  * each with its own picture (very dark at rest), a big outlined number and the title large in Archivo over its line.
  * On hover a window opens out of the card's middle with the picture coming up and the whole step in it. With the
  * scroll, the heading's lines and then the cards rise in one after another (`ScrollStagger` - transform and opacity
@@ -23,6 +25,7 @@ export function HowItWorksSection() {
   return (
     <section id="process" className="relative px-[max(1.25rem,3vw)] py-12 text-white sm:py-16">
       {/* The heading rises in line by line - eyebrow, title, line - with the scroll, before the cards follow. */}
+      <div className="grid items-center gap-8 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] lg:gap-14">
       <ScrollStagger start={1} until={0.55}>
         <header className="max-w-3xl">
           <ScrollItem index={0} count={3}>
@@ -38,6 +41,12 @@ export function HowItWorksSection() {
           </ScrollItem>
         </header>
       </ScrollStagger>
+        <ScrollStagger start={1} until={0.45}>
+          <ScrollItem index={0} count={1}>
+            <VslPlayer />
+          </ScrollItem>
+        </ScrollStagger>
+      </div>
 
       <ScrollStagger className="relative mt-10 lg:mt-14" start={1} until={0.3}>
         <ol className="relative grid grid-cols-1 items-stretch gap-4 sm:grid-cols-2 lg:grid-cols-4">

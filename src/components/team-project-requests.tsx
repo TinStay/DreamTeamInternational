@@ -13,7 +13,7 @@ import { cn } from "@/lib/utils";
 
 /**
  * In the team's project window: the client's change requests - approve (the change is applied to the project at once)
- * or decline (any seconds go back to the client; money paid for it is refunded in Stripe by hand) with an optional note
+ * or decline (any seconds go back to the client; money paid for it is refunded in Paddle by hand) with an optional note
  * the client sees - and, once they have rated it, the client's review. Both through `resolve_project_request()` /
  * `project_reviews` (supabase/changes.sql). `onApplied` re-reads the project after an approval changed it.
  */

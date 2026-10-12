@@ -7,14 +7,13 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
  */
 const state = vi.hoisted(() => ({ user: { id: "u1" } as { id: string } | null }));
 const setCancel = vi.hoisted(() =>
-  vi.fn(async (_stripe: unknown, _uid: string, cancel: boolean): Promise<{ ok: true; cancelAtPeriodEnd: boolean; periodEnd: string | null } | { ok: false; error: string }> => ({
+  vi.fn(async (_uid: string, cancel: boolean): Promise<{ ok: true; cancelAtPeriodEnd: boolean; periodEnd: string | null } | { ok: false; error: string }> => ({
     ok: true,
     cancelAtPeriodEnd: cancel,
     periodEnd: "2026-11-08T00:00:00Z",
   }))
 );
 
-vi.mock("@/lib/stripe", () => ({ getStripe: () => ({ fake: true }) }));
 vi.mock("@/lib/supabase/server", () => ({ createClient: async () => ({ auth: { getUser: async () => ({ data: { user: state.user } }) } }) }));
 vi.mock("@/lib/subscriptions", () => ({ setCancelAtPeriodEnd: setCancel }));
 
@@ -35,12 +34,12 @@ describe("/api/subscription", () => {
     const res = await post({ action: "cancel" });
     expect(res.status).toBe(200);
     expect(await res.json()).toEqual({ cancelAtPeriodEnd: true, periodEnd: "2026-11-08T00:00:00Z" });
-    expect(setCancel).toHaveBeenCalledWith({ fake: true }, state.user!.id, true);
+    expect(setCancel).toHaveBeenCalledWith(state.user!.id, true);
   });
 
   it("resumes it", async () => {
     expect(await (await post({ action: "resume" })).json()).toMatchObject({ cancelAtPeriodEnd: false });
-    expect(setCancel.mock.calls[0][2]).toBe(false);
+    expect(setCancel.mock.calls[0][1]).toBe(false);
   });
 
   it("refuses another site (CSRF), an unknown action, a broken body and a signed-out visitor", async () => {

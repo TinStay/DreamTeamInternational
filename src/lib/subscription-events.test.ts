@@ -1,36 +1,33 @@
 import { describe, expect, it } from "vitest";
-import type Stripe from "stripe";
-import { metadataForPrice, planForPrice, subscriptionChange } from "@/lib/subscription-events";
+import { metadataForPrice, planForPrice, subscriptionChange, type SubscriptionState } from "@/lib/subscription-events";
 import { subscriptionClientEmail, subscriptionTeamEmail } from "@/lib/email/subscription-emails";
 
-const items = (amount: number, interval: "month" | "year") => ({ data: [{ price: { id: "price_x", unit_amount: amount, recurring: { interval } } }] });
-const sub = (over: Record<string, unknown> = {}) => ({ id: "sub_1", status: "active", cancel_at_period_end: false, cancel_at: null, items: items(38900, "month"), metadata: { user_id: "u1", plan_key: "creator" }, ...over });
-const event = (type: string, object: Record<string, unknown>, previous?: Record<string, unknown>) =>
-  ({ id: "evt_1", type, livemode: false, data: { object, ...(previous ? { previous_attributes: previous } : {}) } }) as unknown as Stripe.Event;
+const state = (over: Partial<SubscriptionState> = {}): SubscriptionState => ({ status: "active", cancel_at_period_end: false, amount_cents: 38900, billing: "monthly", ...over });
 
-describe("subscriptionChange", () => {
-  it("a new live subscription is started; a pending one starts once its payment goes through", () => {
-    expect(subscriptionChange(event("customer.subscription.created", sub()))).toEqual({ kind: "started" });
-    expect(subscriptionChange(event("customer.subscription.created", sub({ status: "incomplete" })))).toBeNull();
-    expect(subscriptionChange(event("customer.subscription.updated", sub(), { status: "incomplete" }))).toEqual({ kind: "started" });
+describe("subscriptionChange (the mirror's row before, the subscription now)", () => {
+  it("a new live subscription is started; one that is not running yet is not", () => {
+    expect(subscriptionChange(null, state())).toEqual({ kind: "started" });
+    expect(subscriptionChange(null, state({ status: "past_due" }))).toBeNull();
+    // A plan that had ended and is live again.
+    expect(subscriptionChange(state({ status: "canceled" }), state())).toEqual({ kind: "started" });
   });
 
-  it("cancelling at the period end is a cancellation; deletion is the end", () => {
-    expect(subscriptionChange(event("customer.subscription.updated", sub({ cancel_at_period_end: true }), { cancel_at_period_end: false }))).toEqual({ kind: "cancelled" });
-    expect(subscriptionChange(event("customer.subscription.deleted", sub({ status: "canceled" })))).toEqual({ kind: "ended" });
+  it("a scheduled cancellation is a cancellation; cancelled is the end", () => {
+    expect(subscriptionChange(state(), state({ cancel_at_period_end: true }))).toEqual({ kind: "cancelled" });
+    expect(subscriptionChange(state({ cancel_at_period_end: true }), state({ status: "canceled" }))).toEqual({ kind: "ended" });
+    // Paddle sends it again: no second email.
+    expect(subscriptionChange(state({ status: "canceled" }), state({ status: "canceled" }))).toBeNull();
   });
 
   it("a new price is an upgrade or a downgrade, compared per month", () => {
-    const up = subscriptionChange(event("customer.subscription.updated", sub({ items: items(62900, "month") }), { items: items(38900, "month") }));
-    expect(up).toMatchObject({ kind: "changed", upgrade: true });
+    expect(subscriptionChange(state(), state({ amount_cents: 62900 }))).toMatchObject({ kind: "changed", upgrade: true });
     // Pro monthly ($629) -> Creator annual ($3,890 a year = $324/month): a downgrade.
-    const down = subscriptionChange(event("customer.subscription.updated", sub({ items: items(389000, "year") }), { items: items(62900, "month") }));
-    expect(down).toMatchObject({ kind: "changed", upgrade: false });
+    expect(subscriptionChange(state({ amount_cents: 62900 }), state({ amount_cents: 389000, billing: "annual" }))).toMatchObject({ kind: "changed", upgrade: false });
   });
 
-  it("ignores renewals and metadata writes", () => {
-    expect(subscriptionChange(event("customer.subscription.updated", sub(), { metadata: { plan_key: "pro" } }))).toBeNull();
-    expect(subscriptionChange(event("customer.subscription.updated", sub(), { items: items(38900, "month") }))).toBeNull();
+  it("ignores renewals, repeats and custom-data writes", () => {
+    expect(subscriptionChange(state(), state())).toBeNull();
+    expect(subscriptionChange(state({ cancel_at_period_end: true }), state({ cancel_at_period_end: true }))).toBeNull();
   });
 });
 
@@ -62,9 +59,10 @@ describe("subscription emails", () => {
     expect(e.html).toContain("Resume your subscription");
   });
 
-  it("the admin copy links the subscription in Stripe", () => {
+  it("the admin copy links the subscription in Paddle", () => {
     const e = subscriptionTeamEmail({ ...facts, change: { kind: "started" } }, { name: "Ana Petrova", email: "ana@example.com" }, "https://keplerbay.com");
     expect(e.subject).toBe("New subscription: Pro (Ana Petrova)");
-    expect(e.html).toContain("https://dashboard.stripe.com/test/subscriptions/sub_1");
+    expect(e.html).toContain("https://sandbox-vendors.paddle.com/subscriptions-v2/sub_1");
+    expect(e.html).toContain("Open in Paddle");
   });
 });

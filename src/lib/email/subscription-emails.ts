@@ -1,4 +1,5 @@
 import { PLAN_SECONDS } from "@/lib/credits";
+import { paddleDashboardUrl } from "@/lib/paddle";
 import { formatDateDisplay } from "@/lib/dates";
 import { getDictionary } from "@/lib/i18n/config";
 import type { PlanKey } from "@/lib/pricing";
@@ -9,7 +10,7 @@ import { clientEmail, copy, fill, type ProjectEmail } from "@/lib/email/compose"
 
 /**
  * The emails a subscription sends - bought, cancelled, upgraded / downgraded, ended - to the client, with a copy for the
- * admin inbox. Built from the subscription as Stripe reports it in the webhook; copy in `en.ts` (`emails.subscription`).
+ * admin inbox. Built from the subscription as Paddle reports it in the webhook; copy in `en.ts` (`emails.subscription`).
  */
 
 export type SubscriptionFacts = {
@@ -105,7 +106,7 @@ export function subscriptionTeamEmail(f: SubscriptionFacts, client: { name: stri
   const block = c.team[v];
   const who = client.name?.trim() || client.email || "A client";
   const values = { plan: planName(f.planKey), from: fromName(f.change), client: who, date: f.periodEnd ? formatDateDisplay(f.periodEnd.slice(0, 10)) : "" };
-  const stripeUrl = `https://dashboard.stripe.com/${f.livemode ? "" : "test/"}subscriptions/${f.subscriptionId}`;
+  const paddleUrl = paddleDashboardUrl("subscriptions", f.subscriptionId);
   const extra: EmailFact[] = [{ label: c.facts.client, value: client.email ? `${who} (${client.email})` : who }];
   if (f.change.kind === "changed") extra.unshift({ label: c.facts.previous, value: values.from });
   const { html, text } = renderBrandEmail({
@@ -115,7 +116,7 @@ export function subscriptionTeamEmail(f: SubscriptionFacts, client: { name: stri
     paragraphs: v === "cancelled" ? [fill(c.team.cancelled.note, values)] : [],
     facts: planFacts(f, extra),
     buttons: [
-      { label: c.buttons.stripe, href: stripeUrl },
+      { label: c.buttons.paddle, href: paddleUrl },
       { label: e.buttons.team, href: `${origin}${teamPath("en")}`, variant: "secondary" },
     ],
     footnotes: [e.teamReason],

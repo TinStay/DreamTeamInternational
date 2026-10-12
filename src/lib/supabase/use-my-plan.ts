@@ -30,7 +30,7 @@ export function notifyPlanChanged() {
 const billingOf = (v: unknown): Billing | null => (v === "monthly" || v === "annual" ? v : null);
 
 /**
- * The client's plan: their **live subscription** (`subscriptions`, mirrored from Stripe - plan, billing, price, renewal
+ * The client's plan: their **live subscription** (`subscriptions`, mirrored from Paddle - plan, billing, price, renewal
  * or end date), else the paid subscription order the mirror has not caught up with yet, else their latest **one-time
  * video** order, else none. `null` while loading; `fallback` in sample mode instead of asking Supabase.
  */

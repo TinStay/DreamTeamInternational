@@ -269,7 +269,7 @@ export const en = {
     subscribe: "Get a subscription",
     oneVideo: "Get one video",
     carouselLabel: "The kinds of video we make - drag to explore, click to watch",
-    vsl: { title: "See how Keplerbay works", length: "2 min", soon: "Video coming soon", play: "Play the video" },
+    vsl: { title: "See how Keplerbay works", length: "42 sec", soon: "Video coming soon", play: "Watch it full size" },
     watch: "Watch the video",
     close: "Close",
     previous: "Previous videos",
@@ -913,7 +913,7 @@ export const en = {
       loading: "Loading…",
       invoices: {
         title: "Invoices",
-        hint: "Bill a custom quote. Stripe emails the invoice to the client, adds any tax from their billing address, and they pay it on Stripe's page.",
+        hint: "Bill a custom quote. Paddle issues the invoice and emails it to the client, adds any tax from their billing address, and they pay it on Paddle's checkout.",
         none: "No invoices yet.",
         newInvoice: "New invoice",
         cancel: "Cancel",
@@ -925,7 +925,7 @@ export const en = {
         dueIn: "Due in (days)",
         memo: "Note on the invoice (optional)",
         address: "Billing address",
-        addressHint: "Needed to work out tax. Leave it empty if the client already has one on file.",
+        addressHint: "Paddle needs one on every invoice. Leave it empty if the client already has one on file.",
         addressFields: { line1: "Address", line2: "Apartment, suite (optional)", city: "City", state: "State / region", postal_code: "ZIP / postal code", country: "Country code (e.g. US)" },
         subtotal: "Subtotal before tax",
         send: "Send invoice",
@@ -933,10 +933,10 @@ export const en = {
         sent: "Invoice sent to the client.",
         errors: {
           invalid: "Check the lines: each needs a description and an amount of at least $1.",
-          address_required: "Add the client's billing address - Stripe needs it to work out the tax.",
+          address_required: "Add the client's billing address - Paddle needs one on every invoice.",
           invalid_address: "The address is incomplete. A US address needs the street, city, state and ZIP.",
-          not_configured: "Stripe isn't set up on this site yet.",
-          stripe: "Stripe refused the invoice: {message}",
+          not_configured: "Paddle isn't set up on this site yet.",
+          paddle: "Paddle refused the invoice: {message}",
           generic: "We couldn't send the invoice. Please try again."
         } as Record<string, string>
       }
@@ -999,7 +999,7 @@ export const en = {
       decline: "Decline",
       notePlaceholder: "Note for the client (optional)",
       paid: "paid",
-      refundNote: "Paid by card - declining does not refund it automatically: refund the payment in Stripe.",
+      refundNote: "Paid by card - declining does not refund it automatically: refund the transaction in Paddle.",
       review: "Client review",
       error: "That didn't work. Please try again."
     },
@@ -3144,14 +3144,14 @@ export const en = {
     // A client's subscription (lib/email/subscription-emails.ts). Placeholders: {plan} {from} {date} {client}.
     subscription: {
       reason: "You're getting this email because you have a Keplerbay subscription.",
-      facts: { plan: "Plan", billing: "Billing", price: "Price", videoTime: "Video time", renews: "Renews on", endsOn: "Active until", previous: "Previous plan", client: "Client", stripe: "In Stripe" },
+      facts: { plan: "Plan", billing: "Billing", price: "Price", videoTime: "Video time", renews: "Renews on", endsOn: "Active until", previous: "Previous plan", client: "Client", paddle: "In Paddle" },
       billing: { monthly: "Monthly", annual: "Annual" } as Record<string, string>,
       perMonth: "{price} / month",
       perYear: "{price} / year",
       videoTimeMonthly: "{time} of video every month",
       videoTimeAnnual: "{time} of video a year",
       customPlan: "Custom plan",
-      buttons: { start: "Start a project", manage: "Manage your subscription", resume: "Resume your subscription", plans: "See plans", stripe: "Open in Stripe" },
+      buttons: { start: "Start a project", manage: "Manage your subscription", resume: "Resume your subscription", plans: "See plans", paddle: "Open in Paddle" },
       started: {
         subject: "Welcome to {plan} - your subscription is active",
         eyebrow: "Subscription active",

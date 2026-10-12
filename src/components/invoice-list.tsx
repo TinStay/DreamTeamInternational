@@ -15,8 +15,8 @@ const LINK =
   "group inline-flex h-8 cursor-pointer items-center gap-1 rounded-full border border-white/20 px-3 text-xs font-semibold text-white/80 transition-[transform,border-color,background-color,color] duration-200 ease-out hover:-translate-y-0.5 hover:border-primary/70 hover:bg-white/10 hover:text-white";
 
 /**
- * A client's Stripe invoices, newest first - the number, date, total with its tax, the status (a due one shows its due
- * date and a Pay link), and links to Stripe's hosted page and the PDF. The account page and the team's client window
+ * A client's Paddle invoices, newest first - the number, date, total with its tax, the status (a due one shows its due
+ * date and a Pay link), and links to Paddle's checkout and the PDF. The account page and the team's client window
  * both show it.
  */
 export function InvoiceList({ invoices }: { invoices: InvoiceSummary[] }) {

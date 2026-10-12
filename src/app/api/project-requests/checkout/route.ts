@@ -1,27 +1,27 @@
 import { NextResponse } from "next/server";
-import { getStripe } from "@/lib/stripe";
+import { paddleConfigured } from "@/lib/paddle";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createRateLimiter, isCrossSite } from "@/lib/server/form-guards";
-import { customerFor } from "@/lib/stripe-customers";
-import { checkoutStudioParams, checkoutTaxAndInvoice, lineTax } from "@/lib/stripe-tax";
+import { customerFor } from "@/lib/paddle-customers";
+import { createCheckoutTransaction, lineItem } from "@/lib/paddle-checkout";
 
 const isRateLimited = createRateLimiter(60_000, 10);
 
-/** What the Stripe line reads, per kind of paid request. */
+/** What the checkout line reads, per kind of paid request. */
 const LINE: Record<string, string> = { deadline: "Earlier deadline", revision: "Extra revision" };
 
 /**
  * Pays for a change request that costs money (an earlier deadline, an extra revision). The request was created - and
  * priced - in the database by `request_project_change()` (supabase/changes.sql); here the signed-in client's own request,
- * still `awaiting_payment`, is turned into a Stripe Checkout for exactly its `cost_cents`. Nothing about the price comes
- * from the browser. The webhook marks it `requested` (paid) once the money is in, and the team then sees it.
+ * still `awaiting_payment`, is turned into a Paddle transaction for exactly its `cost_cents`, whose id the browser opens in
+ * the overlay checkout. Nothing about the price comes from the browser. The webhook marks it `requested` (paid) once the
+ * money is in, and the team then sees it.
  */
 export async function POST(request: Request) {
   if (isCrossSite(request)) return NextResponse.json({ error: "forbidden" }, { status: 403 });
-  const stripe = getStripe();
   const admin = createAdminClient();
-  if (!stripe || !admin) return NextResponse.json({ error: "not_configured" }, { status: 503 });
+  if (!paddleConfigured() || !admin) return NextResponse.json({ error: "not_configured" }, { status: 503 });
 
   const supabase = await createClient();
   const { data: auth } = await supabase.auth.getUser();
@@ -42,38 +42,21 @@ export async function POST(request: Request) {
   if (row.status !== "awaiting_payment" || !(Number(row.cost_cents) > 0)) return NextResponse.json({ error: "not_payable" }, { status: 409 });
 
   const title = (row.projects as { title?: string } | null)?.title ?? "";
-  const origin = new URL(request.url).origin;
-  const back = `${origin}/en/my-projects/${row.project_id}`;
-  const metadata = { user_id: auth.user.id, request_id: row.id, project_id: String(row.project_id), purchase_type: "project_request", kind: String(row.kind) };
-
-  const customer = await customerFor(stripe, auth.user.id, { email: auth.user.email });
-  if (!customer) return NextResponse.json({ error: "not_configured" }, { status: 503 });
+  const customData = { user_id: auth.user.id, request_id: String(row.id), project_id: String(row.project_id), purchase_type: "project_request", kind: String(row.kind) };
   const productName = `Keplerbay - ${LINE[String(row.kind)] ?? "Project change"}`;
-  const tax = lineTax();
 
-  const session = await stripe.checkout.sessions.create({
-    mode: "payment",
-    customer,
-    client_reference_id: auth.user.id,
-    ...checkoutStudioParams("payment"),
-    ...checkoutTaxAndInvoice("payment", metadata, productName),
-    line_items: [
-      {
-        quantity: 1,
-        price_data: {
-          currency: "usd",
-          unit_amount: Number(row.cost_cents),
-          ...tax.taxBehavior,
-          product_data: { name: productName, description: title ? `For "${title.slice(0, 120)}"` : undefined, ...tax.taxCode },
-        },
-      },
-    ],
-    metadata,
-    payment_intent_data: { metadata },
-    success_url: `${back}?request=paid`,
-    cancel_url: `${back}?request=cancelled`,
-  });
-
-  await admin.from("project_requests").update({ stripe_session_id: session.id }).eq("id", row.id);
-  return NextResponse.json({ url: session.url });
+  try {
+    const customerId = await customerFor(auth.user.id, { email: auth.user.email });
+    if (!customerId) return NextResponse.json({ error: "not_configured" }, { status: 503 });
+    const transaction = await createCheckoutTransaction({
+      customerId,
+      customData,
+      items: [lineItem({ name: productName, description: title ? `For "${title.slice(0, 120)}"` : productName, amountCents: Number(row.cost_cents) })],
+    });
+    await admin.from("project_requests").update({ paddle_transaction_id: transaction.id }).eq("id", row.id);
+    return NextResponse.json({ transactionId: transaction.id });
+  } catch (err) {
+    console.error("project request checkout: paddle refused", err);
+    return NextResponse.json({ error: "checkout_failed" }, { status: 502 });
+  }
 }

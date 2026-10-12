@@ -2,14 +2,14 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
-import { IconArrowRight, IconClockFilled, IconPlayerPlayFilled } from "@tabler/icons-react";
+import { IconArrowRight, IconPlayerPlayFilled } from "@tabler/icons-react";
 import { TigerCta } from "@/components/hero-tiger/tiger-cta";
 import { TiltedGridHero, type TiltedGridItem } from "@/components/ui/tilted-grid-hero";
 import { ClipLightbox } from "@/components/projects/story/primitives";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/lib/i18n/language-context";
 import { bunnyMp4Url, bunnyThumbnailUrl } from "@/lib/bunny-stream";
-import { HOME_VSL, VIDEO_PACK } from "@/lib/video-pack";
+import { VIDEO_PACK } from "@/lib/video-pack";
 import { pricingPath } from "@/lib/routes";
 import { PHONE_QUERY, useMediaQuery } from "@/lib/use-media-query";
 import { VideoPackRail } from "@/components/video-pack-rail";
@@ -25,8 +25,9 @@ const PEARL_INK =
  * the viewer at the faded ends. It drifts on its own and slows under the pointer; a mouse drag or a swipe turns it (with
  * a fling), and so does horizontal trackpad scrolling - the page's own vertical scrolling is untouched. A click on a card
  * plays its film in the lightbox (`ClipLightbox`, with sound and controls); the row of category chips under it does the
- * same, for the keyboard and screen readers (out of sight until focused). The heading and the two ways in - "Get a
- * subscription" (the orange pill) or "Get one video" (a plain text link) - are centred above the carousel.
+ * same, for the keyboard and screen readers (out of sight until focused). Above the carousel, left-aligned on the page
+ * margin: the heading running wide (one line on a laptop), its line, and the two ways in - "Get a subscription" (the
+ * orange pill) or "Get one video" (a plain text link). Nothing else - the video sales letter lives in "How it works".
  *
  * The cards play their films (muted, looping, only while on screen): one hidden video per card, drawn across the card's 16
  * curved strips (`TiltedGridHero` - one decoder a card), over the poster until it loads. A click plays it with sound in the
@@ -50,9 +51,8 @@ export function VideoPackSection() {
       })),
     [packs, p],
   );
-  // The lightbox plays a card's film (`open` = its index) or the VSL (`-1`).
-  const current = open !== null && open >= 0 ? packs[open] : null;
-  const panel = open === -1 && HOME_VSL ? { clip: HOME_VSL, title: p.vsl.title } : current?.clip ? { clip: current.clip, title: p.items[current.key].title } : null;
+  const current = open !== null ? packs[open] : null;
+  const panel = current?.clip ? { clip: current.clip, title: p.items[current.key].title } : null;
 
   return (
     <div id="video-pack">
@@ -62,13 +62,13 @@ export function VideoPackSection() {
         <VideoPackRail />
       </div>
     <section className="relative hidden flex-col justify-start overflow-x-clip pt-[5.25rem] pb-10 text-white md:flex">
-      {/* Two columns: the heading, its line and the two ways in on the left; the video sales letter on the right. */}
-      <div className="grid w-full items-center gap-8 px-[max(1.25rem,3vw)] md:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)] lg:gap-14">
+      {/* The heading running wide, its line and the two ways in - left-aligned on the page margin. */}
+      <div className="w-full px-[max(1.25rem,3vw)]">
         <div className="min-w-0">
-          <h2 className={cn("font-heading text-[clamp(30px,4.2vw,72px)] font-black uppercase leading-[0.95] tracking-[-0.01em] text-balance", PEARL_INK)}>
+          <h2 className={cn("font-heading text-[clamp(34px,4.6vw,96px)] font-black uppercase leading-[0.92] tracking-[-0.01em] md:whitespace-nowrap", PEARL_INK)}>
             {p.title}
           </h2>
-          <p className="mt-4 max-w-[60ch] text-[clamp(14px,1.05vw,17px)] leading-relaxed text-white/65">{p.subtitle}</p>
+          <p className="mt-4 max-w-[72ch] text-[clamp(15px,1.15vw,19px)] leading-relaxed text-white/65">{p.subtitle}</p>
           {/* The two ways in: a subscription (the orange pill, the Business plans) or one video. */}
           <div className="relative z-10 mt-6 flex flex-wrap items-center gap-x-6 gap-y-3">
             <TigerCta href={`${pricingPath(language)}?for=business`} label={p.subscribe} className="tiger-cta--orange" />
@@ -81,24 +81,22 @@ export function VideoPackSection() {
             </Link>
           </div>
         </div>
-        {/* Sized by the screen's height too (a wide, short screen would make it tall enough to push the carousel out of view):
-            at most as tall as the room left over the carousel, right-aligned in its column. */}
-        <VslFrame onPlay={HOME_VSL ? () => setOpen(-1) : undefined} copy={p.vsl} className="justify-self-end md:max-w-[max(20rem,calc((100svh-33rem)*16/9))]" />
       </div>
 
-      {/* The curved row along the bottom, a band under the heading and the VSL. */}
+      {/* The curved row along the bottom: the rest of the first screen, so the cards are big (sized by the screen's height,
+          never pushed below the fold on a wide, short screen). */}
       <TiltedGridHero
         items={items}
         onSelect={setOpen}
         speed={9}
-        tileHeight={phone ? 66 : 64}
-        maxWidth={phone ? 84 : 30}
+        tileHeight={phone ? 66 : 72}
+        maxWidth={phone ? 84 : 42}
         curve={phone ? 58 : 38}
         fade={phone ? 6 : 8}
         gap={8}
         radius="1rem"
         aria-label={p.carouselLabel}
-        className="mt-6 h-[clamp(16rem,50svh,26rem)] w-full md:mt-5 md:h-[clamp(13rem,calc(100svh-33rem),28rem)]"
+        className="mt-6 h-[clamp(16rem,50svh,26rem)] w-full md:mt-8 md:h-[clamp(18rem,calc(100svh-24rem),44rem)]"
       />
 
       {/* The kinds of video as buttons - each plays its film too. The keyboard's and screen readers' way in (the curved row
@@ -148,57 +146,5 @@ function PackCaption({ title, line, watch }: { title: string; line: string; watc
         <p className="mt-[1.2%] max-w-[46ch] text-[clamp(10px,2.1cqh,14px)] text-white/80">{line}</p>
       </div>
     </>
-  );
-}
-
-/**
- * The video sales letter's frame (top right of the desktop hero): a 16:9 window in the site's dark glass with an orange
- * edge, the play disc in a slow pulse, the title and its length. Until `HOME_VSL` is set (`lib/video-pack.ts`) it is a
- * branded placeholder - "video coming soon", nothing to click; with a film it shows the poster and plays it in the
- * lightbox.
- */
-function VslFrame({ onPlay, copy, className }: { onPlay?: () => void; copy: { title: string; length: string; soon: string; play: string }; className?: string }) {
-  const poster = HOME_VSL ? bunnyThumbnailUrl(HOME_VSL) : null;
-  const body = (
-    <>
-      {poster ? (
-        // eslint-disable-next-line @next/next/no-img-element -- the Bunny poster's pull zone is referer-gated, never optimised
-        <img src={poster} alt="" referrerPolicy="origin" className="absolute inset-0 size-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03]" />
-      ) : (
-        <>
-          <span aria-hidden className="absolute inset-0 bg-[radial-gradient(70%_80%_at_50%_110%,rgba(255,106,20,0.28),transparent_70%),radial-gradient(50%_60%_at_15%_0%,rgba(255,176,102,0.10),transparent_70%),#0b0c0e]" />
-          <span aria-hidden className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.035)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.035)_1px,transparent_1px)] bg-[size:36px_36px] [mask-image:radial-gradient(ellipse_at_center,black_30%,transparent_75%)]" />
-        </>
-      )}
-      <span aria-hidden className="absolute inset-0 bg-[linear-gradient(to_top,rgba(0,0,0,0.75),rgba(0,0,0,0.1)_55%,transparent)]" />
-      {/* The play disc, in a slow pulse. */}
-      <span className="absolute top-1/2 left-1/2 flex size-20 -translate-x-1/2 -translate-y-1/2 items-center justify-center">
-        <span aria-hidden className="absolute inset-0 rounded-full border border-[#ff8a1f]/50 motion-safe:animate-ping [animation-duration:3s]" />
-        <span className="relative flex size-16 items-center justify-center rounded-full bg-[linear-gradient(115deg,#ff5e00,#ff9a3c)] shadow-[0_0_40px_rgba(255,122,26,0.6)] transition-transform duration-300 group-hover:scale-110">
-          <IconPlayerPlayFilled className="ml-0.5 size-7 text-white" aria-hidden />
-        </span>
-      </span>
-      <span className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-4 p-5 text-left">
-        <span className="min-w-0">
-          <span className="block font-heading text-lg leading-tight font-black uppercase lg:text-xl">{copy.title}</span>
-          <span className="mt-1 block text-sm text-white/60">{onPlay ? copy.play : copy.soon}</span>
-        </span>
-        <span className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-white/15 bg-black/40 px-3 py-1 text-xs font-semibold text-white/80 backdrop-blur">
-          <IconClockFilled className="size-3.5 text-[#ff8a1f]" aria-hidden />
-          {copy.length}
-        </span>
-      </span>
-    </>
-  );
-  const frame =
-    "group relative block aspect-video w-full overflow-hidden rounded-2xl border border-[#ff8a1f]/30 bg-[#0b0c0e] text-white shadow-[0_30px_80px_-30px_rgba(255,106,20,0.45),0_24px_60px_-30px_rgba(0,0,0,0.9)]";
-  return onPlay ? (
-    <button type="button" onClick={onPlay} aria-label={`${copy.play}: ${copy.title}`} className={cn(frame, "cursor-pointer transition-[transform,border-color] duration-300 ease-out hover:-translate-y-1 hover:border-[#ff8a1f]/60", className)}>
-      {body}
-    </button>
-  ) : (
-    <div role="img" aria-label={`${copy.title} - ${copy.soon}`} className={cn(frame, className)}>
-      {body}
-    </div>
   );
 }

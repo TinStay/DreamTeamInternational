@@ -20,7 +20,7 @@ import { formatPrice } from "@/lib/pricing";
 import { InvoiceList } from "@/components/invoice-list";
 import type { InvoiceSummary } from "@/lib/invoices";
 
-/** The client's latest subscription, as `/account` reads it from `subscriptions` (mirrored from Stripe). */
+/** The client's latest subscription, as `/account` reads it from `subscriptions` (mirrored from Paddle). */
 export type AccountSubscription = { planKey: string | null; status: string; periodEnd: string | null; cancelAtPeriodEnd: boolean };
 
 /** One of the client's orders, as `/account` reads it from `orders`. */
@@ -31,7 +31,7 @@ const SECTION_TITLE = "font-heading text-base font-black uppercase tracking-wide
 /**
  * `/account` - Account & subscription, one page (the old View profile is merged in): who is signed in, the account facts,
  * their editable details (`ProfileForm`), their plan and video time (`AccountPlanCard`) with the subscription - status,
- * renewal or end date - their orders and Stripe invoices (`InvoiceList`), and how to delete the account. Sign out lives in the side menu.
+ * renewal or end date - their orders and Paddle invoices (`InvoiceList`), and how to delete the account. Sign out lives in the side menu.
  */
 export function AccountPageView({
   info,
@@ -174,7 +174,7 @@ export function AccountPageView({
         )}
       </section>
 
-      {/* Every Stripe invoice - one per payment and any the team sent - with its tax, the hosted page and the PDF. */}
+      {/* Every Paddle invoice - one per payment and any the team sent - with its tax, the hosted page and the PDF. */}
       <section className={`${ACCOUNT_CARD} mt-6 p-6`}>
         <h2 className={SECTION_TITLE}>{a.invoices.title}</h2>
         <p className="mt-1.5 max-w-[75ch] text-sm leading-relaxed text-white/50">{a.invoices.hint}</p>

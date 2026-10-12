@@ -1,4 +1,4 @@
--- ONE-FILE SETUP: projects + team + credits + delivery + profiles + orders + hardening + approval + changes, in the right order. Run this once in the Supabase SQL Editor.
+-- ONE-FILE SETUP: projects + team + credits + delivery + profiles + orders + hardening + approval + changes + paddle, in the right order. Run this once in the Supabase SQL Editor.
 -- (Same content as projects.sql, then team.sql, then credits.sql, then delivery.sql, then profiles.sql, then orders.sql, then hardening.sql, then approval.sql, then changes.sql. After it, make yourself an admin - see the snippet
 -- inside the team.sql part below, and read README.md.)
 
@@ -1147,3 +1147,22 @@ alter table public.project_comments add column if not exists author_avatar text;
 alter table public.project_comments drop constraint if exists project_comments_author_avatar_url;
 alter table public.project_comments add constraint project_comments_author_avatar_url
   check (author_avatar is null or (author_avatar ~ '^https://' and char_length(author_avatar) <= 500));
+
+-- ======================= paddle =======================
+-- Run once in the Supabase SQL Editor (after the other files; setup-all.sql includes it). Safe to run again.
+-- The old stripe_* columns stay: they keep the ids of anything bought before the move.
+
+-- The client's one Paddle customer (ctm_...), set on first checkout and by the subscription webhook.
+alter table public.profiles add column if not exists paddle_customer_id text;
+create index if not exists profiles_paddle_customer_idx on public.profiles (paddle_customer_id);
+
+-- Each checkout's Paddle transaction (txn_...) and, for a plan, the subscription it created (sub_...).
+alter table public.orders add column if not exists paddle_transaction_id text unique;
+alter table public.orders add column if not exists paddle_subscription_id text;
+create index if not exists orders_paddle_subscription_idx on public.orders (paddle_subscription_id);
+
+-- A paid change request's Paddle transaction.
+alter table public.project_requests add column if not exists paddle_transaction_id text;
+
+-- No new grants: profiles / orders / project_requests keep their table grants (profiles.sql, orders.sql, changes.sql) -
+-- clients read their own rows, and only the server (service role) writes these columns.

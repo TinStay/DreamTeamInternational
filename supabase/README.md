@@ -21,7 +21,7 @@ Or, in the Supabase dashboard → **SQL Editor** → **New query**, run these fi
 4. `delivery.sql` - the private `project-deliveries` bucket for finished work, the client's approve / revision action,
    `updated_at` kept by a trigger, and the `subscriptions` mirror (one live plan per client)
 5. `profiles.sql` - **one `profiles` row per user** (same id as the sign-in account, created at sign-up by a trigger,
-   backfilled for existing users): name, company, phone, country, Stripe customer id. `projects`, `credit_ledger`,
+   backfilled for existing users): name, company, phone, country, Paddle customer id. `projects`, `credit_ledger`,
    `project_comments` and `subscriptions` now point at it. Also the team's private `client_notes`, the
    `client_overview` view the team's Clients tab reads, and the security hardening the Supabase advisors asked for
 
@@ -60,56 +60,46 @@ Also in Supabase:
 - **Project Settings → Storage → Upload file size limit**: 50 MB on the free plan. Finished films are often bigger - on a
   paid plan raise it (e.g. 2 GB), or the team's video upload fails with a size error.
 
-## 2. Stripe (taking payment for packs)
+## 2. Paddle (taking payment for packs)
 
-1. Create a Stripe account (stripe.com) and stay in **test mode** at first.
-2. **Developers → API keys**: copy the **Secret key** (`sk_test_…`).
-3. **Developers → Webhooks → Add endpoint**:
-   - URL: `https://YOUR-SITE/api/stripe/webhook`
-   - Events: `checkout.session.completed`, `checkout.session.async_payment_succeeded`,
-     `checkout.session.async_payment_failed`, `checkout.session.expired` (the last two settle an order as failed /
-     not completed), `invoice.paid`,
-     `customer.subscription.created`, `customer.subscription.updated` and `customer.subscription.deleted` (the last three
-     keep a client from buying a second plan while one is live)
-   - Seconds are added **only for money collected**: a declined card never completes the checkout, a bank payment
-     (ACH / SEPA) completes it as unpaid and is credited only when `async_payment_succeeded` arrives, and a failed
-     subscription payment sends `invoice.payment_failed`, never `invoice.paid` (`src/lib/stripe-credits.ts`). To tell
-     clients about a failed renewal, turn on Stripe's own emails: **Settings → Billing → Subscriptions and emails →
-     failed payments**.
-   - Copy the **Signing secret** (`whsec_…`).
-4. To test on your computer, use the Stripe CLI: `stripe listen --forward-to localhost:3000/api/stripe/webhook`
-   (it prints a `whsec_…` for local use). Test card: `4242 4242 4242 4242`, any future date, any CVC.
-5. In production use a **restricted key** (`rk_…`) rather than the full secret key: write access to Checkout Sessions,
-   Customers, Invoices, Invoice Items and Subscriptions, read access to Tax settings.
+Payments run on **Paddle Billing**. Paddle is the **merchant of record**: it sells to the client, collects and remits
+sales tax / VAT, issues every invoice and receipt, and pays out to DT A I. The step-by-step account setup is in
+`PADDLE_SETUP.md` at the repo root; in short:
 
-## 2b. Invoices and tax (DT A I, Bulgaria → US clients)
+1. A **sandbox** account first (sandbox-vendors.paddle.com), then the live one once Paddle has approved the business
+   and the domain.
+2. **Developer tools → Authentication**: an **API key** (server - `PADDLE_API_KEY`) and a **client-side token**
+   (browser - `NEXT_PUBLIC_PADDLE_CLIENT_TOKEN`).
+3. **Checkout → Checkout settings**: the **default payment link** = `https://YOUR-SITE/en/pricing` (Paddle requires one;
+   the checkout opens there as an overlay), and **Website approval** for the domain.
+4. **Developer tools → Notifications → New destination**:
+   - URL: `https://YOUR-SITE/api/paddle/webhook`
+   - Events: `transaction.completed`, `transaction.canceled`, `transaction.payment_failed`, and
+     `subscription.created`, `subscription.updated`, `subscription.activated`, `subscription.canceled`,
+     `subscription.past_due`, `subscription.paused`, `subscription.resumed`, `subscription.trialing`
+   - Seconds are added **only for money collected** - on `transaction.completed` (a one-time pack, a subscription's
+     first payment and every renewal; `src/lib/paddle-credits.ts`). A failed renewal never completes; Paddle retries
+     it and emails the client itself, and the subscription turns `past_due` - the admin dashboard's red alert.
+   - Copy the destination's **secret key** (`PADDLE_WEBHOOK_SECRET`).
+5. To test on your computer, Paddle cannot reach `localhost`: use a tunnel (e.g. `ngrok http 3000`) as the destination
+   URL, or Paddle's **Notifications → Simulations**. Sandbox test card: `4242 4242 4242 4242`, any future date, CVC `100`.
+6. Run `supabase/paddle.sql` (the `paddle_*` id columns) on any database set up before October 2026.
 
-Keplerbay is the brand; the seller on every invoice and receipt is **DT A I**, a Bulgarian company. The code does its
-part (`src/lib/stripe-tax.ts`, `src/lib/invoices.ts`); the rest are account settings only you can set:
+## 2b. Invoices and tax
 
-1. **Settings → Business → Public details**: legal name **DT A I**, the Sofia address, support email
-   `info@keplerbay.com`, statement descriptor (e.g. `KEPLERBAY`). This is the header of every invoice.
-2. **Settings → Billing → Invoices**: the number prefix and sequential numbering, the default footer, and the Bulgarian
-   company / VAT numbers on the invoice (**Settings → Tax → Tax IDs**, or the template's custom fields). Ask your
-   accountant whether Stripe's invoices meet Bulgarian invoicing rules (ЗДДС - numbering, required fields, language) or
-   whether your accounting software must also issue its own invoice for each payment.
-3. **Tax → Settings**: head office address (Sofia, Bulgaria), default tax behavior **exclusive**, and a preset product
-   tax code. Pick the code with your tax advisor from Stripe's list (https://docs.stripe.com/tax/tax-codes, and
-   https://docs.stripe.com/tax/ai for AI services) - or set `STRIPE_TAX_CODE`.
-4. **Tax → Locations → Add registration**: record every registration you actually hold - Bulgarian VAT, and any US
-   state where your advisor says you must collect. Adding one in Stripe does not register you with the authority.
-   **Threshold monitoring** (Tax → Locations → Needs attention) warns as your US sales near a state's economic-nexus
-   threshold; in eligible states Stripe can register for you ("Register for me").
-5. Only then set `STRIPE_TAX_ENABLED=true`. With it on, every checkout and team invoice is taxed on the client's billing
-   address. Where there is no registration Stripe collects **zero, silently** - check a sandbox checkout's tax breakdown
-   first (`taxability_reason` must not be `not_collecting`).
+Paddle is the seller on every online order, so the invoice is **Paddle's** (Paddle.com as reseller, your business named
+on it): its numbering, tax lines and the client's tax ID are Paddle's job. What the site does: every checkout uses the
+client's one Paddle customer (`profiles.paddle_customer_id`, `src/lib/paddle-customers.ts`); prices are quoted before
+tax and Paddle adds the tax from the client's address at checkout; `/account` lists every invoice (a transaction) with
+its tax and a PDF link (`/api/invoices/[id]/pdf` - Paddle's own links expire); and the team bills a **custom quote**
+from the Clients tab → client → Invoices (`/api/team/invoices`) - a manually collected Paddle invoice that Paddle
+emails, payable through its checkout link. Paddle needs a **billing address** on every such invoice.
 
-What the site does either way: every checkout uses the client's one Stripe customer, collects their billing address and
-lets a business enter its tax ID (without one, Stripe treats the buyer as a consumer); prices are quoted before tax; a
-one-time payment (a video, a change request) gets a Stripe **invoice** (subscriptions get one each period); `/account`
-lists every invoice with its tax, the hosted page and the PDF; and the team bills a **custom quote** from the Clients
-tab → client → Invoices (`/api/team/invoices`) - Stripe emails it and the client pays on Stripe's page. Turn on
-**Settings → Billing → Customer emails** for receipts and invoice emails.
+The video work's **tax category** is `standard` unless `PADDLE_TAX_CATEGORY` names another one Paddle has enabled on
+the account (ask Paddle support whether AI video production should be `professional-services`).
+
+Your own books: Paddle pays out the net amount; ask your accountant how DT A I records Paddle's payouts (a reseller's
+payout, not a sale to each client).
 
 ## 3. Environment variables
 
@@ -119,23 +109,25 @@ In `.env.local` (your computer) **and** in Vercel → Settings → Environment V
 NEXT_PUBLIC_SUPABASE_URL=...
 NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=...
 SUPABASE_SERVICE_ROLE_KEY=...      # secret - server only, never NEXT_PUBLIC
-STRIPE_SECRET_KEY=sk_test_...
-STRIPE_WEBHOOK_SECRET=whsec_...
-STRIPE_TAX_ENABLED=false           # true only once Stripe Tax has a head office address and registrations (step 2b)
-STRIPE_TAX_CODE=                   # optional: the product tax code your tax advisor picks (else the account preset)
+PADDLE_API_KEY=pdl_sdbx_apikey_...      # secret - server only
+PADDLE_WEBHOOK_SECRET=pdl_ntfset_...    # the notification destination's secret key
+PADDLE_ENVIRONMENT=sandbox              # production once the live account is approved
+PADDLE_TAX_CATEGORY=                    # optional: a tax category Paddle enabled for you (else standard)
+NEXT_PUBLIC_PADDLE_CLIENT_TOKEN=test_...  # the client-side token (safe in the browser)
+NEXT_PUBLIC_PADDLE_ENVIRONMENT=sandbox    # must match PADDLE_ENVIRONMENT
 RESEND_API_KEY=...                 # project emails: the client hears every step, the team every client action
 TEAM_NOTIFY_EMAIL=                 # optional: where admin emails go (default info@dreamteamvideo.com while testing)
 ```
 
-Without the Stripe keys the pack buttons say payments aren't on yet; without the service key a paid purchase can't be
-credited (Stripe will keep retrying). You can always add or take back seconds by hand in the team dashboard.
+Without the Paddle keys the pack buttons say payments aren't on yet; without the service key a paid purchase can't be
+credited (Paddle will keep retrying). You can always add or take back seconds by hand in the team dashboard.
 
 ## 4. Try it without any data
 
 - `/en/my-projects?sample=1` - the client's Your Projects with made-up projects (any signed-in account)
 - `/en/team?sample=1` - the team dashboard with made-up data (any signed-in account)
 
-## Testing without payments (no Stripe)
+## Testing without payments (no Paddle)
 
 1. Run the three SQL files (section 1) and make yourself a team member.
 2. Use **two accounts**: your team account (admin) and a normal **client** account (a different email). An admin account is
@@ -145,5 +137,5 @@ credited (Stripe will keep retrying). You can always add or take back seconds by
 5. Sign in as the team account → account menu → **Team dashboard**: the project is there with everything the client filled
    in and their files; write a comment, change the stage, save. The client sees it at once in **Your Projects**.
 
-Stripe and `SUPABASE_SERVICE_ROLE_KEY` are not needed for this; the pack buttons on the Pricing page will say payments
+Paddle and `SUPABASE_SERVICE_ROLE_KEY` are not needed for this; the pack buttons on the Pricing page will say payments
 aren't switched on yet.

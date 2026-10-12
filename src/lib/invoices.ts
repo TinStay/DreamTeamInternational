@@ -1,10 +1,16 @@
-import type Stripe from "stripe";
-import { INVOICE_FOOTER, lineTax, taxEnabled } from "@/lib/stripe-tax";
+import { paddle, type PaddleTransaction } from "@/lib/paddle";
+import { lineItem } from "@/lib/paddle-checkout";
+import type { BillingAddress } from "@/lib/paddle-customers";
 
-/** One invoice, as the client's account page and the team's client window show it. */
+export type { BillingAddress } from "@/lib/paddle-customers";
+
+/**
+ * One invoice, as the client's account page and the team's client window show it. In Paddle every invoice is a
+ * **transaction** (Paddle, the merchant of record, issues it): a checkout payment, a renewal, or one the team sent.
+ */
 export type InvoiceSummary = {
   id: string;
-  /** Stripe's invoice number (e.g. `KEPL-0001`), once finalized. */
+  /** Paddle's invoice number, once issued. */
   number: string | null;
   /** ISO date-time it was issued. */
   createdAt: string;
@@ -16,32 +22,55 @@ export type InvoiceSummary = {
   taxCents: number;
   currency: string;
   status: "open" | "paid" | "void" | "uncollectible" | "draft";
-  /** Stripe's hosted page - view and pay. */
+  /** Paddle's checkout for an invoice still to pay. */
   hostedUrl: string | null;
+  /** Our route that hands over Paddle's PDF (its links expire, so it is fetched on click - `/api/invoices/[id]/pdf`). */
   pdfUrl: string | null;
 };
 
-export function invoiceSummary(inv: Stripe.Invoice): InvoiceSummary {
-  const total = inv.total ?? 0;
+const STATUS: Record<PaddleTransaction["status"], InvoiceSummary["status"]> = {
+  completed: "paid",
+  paid: "paid",
+  billed: "open",
+  past_due: "uncollectible",
+  canceled: "void",
+  draft: "draft",
+  ready: "draft",
+};
+
+const DAY_MS = 86_400_000;
+
+export function invoiceSummary(tx: PaddleTransaction): InvoiceSummary {
+  const totals = tx.details?.totals;
+  const issued = tx.billed_at ?? tx.created_at;
+  const terms = tx.billing_details?.payment_terms;
+  const dueAt = tx.collection_mode === "manual" && tx.billed_at && terms ? new Date(Date.parse(tx.billed_at) + terms.frequency * (terms.interval === "week" ? 7 : terms.interval === "month" ? 30 : 1) * DAY_MS).toISOString() : null;
+  const status = STATUS[tx.status] ?? "draft";
   return {
-    id: inv.id ?? "",
-    number: inv.number ?? null,
-    createdAt: new Date(inv.created * 1000).toISOString(),
-    dueAt: inv.due_date ? new Date(inv.due_date * 1000).toISOString() : null,
-    description: inv.description ?? inv.lines?.data?.[0]?.description ?? null,
-    totalCents: total,
-    taxCents: Math.max(0, total - (inv.total_excluding_tax ?? total)),
-    currency: inv.currency,
-    status: (inv.status ?? "draft") as InvoiceSummary["status"],
-    hostedUrl: inv.hosted_invoice_url ?? null,
-    pdfUrl: inv.invoice_pdf ?? null,
+    id: tx.id,
+    number: tx.invoice_number ?? null,
+    createdAt: issued,
+    dueAt,
+    description: tx.billing_details?.additional_information || tx.items?.[0]?.price?.description || null,
+    totalCents: Number.parseInt(totals?.grand_total ?? "0", 10) || 0,
+    taxCents: Number.parseInt(totals?.tax ?? "0", 10) || 0,
+    currency: (tx.currency_code ?? "USD").toLowerCase(),
+    status,
+    hostedUrl: status === "open" ? (tx.checkout?.url ?? null) : null,
+    pdfUrl: tx.invoice_number ? `/api/invoices/${encodeURIComponent(tx.id)}/pdf` : null,
   };
 }
 
-/** A customer's invoices, newest first - drafts left out (the client never sees one, the team sends them finalized). */
-export async function listInvoices(stripe: Stripe, customerId: string, limit = 24): Promise<InvoiceSummary[]> {
-  const page = await stripe.invoices.list({ customer: customerId, limit });
-  return page.data.filter((inv) => inv.status !== "draft").map(invoiceSummary);
+/** A customer's invoices, newest first - drafts and abandoned checkouts left out. */
+export async function listInvoices(customerId: string, limit = 24): Promise<InvoiceSummary[]> {
+  const list = await paddle<PaddleTransaction[]>("GET", "/transactions", undefined, {
+    customer_id: customerId,
+    status: "billed,paid,completed,past_due,canceled",
+    order_by: "created_at[DESC]",
+    per_page: limit,
+  });
+  // A canceled transaction that was never billed is an abandoned checkout, not an invoice.
+  return list.filter((tx) => tx.status !== "canceled" || tx.billed_at).map(invoiceSummary);
 }
 
 /** One line of an invoice the team writes. */
@@ -68,9 +97,6 @@ export function parseInvoiceDraft(body: unknown): InvoiceDraft | null {
   return { lines, daysUntilDue: days, memo };
 }
 
-/** A billing address the team enters for a client (needed to tax an invoice - a US one in full). */
-export type BillingAddress = { line1: string; line2?: string; city: string; state?: string; postal_code: string; country: string };
-
 export function parseAddress(raw: unknown): BillingAddress | null {
   const a = (raw ?? {}) as Record<string, unknown>;
   const s = (k: string, max = 120) => (typeof a[k] === "string" ? (a[k] as string).trim().slice(0, max) : "");
@@ -82,34 +108,24 @@ export function parseAddress(raw: unknown): BillingAddress | null {
 }
 
 /**
- * Writes, finalizes and emails a one-off invoice for a custom quote: the lines in USD before tax, Stripe Tax on top when it
- * is on, due in `daysUntilDue` days, paid on Stripe's hosted page (card or bank transfer, as set in the Dashboard). The
- * invoice carries `purchase_type: custom_invoice`, so the webhook never mistakes it for a video-time pack.
+ * Issues a one-off invoice for a custom quote: a **manually collected** Paddle transaction, issued at once (`billed`) - the
+ * lines in USD before tax (Paddle adds the tax from the address), due in `daysUntilDue` days, payable through Paddle's
+ * checkout link, the memo printed on the invoice. Paddle emails it to the client. It carries
+ * `purchase_type: custom_invoice`, so the webhook never mistakes it for a video-time pack.
  */
-export async function sendCustomInvoice(stripe: Stripe, customerId: string, userId: string, draft: InvoiceDraft, teamUserId: string): Promise<Stripe.Invoice> {
-  const tax = lineTax();
-  const invoice = await stripe.invoices.create({
-    customer: customerId,
-    currency: "usd",
-    collection_method: "send_invoice",
-    days_until_due: draft.daysUntilDue,
-    automatic_tax: { enabled: taxEnabled() },
-    pending_invoice_items_behavior: "exclude",
-    footer: INVOICE_FOOTER,
-    ...(draft.memo ? { description: draft.memo } : {}),
-    metadata: { user_id: userId, purchase_type: "custom_invoice", created_by: teamUserId },
+export async function sendCustomInvoice(customerId: string, addressId: string, userId: string, draft: InvoiceDraft, teamUserId: string): Promise<PaddleTransaction> {
+  return paddle<PaddleTransaction>("POST", "/transactions", {
+    items: draft.lines.map((l) => lineItem({ name: l.description, description: l.description, amountCents: l.amountCents })),
+    customer_id: customerId,
+    address_id: addressId,
+    currency_code: "USD",
+    collection_mode: "manual",
+    status: "billed",
+    billing_details: {
+      enable_checkout: true,
+      payment_terms: { interval: "day", frequency: draft.daysUntilDue },
+      ...(draft.memo ? { additional_information: draft.memo } : {}),
+    },
+    custom_data: { user_id: userId, purchase_type: "custom_invoice", created_by: teamUserId },
   });
-  for (const line of draft.lines) {
-    await stripe.invoiceItems.create({
-      customer: customerId,
-      invoice: invoice.id,
-      currency: "usd",
-      amount: line.amountCents,
-      description: line.description,
-      ...tax.taxBehavior,
-      ...tax.taxCode,
-    });
-  }
-  const finalized = await stripe.invoices.finalizeInvoice(invoice.id ?? "");
-  return stripe.invoices.sendInvoice(finalized.id ?? "");
 }
