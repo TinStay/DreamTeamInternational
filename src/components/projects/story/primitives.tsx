@@ -19,7 +19,7 @@ import { bunnyBackgroundEmbedSrc, bunnyPlayerEmbedSrc, bunnyThumbnailUrl, type B
 import { useLanguage } from "@/lib/i18n/language-context";
 import { MAIN_WITH_FIXED_PAGE_BG_CLASS } from "@/lib/page-shell";
 import type { StoryClip } from "@/lib/projects";
-import { contactProcessPath } from "@/lib/routes";
+import { emailHref } from "@/lib/contact-info";
 import { cn } from "@/lib/utils";
 import { YOUTUBE_EMBED_BASE, YOUTUBE_IFRAME_ALLOW, YOUTUBE_REFERRER_POLICY } from "@/lib/youtube-embeds";
 
@@ -771,7 +771,6 @@ export function CtaBand({
   /** Decoration layers (backgrounds, marks) - rendered first, behind the copy. */
   children?: ReactNode;
 }) {
-  const { language } = useLanguage();
   const face = useStoryDisplay();
   const rise = animate === "rise";
   // The rising card staggers its copy block and its pills (both `fadeUp` children); the fading one moves as a whole.
@@ -820,7 +819,7 @@ export function CtaBand({
         <ButtonWithIcon href="#quote" surface={tone === "light" ? "dark" : tone === "dark" ? "light" : "auto"}>
           {quote}
         </ButtonWithIcon>
-        <Link href={contactProcessPath(language)} className={cn(ctaPillClassName, "border transition-colors duration-200", outline)}>
+        <Link href={emailHref()} className={cn(ctaPillClassName, "border transition-colors duration-200", outline)}>
           {contact}
         </Link>
       </motion.div>

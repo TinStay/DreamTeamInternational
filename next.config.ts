@@ -20,6 +20,8 @@ const nextConfig: NextConfig = {
       { source: "/training", destination: "/en/training", permanent: true },
       { source: "/individual", destination: "/en/training/individual", permanent: true },
       { source: "/en/individual", destination: "/en/training/individual", permanent: true },
+      // The contact page became the investor relations page (temporary, so it can change again).
+      { source: "/en/contact", destination: "/en/investors", permanent: false },
       // Retired Chinese locale → English (replaces the old /zh middleware redirect).
       { source: "/zh", destination: "/en", permanent: true },
       { source: "/zh/:path*", destination: "/en/:path*", permanent: true },

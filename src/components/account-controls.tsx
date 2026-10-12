@@ -37,7 +37,9 @@ export function AccountControls() {
           ) : null}
           <WaterButton href={myProjectsPath(language)}>
             <IconFolderFilled className="size-[18px]" aria-hidden />
-            {t.account.projectsButton}
+            {/* The long label only where the bar has room for it (the nav fits its tabs to what is left). */}
+            <span className="max-[1699px]:hidden">{t.account.projectsButton}</span>
+            <span className="min-[1700px]:hidden">{t.account.projectsButtonShort}</span>
           </WaterButton>
           <span className="ml-1">
             <AccountMenu user={user} />
@@ -47,12 +49,14 @@ export function AccountControls() {
         <>
           <WaterButton onClick={openLogin}>
             <IconFolderFilled className="size-[18px]" aria-hidden />
-            {t.account.projectsButton}
+            {/* The long label only where the bar has room for it (the nav fits its tabs to what is left). */}
+            <span className="max-[1699px]:hidden">{t.account.projectsButton}</span>
+            <span className="min-[1700px]:hidden">{t.account.projectsButtonShort}</span>
           </WaterButton>
           <button
             type="button"
             onClick={openLogin}
-            className="inline-flex h-11 cursor-pointer items-center rounded-full px-4 text-[15px] font-semibold text-white/85 transition-[transform,background-color,color] duration-200 ease-out hover:-translate-y-px hover:bg-white/[0.08] hover:text-white"
+            className="inline-flex h-11 cursor-pointer items-center rounded-full px-4 max-[1699px]:px-3 text-[15px] font-semibold text-white/85 transition-[transform,background-color,color] duration-200 ease-out hover:-translate-y-px hover:bg-white/[0.08] hover:text-white"
           >
             {t.header.login}
           </button>

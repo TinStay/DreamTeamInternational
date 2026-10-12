@@ -19,11 +19,13 @@ import { MobileTopControls } from "@/components/mobile-account";
 import { AuthDialog } from "@/components/auth-dialog";
 import { PARTNERS, PARTNER_ICON_BASE } from "@/lib/partners";
 import { PROJECTS } from "@/lib/projects";
+import { PORTFOLIO_KEYS } from "@/lib/portfolio-grid";
 import { getServiceSlug } from "@/lib/services/constants";
 import {
   aboutPath,
   careersPath,
   contactProcessPath,
+  investorsPath,
   homePath,
   portfolioPath,
   pricingPath,
@@ -217,37 +219,36 @@ export function SiteHeader() {
     ),
   }));
 
-  // The English mega menu's tabs, in the client's order and groups (split by thin lines): Explore - the home page,
-  // dropping down the video types (each on its portfolio category until it has its own page) | About · Case studies ·
-  // Pricing · Careers | Custom Services, dropping down the rest of the site.
+  // The English mega menu's tabs, in the client's order and groups (split by thin lines): Home | the big glowing
+  // "Explore Videos" button - a list of every video category, each opening the portfolio filtered to it - | About Us,
+  // Customers, Pricing, Careers | Investor Relations. All of them stay on the bar, set a little smaller when the screen
+  // is short of room (`MegaHeader`); only when even that is not enough do tabs fold into "More", which then appears at
+  // the end - the `collapse` number says in what order (Careers first, then About Us and Customers, Home last; the
+  // glowing tab, Pricing and Investor Relations never).
   const portfolioCategory = (key: string) => `${portfolioPath(language)}?category=${key}`;
+  const categoryNames = t.packages.items as Record<string, { title: string; line: string }>;
+  const categoryItems = PORTFOLIO_KEYS.map((key) => ({
+    label: categoryNames[key].title,
+    hint: categoryNames[key].line,
+    href: portfolioCategory(key),
+  }));
   const megaGroups: MegaNavGroup[] = [
+    { label: t.header.nav.explore, href: homeHref, items: [], collapse: 6 },
     {
-      label: t.header.nav.explore,
-      href: homeHref,
-      items: [
-        { label: t.header.nav.socialAds, href: portfolioCategory("socialAds") },
-        { label: t.header.nav.corporate, href: portfolioCategory("corporate") },
-        { label: t.header.nav.tvAds, href: portfolioCategory("tvAds") },
-        { label: t.header.nav.productVideos, href: portfolioCategory("productVideos") },
-      ],
-    },
-    { label: t.header.about, href: aboutPath(language), items: [], divideBefore: true },
-    { label: t.header.projects, href: projectsPath(language), items: [] },
-    { label: t.header.pricingPage, href: pricingPath(language), items: [] },
-    { label: t.footer.careers, href: careersPath(language), items: [] },
-    {
-      label: t.header.nav.other,
-      href: servicesPath(language),
+      label: t.header.nav.exploreVideos,
+      href: portfolioPath(language),
+      cta: true,
       divideBefore: true,
-      items: [
-        { label: t.header.portfolio, href: portfolioPath(language) },
-        { label: t.header.services, href: servicesPath(language) },
-        { label: t.header.nav.brandMascots, href: servicePath(language, "brand-mascots") },
-        { label: t.header.training, href: trainingPath(language) },
-        { label: t.header.contact, href: contactProcessPath(language) },
-      ],
+      items: categoryItems,
+      footerLink: { label: t.header.nav.exploreAll, href: portfolioPath(language) },
     },
+    { label: t.header.about, href: aboutPath(language), items: [], divideBefore: true, collapse: 8 },
+    { label: t.header.projects, href: projectsPath(language), items: [], collapse: 7 },
+    { label: t.header.pricingPage, href: pricingPath(language), items: [] },
+    { label: t.footer.careers, href: careersPath(language), items: [], collapse: 9 },
+    { label: t.header.investors, href: investorsPath(language), items: [], divideBefore: true },
+    // "More" is only on the bar while tabs are folded into it (a narrow window).
+    { label: t.header.nav.other, href: "#more", overflow: true, divideBefore: true, items: [] },
   ];
 
   const desktopControls = (

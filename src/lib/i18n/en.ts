@@ -10,15 +10,19 @@ export const en = {
     training: "Training",
     projects: "Customers",
     pricingPage: "Pricing",
-    // The mega menu's tabs (`site-header.tsx`): Explore (home), the video services, Pricing, and "Other" for the rest.
+    investors: "Investor Relations",
+    // The mega menu's tabs (`site-header.tsx`): Home, the glowing "Explore Videos" tab (a list of every video category),
+    // About Us, Customers, Pricing, Careers, Investor Relations - and "More" for what does not fit a narrow window.
     nav: {
-      explore: "Explore",
+      explore: "Home",
+      exploreVideos: "Explore Videos",
+      exploreAll: "Browse all videos",
       socialAds: "Social Media Ads",
       corporate: "Corporate Videos",
       tvAds: "TV Ads",
       productVideos: "Product Videos",
       brandMascots: "Brand Mascots",
-      other: "Custom Services"
+      other: "More"
     },
     login: "Log in",
     signup: "Sign up",
@@ -458,7 +462,6 @@ export const en = {
       title: "Delete your account",
       text: "Contact our support team and we'll take care of it: we delete your account, your projects and your files within 30 days and confirm by email. We keep only what the law requires us to keep, such as payment and tax records, and only for as long as it requires. Any active subscription is cancelled first.",
       cta: "Contact support",
-      form: "or use the contact form",
       subject: "Account deletion request"
     },
     profileForm: {
@@ -477,6 +480,7 @@ export const en = {
     providers: { google: "Google", azure: "Microsoft", email: "Email link" },
     // The header's Your Projects button and the /my-projects page.
     projectsButton: "Your Projects",
+    projectsButtonShort: "Projects",
     projectsPage: {
       trySample: "Want to see how it will look? Preview with sample projects",
       purchased: "Thank you for your order! Your video seconds are added as soon as your payment is confirmed - for a card, within a few seconds; a bank payment can take a few business days. If the payment fails, nothing is charged and no seconds are added.",
@@ -1073,10 +1077,84 @@ export const en = {
       musicVideos: { title: "Music Videos", line: "Cinematic visuals for artists and labels" }
     }
   },
-  contactPage: {
-    metaTitle: "Contact & Process | Keplerbay",
+  // `/investors` - the investor relations page (it replaced the contact page): why Keplerbay, who we want to hear from,
+  // what happens next, and the short "I'm interested" form (posted to `/api/contact` as an investor inquiry).
+  investors: {
+    metaTitle: "Investor Relations | Keplerbay",
     metaDescription:
-      "How we work from brief to delivery, and how to reach Keplerbay for AI video production.",
+      "Keplerbay makes professional AI video on subscription for brands worldwide. Investors who would like to learn more can get in touch here.",
+    eyebrow: "Investor relations",
+    title1: "Invest in the future of",
+    title2: "AI video",
+    lead:
+      "Keplerbay turns AI video into a service brands can rely on: professional films made by an experienced team, on a plan, with no prompting, no credits and no learning curve. If you share our view of where video is going, we would like to talk.",
+    cta: "I'm interested",
+    whyTitle: "Why Keplerbay",
+    why: [
+      {
+        title: "A market moving to AI",
+        text: "Every brand needs more video, in more formats, more often. The old production model cannot keep up on cost or on time - AI can.",
+      },
+      {
+        title: "A product, not a project",
+        text: "Video packs and subscriptions across eleven formats, from social ads to TV spots, so revenue repeats instead of starting again with every brief.",
+      },
+      {
+        title: "Proof with real brands",
+        text: "Work for brands such as MindGuard, Boleron, Emblema and OSMO, including a campaign with more than 75 million views.",
+      },
+      {
+        title: "A team that delivers",
+        text: "Hundreds of videos delivered for clients around the world, and a US launch under way.",
+      },
+    ],
+    lookingTitle: "Who we would like to hear from",
+    looking: ["Angel investors", "Venture funds", "Family offices", "Strategic partners in media, advertising and AI"],
+    stepsTitle: "What happens next",
+    steps: [
+      { title: "Tell us about you", text: "Send the short form below - who you are and what you are looking for." },
+      { title: "A first conversation", text: "We reply personally and set up a call to share the story, the product and where we are going." },
+      { title: "The details", text: "If there is a fit, we share the deck and the numbers - under NDA where needed." },
+    ],
+    form: {
+      title: "I'm interested",
+      subtitle: "Tell us a little about yourself. We read every message.",
+      name: "Full name",
+      email: "Email",
+      firm: "Fund or company (optional)",
+      type: "I am a",
+      types: {
+        angel: "Angel investor",
+        fund: "Venture fund",
+        family: "Family office",
+        strategic: "Strategic partner",
+        other: "Something else",
+      },
+      range: "Typical investment (optional)",
+      ranges: {
+        discuss: "Prefer to discuss",
+        under50: "Under $50k",
+        from50: "$50k - $250k",
+        from250: "$250k - $1M",
+        over1m: "Over $1M",
+      },
+      message: "Message",
+      messagePlaceholder: "What would you like to know about Keplerbay?",
+      submit: "Send message",
+      sending: "Sending...",
+      successTitle: "Thank you",
+      successText: "We have your message and will reply to you personally.",
+      another: "Send another message",
+      required: "Please fill out your name, a valid email and a message.",
+      error: "Something went wrong. Please try again, or write to us directly.",
+    },
+    direct: {
+      title: "Prefer email?",
+      text: "Write to us directly and we will take it from there.",
+      cta: "Email us",
+      subject: "Investor inquiry",
+    },
+    note: "This page is for information only and is not an offer to sell or a solicitation of an offer to buy any securities.",
   },
   // The SEO copy: the home page's title / description / keywords (the layout's defaults too), the organization's
   // description for the structured data and `llms.txt`, the address split for the schema, the topics it knows.
@@ -1876,7 +1954,10 @@ export const en = {
   services: {
     title1: "Our",
     title2: "Services",
+    eyebrow: "What we do",
     subtitle: "End-to-end AI production - from video and mascots to stills and automated pipelines.",
+    pricingCta: "See pricing",
+    workCta: "Explore videos",
     learnMore: "Learn more",
     quoteCta: "Request a quote",
     metaTitle: "AI Video Services for Business | Keplerbay",

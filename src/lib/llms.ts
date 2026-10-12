@@ -2,14 +2,13 @@ import { getDictionary, type Language } from "@/lib/i18n/config";
 import { EMAIL_PRIMARY, GOOGLE_REVIEWS, PHONE_PRIMARY, PHONE_SECONDARY } from "@/lib/contact-info";
 import { PROJECTS } from "@/lib/projects";
 import {
-  contactProcessPath,
   homePath,
+  investorsPath,
   portfolioPath,
   projectPath,
   projectsPath,
   servicePath,
   servicesPath,
-  trainingPath,
 } from "@/lib/routes";
 import { absoluteUrl } from "@/lib/seo";
 import { getServiceSlug } from "@/lib/services/constants";
@@ -101,18 +100,12 @@ function section(lang: Language, full: boolean) {
     lines.push("");
   }
 
-  lines.push(`### ${h.training}`, "");
-  lines.push(`- **${t.training.cards.individual.title}** - ${t.training.cards.individual.featureSummary} ${absoluteUrl(`${trainingPath(lang)}/individual`)}`);
-  lines.push(`- **${t.training.cards.team.title}** - ${t.training.cards.team.featureSummary} ${absoluteUrl(`${trainingPath(lang)}/team`)}`);
-  lines.push("");
-
   lines.push(`### ${h.pages}`, "");
   lines.push(`- ${t.legal.home}: ${absoluteUrl(homePath(lang))}`);
   lines.push(`- ${t.header.services}: ${absoluteUrl(servicesPath(lang))}`);
   lines.push(`- ${t.header.projects}: ${absoluteUrl(projectsPath(lang))}`);
   lines.push(`- ${t.header.portfolio}: ${absoluteUrl(portfolioPath(lang))}`);
-  lines.push(`- ${t.header.training}: ${absoluteUrl(trainingPath(lang))}`);
-  lines.push(`- ${t.header.contact}: ${absoluteUrl(contactProcessPath(lang))}`);
+  lines.push(`- ${t.header.investors}: ${absoluteUrl(investorsPath(lang))}`);
   lines.push("");
 
   return lines.join("\n");

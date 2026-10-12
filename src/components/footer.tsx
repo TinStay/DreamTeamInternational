@@ -7,7 +7,7 @@ import { openConsentSettings } from "@/lib/consent";
 import { PHONE_US } from "@/lib/contact-info";
 import { useLanguage } from "@/lib/i18n/language-context";
 import { BrandWordmark } from "@/components/ui/brand-wordmark";
-import { aboutPath, careersPath, homePath, portfolioPath, pricingPath, privacyPath, projectsPath, termsPath } from "@/lib/routes";
+import { aboutPath, careersPath, homePath, investorsPath, portfolioPath, pricingPath, privacyPath, projectsPath, termsPath } from "@/lib/routes";
 import { SOCIAL_LINKS } from "@/lib/social-links";
 import { cn } from "@/lib/utils";
 
@@ -93,6 +93,9 @@ export function Footer() {
             </Link>
             <Link href={careersPath(language)} className={linkClass}>
               {f.careers}
+            </Link>
+            <Link href={investorsPath(language)} className={linkClass}>
+              {t.header.investors}
             </Link>
             <Link href={privacyPath(language)} className={linkClass}>
               {f.policies}

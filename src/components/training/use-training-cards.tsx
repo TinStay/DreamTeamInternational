@@ -3,7 +3,7 @@
 import type React from "react";
 import { useMemo } from "react";
 import { useLanguage } from "@/lib/i18n/language-context";
-import { contactProcessPath } from "@/lib/routes";
+import { emailHref } from "@/lib/contact-info";
 import { TrainingModalDetails, TrainingModalIncludes } from "./training-modal-rich";
 
 export type TrainingExpandableCard = {
@@ -20,9 +20,9 @@ export type TrainingExpandableCard = {
 };
 
 export function useTrainingCards(): TrainingExpandableCard[] {
-  const { t, language } = useLanguage();
+  const { t } = useLanguage();
   const tr = t.training;
-  const contactHref = contactProcessPath(language);
+  const contactHref = emailHref();
 
   return useMemo(
     () => [

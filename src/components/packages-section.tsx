@@ -10,7 +10,8 @@ import { useLanguage } from "@/lib/i18n/language-context";
 import { bunnyMp4Url, type BunnyVideo } from "@/lib/bunny-stream";
 import { PACKAGE_FILMS } from "@/lib/package-films";
 import { PHONE_QUERY, useMediaQuery } from "@/lib/use-media-query";
-import { contactProcessPath, portfolioPath, pricingPath } from "@/lib/routes";
+import { portfolioPath, pricingPath } from "@/lib/routes";
+import { emailHref } from "@/lib/contact-info";
 
 /** The kinds of video in the grid, in order: the header's tabs first, then the rest. Words in `packages.items`, the
  *  picture at `public/packages/<key>.webp` (1200 x 675). */
@@ -187,7 +188,7 @@ export function PackagesSection() {
       <div className="mt-10 flex flex-wrap items-center gap-x-6 gap-y-3">
         <TigerCta href={plansHref} label={p.compare} className="tiger-cta--orange" />
         <Link
-          href={contactProcessPath(language)}
+          href={emailHref()}
           className="group inline-flex items-center gap-1.5 text-[15px] text-white/65 transition-colors duration-200 hover:text-white"
         >
           {p.custom}

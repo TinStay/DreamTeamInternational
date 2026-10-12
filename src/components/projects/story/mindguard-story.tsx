@@ -8,7 +8,7 @@ import { PartnerLogo } from "@/components/partner-logo";
 import { useLanguage } from "@/lib/i18n/language-context";
 import { PARTNERS } from "@/lib/partners";
 import type { Project, StoryClip } from "@/lib/projects";
-import { contactProcessPath } from "@/lib/routes";
+import { emailHref } from "@/lib/contact-info";
 import { cn } from "@/lib/utils";
 import { COPY_DELAY, ClientSite, MediaFrame, STORY_CONTAINER, Section, StoryShell, VIEWPORT, fadeUp, fadeUpAfter, frameIn, stagger } from "./primitives";
 
@@ -139,7 +139,7 @@ function Quote({ eyebrow, quote, name, role, className }: { eyebrow?: string; qu
 }
 
 export function MindguardStory({ project }: { project: Project }) {
-  const { t, language } = useLanguage();
+  const { t } = useLanguage();
   const story = t.projects.stories.mindguard;
   const name = t.projects.items[project.id].name;
   const partner = PARTNERS.find((p) => p.id === project.partnerId);
@@ -354,7 +354,7 @@ export function MindguardStory({ project }: { project: Project }) {
           {/* A size under the section titles - it is a question beside a pill, not a headline. */}
           <h2 className={cn(HEADING, "max-w-[34ch] text-[clamp(1.25rem,1.8vw,1.75rem)] font-semibold tracking-[-0.015em] text-balance leading-[1.2]")}>{story.cta.title}</h2>
           <Link
-            href={contactProcessPath(language)}
+            href={emailHref()}
             className="inline-block shrink-0 cursor-pointer whitespace-nowrap rounded-full bg-[#35827C] px-9 py-4 text-[1.05rem] font-bold text-white transition-[background-color,transform,box-shadow] duration-200 ease-out hover:-translate-y-0.5 hover:bg-[#45A199] hover:shadow-[0_14px_30px_-12px_rgba(69,161,153,0.7)] focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-[#45A199]"
           >
             {story.cta.contact}

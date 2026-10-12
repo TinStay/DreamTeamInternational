@@ -23,6 +23,11 @@ export const EMAIL_PRIMARY = {
   label: "info@keplerbay.com",
 } as const;
 
+/** A `mailto:` link to the public inbox, with a subject when there is one - the "write to us" links on the site. */
+export function emailHref(subject?: string) {
+  return subject ? `${EMAIL_PRIMARY.href}?subject=${encodeURIComponent(subject)}` : EMAIL_PRIMARY.href;
+}
+
 /**
  * Keplerbay's Google Business listing ("Keplerbay - AI видео реклами и услуги", Sofia). The rating and the
  * review count are the listing's own numbers, read off the place page on 16-09-2026 - there is no key-less way to
