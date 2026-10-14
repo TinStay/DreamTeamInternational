@@ -23,7 +23,7 @@ import {
 export const PROJECT_EVENTS = ["submitted", "status", "approved", "revision", "comment", "change_request", "request_resolved"] as const;
 export type ProjectEvent = (typeof PROJECT_EVENTS)[number];
 
-/** Who is asking: a signed-in account, or the server itself (`system` - the Stripe webhook, once a change is paid for). */
+/** Who is asking: a signed-in account, or the server itself (`system` - the Paddle webhook, once a change is paid for). */
 export type Caller = { id: string; isTeam: boolean; system?: boolean };
 export type NotifyInput = { projectId: string; event: ProjectEvent; commentId?: string | null; requestId?: string | null };
 export type NotifyResult = { status: "sent" | "skipped" | "forbidden" | "not_found" | "not_configured"; sent: number };
@@ -140,7 +140,7 @@ export async function notifyProjectEvent(caller: Caller, input: NotifyInput, ori
       );
     }
 
-    // The client asked for a change - free, or paid (then the Stripe webhook calls this once the money is in).
+    // The client asked for a change - free, or paid (then the Paddle webhook calls this once the money is in).
     case "change_request": {
       if (!isOwner && !caller.system) return { status: "forbidden", sent: 0 };
       const req = await loadRequest(admin, input.requestId, p.id);

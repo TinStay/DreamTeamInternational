@@ -33,7 +33,7 @@ const PATHS: readonly string[] = [
 
 function priorityFor(path: string) {
   if (path === "") return 1;
-  if (path.startsWith("/services") || path.startsWith("/projects")) return 0.9;
+  if (path === "/pricing" || path.startsWith("/services") || path.startsWith("/projects")) return 0.9;
   if (path === "/portfolio") return 0.8;
   if (path === "/investors") return 0.5;
   return 0.4;

@@ -11,11 +11,23 @@ export const VIDEO_PACK_KEYS = ["socialAds", "tvAds", "corporate", "brandCampaig
 export type VideoPackKey = (typeof VIDEO_PACK_KEYS)[number];
 
 /**
- * The video sales letter in the home page's first screen (top right, desktop): `null` shows a branded placeholder
- * ("video coming soon"); set it to the Bunny clip - `bunny("<guid>")` - and the frame shows its poster and plays it in the
- * lightbox with sound.
+ * Where the video sales letter comes from: a Bunny clip (the frame shows its poster and plays it in the lightbox with sound),
+ * or an animated **page** - a self-contained HTML motion piece in `public/` (a Claude Design export), which plays live and
+ * muted in the frame and full size, with its own play bar, in the lightbox. `poster` is a still of it (shown until it has
+ * loaded, and alone under reduced motion).
  */
-export const HOME_VSL: BunnyVideo | null = null;
+export type VslSource = { kind: "bunny"; clip: BunnyVideo } | { kind: "page"; src: string; poster: string };
+
+/**
+ * The video sales letter in the home page's first screen (top right, desktop): "Order to delivery", the 42-second
+ * walkthrough of ordering and tracking a video (`public/vsl/order-to-delivery.html`; the poster is its opening frame).
+ * `null` shows a branded placeholder ("video coming soon").
+ */
+export const HOME_VSL: VslSource | null = {
+  kind: "page",
+  src: "/vsl/order-to-delivery.html",
+  poster: "/vsl/order-to-delivery.webp",
+};
 
 export const VIDEO_PACK: { key: VideoPackKey; clip: BunnyVideo | null }[] = [
   { key: "socialAds", clip: bunny("b7bd4d28-a15f-46cc-a82e-800d9d4e3ee9") },

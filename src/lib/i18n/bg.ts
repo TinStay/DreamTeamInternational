@@ -1479,7 +1479,7 @@ export const bg = {
     title2: "в цифри",
     subline: "Индустрията за AI видео продукция се развива бързо. Заедно с вас създаваме бъдещето.",
     items: [
-      { id: "views", value: "30M+", label: "Гледания" },
+      { id: "views", value: "76M+", label: "Гледания" },
       { id: "clients", value: "50+", label: "Клиенти" },
       { id: "projects", value: "270+", label: "Реализирани Проекти" },
     ],

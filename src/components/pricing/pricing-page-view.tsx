@@ -10,12 +10,13 @@ import { PEARL_TAG, PricingCard } from "@/components/pricing/pricing-card";
 import { MAIN_WITH_FIXED_PAGE_BG_CLASS } from "@/lib/page-shell";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/lib/i18n/language-context";
-import { ANNUAL_PERCENT, PLANS, type Audience, type Billing, type Plan } from "@/lib/pricing";
+import { PricingFaq } from "@/components/pricing/pricing-faq";
+import { ANNUAL_PERCENT, AUDIENCES, PLANS, type Audience, type Billing, type Plan } from "@/lib/pricing";
 import { openSignup } from "@/lib/signup-dialog";
 import { useAuthUser } from "@/lib/supabase/use-auth-user";
 import { emailHref } from "@/lib/contact-info";
+import { openPaddleCheckout } from "@/lib/paddle-client";
 
-const AUDIENCES: Audience[] = ["individual", "business"];
 const BILLINGS: Billing[] = ["monthly", "annual"];
 
 /** A pill of the file's segmented controls. */
@@ -30,8 +31,9 @@ function segButton(active: boolean) {
  * `/pricing` - the client's "AI Video Subscription Plans" file on the site: a centred head (eyebrow, the title in
  * Archivo expanded, the audience's line), the two segmented controls (Individual / Business, Monthly / Annual with the
  * annual discount's tag), that audience's three cards, the "every plan includes" box with the revision and scriptwriting
- * definitions, and the audience's note. Dark whatever the theme - the file's palette. `initialAudience` comes from
- * `?for=` (the header's Pricing links, read by the route). A pack's button opens Stripe's checkout (`/api/checkout` - a
+ * definitions, the audience's note, and the pricing questions (`PricingFaq` - every plan's price in the page's HTML,
+ * whichever audience is on screen, for search engines and AI assistants). Dark whatever the theme - the file's palette. `initialAudience` comes from
+ * `?for=` (the header's Pricing links, read by the route). A pack's button opens Paddle's overlay checkout (`/api/checkout` - a
  * client with a live subscription is not sold a second one), the Enterprise one the contact page.
  */
 export function PricingPageView({ initialAudience = "business" }: { initialAudience?: Audience }) {
@@ -44,8 +46,8 @@ export function PricingPageView({ initialAudience = "business" }: { initialAudie
   const [buying, setBuying] = useState<string | null>(null);
   const [buyError, setBuyError] = useState<string | null>(null);
 
-  // Buying a pack: a signed-out visitor is asked to sign up first; then Stripe's checkout opens, and once it confirms the
-  // payment the seconds appear in the account (see /api/stripe/webhook).
+  // Buying a pack: a signed-out visitor is asked to sign up first; then Paddle's checkout opens over the page, and once it
+  // confirms the payment the seconds appear in the account (see /api/paddle/webhook).
   async function buy(plan: Plan, seconds?: number) {
     setBuyError(null);
     if (!user) {
@@ -55,9 +57,13 @@ export function PricingPageView({ initialAudience = "business" }: { initialAudie
     setBuying(plan.key);
     try {
       const res = await fetch("/api/checkout", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ plan: plan.key, billing, ...(seconds ? { seconds } : {}) }) });
-      const json = (await res.json().catch(() => ({}))) as { url?: string; error?: string };
-      if (res.ok && json.url) {
-        window.location.assign(json.url);
+      const json = (await res.json().catch(() => ({}))) as { transactionId?: string; error?: string };
+      if (res.ok && json.transactionId) {
+        // Closed without paying: the card's button is usable again.
+        const opened = await openPaddleCheckout(json.transactionId, { successUrl: `${window.location.origin}/en/my-projects?purchase=success`, onClosed: () => setBuying(null) });
+        if (opened) return;
+        setBuyError(p.buy.notConfigured);
+        setBuying(null);
         return;
       }
       setBuyError(json.error === "not_configured" ? p.buy.notConfigured : json.error === "already_subscribed" ? p.buy.alreadySubscribed : p.buy.error);
@@ -82,10 +88,12 @@ export function PricingPageView({ initialAudience = "business" }: { initialAudie
           <PageBreadcrumbs className="mb-6" />
 
           <header className="mb-7 text-center">
+            {/* The keyword-rich `h1` is for search engines and assistants; the file's title stays the visible one. */}
+            <h1 className="sr-only">{p.seoHeading}</h1>
             <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#9a9ba3]">{p.eyebrow}</p>
-            <h1 className="mx-auto my-2.5 max-w-[18ch] font-heading text-[clamp(28px,4.4vw,44px)] font-black uppercase leading-[1.02] tracking-[-0.01em] text-balance">
+            <p className="mx-auto my-2.5 max-w-[18ch] font-heading text-[clamp(28px,4.4vw,44px)] font-black uppercase leading-[1.02] tracking-[-0.01em] text-balance">
               {p.title}
-            </h1>
+            </p>
             <p className="mx-auto max-w-[580px] text-[15.5px] text-[#9a9ba3]">{p.subtitle[audience]}</p>
           </header>
 
@@ -155,6 +163,8 @@ export function PricingPageView({ initialAudience = "business" }: { initialAudie
             </p>
           </section>
           <p className="mt-[18px] text-center text-[13px] text-[#62636b]">{p.note[audience]}</p>
+
+          <PricingFaq className="mt-14" />
         </div>
       </div>
 

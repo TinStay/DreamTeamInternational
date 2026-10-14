@@ -97,7 +97,8 @@ export function MegaHeader({
     const measure = () => {
       const widths = Array.from(ruler.children, (el) => (el as HTMLElement).offsetWidth).slice(0, groups.length);
       const gap = parseFloat(getComputedStyle(ruler).columnGap) || 0;
-      const room = nav.clientWidth - (parseFloat(getComputedStyle(nav).paddingInlineStart) || 0);
+      const navStyle = getComputedStyle(nav);
+      const room = nav.clientWidth - (parseFloat(navStyle.paddingInlineStart) || 0) - (parseFloat(navStyle.paddingInlineEnd) || 0);
       const moreIdx = groups.findIndex((g) => g.overflow);
       const tabHidden = widths.map(() => false);
       // "More" is on the bar only while something is folded into it.
@@ -238,7 +239,7 @@ export function MegaHeader({
             // The server HTML carries every tab, and only the measurement (client side) knows how many fit - until then
             // the row is clear, so a tab is never seen cut off at the edge for the moment before the page hydrates.
             className={cn(
-              "relative flex min-w-0 flex-1 items-start justify-between gap-x-[1em] overflow-x-clip text-[length:calc(15px*var(--nav-fit,1))] font-semibold text-[#ececee] transition-opacity duration-200 xl:gap-x-[1.16em] xl:ps-4 min-[1900px]:gap-x-[1.55em] min-[1900px]:ps-8 min-[1900px]:text-[length:calc(16px*var(--nav-fit,1))]",
+              "relative flex min-w-0 flex-1 items-start justify-between gap-x-[1em] overflow-x-clip text-[length:calc(15px*var(--nav-fit,1))] font-semibold text-[#ececee] transition-opacity duration-200 xl:gap-x-[1.16em] xl:ps-4 xl:pe-7 min-[1900px]:gap-x-[1.55em] min-[1900px]:ps-8 min-[1900px]:pe-11 min-[1900px]:text-[length:calc(16px*var(--nav-fit,1))]",
               !fitted && "opacity-0"
             )}
             style={fit < 1 ? ({ "--nav-fit": fit } as CSSProperties) : undefined}

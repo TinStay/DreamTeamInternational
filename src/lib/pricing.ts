@@ -24,6 +24,9 @@ export type Plan = {
   secs?: number;
 };
 
+/** The page's toggle order. */
+export const AUDIENCES: Audience[] = ["individual", "business"];
+
 export const PLANS: Record<Audience, Plan[]> = {
   individual: [
     { key: "personal", tint: "gray", price: 299, oneTime: true },

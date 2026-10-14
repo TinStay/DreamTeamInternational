@@ -57,7 +57,7 @@ const TONE: Record<Tone, { ring: string; glow: string; corner: string; scan: str
   },
 };
 
-/** A client whose live subscription's payment failed: Stripe's `past_due` / `unpaid`. */
+/** A client whose live subscription's payment failed: Paddle's `past_due` (`unpaid` is the Stripe-era status, kept for old rows). */
 export const hasMissingPayment = (c: ClientOverview) => c.subscriptionStatus === "past_due" || c.subscriptionStatus === "unpaid";
 
 type Alert = { key: string; kind: "payment" | "reply" | "overdue"; title: string; sub: string; onClick: () => void };

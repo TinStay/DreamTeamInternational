@@ -588,13 +588,19 @@ export function ClipCollage({
   );
 }
 
-/** The full Bunny player over the page (Escape / the backdrop / the X close it; the page stops scrolling under it). */
+/** The play bar an animated page (a Claude Design motion export) draws under its 16:9 picture, in px. */
+export const MOTION_PAGE_BAR = 44;
+
+/**
+ * The full Bunny player over the page (Escape / the backdrop / the X close it; the page stops scrolling under it) - or, for
+ * a `page` panel, an animated HTML page (a Claude Design motion export, same-origin) at 16:9 with its own play bar under it.
+ */
 export function ClipLightbox({
   panel,
   closeLabel,
   onClose,
 }: {
-  panel: { clip: BunnyVideo; title: string } | null;
+  panel: ({ clip: BunnyVideo; page?: undefined } | { page: string; clip?: undefined }) & { title: string } | null;
   closeLabel: string;
   onClose: () => void;
 }) {
@@ -617,15 +623,22 @@ export function ClipLightbox({
             >
               <IconX className="size-5" aria-hidden />
             </button>
-            <div className="relative aspect-video w-full overflow-hidden rounded-2xl bg-black">
-              <iframe
-                className="absolute inset-0 h-full w-full"
-                src={bunnyPlayerEmbedSrc(panel.clip, { autoplay: true })}
-                title={panel.title}
-                allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture"
-                allowFullScreen
-              />
-            </div>
+            {panel.page ? (
+              // 16:9 for the picture plus the page's play bar under it.
+              <div className="relative w-full overflow-hidden rounded-2xl bg-black" style={{ paddingBottom: `calc(56.25% + ${MOTION_PAGE_BAR}px)` }}>
+                <iframe className="absolute inset-0 h-full w-full" src={panel.page} title={panel.title} allowFullScreen />
+              </div>
+            ) : (
+              <div className="relative aspect-video w-full overflow-hidden rounded-2xl bg-black">
+                <iframe
+                  className="absolute inset-0 h-full w-full"
+                  src={bunnyPlayerEmbedSrc(panel.clip!, { autoplay: true })}
+                  title={panel.title}
+                  allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture"
+                  allowFullScreen
+                />
+              </div>
+            )}
           </>
         ) : null}
       </DialogContent>

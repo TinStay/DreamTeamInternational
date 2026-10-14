@@ -10,7 +10,7 @@ import type { ClientProject, ProjectStatus } from "@/lib/client-projects";
  *   one-time price (`TOPUP_CENTS_PER_SECOND`, $11.90), up to a 10-minute film.
  * - **Format**: one more format costs as many seconds as the film is long (missing seconds bought the same way).
  * - **Revision**: $49 for one more.
- * Seconds are spent when the request is sent and given back if the team declines it; a paid request goes through Stripe
+ * Seconds are spent when the request is sent and given back if the team declines it; a paid request goes through Paddle
  * before the team sees it.
  */
 export const CHANGE_PRICES = { deadlinePerDayCents: 5000, extraRevisionCents: 4900 } as const;

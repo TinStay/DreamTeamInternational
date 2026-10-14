@@ -207,29 +207,32 @@ export function ContactSection({
               </motion.button>
             </div>
 
-            <div className="flex flex-wrap items-center gap-x-6 gap-y-4 sm:gap-x-10">
-              {socials.map((s, i) => (
-                <MotionLink
-                  key={s.alt}
-                  href={s.href}
-                  aria-label={s.alt}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="group inline-flex shrink-0 cursor-pointer items-center justify-center"
-                  whileHover={{ scale: 1.2, transition: HOVER_TRANSITION }}
-                  whileTap={{ scale: 0.95, transition: TAP_TRANSITION }}
-                  {...reveal(4 + i)}
-                >
-                  <SocialIcon name={s.alt} className="size-11 sm:size-12" />
-                </MotionLink>
-              ))}
-            </div>
+            {/* The profiles' icons - no row at all while they are parked (`SOCIAL_LINKS` empty). */}
+            {socials.length ? (
+              <div className="flex flex-wrap items-center gap-x-6 gap-y-4 sm:gap-x-10">
+                {socials.map((s, i) => (
+                  <MotionLink
+                    key={s.alt}
+                    href={s.href}
+                    aria-label={s.alt}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group inline-flex shrink-0 cursor-pointer items-center justify-center"
+                    whileHover={{ scale: 1.2, transition: HOVER_TRANSITION }}
+                    whileTap={{ scale: 0.95, transition: TAP_TRANSITION }}
+                    {...reveal(4 + i)}
+                  >
+                    <SocialIcon name={s.alt} className="size-11 sm:size-12" />
+                  </MotionLink>
+                ))}
+              </div>
+            ) : null}
 
             {/* The Google rating + the Clutch widget: a row from sm; on phones two full-width matching cards (the
                 client wanted them edge to edge there - the column's padding is the side spacing). */}
             {reviews ? (
               <motion.div
-                className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-6 sm:gap-y-4"
+                className={cn("flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-6 sm:gap-y-4", socials.length > 0 && "mt-8")}
                 {...reveal(4 + socials.length)}
               >
                 <GoogleReviewsBadge label={t.footer.googleReviews} className="max-sm:w-full max-sm:justify-center" mobileLarge />

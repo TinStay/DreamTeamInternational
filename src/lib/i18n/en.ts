@@ -47,7 +47,7 @@ export const en = {
     titleGlow: "imagination",
     titleAfter: "is the limit.",
     seoHeading:
-      "Keplerbay - AI video production and AI-powered video ads for brands in Bulgaria and worldwide",
+      "Keplerbay - AI video production company: AI video ads, brand and product videos for businesses and creators in the US and worldwide",
     subtitle: "If you can imagine it, we can deliver it - AI video and media production for your brand.",
     cta1: "Request a quote",
     cta2: "View Our Work",
@@ -73,9 +73,11 @@ export const en = {
   // The plans page (`/pricing`, `components/pricing/`) - the client's "AI Video Subscription Plans" file; the numbers are
   // in `lib/pricing.ts`. `{x}` placeholders are filled in by the cards.
   plans: {
-    metaTitle: "AI Video Subscription Plans & Pricing | Keplerbay",
+    metaTitle: "AI Video Pricing & Subscription Plans | Keplerbay",
     metaDescription:
-      "AI video subscription plans for creators and businesses - from a one-time $299 video to monthly plans with voiceover, subtitles, sound design and revisions included. No filming needed.",
+      "AI video pricing: one video from $299, creator plans from $389/month, business plans from $990/month. Voiceover, subtitles and revisions included. No filming needed.",
+    // The page's `h1` for search engines and assistants (visually hidden; the visible title is `title`).
+    seoHeading: "Keplerbay AI video pricing - subscription plans and one-time AI videos",
     eyebrow: "AI video subscription",
     title: "Next-generation video, every month",
     subtitle: {
@@ -258,6 +260,11 @@ export const en = {
       individual:
         "Prices in USD. Individual plans are for personal and creator use - advertising a business requires a Business plan.",
       business: "Prices in USD. Business plans include full commercial use."
+    },
+    // The questions under the plans (`pricing-faq.tsx`) - picked from `faq.groups` by id, so the answers live in one place.
+    faq: {
+      eyebrow: "FAQ",
+      title: "Questions about pricing"
     }
   },
   // The English home page's rail of video categories, right after the hero (`video-pack-section.tsx`, `lib/video-pack.ts`).
@@ -269,7 +276,7 @@ export const en = {
     subscribe: "Get a subscription",
     oneVideo: "Get one video",
     carouselLabel: "The kinds of video we make - drag to explore, click to watch",
-    vsl: { title: "See how Keplerbay works", length: "2 min", soon: "Video coming soon", play: "Play the video" },
+    vsl: { title: "See how Keplerbay works", length: "42 sec", soon: "Video coming soon", play: "Watch it full size" },
     watch: "Watch the video",
     close: "Close",
     previous: "Previous videos",
@@ -913,7 +920,7 @@ export const en = {
       loading: "Loading…",
       invoices: {
         title: "Invoices",
-        hint: "Bill a custom quote. Stripe emails the invoice to the client, adds any tax from their billing address, and they pay it on Stripe's page.",
+        hint: "Bill a custom quote. Paddle issues the invoice and emails it to the client, adds any tax from their billing address, and they pay it on Paddle's checkout.",
         none: "No invoices yet.",
         newInvoice: "New invoice",
         cancel: "Cancel",
@@ -925,7 +932,7 @@ export const en = {
         dueIn: "Due in (days)",
         memo: "Note on the invoice (optional)",
         address: "Billing address",
-        addressHint: "Needed to work out tax. Leave it empty if the client already has one on file.",
+        addressHint: "Paddle needs one on every invoice. Leave it empty if the client already has one on file.",
         addressFields: { line1: "Address", line2: "Apartment, suite (optional)", city: "City", state: "State / region", postal_code: "ZIP / postal code", country: "Country code (e.g. US)" },
         subtotal: "Subtotal before tax",
         send: "Send invoice",
@@ -933,10 +940,10 @@ export const en = {
         sent: "Invoice sent to the client.",
         errors: {
           invalid: "Check the lines: each needs a description and an amount of at least $1.",
-          address_required: "Add the client's billing address - Stripe needs it to work out the tax.",
+          address_required: "Add the client's billing address - Paddle needs one on every invoice.",
           invalid_address: "The address is incomplete. A US address needs the street, city, state and ZIP.",
-          not_configured: "Stripe isn't set up on this site yet.",
-          stripe: "Stripe refused the invoice: {message}",
+          not_configured: "Paddle isn't set up on this site yet.",
+          paddle: "Paddle refused the invoice: {message}",
           generic: "We couldn't send the invoice. Please try again."
         } as Record<string, string>
       }
@@ -999,7 +1006,7 @@ export const en = {
       decline: "Decline",
       notePlaceholder: "Note for the client (optional)",
       paid: "paid",
-      refundNote: "Paid by card - declining does not refund it automatically: refund the payment in Stripe.",
+      refundNote: "Paid by card - declining does not refund it automatically: refund the transaction in Paddle.",
       review: "Client review",
       error: "That didn't work. Please try again."
     },
@@ -1087,34 +1094,34 @@ export const en = {
     title1: "Invest in the future of",
     title2: "AI video",
     lead:
-      "Keplerbay turns AI video into a service brands can rely on: professional films made by an experienced team, on a plan, with no prompting, no credits and no learning curve. If you share our view of where video is going, we would like to talk.",
+      "Keplerbay makes professional AI video a service brands can rely on: finished films from an experienced team, on a plan, with no filming crew and no prompting on the client's side. Video is the format every brand needs more of, and AI is changing what it costs and how fast it arrives. If you share that view, we would like to talk.",
     cta: "I'm interested",
     whyTitle: "Why Keplerbay",
     why: [
       {
-        title: "A market moving to AI",
-        text: "Every brand needs more video, in more formats, more often. The old production model cannot keep up on cost or on time - AI can.",
+        title: "Demand that keeps growing",
+        text: "Every brand needs more video, in more formats, more often. Traditional production cannot keep up on cost or on time. AI video can, and we build it into a service rather than a tool.",
       },
       {
-        title: "A product, not a project",
-        text: "Video packs and subscriptions across eleven formats, from social ads to TV spots, so revenue repeats instead of starting again with every brief.",
+        title: "A product, not a one-off project",
+        text: "Video packs and subscriptions across eleven formats, from social ads to TV spots. Clients come back for the next video, so revenue repeats instead of starting over with every brief.",
       },
       {
         title: "Proof with real brands",
-        text: "Work for brands such as MindGuard, Boleron, Emblema and OSMO, including a campaign with more than 75 million views.",
+        text: "Case studies with MindGuard, Boleron, Emblema, Plasico and OSMO, including a campaign with more than 75 million views.",
       },
       {
-        title: "A team that delivers",
-        text: "Hundreds of videos delivered for clients around the world, and a US launch under way.",
+        title: "Built to scale",
+        text: "A lean, mostly automated production workflow, so more clients mean more output without a matching rise in cost. We are launching in the United States, with Europe already served from Sofia.",
       },
     ],
     lookingTitle: "Who we would like to hear from",
     looking: ["Angel investors", "Venture funds", "Family offices", "Strategic partners in media, advertising and AI"],
     stepsTitle: "What happens next",
     steps: [
-      { title: "Tell us about you", text: "Send the short form below - who you are and what you are looking for." },
-      { title: "A first conversation", text: "We reply personally and set up a call to share the story, the product and where we are going." },
-      { title: "The details", text: "If there is a fit, we share the deck and the numbers - under NDA where needed." },
+      { title: "Tell us about you", text: "Send the short form below: who you are and what you are looking for." },
+      { title: "A first conversation", text: "We reply personally and set up a call to share the story, the product and the plan." },
+      { title: "The details", text: "If there is a fit, we share the deck and the numbers, under NDA where needed." },
     ],
     form: {
       title: "I'm interested",
@@ -1159,40 +1166,46 @@ export const en = {
   // The SEO copy: the home page's title / description / keywords (the layout's defaults too), the organization's
   // description for the structured data and `llms.txt`, the address split for the schema, the topics it knows.
   seo: {
+    // The prices quoted here must match `lib/pricing.ts` (`pricing-copy.test.ts` checks them).
     home: {
-      title: "AI Video Production Company in Bulgaria | Keplerbay",
+      title: "AI Video Production Company for Brands & Creators | Keplerbay",
       description:
-        "AI video production company in Sofia, Bulgaria: AI-generated video ads, product videos, brand mascots and AI avatars for brands in Bulgaria, Europe and the US. Delivered in 5–12 working days, with full commercial rights.",
+        "Keplerbay makes AI video ads, brand, product and explainer videos for businesses and creators in the US and worldwide. One video from $299, plans from $389/month.",
       keywords: [
         "AI video production",
-        "AI video company",
+        "AI video production company",
         "AI video ads",
-        "AI video production Bulgaria",
-        "AI video production company Europe",
+        "AI commercials",
+        "AI video subscription",
+        "AI video pricing",
+        "AI UGC ads",
         "product videos",
+        "explainer videos",
         "brand mascots",
-        "AI avatars",
-        "social media video",
+        "social media video ads",
         "corporate video",
         "Keplerbay",
       ],
     },
     organizationDescription:
-      "Keplerbay is an AI video production company based in Sofia, Bulgaria. It creates AI-generated advertising and brand video - TV and social media ads, product videos, brand mascots, explainer videos and AI avatars - for clients in Bulgaria, across Europe and in the United States, and trains individuals and teams in AI video production.",
-    streetAddress: "27–29 Nikola Kopernik St., Floor 2, Office 17",
-    city: "Sofia",
-    country: "Bulgaria",
+      "Keplerbay is an AI video production company. Its team writes, directs and produces finished AI videos - social media ads, TV ads, corporate, product, explainer and UGC-style videos, brand mascots, real estate and music videos - for businesses and creators in the United States, Europe and worldwide, fully online. One video costs from $299; monthly plans start at $389 for individuals and $990 for businesses. Videos are delivered in 3-10 days and clients own the files.",
+    // The address the structured data gives (San Francisco, like the footer and the contact section); no street yet.
+    city: "San Francisco",
+    region: "CA",
+    country: "United States",
     topics: [
       "AI video production",
       "AI-generated video advertising",
+      "AI social media ads",
+      "AI TV commercials",
       "AI product videos",
+      "AI explainer videos",
+      "AI UGC ads",
       "AI brand mascots",
       "AI avatars",
-      "explainer videos",
       "generative AI video",
       "AI images and graphic design",
       "video and image automation",
-      "AI video training",
     ],
   },
   // The process, for the package way of working (home, right after the packages; the contact page too).
@@ -1962,7 +1975,7 @@ export const en = {
     quoteCta: "Request a quote",
     metaTitle: "AI Video Services for Business | Keplerbay",
     metaDescription:
-      "AI video production, brand mascots, AI images, and automations. AI-powered video ads for brands in Bulgaria and worldwide.",
+      "AI video production, brand mascots, AI images and automation - finished AI video ads for businesses in the US and worldwide, with no filming needed.",
     ctaHeading: "Ready to get started?",
     ctaSubtitle:
       "Tell us your idea and we'll send a personalized quote for your video.",
@@ -2319,29 +2332,35 @@ export const en = {
     title2: "Asked Questions",
     subtitle:
       "Answers to the questions clients ask us most - about pricing, timelines, rights, and how we work.",
-    // The questions in topics: the menu on the left of the FAQ (`key` picks the icon).
+    // The questions in topics: the menu on the left of the FAQ (`key` picks the icon). An item's `id` is stable - the
+    // pricing page picks its questions by it (`pricing-faq.tsx`).
     groups: [
       {
         key: "pricing",
         label: "Packs & pricing",
         items: [
           {
+            id: "cost",
             q: "How much does an AI video cost?",
             a: "Personal is a single video for $299 (up to 20 seconds, +$119 for every extra 10 seconds). Monthly plans start at $389 a month for individuals (Creator, 40 seconds of video a month; Pro, 1 minute for $629) and at $990 a month for businesses (Local, 1.5 minutes; Brand, 3 minutes for $3,490). Enterprise is priced around your campaigns. All prices are in US dollars on the Pricing page.",
           },
           {
+            id: "one-time-vs-subscription",
             q: "What is the difference between a one-time video and a subscription?",
             a: "A one-time Personal video is a single order with a single payment and no subscription. A monthly plan gives you a set amount of video time every month - for example 40 seconds with Creator or 3 minutes with Brand - plus more included extras such as subtitles, sound design and colour grading on the higher plans. You can pause or cancel a subscription anytime.",
           },
           {
+            id: "annual-discount",
             q: "Is there a discount for paying annually?",
             a: "Yes. With annual billing you pay for ten months and get twelve - two months free, about 17% off - on every monthly plan. Your video time for the whole year is added to your account when you pay.",
           },
           {
+            id: "vs-filming",
             q: "Is AI video cheaper than traditional filming?",
             a: "In most cases, yes. There are no film crews, actors, locations or props to hire, so you get a high-end look on a smaller budget. It's especially cost-effective for scenes that would be expensive or hard to shoot in real life.",
           },
           {
+            id: "individual-for-business",
             q: "Can I use an Individual plan to advertise my business?",
             a: "No - Individual plans are for personal projects and creators. Advertising a business needs a Business plan, which includes full commercial use.",
           },
@@ -2352,14 +2371,17 @@ export const en = {
         label: "Your account & video time",
         items: [
           {
+            id: "video-time",
             q: "How does video time work?",
             a: "When you buy a pack, its seconds of video are added to your account and shown as minutes and seconds in your account menu. When you submit a project, its length is taken from that balance - for example a 30-second video uses 30 seconds. If you don't have enough, we show it before you submit, and you can buy another pack.",
           },
           {
+            id: "how-to-order",
             q: "How do I order a video?",
             a: "Sign up, buy a pack, then open Your Projects and press Submit a project. A short form asks whether you have a script, what the goal is, the length, format, voice-over, where it will run and your deadline - and you can attach files. Then we get to work.",
           },
           {
+            id: "follow-project",
             q: "Where do I follow my project and talk to you?",
             a: "In Your Projects. Each project shows its stage from brief to delivery, a timeline, your revisions, the files to download and a Comments tab. We use comments instead of a chat: write a question or a revision request and we reply on the same page, so you never have to wait online.",
           },
@@ -2370,22 +2392,27 @@ export const en = {
         label: "How we work",
         items: [
           {
+            id: "turnaround",
             q: "How long does a video take?",
             a: "Most videos are delivered in 3-10 days, depending on the complexity and length. Enterprise clients get priority delivery. If you want the highest quality, we take the time it needs - meeting your expectations always comes first.",
           },
           {
+            id: "what-you-need",
             q: "What do you need from me to get started?",
             a: "Your idea and a few assets are enough - product photos, your logo and brand guidelines. If you don't have a script, choose \"No, I want you to write it\" in the form and we propose one based on your brief. Scriptwriting is an add-on at $100 per 30 seconds of video (included in the Brand plan).",
           },
           {
+            id: "revisions",
             q: "How do revisions work?",
             a: "One revision is one round of changes per video, covering up to 30% of the video's length - up to 9 seconds of a 30-second video. Personal includes 1 free revision, Creator 1 per video, Pro and Local 2, Brand 3 and Enterprise 4 or more. Fixes for mistakes on our side are always free and don't count.",
           },
           {
+            id: "brand-voiceover",
             q: "Can you match my brand style and provide voiceover?",
             a: "Yes. We work from your colours, logo and tone so the video looks like part of your brand. Voiceover is included in every plan - one language per video, male or female voice - and subtitles are included from Creator up.",
           },
           {
+            id: "worldwide",
             q: "Do you work with clients around the world?",
             a: "Yes. We work fully online with clients in the USA, Europe and worldwide. The whole process - from brief to delivery - runs remotely, with no need to meet in person.",
           },
@@ -2396,18 +2423,22 @@ export const en = {
         label: "Videos & rights",
         items: [
           {
+            id: "video-types",
             q: "What types of videos can you make?",
             a: "Social media ads (Reels, TikTok, Shorts), corporate videos, TV ads, product videos, brand mascots, motion graphics, launch and explainer videos, UGC-style ads, real estate videos and music videos. We can show your product in settings traditional filming can't easily reach.",
           },
           {
+            id: "tools",
             q: "Which tools and AI models do you use?",
             a: "We use the best tools on the market and pick the right one for each scenario. We work with different AI and video models and know the strengths and weaknesses of each, so we choose the one that fits your project.",
           },
           {
+            id: "formats",
             q: "What resolution and formats do I get?",
             a: "Personal is delivered in 720p HD, Creator, Pro and Local in 1080p Full HD, and Brand and Enterprise up to 4K. You choose one aspect ratio per video - 9:16, 16:9, 1:1 or 4:5 - and the final files come ready for social media, your website or TV.",
           },
           {
+            id: "rights",
             q: "Do I get full commercial usage rights to the video?",
             a: "Business plans include full commercial use, and every plan means you own your videos and source files. After final delivery the video is yours to use for advertising, social media, your website, TV and any commercial purpose.",
           },
@@ -2418,10 +2449,12 @@ export const en = {
         label: "Training & more",
         items: [
           {
+            id: "training",
             q: "Do you teach AI video production?",
             a: "Yes. We offer training in AI video production - individual lessons, a community on Skool and workshops for teams - so you can learn to make your own videos. Find the details on our Training page.",
           },
           {
+            id: "mascot",
             q: "Can you make a brand mascot?",
             a: "Yes. We create an AI brand mascot - a character that becomes the face of your brand - and bring it to life in your videos. Tell us about your brand when you submit a project or contact us.",
           },
@@ -2489,7 +2522,7 @@ export const en = {
     subline:
       "The AI video production industry is evolving fast. Together with you, we are shaping its future.",
     items: [
-      { id: "views", value: "30M+", label: "Views" },
+      { id: "views", value: "76M+", label: "Views" },
       { id: "clients", value: "50+", label: "Clients" },
       { id: "projects", value: "270+", label: "Realized Projects" },
     ],
@@ -2555,8 +2588,8 @@ export const en = {
     address: "Address",
     hours: "Hours",
     hoursVal: "Mon-Fri, 9am - 6pm",
-    addressVal:
-      "27–29 Nikola Kopernik St., Floor 2, Office 17, Geo Milev, Sofia, Bulgaria",
+    // The same address as the footer's (`footer.address`) - one address everywhere.
+    addressVal: "San Francisco, Silicon Valley, CA, USA",
     copyAddress: "Copy address",
     formTitle: "Send a Message",
     name: "Name",
@@ -3144,14 +3177,14 @@ export const en = {
     // A client's subscription (lib/email/subscription-emails.ts). Placeholders: {plan} {from} {date} {client}.
     subscription: {
       reason: "You're getting this email because you have a Keplerbay subscription.",
-      facts: { plan: "Plan", billing: "Billing", price: "Price", videoTime: "Video time", renews: "Renews on", endsOn: "Active until", previous: "Previous plan", client: "Client", stripe: "In Stripe" },
+      facts: { plan: "Plan", billing: "Billing", price: "Price", videoTime: "Video time", renews: "Renews on", endsOn: "Active until", previous: "Previous plan", client: "Client", paddle: "In Paddle" },
       billing: { monthly: "Monthly", annual: "Annual" } as Record<string, string>,
       perMonth: "{price} / month",
       perYear: "{price} / year",
       videoTimeMonthly: "{time} of video every month",
       videoTimeAnnual: "{time} of video a year",
       customPlan: "Custom plan",
-      buttons: { start: "Start a project", manage: "Manage your subscription", resume: "Resume your subscription", plans: "See plans", stripe: "Open in Stripe" },
+      buttons: { start: "Start a project", manage: "Manage your subscription", resume: "Resume your subscription", plans: "See plans", paddle: "Open in Paddle" },
       started: {
         subject: "Welcome to {plan} - your subscription is active",
         eyebrow: "Subscription active",

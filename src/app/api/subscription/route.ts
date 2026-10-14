@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import { getStripe } from "@/lib/stripe";
 import { createClient } from "@/lib/supabase/server";
 import { setCancelAtPeriodEnd } from "@/lib/subscriptions";
 import { createRateLimiter, isCrossSite } from "@/lib/server/form-guards";
@@ -24,7 +23,7 @@ export async function POST(request: Request) {
   const body = (await request.json().catch(() => ({}))) as { action?: unknown };
   if (body.action !== "cancel" && body.action !== "resume") return NextResponse.json({ error: "invalid_action" }, { status: 400 });
 
-  const result = await setCancelAtPeriodEnd(getStripe(), auth.user.id, body.action === "cancel");
+  const result = await setCancelAtPeriodEnd(auth.user.id, body.action === "cancel");
   if (!result.ok) return NextResponse.json({ error: result.error }, { status: STATUS[result.error] });
   return NextResponse.json({ cancelAtPeriodEnd: result.cancelAtPeriodEnd, periodEnd: result.periodEnd });
 }

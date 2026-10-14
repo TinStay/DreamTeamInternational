@@ -1,39 +1,47 @@
-import type Stripe from "stripe";
 import { PLAN_SECONDS } from "@/lib/credits";
 import type { PlanKey } from "@/lib/pricing";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { subscriptionRow } from "@/lib/subscriptions";
+import { paddle, paddleEnvironment, type PaddleSubscription } from "@/lib/paddle";
+import type { SubscriptionRow } from "@/lib/subscriptions";
 import { metadataForPrice, planForPrice, planPriceOf, subscriptionChange } from "@/lib/subscription-events";
 import { sendEmail, teamInbox } from "@/lib/email/send";
 import { subscriptionClientEmail, subscriptionTeamEmail, type SubscriptionFacts } from "@/lib/email/subscription-emails";
 
 /**
- * Called by the Stripe webhook for every `customer.subscription.*` event, after the mirror is saved. When the event is one
- * a person should hear about (`subscriptionChange` - bought, cancelled, plan changed, ended) the client gets their email
- * and the admin inbox its copy, each once only (the idempotency key names the subscription and what happened).
+ * Called by the Paddle webhook for every `subscription.*` notification, after the mirror is saved, with the row it
+ * replaced. When the change is one a person should hear about (`subscriptionChange` - bought, cancelled, plan changed,
+ * ended) the client gets their email and the admin inbox its copy, each once only (the idempotency key names the
+ * subscription and what happened).
  *
- * A **plan change** is made by the team in Stripe (swapping the price), which leaves the subscription's metadata - the
- * plan and the seconds every payment credits (`creditDecision`) - on the old plan. So the metadata is brought in step
- * with the new price first, when the price is one of the plans on `/pricing`; a custom price keeps its metadata.
+ * A **plan change** is made by the team in Paddle (a new price on the subscription), which leaves its custom data - the
+ * plan and the seconds every renewal credits (`creditDecision`) - on the old plan. So the custom data is brought in step
+ * with the new price first, when the price is one of the plans on `/pricing`; a custom price keeps its custom data.
  *
- * Never throws: an email problem must never make Stripe retry the event.
+ * Never throws: an email problem must never make Paddle retry the notification.
  */
-export async function notifySubscriptionEvent(stripe: Stripe, event: Stripe.Event, origin: string): Promise<void> {
+export async function notifySubscriptionEvent(
+  sub: PaddleSubscription,
+  previous: SubscriptionRow | null,
+  row: SubscriptionRow | null,
+  origin: string,
+): Promise<void> {
   try {
-    const change = subscriptionChange(event);
+    if (!row) return;
+    const change = subscriptionChange(previous, row);
     if (!change) return;
-    const sub = event.data.object as Stripe.Subscription;
-    const userId = sub.metadata?.user_id;
-    if (!userId) return;
+    const userId = row.user_id;
 
-    const price = planPriceOf(sub.items as unknown as Parameters<typeof planPriceOf>[0]);
-    const metaKey = sub.metadata?.plan_key && sub.metadata.plan_key in PLAN_SECONDS ? (sub.metadata.plan_key as PlanKey) : null;
+    const price = planPriceOf(row);
+    const meta0 = sub.custom_data ?? {};
+    const metaKey = meta0.plan_key && meta0.plan_key in PLAN_SECONDS ? (meta0.plan_key as PlanKey) : null;
     const planKey = (price && planForPrice(price)) ?? metaKey;
 
     if (change.kind === "changed" && price) {
       const meta = metadataForPrice(price);
-      if (meta && (meta.plan_key !== sub.metadata?.plan_key || meta.seconds !== sub.metadata?.seconds || meta.billing !== sub.metadata?.billing)) {
-        await stripe.subscriptions.update(sub.id, { metadata: { ...sub.metadata, ...meta } }).catch((err) => console.error("subscription: metadata sync failed", err));
+      if (meta && (meta.plan_key !== meta0.plan_key || meta.seconds !== meta0.seconds || meta.billing !== meta0.billing)) {
+        await paddle("PATCH", `/subscriptions/${encodeURIComponent(sub.id)}`, { custom_data: { ...meta0, ...meta } }).catch((err) =>
+          console.error("subscription: custom data sync failed", err),
+        );
       }
     }
 
@@ -46,9 +54,9 @@ export async function notifySubscriptionEvent(stripe: Stripe, event: Stripe.Even
       change,
       planKey,
       price,
-      periodEnd: subscriptionRow(sub)?.current_period_end ?? null,
+      periodEnd: row.current_period_end,
       subscriptionId: sub.id,
-      livemode: event.livemode,
+      livemode: paddleEnvironment() === "production",
     };
     const what = change.kind === "changed" ? `changed:${change.to.amountCents}-${change.to.interval}` : change.kind === "cancelled" ? `cancelled:${facts.periodEnd ?? ""}` : change.kind;
 

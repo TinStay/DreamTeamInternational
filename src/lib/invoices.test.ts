@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type Stripe from "stripe";
+import type { PaddleTransaction } from "@/lib/paddle";
 import { invoiceSummary, parseAddress, parseInvoiceDraft } from "@/lib/invoices";
 
 describe("parseInvoiceDraft", () => {
@@ -38,8 +38,31 @@ describe("parseAddress", () => {
 });
 
 describe("invoiceSummary", () => {
-  it("reads the tax as total less total before tax", () => {
-    const inv = { id: "in_1", number: "KEPL-0001", created: 1_760_000_000, due_date: null, description: null, lines: { data: [{ description: "Film" }] }, total: 10875, total_excluding_tax: 10000, currency: "usd", status: "paid", hosted_invoice_url: "https://invoice.stripe.com/i/1", invoice_pdf: null } as unknown as Stripe.Invoice;
-    expect(invoiceSummary(inv)).toMatchObject({ number: "KEPL-0001", totalCents: 10875, taxCents: 875, description: "Film", status: "paid" });
+  const tx = (over: Partial<PaddleTransaction> = {}) =>
+    ({
+      id: "txn_01abc",
+      status: "completed",
+      invoice_number: "325-10001",
+      collection_mode: "automatic",
+      currency_code: "USD",
+      created_at: "2026-10-01T09:00:00Z",
+      billed_at: "2026-10-01T09:00:00Z",
+      custom_data: null,
+      details: { totals: { grand_total: "10875", tax: "875", subtotal: "10000" } },
+      items: [{ price: { description: "Film" } }],
+      ...over,
+    }) as PaddleTransaction;
+
+  it("reads Paddle's totals and tax, and links the PDF through our route", () => {
+    expect(invoiceSummary(tx())).toMatchObject({ number: "325-10001", totalCents: 10875, taxCents: 875, description: "Film", status: "paid", currency: "usd", hostedUrl: null, pdfUrl: "/api/invoices/txn_01abc/pdf" });
+  });
+
+  it("a sent invoice is open, due after its payment terms, payable on Paddle's checkout", () => {
+    const inv = invoiceSummary(tx({ status: "billed", collection_mode: "manual", billing_details: { payment_terms: { interval: "day", frequency: 14 }, additional_information: "Brand film" }, checkout: { url: "https://pay.example/?_ptxn=txn_01abc" } }));
+    expect(inv).toMatchObject({ status: "open", dueAt: "2026-10-15T09:00:00.000Z", description: "Brand film", hostedUrl: "https://pay.example/?_ptxn=txn_01abc" });
+  });
+
+  it("has no PDF before Paddle numbers it", () => {
+    expect(invoiceSummary(tx({ invoice_number: null, status: "ready" }))).toMatchObject({ pdfUrl: null, status: "draft" });
   });
 });

@@ -20,7 +20,7 @@ export function orderRow(spec: CheckoutSpec, userId: string, billing: Billing) {
 }
 
 /**
- * Records a checkout before Stripe opens, as a pending order; returns its id (it rides along in the checkout's metadata,
+ * Records a checkout before Paddle opens, as a pending order; returns its id (it rides along in the checkout's metadata,
  * so the webhook can settle it) - or `null` without the service role / the table, and the purchase still goes through.
  */
 export async function createPendingOrder(spec: CheckoutSpec, userId: string, billing: Billing): Promise<string | null> {
@@ -31,7 +31,7 @@ export async function createPendingOrder(spec: CheckoutSpec, userId: string, bil
 }
 
 /** Updates an order (best effort - an order is a record; the credits never wait on it). */
-export async function updateOrder(orderId: string | null | undefined, patch: Partial<{ status: OrderStatus; stripe_session_id: string; stripe_subscription_id: string; paid_at: string }>) {
+export async function updateOrder(orderId: string | null | undefined, patch: Partial<{ status: OrderStatus; paddle_transaction_id: string; paddle_subscription_id: string; paid_at: string }>) {
   if (!orderId) return;
   const admin = createAdminClient();
   if (!admin) return;

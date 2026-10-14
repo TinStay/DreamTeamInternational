@@ -11,10 +11,11 @@ const state = vi.hoisted(() => ({
   filters: [] as [string, unknown][],
   updates: [] as Record<string, unknown>[],
 }));
-const create = vi.hoisted(() => vi.fn(async (...args: [Record<string, unknown>]) => (void args, { id: "cs_req", url: "https://checkout.stripe.com/c/cs_req" })));
+const create = vi.hoisted(() => vi.fn(async (...args: [Record<string, unknown>]) => (void args, { id: "txn_req" })));
 
-vi.mock("@/lib/stripe", () => ({ getStripe: () => ({ checkout: { sessions: { create } } }) }));
-vi.mock("@/lib/stripe-customers", () => ({ customerFor: vi.fn(async () => "cus_test_1") }));
+vi.mock("@/lib/paddle", () => ({ paddleConfigured: () => true }));
+vi.mock("@/lib/paddle-customers", () => ({ customerFor: vi.fn(async () => "ctm_test_1") }));
+vi.mock("@/lib/paddle-checkout", async (importOriginal) => ({ ...(await importOriginal<typeof import("@/lib/paddle-checkout")>()), createCheckoutTransaction: create }));
 vi.mock("@/lib/supabase/server", () => ({ createClient: async () => ({ auth: { getUser: async () => ({ data: { user: state.user } }) } }) }));
 vi.mock("@/lib/supabase/admin", () => ({
   createAdminClient: () => ({
@@ -47,17 +48,17 @@ beforeEach(() => {
 });
 
 describe("/api/project-requests/checkout", () => {
-  it("opens a Stripe payment for exactly the request's price, marked as a project request", async () => {
+  it("opens a Paddle transaction for exactly the request's price, marked as a project request", async () => {
     const res = await post({ requestId: ID, amount: 1 /* ignored */ });
-    expect(await res.json()).toEqual({ url: "https://checkout.stripe.com/c/cs_req" });
-    const s = create.mock.calls[0][0] as { mode: string; line_items: { price_data: { unit_amount: number } }[]; metadata: Record<string, string>; success_url: string };
-    expect(s.mode).toBe("payment");
-    expect(s.line_items[0].price_data.unit_amount).toBe(15000);
-    expect(s.metadata).toMatchObject({ request_id: ID, purchase_type: "project_request", user_id: state.user!.id });
-    expect(s.success_url).toBe("http://localhost:3000/en/my-projects/p1?request=paid");
-    // Only this client's request was looked up, and the session is remembered on it.
+    expect(await res.json()).toEqual({ transactionId: "txn_req" });
+    const t = create.mock.calls[0][0] as { customerId: string; items: { price: { unit_price: { amount: string }; billing_cycle?: unknown } }[]; customData: Record<string, string> };
+    expect(t.customerId).toBe("ctm_test_1");
+    expect(t.items[0].price.unit_price.amount).toBe("15000");
+    expect(t.items[0].price.billing_cycle).toBeUndefined();
+    expect(t.customData).toMatchObject({ request_id: ID, purchase_type: "project_request", user_id: state.user!.id, project_id: "p1" });
+    // Only this client's request was looked up, and the transaction is remembered on it.
     expect(state.filters).toContainEqual(["user_id", state.user!.id]);
-    expect(state.updates).toEqual([{ stripe_session_id: "cs_req" }]);
+    expect(state.updates).toEqual([{ paddle_transaction_id: "txn_req" }]);
   });
 
   it("refuses another client's request, one already paid or free, a bad id, a signed-out visitor and another site", async () => {

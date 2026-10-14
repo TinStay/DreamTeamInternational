@@ -14,7 +14,8 @@ import { cn } from "@/lib/utils";
 /*
  * The site footer: the brand (logo, line, the San Francisco phone and address) and five link columns -
  * Order a video (with every style of video), Pricing (with the packs), Company (About us, Policies, Cookies, Terms),
- * Resources (Customers, Our work) and Socials (text links, no icon buttons) - with the copyright along the bottom.
+ * Resources (Customers, Our work) and Socials (text links, no icon buttons; dropped while `SOCIAL_LINKS` is empty) -
+ * with the copyright along the bottom.
  */
 
 const linkClass = "text-muted-foreground transition-colors hover:text-primary";
@@ -42,7 +43,13 @@ export function Footer() {
   return (
     <footer className="liquid-glass relative mt-20 overflow-hidden border-t border-card-border">
       <div className="relative z-10 mx-auto max-w-[88rem] px-6 pt-12 pb-28 lg:pb-12">
-        <div className="grid gap-10 text-center sm:grid-cols-2 sm:text-left lg:grid-cols-[1.5fr_1.15fr_0.9fr_0.9fr_0.9fr_0.8fr] lg:gap-8">
+        {/* Five columns while the social profiles are parked (`SOCIAL_LINKS` empty), six with them. */}
+        <div
+          className={cn(
+            "grid gap-10 text-center sm:grid-cols-2 sm:text-left lg:gap-8",
+            SOCIAL_LINKS.length ? "lg:grid-cols-[1.5fr_1.15fr_0.9fr_0.9fr_0.9fr_0.8fr]" : "lg:grid-cols-[1.5fr_1.15fr_0.9fr_0.9fr_0.9fr]"
+          )}
+        >
           {/* Brand column */}
           <div className="flex flex-col items-center gap-4 sm:items-start">
             <Link href={homeHref} className="font-heading text-2xl font-bold tracking-tight">
@@ -120,15 +127,17 @@ export function Footer() {
             </Link>
           </div>
 
-          {/* Socials: plain text links. */}
-          <div className="flex flex-col items-center gap-2.5 text-sm sm:items-start">
-            <h4 className={headingClass}>{f.socials}</h4>
-            {SOCIAL_LINKS.map((s) => (
-              <a key={s.alt} href={s.href} target="_blank" rel="noopener noreferrer" className={linkClass}>
-                {s.alt}
-              </a>
-            ))}
-          </div>
+          {/* Socials: plain text links - none while the profiles are parked. */}
+          {SOCIAL_LINKS.length ? (
+            <div className="flex flex-col items-center gap-2.5 text-sm sm:items-start">
+              <h4 className={headingClass}>{f.socials}</h4>
+              {SOCIAL_LINKS.map((s) => (
+                <a key={s.alt} href={s.href} target="_blank" rel="noopener noreferrer" className={linkClass}>
+                  {s.alt}
+                </a>
+              ))}
+            </div>
+          ) : null}
         </div>
 
         <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-border/10 pt-8 text-xs text-muted-foreground md:flex-row">

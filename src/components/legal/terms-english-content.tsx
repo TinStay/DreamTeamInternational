@@ -49,6 +49,13 @@ export function TermsEnglishContent() {
         even if the video does not match the Client&apos;s personal aesthetic preferences. At the
         Contractor&apos;s discretion and with valid reason, up to 50% of the amount may be refunded.
       </p>
+      <p>
+        <strong>2.5. Online orders:</strong> Our order process is conducted by our online reseller Paddle.com. Paddle.com is
+        the Merchant of Record for all our online orders - packs, subscriptions, paid project changes and invoices sent
+        through our website. Paddle provides all customer service inquiries and handles returns, and its{" "}
+        <a href="https://www.paddle.com/legal/checkout-buyer-terms" target="_blank" rel="noopener noreferrer">Buyer Terms</a>{" "}
+        apply to the purchase. Prices are shown before tax; Paddle adds any sales tax or VAT due at checkout.
+      </p>
 
       <h2>3. Right of Refusal and Termination</h2>
       <p>

@@ -24,7 +24,7 @@ const cents = (amount: string) => Math.round(Number.parseFloat(amount.replace(/[
 /**
  * The team's invoices for one client, in their client window: what they have been billed (`InvoiceList`), and a form to
  * bill a custom quote - lines in USD before tax, the days until it is due, a note, and the billing address when the client
- * has none on file (Stripe needs one to work out the tax). Sending goes through `/api/team/invoices`; Stripe emails it.
+ * has none on file (Paddle needs one on every invoice). Sending goes through `/api/team/invoices`; Paddle issues and emails it.
  */
 export function TeamClientInvoices({ userId, sample = false }: { userId: string; sample?: boolean }) {
   const { t } = useLanguage();
