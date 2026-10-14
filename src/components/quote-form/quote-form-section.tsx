@@ -368,23 +368,26 @@ export function QuoteFormSection({
                     </Button>
                   </motion.div>
 
-                  <motion.div
-                    variants={successItemVariants}
-                    className="mt-8 flex items-center gap-6"
-                  >
-                    {SOCIAL_LINKS.map((social) => (
-                      <a
-                        key={social.alt}
-                        href={social.href}
-                        aria-label={social.alt}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="group inline-flex shrink-0 cursor-pointer items-center justify-center transition-transform duration-200 ease-out hover:scale-110"
-                      >
-                        <SocialIcon name={social.alt} />
-                      </a>
-                    ))}
-                  </motion.div>
+                  {/* The profiles' icons - no row while they are parked (`SOCIAL_LINKS` empty). */}
+                  {SOCIAL_LINKS.length ? (
+                    <motion.div
+                      variants={successItemVariants}
+                      className="mt-8 flex items-center gap-6"
+                    >
+                      {SOCIAL_LINKS.map((social) => (
+                        <a
+                          key={social.alt}
+                          href={social.href}
+                          aria-label={social.alt}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="group inline-flex shrink-0 cursor-pointer items-center justify-center transition-transform duration-200 ease-out hover:scale-110"
+                        >
+                          <SocialIcon name={social.alt} />
+                        </a>
+                      ))}
+                    </motion.div>
+                  ) : null}
                 </div>
               </motion.div>
             ) : (

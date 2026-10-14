@@ -1,9 +1,11 @@
 import type { MetadataRoute } from "next";
+import { LOCALES } from "@/lib/i18n/config";
 import { SITE_URL } from "@/lib/seo";
 
 /*
- * Everyone may crawl everything but the API. The AI assistants / answer
- * engines are named as well, so their access is explicit and cannot be
+ * Everyone may crawl everything but the API and the signed-in areas (the
+ * brief written for AI assistants is `/llms.txt` + `/llms-full.txt`). The AI
+ * assistants / answer engines are named as well, so their access is explicit and cannot be
  * lost to a copied blanket rule later: the convention is one plain bot per
  * operator for training, a "SearchBot" for its search index and a "User"
  * agent for live fetches on a person's behalf - all welcome, so Keplerbay
@@ -51,8 +53,19 @@ const AI_CRAWLERS = [
   "Bytespider",
 ];
 
+/**
+ * The signed-in areas - the client's account and projects, the team's dashboard - and the sign-in callback: nothing
+ * there is public (each page redirects a visitor to the log-in and says `noindex` besides), so crawlers need not spend
+ * their visits on them.
+ */
+const PRIVATE_SEGMENTS = ["account", "my-projects", "profile", "admin", "team"];
+
 export default function robots(): MetadataRoute.Robots {
-  const disallow = ["/api/"];
+  const disallow = [
+    "/api/",
+    "/auth/",
+    ...LOCALES.flatMap((lang) => PRIVATE_SEGMENTS.map((segment) => `/${lang}/${segment}`)),
+  ];
   return {
     rules: [
       { userAgent: "*", allow: "/", disallow },

@@ -9,6 +9,7 @@ import { sideTabClass, sideTabDiscClass } from "@/components/ui/button-with-icon
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
+import { jsonLd as jsonLdHtml } from "@/lib/seo";
 
 /*
  * The FAQ: the questions in topics (`faq.groups` - packs & pricing, your
@@ -19,7 +20,9 @@ import { cn } from "@/lib/utils";
  * (`sideTabClass`: the active topic as the site's CTA pill with its icon in
  * the gradient disc on the left). On the home journey
  * the heading, the menu and the list are the parts that travel.
- * FAQPage structured data covers every question, whatever topic is open.
+ * FAQPage structured data covers every question, whatever topic is open, and
+ * every topic's questions and answers are in the HTML as well (hidden until
+ * opened).
  */
 
 const GROUP_ICONS = { pricing: IconCoins, account: IconUserCircle, process: IconRoute, videos: IconMovie, training: IconSchool } as const;
@@ -54,7 +57,7 @@ export function FaqSection({ className }: { className?: string }) {
 
   return (
     <section id="faq" className={cn("relative w-full py-10 sm:py-14", className)}>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={jsonLdHtml(jsonLd)} />
       <div className={cn("relative z-10 mx-auto w-full", language === "en" ? "px-[max(1.25rem,3vw)]" : "max-w-7xl px-4")}>
         {/* Journey parts (home): the heading first, then the topic menu from the left and the questions from the right. */}
         <JourneyItem kind="title" className={language === "en" ? "mb-10 text-left lg:mb-12" : "mb-10 text-center lg:mb-12"}>
@@ -102,10 +105,18 @@ export function FaqSection({ className }: { className?: string }) {
 
           <JourneyItem index={1} from="right" className="min-w-0 flex-1">
             {faq.groups.map((group) => (
-              <TabsContent key={group.key} value={group.key} className="min-w-0">
-                {/* A fresh list slides in with each topic; the first answer starts open. */}
-                <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45, ease: EASE }}>
-                  <Accordion className="gap-3 sm:gap-4" defaultValue={[`${group.key}-0`]}>
+              // Every topic stays in the HTML (`keepMounted` - an inactive one is `hidden`) and so does every closed
+              // answer (`hiddenUntilFound`), so crawlers and AI assistants read the whole FAQ, not just the open topic.
+              <TabsContent key={group.key} value={group.key} keepMounted className="min-w-0">
+                {/* A fresh list slides in with each topic (keyed by being the open one, so it remounts on a switch); the
+                    first answer starts open. */}
+                <motion.div
+                  key={group.key === active ? "open" : "closed"}
+                  initial={{ opacity: 0, y: 16 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.45, ease: EASE }}
+                >
+                  <Accordion className="gap-3 sm:gap-4" defaultValue={[`${group.key}-0`]} hiddenUntilFound>
                     {group.items.map((item, i) => (
                       <AccordionItem
                         key={item.q}
