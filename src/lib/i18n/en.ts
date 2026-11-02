@@ -258,8 +258,8 @@ export const en = {
     },
     note: {
       individual:
-        "Prices in USD. Individual plans are for personal and creator use - advertising a business requires a Business plan.",
-      business: "Prices in USD. Business plans include full commercial use."
+        "Prices in USD, before tax - any sales tax or VAT is added at checkout. Individual plans are for personal and creator use - advertising a business requires a Business plan.",
+      business: "Prices in USD, before tax - any sales tax or VAT is added at checkout. Business plans include full commercial use."
     },
     // The questions under the plans (`pricing-faq.tsx`) - picked from `faq.groups` by id, so the answers live in one place.
     faq: {
@@ -2342,7 +2342,7 @@ export const en = {
           {
             id: "cost",
             q: "How much does an AI video cost?",
-            a: "Personal is a single video for $299 (up to 20 seconds, +$119 for every extra 10 seconds). Monthly plans start at $389 a month for individuals (Creator, 40 seconds of video a month; Pro, 1 minute for $629) and at $990 a month for businesses (Local, 1.5 minutes; Brand, 3 minutes for $3,490). Enterprise is priced around your campaigns. All prices are in US dollars on the Pricing page.",
+            a: "Personal is a single video for $299 (up to 20 seconds, +$119 for every extra 10 seconds). Monthly plans start at $389 a month for individuals (Creator, 40 seconds of video a month; Pro, 1 minute for $629) and at $990 a month for businesses (Local, 1.5 minutes; Brand, 3 minutes for $3,490). Enterprise is priced around your campaigns. All prices are in US dollars, before tax, on the Pricing page - any sales tax or VAT is added at checkout.",
           },
           {
             id: "one-time-vs-subscription",

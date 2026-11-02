@@ -12,8 +12,11 @@ export function taxCategory(): (typeof TAX_CATEGORIES)[number] {
 
 /**
  * One line priced on the server (a **non-catalog** price and product - the amount comes from `lib/pricing.ts` or the
- * database, never from the browser): USD, tax-exclusive (Paddle adds any sales tax / VAT on top - the US norm), and
- * recurring when `interval` is given (Paddle then creates a subscription when the checkout completes).
+ * database, never from the browser): USD, tax-exclusive (Paddle adds any sales tax / VAT on top - the US norm, and what
+ * the terms promise: "prices are shown before tax"), and recurring when `interval` is given (Paddle then creates a
+ * subscription when the checkout completes). `tax_mode: "external"` is stated on the line rather than left to the Paddle
+ * account's setting: that setting was `location` in the sandbox (VAT inside the price for an EU buyer), so the same $299
+ * card could cost $299 or $358.80 depending on a dashboard toggle.
  */
 export function lineItem(line: { name: string; description: string; amountCents: number; interval?: "month" | "year" }) {
   return {
@@ -22,7 +25,7 @@ export function lineItem(line: { name: string; description: string; amountCents:
       name: line.name.slice(0, 150),
       description: line.description.slice(0, 500).padEnd(2, "."),
       unit_price: { amount: String(Math.round(line.amountCents)), currency_code: "USD" },
-      tax_mode: "account_setting",
+      tax_mode: "external",
       ...(line.interval ? { billing_cycle: { interval: line.interval, frequency: 1 } } : {}),
       product: { name: line.name.slice(0, 200), tax_category: taxCategory() },
     },
