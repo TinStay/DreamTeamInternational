@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { EMAIL_PRIMARY } from "@/lib/contact-info";
 import { useLanguage } from "@/lib/i18n/language-context";
 import { cn } from "@/lib/utils";
 import { motion } from "motion/react";
@@ -132,7 +133,7 @@ export function ContactSection({
           <JourneyItem index={1} from="right">
             <div className="mb-10 space-y-6">
               <MotionLink
-                href="mailto:info@keplerbay.com"
+                href={EMAIL_PRIMARY.href}
                 className="group flex origin-left cursor-pointer items-center gap-4"
                 whileHover={{ scale: 1.05, transition: HOVER_TRANSITION }}
                 whileTap={{ scale: 0.99, transition: TAP_TRANSITION }}
@@ -144,7 +145,7 @@ export function ContactSection({
                 <div>
                   <div className="text-sm text-muted-foreground">{t.contact.email}</div>
                   <div className="font-semibold text-foreground transition-colors group-hover:text-primary">
-                    info@keplerbay.com
+                    {EMAIL_PRIMARY.label}
                   </div>
                 </div>
               </MotionLink>

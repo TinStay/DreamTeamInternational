@@ -5,7 +5,9 @@
  * keeping the EU GDPR rights, since Keplerbay is based in Bulgaria. Every vendor, cookie and duration here must match
  * the code - `lib/consent.ts`, the banner copy (`consent.categories.*`) and `PROJECT_GUIDE.md`'s consent row.
  */
-const MAIL = "info@keplerbay.com";
+import { EMAIL_PRIMARY } from "@/lib/contact-info";
+
+const MAIL = EMAIL_PRIMARY.label;
 
 function Mail({ subject }: { subject?: string }) {
   return <a href={`mailto:${MAIL}${subject ? `?subject=${encodeURIComponent(subject)}` : ""}`}>{MAIL}</a>;
@@ -56,7 +58,7 @@ export function PrivacyEnglishContent() {
         </li>
         <li>
           <strong>Account records:</strong>{" "}when you signed up, how you sign in, and your confirmation that you accepted our
-          Terms of Use, read this Privacy Policy and are at least 18 years old.
+          Terms and Conditions, read this Privacy Policy and are at least 18 years old.
         </li>
         <li>
           <strong>Commercial information:</strong>{" "}the packs and subscriptions you buy, your plan and its status, your
@@ -191,8 +193,8 @@ export function PrivacyEnglishContent() {
         By itself the website stores only what it needs to work: your language and theme, your cookie choice (the{" "}
         <code>dt_consent</code> cookie, kept for six months) and, if you sign in, the session cookies that keep you signed in
         (<code>sb-*</code>, set by Supabase and removed when you sign out or the session expires). Everything else runs only
-        after you agree in the cookie banner. You can change or withdraw your choice at any time from &ldquo;Cookie
-        settings&rdquo; in the footer.
+        after you agree in the cookie banner. You can change or withdraw your choice at any time from &ldquo;Cookies&rdquo;
+        in the footer.
       </p>
       <ul>
         <li>
@@ -241,7 +243,7 @@ export function PrivacyEnglishContent() {
         </li>
         <li>
           <strong>Right to opt out</strong>{" "}of the sale or sharing of personal information and of targeted advertising:
-          decline or withdraw marketing cookies in &ldquo;Cookie settings&rdquo;, turn on GPC, or email us.
+          decline or withdraw marketing cookies under &ldquo;Cookies&rdquo; in the footer, turn on GPC, or email us.
         </li>
         <li>
           <strong>Right to limit</strong>{" "}the use of sensitive personal information. We do not use any beyond what the

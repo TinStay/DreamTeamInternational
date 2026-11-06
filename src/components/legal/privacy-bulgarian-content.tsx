@@ -18,7 +18,7 @@ export function PrivacyBulgarianContent() {
         </li>
         <li>
           <strong>Имейл за контакт:</strong>{" "}
-          <a href="mailto:info@keplerbay.com">info@keplerbay.com</a>
+          <a href="mailto:hq@keplerbay.com">hq@keplerbay.com</a>
         </li>
         <li>
           <strong>Дейност:</strong> Компания за създаване на видео съдържание с помощта на изкуствен
@@ -119,7 +119,7 @@ export function PrivacyBulgarianContent() {
       <h2>Контакт</h2>
       <p>
         Ако имате въпроси относно тази политика, моля свържете се с нас на:{" "}
-        <a href="mailto:info@keplerbay.com">info@keplerbay.com</a>.
+        <a href="mailto:hq@keplerbay.com">hq@keplerbay.com</a>.
       </p>
     </>
   );

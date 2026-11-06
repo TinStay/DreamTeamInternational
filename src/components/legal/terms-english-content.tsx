@@ -6,7 +6,11 @@ import { pricingPath, privacyPath, refundsPath } from "@/lib/routes";
  * The English terms. What Paddle's domain review looks for is all here, so keep it when changing them: the legal seller,
  * acceptance, Paddle as reseller and merchant of record (clause 2.1), misuse rules, generative-AI rules with a takedown
  * route (section 3), suspension, the service level, IP and a contact. Nothing here may read "no refunds": refunds live in
- * the Refund Policy (`refunds-english-content.tsx`), which only points at Paddle's own.
+ * the Refund Policy (`refunds-english-content.tsx`), which only points at Paddle's own. The site sells to the US first, so
+ * the terms also carry what US law and practice expect: the automatic-renewal disclosure (ROSCA, California's ARL -
+ * clause 2.5), the warranty disclaimer and liability cap in capitals (section 7), the note that fully AI-generated work
+ * may not be copyrightable in the US (6.1), the AI-performer disclosure and the FTC rules on testimonials (3.5),
+ * a DMCA route (3.6), and the governing law (7.3).
  */
 const PADDLE_AUP = "https://www.paddle.com/help/start/intro-to-paddle/what-am-i-not-allowed-to-sell-on-paddle";
 
@@ -14,7 +18,8 @@ export function TermsEnglishContent() {
   return (
     <>
       <p className="not-prose text-[0.9375rem] leading-relaxed text-muted-foreground">
-        These Terms and Conditions govern the relationship between DT A I, a company registered in Bulgaria and trading as &ldquo;Keplerbay&rdquo;
+        These Terms and Conditions govern the relationship between DT A I, a company registered in Bulgaria with its office at
+        27-29 Nikolay Kopernik Street, floor 2, office 17, Sofia, and trading as &ldquo;Keplerbay&rdquo;
         (hereinafter referred to as the &ldquo;Contractor&rdquo;) and clients (hereinafter referred
         to as the &ldquo;Client&rdquo;), in connection with the provision of services for generating
         and editing video content using artificial intelligence (AI). The Client contracts with DT A I for these services. By
@@ -66,10 +71,15 @@ export function TermsEnglishContent() {
         ends when the account is deleted.
       </p>
       <p>
-        <strong>2.5. Subscriptions:</strong>{" "}A subscription is billed monthly or annually, as chosen at checkout, and renews
-        automatically until it is cancelled. The Client can cancel at any time from their account, or ask the Contractor to
-        pause or cancel it. After a cancellation the plan and its video time stay available until the end of the paid period,
-        and no further payment is taken.
+        <strong>2.5. Subscriptions and automatic renewal:</strong>{" "}A subscription is billed monthly or annually, as
+        chosen at checkout. It renews automatically at the end of each billing period, and the payment method on file is
+        charged the price shown at checkout for the next period, until the Client cancels. The price, the billing period and
+        the renewal are shown before the Client confirms the purchase, and Paddle&apos;s receipt confirms them by email. The
+        Client can cancel at any time online, from their account, or by writing to{" "}
+        <a href={emailHref("Cancel my subscription")}>{EMAIL_PRIMARY.label}</a>; cancelling takes effect at the end of the
+        paid period, the plan and its video time stay available until then, and no further payment is taken. Paddle sends
+        renewal reminders where the law requires them. Price changes are announced by email at least 30 days before they
+        apply to a renewal.
       </p>
       <p>
         <strong>2.6. Refunds:</strong>{" "}Refunds are covered by our <Link href={refundsPath("en")}>Refund Policy</Link>.
@@ -106,14 +116,22 @@ export function TermsEnglishContent() {
       </p>
       <p>
         <strong>3.5. Accuracy and publishing:</strong>{" "}AI output can contain errors. The Client checks each video before
-        publishing it and is responsible for how it is used, including the claims it makes and any AI disclosure that a law or
-        platform requires. Videos are not professional, legal, medical or financial advice.
+        publishing it and is responsible for how it is used, including the claims it makes. Videos are not professional,
+        legal, medical or financial advice.
       </p>
       <p>
-        <strong>3.6. Infringement reports:</strong>{" "}Anyone who believes a video made by the Contractor infringes their rights
+        <strong>3.6. AI disclosures and advertising rules:</strong>{" "}Some laws and platforms require advertisements to
+        disclose AI-generated people, voices or scenes - for example New York requires a conspicuous disclosure when an
+        advertisement uses a synthetic performer. The Client is responsible for those disclosures where their videos are
+        shown, and for complying with advertising law, including the rules of the US Federal Trade Commission. In
+        particular, a creator-style (UGC) video with an AI-generated person must not be presented as the genuine experience or
+        opinion of a real customer.
+      </p>
+      <p>
+        <strong>3.7. Infringement reports (DMCA):</strong>{" "}Anyone who believes a video made by the Contractor infringes their rights
         can write to <a href={emailHref("Infringement report")}>{EMAIL_PRIMARY.label}</a> with the video, the right concerned and their
-        contact details. The Contractor reviews each report and removes content where it is justified. Accounts that infringe
-        repeatedly are closed.
+        contact details - a notice under the US Digital Millennium Copyright Act goes to the same address. The Contractor
+        reviews each report and removes content where it is justified. Accounts that infringe repeatedly are closed.
       </p>
 
       <h2>4. Right of Refusal and Termination</h2>
@@ -153,9 +171,14 @@ export function TermsEnglishContent() {
 
       <h2>6. Copyright and Portfolio</h2>
       <p>
-        <strong>6.1. The Client&apos;s videos:</strong>{" "}After full payment, and to the extent the law allows, the Client owns
-        the delivered videos and source files. Individual plans are for personal and creator use. Advertising a business
-        requires a Business plan, which includes full commercial use.
+        <strong>6.1. The Client&apos;s videos:</strong>{" "}After full payment, the Contractor assigns to the Client all rights
+        it holds in the delivered videos and source files, and the Client may use them for any lawful purpose their plan
+        allows. Individual plans are for personal and creator use. Advertising a business
+        requires a Business plan, which includes full commercial use. The Client should know that copyright law in the
+        United States and some other countries protects only what a person created: parts of a video generated entirely by
+        AI may not be protected by copyright, and the Contractor does not promise that a video can be registered or
+        enforced against others. Elements of the video may use AI models, stock material or fonts under their own licences,
+        which the Contractor chooses so that the Client&apos;s use under their plan is allowed.
       </p>
       <p>
         <strong>6.2. The service:</strong>{" "}The Contractor keeps all rights in the website, the software and the service.
@@ -165,12 +188,44 @@ export function TermsEnglishContent() {
         working materials in their portfolio unless explicit confidentiality has been agreed upon.
       </p>
 
-      <h2>7. Changes and Contact</h2>
+      <h2>7. Warranties, Liability and Governing Law</h2>
       <p>
-        <strong>7.1. Changes:</strong>{" "}When these Terms change, the &ldquo;Last updated&rdquo; date above changes too.
+        <strong>7.1. No other warranties:</strong>{" "}EXCEPT AS STATED IN THESE TERMS, THE SERVICE AND THE VIDEOS ARE PROVIDED
+        &ldquo;AS IS&rdquo; AND &ldquo;AS AVAILABLE&rdquo;, AND THE CONTRACTOR DISCLAIMS ALL OTHER WARRANTIES, EXPRESS OR IMPLIED,
+        INCLUDING MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT, AND ANY WARRANTY THAT A VIDEO WILL
+        ACHIEVE PARTICULAR VIEWS, SALES OR OTHER RESULTS.
       </p>
       <p>
-        <strong>7.2. Contact:</strong>{" "}Questions about these Terms: <a href={emailHref()}>{EMAIL_PRIMARY.label}</a>. See also our{" "}
+        <strong>7.2. Limitation of liability:</strong>{" "}TO THE FULLEST EXTENT THE LAW ALLOWS, THE CONTRACTOR IS NOT LIABLE
+        FOR INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL OR PUNITIVE DAMAGES, OR FOR LOST PROFITS, REVENUE OR DATA, ARISING OUT
+        OF THESE TERMS OR THE SERVICE, AND ITS TOTAL LIABILITY FOR ALL CLAIMS IS LIMITED TO THE AMOUNT THE CLIENT PAID FOR
+        THE SERVICE IN THE TWELVE MONTHS BEFORE THE CLAIM. Nothing in these Terms limits liability that cannot be limited by
+        law, or the rights a consumer has under the law of their state or country.
+      </p>
+      <p>
+        <strong>7.3. The Client&apos;s responsibility:</strong>{" "}The Client will defend and compensate the Contractor for
+        claims by others that arise from the Client&apos;s materials, from instructions the Client gave, or from the
+        Client&apos;s use of a video in breach of these Terms or the law.
+      </p>
+      <p>
+        <strong>7.4. Governing law and disputes:</strong>{" "}These Terms are governed by the law of Bulgaria, and disputes are
+        heard by the courts of Sofia, Bulgaria. If the Client is a consumer, they keep the protection of the mandatory
+        consumer law of the place where they live, and may bring a claim there. The Client and the Contractor will first try
+        to settle any dispute by writing to each other. Purchases made through Paddle are also subject to Paddle&apos;s{" "}
+        <a href="https://www.paddle.com/legal/checkout-buyer-terms" target="_blank" rel="noopener noreferrer">Buyer Terms</a>.
+      </p>
+      <p>
+        <strong>7.5. Age and accounts:</strong>{" "}The Client must be at least 18 years old to create an account or place an
+        order, and is responsible for keeping their sign-in details safe and for what is done through their account.
+      </p>
+
+      <h2>8. Changes and Contact</h2>
+      <p>
+        <strong>8.1. Changes:</strong>{" "}When these Terms change, the &ldquo;Last updated&rdquo; date above changes too.
+        Account holders are told by email about material changes before they take effect.
+      </p>
+      <p>
+        <strong>8.2. Contact:</strong>{" "}Questions about these Terms: <a href={emailHref()}>{EMAIL_PRIMARY.label}</a>. See also our{" "}
         <Link href={privacyPath("en")}>Privacy Policy</Link>.
       </p>
     </>

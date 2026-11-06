@@ -17,10 +17,11 @@ export const PHONE_US = {
   label: "+1 (415) 555-0142",
 } as const;
 
-/** Public email (header copy button). Stays on the old domain - Resend-verified sender/recipient. */
+/** The public contact email - the header copy button, the footer, the legal pages and the structured data. The emails
+ * the site sends keep `info@keplerbay.com` as their sender (`RESEND_FROM`) and the admin inbox is `ADMIN_INBOX`. */
 export const EMAIL_PRIMARY = {
-  href: "mailto:info@keplerbay.com",
-  label: "info@keplerbay.com",
+  href: "mailto:hq@keplerbay.com",
+  label: "hq@keplerbay.com",
 } as const;
 
 /** A `mailto:` link to the public inbox, with a subject when there is one - the "write to us" links on the site. */

@@ -112,6 +112,10 @@ export const en = {
     saveAnnual: "Save {amount}/yr ({n}%) with annual billing",
     savedAnnual: "You save {amount} a year · billed {total}/yr",
     vsOneTime: "Save {n}% vs one-time orders",
+    // Under a subscription's button: the renewal terms, stated before the checkout opens.
+    renewal: "Renews automatically at {total}",
+    renewalMonthly: "every month until you cancel. Cancel anytime from your account.",
+    renewalAnnual: "every year until you cancel. Cancel anytime from your account.",
     notIncluded: "Not included:",
     buy: {
       notConfigured: "Payments aren't switched on yet - please contact us and we'll set your pack up by hand.",
@@ -336,7 +340,7 @@ export const en = {
     emailLabel: "Email address",
     emailPlaceholder: "you@company.com",
     consent1: "I agree to the",
-    terms: "Terms of Use",
+    terms: "Terms and Conditions",
     consent2: ", acknowledge the",
     privacy: "Privacy Policy",
     consent3: ", and confirm I'm at least 18 years old.",
@@ -699,7 +703,7 @@ export const en = {
         close: "Close",
         error: "We couldn't save your project. Please check your connection and try again.",
         done: "Thank you - your project is in. We're reviewing your brief and will confirm the details within a few working days.",
-        doneNoFiles: "Your project is saved, but we couldn't send your attached files. Please email them to info@keplerbay.com and mention the project name.",
+        doneNoFiles: "Your project is saved, but we couldn't send your attached files. Please email them to hq@keplerbay.com and mention the project name.",
         nextStep: "We're reviewing your brief and will confirm the details within a few working days.",
         available: "Video time available",
         cost: "This project uses {needed} of your {available}.",
