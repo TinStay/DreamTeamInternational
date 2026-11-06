@@ -7,6 +7,7 @@ import { isTeamUser } from "@/lib/team";
 import { projectFromRow } from "@/lib/client-projects";
 import { SAMPLE_PROJECTS } from "@/lib/client-projects-sample";
 import { clientFromRow, SAMPLE_CLIENTS } from "@/lib/clients";
+import { getPortfolioItems } from "@/lib/portfolio-videos-server";
 import { createClient } from "@/lib/supabase/server";
 import { supabaseConfigured } from "@/lib/supabase/config";
 
@@ -47,9 +48,10 @@ export default async function TeamPage({
   if (!auth.user) redirect(loginPath(lang, `${teamPath(lang)}${projectId ? `?project=${projectId}` : ""}`));
 
   const sample = query.sample === "1";
-  // `?view=clients` opens the Clients list under the status card (Projects otherwise).
-  const initialList = query.view === "clients" ? "clients" : "projects";
-  if (sample) return <TeamDashboardView projects={SAMPLE_PROJECTS} clients={SAMPLE_CLIENTS} sample initialList={initialList} />;
+  // `?view=clients` / `?view=portfolio` opens that list under the status card (Projects otherwise).
+  const initialList = query.view === "clients" || query.view === "portfolio" ? query.view : "projects";
+  const portfolio = await getPortfolioItems();
+  if (sample) return <TeamDashboardView projects={SAMPLE_PROJECTS} clients={SAMPLE_CLIENTS} portfolio={portfolio} sample initialList={initialList} />;
 
   if (!isTeamUser(auth.user)) redirect(homePath(lang));
   const { data } = await supabase.from("projects").select("*").order("created_at", { ascending: false });
@@ -72,5 +74,5 @@ export default async function TeamPage({
     .eq("is_team", false)
     .order("last_activity", { ascending: false, nullsFirst: false });
   const clients = clientsError ? null : (clientRows ?? []).map((row) => clientFromRow(row as Record<string, unknown>));
-  return <TeamDashboardView projects={projects} clients={clients} sample={false} initialProjectId={projectId} initialList={initialList} />;
+  return <TeamDashboardView projects={projects} clients={clients} portfolio={portfolio} sample={false} initialProjectId={projectId} initialList={initialList} />;
 }

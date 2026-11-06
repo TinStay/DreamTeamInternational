@@ -3,13 +3,15 @@
 import { PillSelect } from "@/components/ui/pill-select";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { motion } from "motion/react";
-import { IconAlertTriangle, IconChevronRight, IconClock, IconFolderFilled, IconMessageCircle, IconPaperclip, IconSearch, IconUsersGroup } from "@tabler/icons-react";
+import { IconAlertTriangle, IconChevronRight, IconClock, IconFolderFilled, IconMessageCircle, IconMovie, IconPaperclip, IconSearch, IconUsersGroup } from "@tabler/icons-react";
 import { ACCOUNT_CARD } from "@/components/account-shell";
 import { AdminShell } from "@/components/admin/admin-shell";
 import { InboxCard, hasMissingPayment } from "@/components/admin/inbox-card";
 import { StatusChip } from "@/components/project-status-chip";
 import { TeamProjectPopup } from "@/components/team-project-popup";
 import { TeamClientsView } from "@/components/team-clients-view";
+import { PortfolioManager } from "@/components/admin/portfolio-manager";
+import type { PortfolioItem } from "@/lib/portfolio-grid";
 import type { ClientOverview } from "@/lib/clients";
 import { Input } from "@/components/ui/input";
 import { useLanguage } from "@/lib/i18n/language-context";
@@ -21,7 +23,7 @@ import { cn } from "@/lib/utils";
 
 type Filter = "all" | ProjectStatus;
 type Sort = "newest" | "due" | "client";
-export type AdminList = "projects" | "clients";
+export type AdminList = "projects" | "clients" | "portfolio";
 
 const today = () => new Date().toISOString().slice(0, 10);
 const isOverdue = (p: ClientProject) => p.status !== "delivered" && !!p.dueDate && p.dueDate.slice(0, 10) < today();
@@ -38,16 +40,19 @@ const EASE = [0.22, 1, 0.36, 1] as const;
 export function TeamDashboardView({
   projects: initial,
   clients,
+  portfolio,
   sample,
   initialProjectId = null,
   initialList = "projects",
 }: {
   projects: ClientProject[];
   clients: ClientOverview[] | null;
+  /** The portfolio page's films, in their order. */
+  portfolio: PortfolioItem[];
   sample: boolean;
   /** `?project=<id>` - a team alert email's button: the dashboard opens on that project's window. */
   initialProjectId?: string | null;
-  /** `?view=clients` - which list shows first. */
+  /** `?view=clients` / `?view=portfolio` - which list shows first. */
   initialList?: AdminList;
 }) {
   const { t } = useLanguage();
@@ -158,9 +163,10 @@ export function TeamDashboardView({
       {/* The lists: Projects or Clients, switched by the chip (the light slides to the chosen one). */}
       <section ref={listRef} className="mt-10 scroll-mt-24">
         <div className="inline-flex gap-1 rounded-full border border-white/12 bg-black/40 p-1" role="tablist" aria-label={a.lists.label}>
-          {(["projects", "clients"] as const).map((key) => {
+          {(["projects", "clients", "portfolio"] as const).map((key) => {
             const on = list === key;
-            const Icon = key === "projects" ? IconFolderFilled : IconUsersGroup;
+            const Icon = key === "projects" ? IconFolderFilled : key === "clients" ? IconUsersGroup : IconMovie;
+            const count = key === "projects" ? projects.length : key === "clients" ? (clients?.length ?? 0) : portfolio.length;
             return (
               <button
                 key={key}
@@ -182,13 +188,18 @@ export function TeamDashboardView({
                 ) : null}
                 <Icon className="relative size-4 transition-transform duration-200 group-hover:scale-110" aria-hidden />
                 <span className="relative">{a.lists[key]}</span>
-                <span className="relative text-xs opacity-70">{key === "projects" ? projects.length : (clients?.length ?? 0)}</span>
+                <span className="relative text-xs opacity-70">{count}</span>
               </button>
             );
           })}
         </div>
 
-        {list === "clients" ? (
+        {/* Stays mounted when another list is open, so unsaved arranging survives a look at the projects. */}
+        <div hidden={list !== "portfolio"}>
+          <PortfolioManager initial={portfolio} sample={sample} />
+        </div>
+
+        {list === "portfolio" ? null : list === "clients" ? (
           <motion.div key="clients" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45, ease: EASE }}>
             <TeamClientsView
               clients={clients}

@@ -3,8 +3,12 @@ import { notFound } from "next/navigation";
 import { PortfolioPageView } from "@/components/portfolio/portfolio-page-view";
 import { localeAlternates } from "@/lib/routes";
 import { LOCALES, isLocale, getDictionary } from "@/lib/i18n/config";
+import { getPortfolioItems } from "@/lib/portfolio-videos-server";
 
 export const dynamicParams = false;
+// A static page that picks up the admin dashboard's edits: refreshed at once on a save (`/api/portfolio/refresh`), and
+// within a minute after any other change to the table.
+export const revalidate = 60;
 
 export function generateStaticParams() {
   return LOCALES.map((lang) => ({ lang }));
@@ -35,5 +39,5 @@ export default async function LocalePortfolioPage({
 }) {
   const { lang } = await params;
   if (!isLocale(lang)) notFound();
-  return <PortfolioPageView />;
+  return <PortfolioPageView items={await getPortfolioItems()} />;
 }

@@ -29,10 +29,13 @@ export function PrivacyEnglishContent() {
       <h2>1. Who we are</h2>
       <ul>
         <li>
-          <strong>Company:</strong> DT A I, trading as Keplerbay - an AI video production company registered in Sofia, Bulgaria
+          <strong>Company:</strong>{" "}DT A I, trading as Keplerbay - an AI video production company registered in Sofia, Bulgaria
         </li>
         <li>
-          <strong>Privacy and support contact:</strong> <Mail />
+          <strong>Address:</strong>{" "}27-29 Nikolay Kopernik Street, floor 2, office 17, Geo Milev, Sofia, Bulgaria
+        </li>
+        <li>
+          <strong>Privacy and support contact:</strong>{" "}<Mail />
         </li>
       </ul>
       <p>
@@ -47,16 +50,16 @@ export function PrivacyEnglishContent() {
       </p>
       <ul>
         <li>
-          <strong>Identifiers and contact details:</strong> your name, email address and phone number, your account ID, and
+          <strong>Identifiers and contact details:</strong>{" "}your name, email address and phone number, your account ID, and
           your IP address. These come from you (when you sign up, contact us or send a quote request), from Google or
           Microsoft if you use them to sign in (they share your name and email), and automatically from your browser.
         </li>
         <li>
-          <strong>Account records:</strong> when you signed up, how you sign in, and your confirmation that you accepted our
+          <strong>Account records:</strong>{" "}when you signed up, how you sign in, and your confirmation that you accepted our
           Terms of Use, read this Privacy Policy and are at least 18 years old.
         </li>
         <li>
-          <strong>Commercial information:</strong> the packs and subscriptions you buy, your plan and its status, your
+          <strong>Commercial information:</strong>{" "}the packs and subscriptions you buy, your plan and its status, your
           balance of video seconds and how it changed, and your payment history. Online orders are sold and processed by{" "}
           <strong>Paddle.com</strong>, our reseller and the merchant of record, which collects your payment, billing
           address and any tax ID and handles sales tax under its own privacy notice. We never see or store your full card or
@@ -64,21 +67,21 @@ export function PrivacyEnglishContent() {
           plan you bought.
         </li>
         <li>
-          <strong>Content you give us:</strong> your project briefs and answers, the scripts, images, videos, audio and other
+          <strong>Content you give us:</strong>{" "}your project briefs and answers, the scripts, images, videos, audio and other
           files you upload, your comments and revision requests, and the videos and files we deliver to you.
         </li>
         <li>
-          <strong>Internet and device activity:</strong> pages visited, clicks and similar usage data, plus browser and
+          <strong>Internet and device activity:</strong>{" "}pages visited, clicks and similar usage data, plus browser and
           device type. This is collected only with your consent, except for cookieless visit counts (see section 6) and the
           security logs our hosting provider keeps.
         </li>
         <li>
-          <strong>Approximate location:</strong> the country our hosting provider derives from your IP address. We use it
+          <strong>Approximate location:</strong>{" "}the country our hosting provider derives from your IP address. We use it
           only to show the site in the right language. We do not collect precise geolocation.
         </li>
       </ul>
       <p>
-        <strong>Sensitive personal information.</strong> We do not ask for sensitive personal information, such as
+        <strong>Sensitive personal information.</strong>{" "}We do not ask for sensitive personal information, such as
         government ID numbers, health data or precise location. We do not use any for inferring characteristics about you.
         Please do not put it in briefs or files unless your project needs it.
       </p>
@@ -95,7 +98,28 @@ export function PrivacyEnglishContent() {
         <li>To comply with the law, including tax and accounting rules, and to enforce our Terms.</li>
       </ul>
       <p>
-        <strong>AI and your materials.</strong> We use your briefs and files only to make your project. To produce your
+        <strong>Legal bases under the GDPR.</strong>{" "}If the GDPR applies to you, we rely on these legal bases:
+      </p>
+      <ul>
+        <li>
+          <strong>Performing our contract with you:</strong>{" "}your account, orders, video time, projects, deliveries, support
+          and service messages (identifiers and contact details, account records, commercial information and your content).
+        </li>
+        <li>
+          <strong>Legal obligation:</strong>{" "}tax and accounting records (commercial information), and requests from
+          authorities.
+        </li>
+        <li>
+          <strong>Legitimate interests:</strong>{" "}answering inquiries, keeping the Service secure, preventing fraud and abuse,
+          and enforcing our Terms (identifiers, device data and security logs).
+        </li>
+        <li>
+          <strong>Your consent:</strong>{" "}analytics and marketing cookies (internet and device activity). You can withdraw it
+          at any time.
+        </li>
+      </ul>
+      <p>
+        <strong>AI and your materials.</strong>{" "}We use your briefs and files only to make your project. To produce your
         video, they may be processed by the AI tools we work with, on our instructions and only for that purpose. We do not
         use your materials to train AI models unless you agree to it in writing.
       </p>
@@ -104,7 +128,7 @@ export function PrivacyEnglishContent() {
       <p>We disclose personal information only to:</p>
       <ul>
         <li>
-          <strong>Service providers</strong> that work for us under contract and may use it only to provide their services
+          <strong>Service providers</strong>{" "}that work for us under contract and may use it only to provide their services
           to us:
           <ul>
             <li>Vercel: hosting, and cookieless visit counts.</li>
@@ -118,21 +142,24 @@ export function PrivacyEnglishContent() {
           </ul>
         </li>
         <li>
-          <strong>Advertising partners, only with your consent:</strong> Google (Google Ads) and OpenAI receive information
+          <strong>Advertising partners, only with your consent:</strong>{" "}Google (Google Ads) and OpenAI receive information
           about your visit through their tags. This is used to measure whether our ads lead to inquiries and to build
           remarketing audiences.
         </li>
         <li>
-          <strong>Legal and safety:</strong> authorities or other parties when the law requires it, or when it is needed to
+          <strong>Professional advisers:</strong>{" "}our accountants, auditors and lawyers, where they need it to advise us.
+        </li>
+        <li>
+          <strong>Legal and safety:</strong>{" "}authorities or other parties when the law requires it, or when it is needed to
           protect our rights, our users or the public.
         </li>
         <li>
-          <strong>Business transfers:</strong> a buyer or successor if Keplerbay is involved in a merger, acquisition or sale
+          <strong>Business transfers:</strong>{" "}a buyer or successor if Keplerbay is involved in a merger, acquisition or sale
           of assets, under this policy&rsquo;s protections.
         </li>
       </ul>
       <p>
-        <strong>&ldquo;Sale&rdquo; and &ldquo;sharing&rdquo;.</strong> We do not sell personal information for money and
+        <strong>&ldquo;Sale&rdquo; and &ldquo;sharing&rdquo;.</strong>{" "}We do not sell personal information for money and
         never have. Under California law, letting advertising partners&rsquo; tags collect information for cross-context
         behavioral advertising can count as &ldquo;sharing&rdquo;, or as a &ldquo;sale&rdquo; or &ldquo;targeted
         advertising&rdquo; under other states&rsquo; laws. On our site that happens only if you accept marketing cookies.
@@ -144,18 +171,18 @@ export function PrivacyEnglishContent() {
       <h2>5. How long we keep it</h2>
       <ul>
         <li>
-          <strong>Account, projects, files and comments:</strong> for as long as your account is open. They are deleted when
+          <strong>Account, projects, files and comments:</strong>{" "}for as long as your account is open. They are deleted when
           you ask us to delete your account (see section 8).
         </li>
         <li>
-          <strong>Payment and tax records:</strong> for as long as tax and accounting law requires, even after your account
+          <strong>Payment and tax records:</strong>{" "}for as long as tax and accounting law requires, even after your account
           is deleted.
         </li>
         <li>
-          <strong>Inquiries sent by form or email:</strong> for as long as we need them to answer you and follow up.
+          <strong>Inquiries sent by form or email:</strong>{" "}for as long as we need them to answer you and follow up.
         </li>
         <li>
-          <strong>Cookies:</strong> for the durations listed in section 6.
+          <strong>Cookies:</strong>{" "}for the durations listed in section 6.
         </li>
       </ul>
 
@@ -169,15 +196,15 @@ export function PrivacyEnglishContent() {
       </p>
       <ul>
         <li>
-          <strong>Analytics (PostHog, EU servers):</strong> how the site is used, including pages visited, clicks and session
+          <strong>Analytics (PostHog, EU servers):</strong>{" "}how the site is used, including pages visited, clicks and session
           recordings, so we can improve it. Cookie <code>ph_*</code>, 1 year.
         </li>
         <li>
-          <strong>Marketing (Google Ads, OpenAI):</strong> whether our ads lead to inquiries, and audiences for remarketing.
+          <strong>Marketing (Google Ads, OpenAI):</strong>{" "}whether our ads lead to inquiries, and audiences for remarketing.
           Cookies <code>_gcl_au</code> (90 days) and <code>__obref</code> (1 year).
         </li>
         <li>
-          <strong>Embedded videos:</strong> YouTube videos load in privacy-enhanced mode and set YouTube&rsquo;s cookies only
+          <strong>Embedded videos:</strong>{" "}YouTube videos load in privacy-enhanced mode and set YouTube&rsquo;s cookies only
           when you play them. Videos hosted on Bunny Stream set no advertising cookies.
         </li>
       </ul>
@@ -186,9 +213,9 @@ export function PrivacyEnglishContent() {
         loads from clutch.co.
       </p>
       <p>
-        <strong>Global Privacy Control (GPC).</strong> If your browser sends the GPC signal, we treat it as a request to opt
+        <strong>Global Privacy Control (GPC).</strong>{" "}If your browser sends the GPC signal, we treat it as a request to opt
         out of the sale and sharing of your personal information and of targeted advertising. Our marketing tags then do not
-        load, even if you clicked &ldquo;Accept all&rdquo;. <strong>Do Not Track:</strong> there is no common standard for
+        load, even if you clicked &ldquo;Accept all&rdquo;. <strong>Do Not Track:</strong>{" "}there is no common standard for
         these browser signals, so we do not respond to them. We do honor GPC.
       </p>
 
@@ -200,44 +227,45 @@ export function PrivacyEnglishContent() {
       </p>
       <ul>
         <li>
-          <strong>Right to know and access:</strong> the categories and the specific pieces of personal information we hold
+          <strong>Right to know and access:</strong>{" "}the categories and the specific pieces of personal information we hold
           about you, where they came from, why we use them and who we disclose them to.
         </li>
         <li>
-          <strong>Right to delete:</strong> your personal information, subject to legal exceptions such as tax records.
+          <strong>Right to delete:</strong>{" "}your personal information, subject to legal exceptions such as tax records.
         </li>
         <li>
-          <strong>Right to correct:</strong> information that is inaccurate.
+          <strong>Right to correct:</strong>{" "}information that is inaccurate.
         </li>
         <li>
-          <strong>Right to portability:</strong> a copy of your information in a usable format.
+          <strong>Right to portability:</strong>{" "}a copy of your information in a usable format.
         </li>
         <li>
-          <strong>Right to opt out</strong> of the sale or sharing of personal information and of targeted advertising:
+          <strong>Right to opt out</strong>{" "}of the sale or sharing of personal information and of targeted advertising:
           decline or withdraw marketing cookies in &ldquo;Cookie settings&rdquo;, turn on GPC, or email us.
         </li>
         <li>
-          <strong>Right to limit</strong> the use of sensitive personal information. We do not use any beyond what the
+          <strong>Right to limit</strong>{" "}the use of sensitive personal information. We do not use any beyond what the
           Service needs.
         </li>
         <li>
-          <strong>Right to non-discrimination:</strong> we will not deny you the Service, charge you a different price or
+          <strong>Right to non-discrimination:</strong>{" "}we will not deny you the Service, charge you a different price or
           give you a lower quality of service because you used any of these rights.
         </li>
         <li>
-          <strong>Under the GDPR, also:</strong> the right to restrict or object to processing, to withdraw consent at any
+          <strong>Under the GDPR, also:</strong>{" "}the right to restrict or object to processing, to withdraw consent at any
           time, and to complain to your data protection authority.
         </li>
       </ul>
       <p>
-        <strong>How to make a request.</strong> Email <Mail subject="Privacy request" /> and tell us which right you want to
+        <strong>How to make a request.</strong>{" "}Email <Mail subject="Privacy request" /> and tell us which right you want to
         use. To protect your information, we verify that the request comes from you: we write back to the email address on
         your account, or ask for details only the account holder would know. You may use an authorized agent; we will ask
         for your signed permission and may still verify your identity with you. We respond within 45 days. If we need more
-        time, we may extend that by another 45 days and will tell you why. Requests are free of charge.
+        time, we may extend that by another 45 days and will tell you why. If the GDPR applies to you, we respond within one
+        month, and may extend that by two more months for complex requests, telling you why. Requests are free of charge.
       </p>
       <p>
-        <strong>Appeals.</strong> If we decline your request, you can appeal by replying to our answer with
+        <strong>Appeals.</strong>{" "}If we decline your request, you can appeal by replying to our answer with
         &ldquo;Appeal&rdquo;. We will give you a written decision, with our reasons, within 45 days (60 days in Colorado). If
         you are not satisfied, you can contact your state&rsquo;s Attorney General.
       </p>
@@ -272,8 +300,8 @@ export function PrivacyEnglishContent() {
       <p>
         Keplerbay is based in the European Union (Bulgaria), and our service providers may store and process information in
         the United States, the EU and other countries. When personal information of people in the EU or UK is transferred
-        abroad, our providers protect it with recognized safeguards, such as the EU Standard Contractual Clauses or the EU-US
-        Data Privacy Framework.
+        abroad, our providers protect it with recognized safeguards, such as an adequacy decision, the EU Standard Contractual
+        Clauses, the UK International Data Transfer Agreement or the EU-US Data Privacy Framework.
       </p>
 
       <h2>11. Children</h2>
