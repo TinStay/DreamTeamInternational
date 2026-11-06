@@ -36,8 +36,13 @@ export function RefundsEnglishContent() {
       <h2>2. Your legal rights</h2>
       <p>
         Consumers in the EU, the EEA, the UK and some other countries have a legal right to withdraw from a purchase, usually
-        within 14 days. Paddle&apos;s Refund Policy lists these rights and when they end. Paddle may also refund other requests
-        made within 14 days of the transaction. Nothing in this policy limits the rights you have by law.
+        within 14 days. Paddle&apos;s Refund Policy lists these rights and when they end. For customers in the United States and
+        elsewhere, Paddle may refund requests made within 14 days of the transaction. Nothing in this policy limits the rights
+        you have under the law of your state or country.
+      </p>
+      <p>
+        <strong>Chargebacks.</strong>{" "}Please contact Paddle or us before disputing a charge with your bank. A refund
+        request is usually resolved faster, and a chargeback can suspend your account while it is reviewed.
       </p>
 
       <h2>3. If something is wrong with your video</h2>
@@ -49,9 +54,9 @@ export function RefundsEnglishContent() {
 
       <h2>4. Subscriptions</h2>
       <p>
-        You can cancel a subscription at any time from your account. No further payment is taken, and your plan and its video
-        time stay available until the end of the paid period. Cancelling does not request a refund by itself: to ask for one,
-        follow section 1.
+        A subscription renews automatically until you cancel it. You can cancel at any time from your account, or by writing to
+        us at <Mail />. No further payment is taken, and your plan and its video time stay available until the end of the paid
+        period. Cancelling does not request a refund by itself: to ask for one, follow section 1.
       </p>
 
       <h2>5. Video time and paid changes</h2>

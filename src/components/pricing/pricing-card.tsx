@@ -204,6 +204,14 @@ export function PricingCard({
           {plan.custom ? p.cta.custom : plan.oneTime ? p.cta.oneTime : p.cta.subscribe}
         </button>
       )}
+      {/* The automatic-renewal disclosure US law asks for before a subscription is bought (ROSCA, California's ARL):
+          the period, that it renews until cancelled, and that cancelling is online. Paddle's checkout repeats it. */}
+      {subscription && pricing ? (
+        <p className="mt-2.5 text-center text-[12px] leading-snug text-[#9a9ba3]">
+          {fill(p.renewal, { total: formatPrice(annual ? pricing.annualTotal : plan.price ?? 0) })}{" "}
+          {annual ? p.renewalAnnual : p.renewalMonthly}
+        </p>
+      ) : null}
     </article>
   );
 }
