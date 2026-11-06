@@ -10,13 +10,6 @@ export const PHONE_SECONDARY = {
   label: "+359 88 236 7100",
 } as const;
 
-/** The San Francisco office line shown in the English footer. TODO(content): an example number (555-01xx is the range
- * reserved for fiction) - put the real US number here before launch. */
-export const PHONE_US = {
-  href: "tel:+14155550142",
-  label: "+1 (415) 555-0142",
-} as const;
-
 /** The public contact email - the header copy button, the footer, the legal pages and the structured data. The emails
  * the site sends keep `info@keplerbay.com` as their sender (`RESEND_FROM`) and the admin inbox is `ADMIN_INBOX`. */
 export const EMAIL_PRIMARY = {
