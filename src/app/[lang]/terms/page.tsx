@@ -11,13 +11,13 @@ export function generateStaticParams() {
   return LOCALES.map((lang) => ({ lang }));
 }
 
-const LAST_UPDATED = "October 12, 2026";
+const LAST_UPDATED = "06-11-2026";
 
 const META: Record<Language, { title: string; description: string }> = {
   en: {
     title: "Terms and Conditions | Keplerbay",
     description:
-      "Terms and conditions for Keplerbay AI video production services, payments, revisions, and portfolio use.",
+      "Terms and conditions for Keplerbay AI video production services: orders, payments, subscriptions, acceptable use, revisions and rights.",
   },
 };
 

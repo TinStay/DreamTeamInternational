@@ -7,6 +7,13 @@ import { cn } from "@/lib/utils";
 
 export type PillSelectOption<T extends string> = { value: T; label: string };
 
+const TRIGGER =
+  "group inline-flex h-10 cursor-pointer items-center gap-2 rounded-full border border-white/12 bg-white/[0.04] ps-3.5 pe-3 text-sm font-semibold text-white/85 outline-none transition-[transform,border-color,background-color,color,box-shadow] duration-200 ease-out hover:-translate-y-px hover:border-white/30 hover:bg-white/[0.08] hover:text-white focus-visible:border-[#ff8a1f]/70 data-[popup-open]:border-[#ff8a1f]/60 data-[popup-open]:bg-white/[0.08] data-[popup-open]:text-white data-[popup-open]:shadow-[0_0_0_4px_rgba(255,122,26,0.12)]";
+const POPUP =
+  "min-w-[max(var(--anchor-width),12rem)] origin-(--transform-origin) rounded-2xl border border-white/12 bg-[linear-gradient(160deg,rgba(30,31,36,0.97),rgba(16,17,20,0.97))] p-1.5 text-white shadow-[0_24px_60px_-18px_rgba(0,0,0,0.95)] outline-none backdrop-blur-xl transition-[opacity,transform] duration-200 ease-out data-[ending-style]:-translate-y-1 data-[ending-style]:scale-95 data-[ending-style]:opacity-0 data-[starting-style]:-translate-y-1 data-[starting-style]:scale-95 data-[starting-style]:opacity-0";
+const ITEM =
+  "group/item flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-white/75 outline-none transition-[background-color,color,transform] duration-150 ease-out select-none data-[highlighted]:translate-x-0.5 data-[highlighted]:bg-white/[0.07] data-[highlighted]:text-white data-[selected]:font-semibold data-[selected]:text-white";
+
 /**
  * The app's dropdown: a pill the height of the filter chips (a sort icon, the chosen label, a chevron that turns), and a
  * dark glass menu that drops in under it - rows nudge on hover, the chosen one carries an orange tick. Built on base-ui's
@@ -35,7 +42,7 @@ export function PillSelect<T extends string>({
       <SelectPrimitive.Trigger
         aria-label={label}
         className={cn(
-          "group inline-flex h-10 cursor-pointer items-center gap-2 rounded-full border border-white/12 bg-white/[0.04] ps-3.5 pe-3 text-sm font-semibold text-white/85 outline-none transition-[transform,border-color,background-color,color,box-shadow] duration-200 ease-out hover:-translate-y-px hover:border-white/30 hover:bg-white/[0.08] hover:text-white focus-visible:border-[#ff8a1f]/70 data-[popup-open]:border-[#ff8a1f]/60 data-[popup-open]:bg-white/[0.08] data-[popup-open]:text-white data-[popup-open]:shadow-[0_0_0_4px_rgba(255,122,26,0.12)]",
+          TRIGGER,
           className
         )}
       >
@@ -46,15 +53,59 @@ export function PillSelect<T extends string>({
       <SelectPrimitive.Portal>
         <SelectPrimitive.Positioner side="bottom" align="end" sideOffset={8} alignItemWithTrigger={false} className="isolate z-[80]">
           <SelectPrimitive.Popup
-            className="min-w-[max(var(--anchor-width),12rem)] origin-(--transform-origin) rounded-2xl border border-white/12 bg-[linear-gradient(160deg,rgba(30,31,36,0.97),rgba(16,17,20,0.97))] p-1.5 text-white shadow-[0_24px_60px_-18px_rgba(0,0,0,0.95)] outline-none backdrop-blur-xl transition-[opacity,transform] duration-200 ease-out data-[ending-style]:-translate-y-1 data-[ending-style]:scale-95 data-[ending-style]:opacity-0 data-[starting-style]:-translate-y-1 data-[starting-style]:scale-95 data-[starting-style]:opacity-0"
+            className={POPUP}
           >
             <SelectPrimitive.List>
               {options.map((o) => (
                 <SelectPrimitive.Item
                   key={o.value}
                   value={o.value}
-                  className="group/item flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-white/75 outline-none transition-[background-color,color,transform] duration-150 ease-out select-none data-[highlighted]:translate-x-0.5 data-[highlighted]:bg-white/[0.07] data-[highlighted]:text-white data-[selected]:font-semibold data-[selected]:text-white"
+                  className={ITEM}
                 >
+                  <SelectPrimitive.ItemText className="flex-1 whitespace-nowrap">{o.label}</SelectPrimitive.ItemText>
+                  <SelectPrimitive.ItemIndicator className="flex size-5 items-center justify-center rounded-full bg-[linear-gradient(115deg,#ff5e00,#ff9a3c)] text-white">
+                    <IconCheck className="size-3" stroke={3} aria-hidden />
+                  </SelectPrimitive.ItemIndicator>
+                </SelectPrimitive.Item>
+              ))}
+            </SelectPrimitive.List>
+          </SelectPrimitive.Popup>
+        </SelectPrimitive.Positioner>
+      </SelectPrimitive.Portal>
+    </SelectPrimitive.Root>
+  );
+}
+
+/** The same dropdown when several may be chosen: the menu stays open, and at least one always stays chosen. */
+export function PillMultiSelect<T extends string>({
+  values,
+  onChange,
+  options,
+  label,
+  className,
+  icon,
+}: {
+  values: T[];
+  onChange: (values: T[]) => void;
+  options: PillSelectOption<T>[];
+  label: string;
+  className?: string;
+  icon?: ReactNode;
+}) {
+  const first = options.find((o) => o.value === values[0])?.label ?? "";
+  return (
+    <SelectPrimitive.Root multiple value={values} onValueChange={(next) => next.length > 0 && onChange(next as T[])} items={options}>
+      <SelectPrimitive.Trigger aria-label={label} className={cn(TRIGGER, className)}>
+        {icon}
+        <SelectPrimitive.Value className="min-w-0 flex-1 truncate text-left">{() => (values.length > 1 ? `${first} +${values.length - 1}` : first)}</SelectPrimitive.Value>
+        <IconChevronDown className="size-4 text-white/50 transition-transform duration-200 ease-out group-data-[popup-open]:rotate-180 group-data-[popup-open]:text-[#ff8a1f]" aria-hidden />
+      </SelectPrimitive.Trigger>
+      <SelectPrimitive.Portal>
+        <SelectPrimitive.Positioner side="bottom" align="end" sideOffset={8} alignItemWithTrigger={false} className="isolate z-[80]">
+          <SelectPrimitive.Popup className={POPUP}>
+            <SelectPrimitive.List>
+              {options.map((o) => (
+                <SelectPrimitive.Item key={o.value} value={o.value} className={ITEM}>
                   <SelectPrimitive.ItemText className="flex-1 whitespace-nowrap">{o.label}</SelectPrimitive.ItemText>
                   <SelectPrimitive.ItemIndicator className="flex size-5 items-center justify-center rounded-full bg-[linear-gradient(115deg,#ff5e00,#ff9a3c)] text-white">
                     <IconCheck className="size-3" stroke={3} aria-hidden />

@@ -17,6 +17,7 @@ const nextConfig: NextConfig = {
       { source: "/bg/:path*", destination: "/en/:path*", permanent: true },
       { source: "/privacy", destination: "/en/privacy", permanent: true },
       { source: "/terms", destination: "/en/terms", permanent: true },
+      { source: "/refunds", destination: "/en/refunds", permanent: true },
       { source: "/training", destination: "/en/training", permanent: true },
       { source: "/individual", destination: "/en/training/individual", permanent: true },
       { source: "/en/individual", destination: "/en/training/individual", permanent: true },

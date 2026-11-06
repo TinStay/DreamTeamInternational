@@ -10,6 +10,19 @@ import { MAIN_WITH_FIXED_PAGE_BG_CLASS } from "@/lib/page-shell";
 import { cn } from "@/lib/utils";
 import { PageBreadcrumbs } from "@/components/page-breadcrumbs";
 
+/**
+ * The legal text's look. Tailwind's typography plugin is not installed here, so `prose` classes do nothing: the headings,
+ * spacing, bullets and links are set directly, and Paddle's reviewer has to be able to find each section at a glance.
+ */
+const LEGAL_BODY_CLASS = cn(
+  "max-w-none text-[0.9375rem] leading-relaxed text-muted-foreground",
+  "[&_h2]:mt-10 [&_h2]:mb-4 [&_h2]:scroll-mt-28 [&_h2]:font-heading [&_h2]:text-xl [&_h2]:font-semibold [&_h2]:tracking-tight [&_h2]:text-foreground md:[&_h2]:text-2xl",
+  "[&_p]:my-3 [&_strong]:font-semibold [&_strong]:text-foreground",
+  "[&_ul]:my-3 [&_ul]:list-disc [&_ul]:space-y-2 [&_ul]:pl-6 [&_ul_ul]:my-2",
+  "[&_a]:text-primary [&_a]:underline-offset-4 hover:[&_a]:underline",
+  "[&_code]:rounded [&_code]:bg-foreground/10 [&_code]:px-1 [&_code]:py-0.5 [&_code]:text-[0.85em]"
+);
+
 type LegalPageShellProps = {
   homeHref: string;
   docTitle: string;
@@ -69,7 +82,7 @@ export function LegalPageShell({
               </div>
             </header>
 
-            <div className="prose prose-neutral dark:prose-invert max-w-none prose-headings:font-heading prose-headings:tracking-tight prose-h2:scroll-mt-28 prose-h2:text-xl prose-h2:md:text-2xl prose-h2:font-semibold prose-h2:mt-10 prose-h2:mb-4 prose-h2:text-foreground prose-p:text-[0.9375rem] prose-p:leading-relaxed prose-p:text-muted-foreground prose-li:text-muted-foreground prose-strong:text-foreground prose-a:text-primary prose-a:no-underline hover:prose-a:underline">
+            <div className={LEGAL_BODY_CLASS}>
               {children}
             </div>
           </article>

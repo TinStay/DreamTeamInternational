@@ -60,6 +60,8 @@ function segmentToLabel(
       return t.training.cards.team.title;
     case "privacy":
       return t.legal.privacyTitle;
+    case "refunds":
+      return t.legal.refundsTitle;
     case "terms":
       return t.legal.termsTitle;
     default: {

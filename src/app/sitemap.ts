@@ -29,6 +29,7 @@ const PATHS: readonly string[] = [
   "/investors",
   "/privacy",
   "/terms",
+  "/refunds",
 ];
 
 function priorityFor(path: string) {

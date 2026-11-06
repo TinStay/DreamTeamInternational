@@ -2,12 +2,12 @@
 
 import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { IconPlayerPlayFilled, IconX } from "@tabler/icons-react";
+import { IconLoader2, IconPlayerPlayFilled, IconX } from "@tabler/icons-react";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { useLanguage } from "@/lib/i18n/language-context";
-import { bunnyMp4Url, bunnyPlayerEmbedSrc, bunnyThumbnailUrl } from "@/lib/bunny-stream";
-import { PORTFOLIO_KEYS, portfolioItems, resolvePortfolioFilter, type PortfolioFilter, type PortfolioItem } from "@/lib/portfolio-grid";
-import { youtubeThumbnailUrl } from "@/lib/portfolio-highlights";
+import { bunnyMp4Url, bunnyPlayerEmbedSrc, type BunnyVideo } from "@/lib/bunny-stream";
+import { PORTFOLIO_KEYS, filterPortfolio, resolvePortfolioFilter, type PortfolioFilter, type PortfolioItem } from "@/lib/portfolio-grid";
+import { posterOf } from "@/lib/portfolio-videos";
 import { YOUTUBE_EMBED_BASE } from "@/lib/youtube-embeds";
 import { useMediaQuery } from "@/lib/use-media-query";
 import { cn } from "@/lib/utils";
@@ -46,27 +46,58 @@ function FilterFromUrl({ onFilter }: { onFilter: (filter: PortfolioFilter) => vo
   return null;
 }
 
+/** The MP4 sizes to try, best first: not every film has them all (the music film stops at 480p). */
+const FILM_HEIGHTS = [720, 480, 360] as const;
+
+/** A Bunny film playing muted over its poster. It comes in once it really plays, and drops a size if a file is missing. */
+function FilmPreview({ film, start }: { film: BunnyVideo; start: number }) {
+  const [rung, setRung] = useState(start);
+  const [playing, setPlaying] = useState(false);
+  return (
+    <video
+      src={bunnyMp4Url(film, FILM_HEIGHTS[rung])}
+      muted
+      loop
+      playsInline
+      autoPlay
+      aria-hidden
+      onPlaying={() => setPlaying(true)}
+      onError={() => setRung((current) => Math.min(current + 1, FILM_HEIGHTS.length - 1))}
+      className={cn("absolute inset-0 size-full object-cover transition-opacity duration-500", playing ? "opacity-100" : "opacity-0")}
+    />
+  );
+}
+
+/** A YouTube clip playing muted over its poster, which stays until the player has loaded (a loading player is black). */
+function YoutubePreview({ id, tall }: { id: string; tall: boolean }) {
+  const [loaded, setLoaded] = useState(false);
+  return (
+    <iframe
+      src={`${YOUTUBE_EMBED_BASE}/${id}?autoplay=1&mute=1&controls=0&loop=1&playlist=${id}&playsinline=1&modestbranding=1&rel=0&iv_load_policy=3&disablekb=1&fs=0`}
+      title=""
+      aria-hidden
+      tabIndex={-1}
+      allow="autoplay; encrypted-media"
+      onLoad={() => setLoaded(true)}
+      className={cn(
+        "pointer-events-none absolute left-1/2 top-1/2 h-full -translate-x-1/2 -translate-y-1/2 border-0 transition-opacity duration-500",
+        tall ? "w-[177.78%]" : "w-full",
+        loaded ? "opacity-100" : "opacity-0"
+      )}
+    />
+  );
+}
+
 /**
- * One tile of the grid: the film's poster in its own 16:9 or 9:16 frame. A Bunny film plays muted on hover - or, on a
- * touch screen, while the tile is mostly on screen; a YouTube clip shows its preview after the pointer rests on it for a
- * moment. A click opens the full player.
+ * One tile of the grid: the film's poster in its own 16:9 or 9:16 frame. Every film plays muted in place - under the
+ * pointer, or on a touch screen while it is the tile in the middle of the screen (`active`: one at a time, whichever its
+ * source). A click opens the full player.
  */
-function Tile({ item, label, playLabel, onOpen }: { item: PortfolioItem; label: string; playLabel: string; onOpen: () => void }) {
-  const frameRef = useRef<HTMLDivElement>(null);
+function Tile({ item, active, label, playLabel, onOpen }: { item: PortfolioItem; active: boolean; label: string; playLabel: string; onOpen: () => void }) {
   const [hovered, setHovered] = useState(false);
   const [preview, setPreview] = useState(false);
-  const [inView, setInView] = useState(false);
-  const [filmPlaying, setFilmPlaying] = useState(false);
   const coarse = useMediaQuery("(hover: none)");
   const timer = useRef<number | null>(null);
-
-  useEffect(() => {
-    const frame = frameRef.current;
-    if (!frame || !coarse) return;
-    const io = new IntersectionObserver(([entry]) => setInView(entry.isIntersecting), { threshold: 0.6 });
-    io.observe(frame);
-    return () => io.disconnect();
-  }, [coarse]);
 
   useEffect(
     () => () => {
@@ -78,7 +109,7 @@ function Tile({ item, label, playLabel, onOpen }: { item: PortfolioItem; label: 
   const enter = () => {
     setHovered(true);
     if (timer.current) window.clearTimeout(timer.current);
-    timer.current = window.setTimeout(() => setPreview(true), 350);
+    timer.current = window.setTimeout(() => setPreview(true), 200);
   };
   const leave = () => {
     setHovered(false);
@@ -86,13 +117,11 @@ function Tile({ item, label, playLabel, onOpen }: { item: PortfolioItem; label: 
     if (timer.current) window.clearTimeout(timer.current);
   };
 
-  const playFilm = Boolean(item.film) && (coarse ? inView : preview);
-  const showYoutube = Boolean(item.youtubeId) && !coarse && preview;
-  const poster = item.film ? bunnyThumbnailUrl(item.film) : youtubeThumbnailUrl(item.youtubeId as string);
+  const playing = coarse ? active : preview;
 
   return (
     <div
-      ref={frameRef}
+      data-tile={item.id}
       onPointerEnter={(event) => event.pointerType === "mouse" && enter()}
       onPointerLeave={(event) => event.pointerType === "mouse" && leave()}
       onFocus={enter}
@@ -103,32 +132,10 @@ function Tile({ item, label, playLabel, onOpen }: { item: PortfolioItem; label: 
       )}
     >
       {/* eslint-disable-next-line @next/next/no-img-element -- video posters (Bunny's is referer-gated, YouTube's is a still) */}
-      <img src={poster} alt="" loading="lazy" referrerPolicy="origin" className="absolute inset-0 size-full object-cover" />
+      <img src={posterOf(item)} alt="" loading="lazy" referrerPolicy="origin" className="absolute inset-0 size-full object-cover" />
 
-      {item.film && playFilm ? (
-        <video
-          src={bunnyMp4Url(item.film, coarse ? 480 : 720)}
-          muted
-          loop
-          playsInline
-          autoPlay
-          aria-hidden
-          onPlaying={() => setFilmPlaying(true)}
-          className={cn("absolute inset-0 size-full object-cover transition-opacity duration-500", filmPlaying ? "opacity-100" : "opacity-0")}
-        />
-      ) : null}
-
-      {showYoutube ? (
-        <iframe
-          src={`${YOUTUBE_EMBED_BASE}/${item.youtubeId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${item.youtubeId}&playsinline=1&modestbranding=1&rel=0`}
-          title=""
-          aria-hidden
-          tabIndex={-1}
-          allow="autoplay; encrypted-media"
-          className="pointer-events-none absolute left-1/2 top-1/2 h-full w-[177.78%] -translate-x-1/2 -translate-y-1/2 border-0 data-[tall=false]:w-full"
-          data-tall={item.orientation === "tall"}
-        />
-      ) : null}
+      {playing && item.film ? <FilmPreview film={item.film} start={coarse ? 1 : 0} /> : null}
+      {playing && item.youtubeId ? <YoutubePreview id={item.youtubeId} tall={item.orientation === "tall"} /> : null}
 
       {/* A soft shade along the foot, and the label + a play mark that come up on hover / focus. */}
       <span aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/70 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-focus-within:opacity-100 [@media(hover:none)]:opacity-100" />
@@ -153,6 +160,8 @@ function Tile({ item, label, playLabel, onOpen }: { item: PortfolioItem; label: 
 /** The full player over the page (Escape / the backdrop / the X close it). */
 function Lightbox({ item, label, closeLabel, onClose }: { item: PortfolioItem | null; label: string; closeLabel: string; onClose: () => void }) {
   const tall = item?.orientation === "tall";
+  const [loadedId, setLoadedId] = useState<string | null>(null);
+  const loaded = item !== null && loadedId === item.id;
   return (
     <Dialog open={item !== null} onOpenChange={(next) => (next ? undefined : onClose())}>
       <DialogContent
@@ -175,8 +184,15 @@ function Lightbox({ item, label, closeLabel, onClose }: { item: PortfolioItem | 
               <IconX className="size-5" aria-hidden />
             </button>
             <div className={cn("relative w-full overflow-hidden rounded-2xl bg-black", tall ? "aspect-[9/16]" : "aspect-video")}>
+              {/* The still and a spinner while the player loads: a bare black box reads as a film that will not play. */}
+              {/* eslint-disable-next-line @next/next/no-img-element -- video posters (Bunny's is referer-gated, YouTube's is a still) */}
+              <img src={posterOf(item)} alt="" referrerPolicy="origin" className="absolute inset-0 size-full object-cover" />
+              <span aria-hidden className="absolute inset-0 grid place-items-center bg-black/35">
+                <IconLoader2 className="size-10 animate-spin text-white" />
+              </span>
               <iframe
-                className="absolute inset-0 h-full w-full"
+                className={cn("absolute inset-0 h-full w-full transition-opacity duration-500", loaded ? "opacity-100" : "opacity-0")}
+                onLoad={() => setLoadedId(item.id)}
                 src={item.film ? bunnyPlayerEmbedSrc(item.film, { autoplay: true }) : `${YOUTUBE_EMBED_BASE}/${item.youtubeId}?autoplay=1&rel=0&modestbranding=1`}
                 title={label}
                 allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture"
@@ -191,20 +207,65 @@ function Lightbox({ item, label, closeLabel, onClose }: { item: PortfolioItem | 
 }
 
 /**
- * The portfolio page's body: the heading, a row of category chips (the same kinds of video as the home page's package
- * cards - `?category=<key>` picks one) and the films in a masonry grid of 16:9 and 9:16 tiles that play on hover.
+ * On a touch screen: the tile nearest the middle of the screen once the page has stopped moving, the one that plays.
+ * A wait after the last scroll event, so a fling through the grid starts no players on its way.
  */
-export function PortfolioGrid() {
+function useCentreTile(enabled: boolean, tiles: unknown) {
+  const [active, setActive] = useState<string | null>(null);
+  useEffect(() => {
+    if (!enabled) return;
+    let timer = 0;
+    const pick = () => {
+      const middle = window.innerHeight / 2;
+      let best: string | null = null;
+      let distance = Infinity;
+      document.querySelectorAll<HTMLElement>("[data-tile]").forEach((tile) => {
+        const box = tile.getBoundingClientRect();
+        const shown = Math.min(box.bottom, window.innerHeight) - Math.max(box.top, 0);
+        if (shown < box.height * 0.6) return;
+        const away = Math.abs((box.top + box.bottom) / 2 - middle);
+        if (away < distance) {
+          distance = away;
+          best = tile.dataset.tile ?? null;
+        }
+      });
+      setActive(best);
+    };
+    const settle = () => {
+      window.clearTimeout(timer);
+      timer = window.setTimeout(pick, 250);
+    };
+    settle();
+    window.addEventListener("scroll", settle, { passive: true });
+    window.addEventListener("resize", settle);
+    return () => {
+      window.clearTimeout(timer);
+      window.removeEventListener("scroll", settle);
+      window.removeEventListener("resize", settle);
+    };
+  }, [enabled, tiles]);
+  return active;
+}
+
+/**
+ * The portfolio page's body: the heading, a row of category chips (the same kinds of video as the home page's package
+ * cards - `?category=<key>` picks one) and the films, in the order the team set in the admin dashboard, in a masonry grid
+ * of 16:9 and 9:16 tiles that play in place.
+ */
+export function PortfolioGrid({ items: all }: { items: PortfolioItem[] }) {
   const { t } = useLanguage();
   const p = t.portfolio;
   const names = t.packages.items as Record<string, { title: string }>;
   const [filter, setFilter] = useState<PortfolioFilter>("all");
   const [open, setOpen] = useState<PortfolioItem | null>(null);
   const columnCount = useColumns();
+  const coarse = useMediaQuery("(hover: none)");
 
-  const items = useMemo(() => portfolioItems(filter), [filter]);
+  const items = useMemo(() => filterPortfolio(all, filter), [all, filter]);
   const columns = useMemo(() => dealIntoColumns(items, columnCount), [items, columnCount]);
-  const labelOf = (item: PortfolioItem) => names[item.category]?.title ?? p.categories.all;
+  const activeTile = useCentreTile(coarse, columns);
+  // Named after the category on screen, so a film in several reads right in each.
+  const labelOf = (item: PortfolioItem) => names[filter !== "all" && item.categories.includes(filter) ? filter : item.categories[0]]?.title ?? p.categories.all;
 
   const choose = (next: PortfolioFilter) => {
     setFilter(next);
@@ -265,7 +326,7 @@ export function PortfolioGrid() {
           {columns.map((column, index) => (
             <div key={index} className="flex min-w-0 flex-1 flex-col gap-3">
               {column.map((item) => (
-                <Tile key={item.id} item={item} label={labelOf(item)} playLabel={p.play} onOpen={() => setOpen(item)} />
+                <Tile key={item.id} item={item} active={item.id === activeTile} label={labelOf(item)} playLabel={p.play} onOpen={() => setOpen(item)} />
               ))}
             </div>
           ))}

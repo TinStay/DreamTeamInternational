@@ -14,8 +14,9 @@ steps only you can take. Do them in the **sandbox** first, then repeat 2-6 in th
 ## 2. Website approval (live account)
 
 **Paddle → Checkout → Website approval** → add `keplerbay.com`. Paddle checks the site has: pricing, terms (with the
-Paddle merchant-of-record clause - done, §2.5 of the terms), a privacy policy (done), a refund policy, and a working
-contact email. If they ask for a separate refund page, tell me and I'll add one.
+Paddle merchant-of-record clause - done, clause 2.1 of the terms), a privacy policy (done), a refund policy (done,
+`/en/refunds`, which points at Paddle's own policy), and a working contact email. The company name and address on these
+pages must match the Paddle account exactly.
 
 ## 3. Keys
 

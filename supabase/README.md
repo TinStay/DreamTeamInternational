@@ -60,6 +60,8 @@ Also in Supabase:
 - **Project Settings → Storage → Upload file size limit**: 50 MB on the free plan. Finished films are often bigger - on a
   paid plan raise it (e.g. 2 GB), or the team's video upload fails with a size error.
 
+Run `supabase/portfolio.sql` as well: the portfolio page's films, edited in the admin dashboard (`/admin?view=portfolio`). Until it is run the page shows the list from the code and Save in that tab fails.
+
 ## 2. Paddle (taking payment for packs)
 
 Payments run on **Paddle Billing**. Paddle is the **merchant of record**: it sells to the client, collects and remits

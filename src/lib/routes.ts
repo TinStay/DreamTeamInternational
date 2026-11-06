@@ -55,6 +55,11 @@ export function termsPath(language: Language) {
   return `/${language}/terms`;
 }
 
+/** Localized refund policy path. */
+export function refundsPath(language: Language) {
+  return `/${language}/refunds`;
+}
+
 /** Localized privacy page path. */
 export function privacyPath(language: Language) {
   return `/${language}/privacy`;

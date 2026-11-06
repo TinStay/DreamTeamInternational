@@ -7,8 +7,9 @@ import { GradientBlurPageBg } from "@/components/ui/gradient-blur-bg";
 import { MAIN_WITH_FIXED_PAGE_BG_CLASS } from "@/lib/page-shell";
 import { PageBreadcrumbs } from "@/components/page-breadcrumbs";
 import { PortfolioGrid } from "@/components/portfolio/portfolio-grid";
+import type { PortfolioItem } from "@/lib/portfolio-grid";
 
-export function PortfolioPageView() {
+export function PortfolioPageView({ items }: { items: PortfolioItem[] }) {
   return (
     <main className={MAIN_WITH_FIXED_PAGE_BG_CLASS}>
       <div className="fixed inset-0 z-[-1]">
@@ -22,7 +23,7 @@ export function PortfolioPageView() {
         <div className="mx-auto w-full max-w-none px-[max(1.25rem,3vw)]">
           <PageBreadcrumbs className="mb-6" />
         </div>
-        <PortfolioGrid />
+        <PortfolioGrid items={items} />
       </div>
 
       <div className="relative z-10">
