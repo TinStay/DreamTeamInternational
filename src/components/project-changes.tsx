@@ -70,7 +70,23 @@ const money = (cents: number) => `$${(cents / 100).toLocaleString("en-US", { min
  * doesn't have are bought with the request at the one-time price; a request that costs money goes through Stripe
  * (`/api/project-requests/checkout`) before the team sees it. Below the cards, the project's requests and where each stands.
  */
-export function ProjectChanges({ project, sample = false, open, onOpenChange }: { project: ClientProject; sample?: boolean; open: ChangeKind | null; onOpenChange: (kind: ChangeKind | null) => void }) {
+/** A change request the team has yet to decide (`requested`), per kind - whether it was paid for. */
+export type PendingChanges = Partial<Record<ChangeKind, { paid: boolean }>>;
+
+export function ProjectChanges({
+  project,
+  sample = false,
+  open,
+  onOpenChange,
+  onPendingChange,
+}: {
+  project: ClientProject;
+  sample?: boolean;
+  open: ChangeKind | null;
+  onOpenChange: (kind: ChangeKind | null) => void;
+  /** Told which kinds have a request waiting for the team, so the drawer's facts can say so. */
+  onPendingChange?: (pending: PendingChanges) => void;
+}) {
   const { t } = useLanguage();
   const c = t.account.projectsPage.changes;
   const credits = useCredits(!sample, sample ? SAMPLE_CREDITS : undefined);
@@ -102,6 +118,13 @@ export function ProjectChanges({ project, sample = false, open, onOpenChange }: 
     }, 0);
     return () => window.clearTimeout(id);
   }, [load, c.paid, c.payCancelled]);
+
+  useEffect(() => {
+    if (!onPendingChange) return;
+    const pending: PendingChanges = {};
+    for (const r of requests) if (r.status === "requested") pending[r.kind] = { paid: Boolean(r.paidAt) || r.costCents > 0 };
+    onPendingChange(pending);
+  }, [requests, onPendingChange]);
 
   const closed = Boolean(project.approvedAt) || project.status === "delivered";
   const openOf = (kind: ChangeKind) => requests.find((r) => r.kind === kind && isOpen(r));

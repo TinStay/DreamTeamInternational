@@ -41,9 +41,9 @@ export default async function LocalePricingPage({
 }) {
   const { lang } = await params;
   if (!isLocale(lang)) notFound();
-  // `?for=individual` (the header's "Individual plans" link) opens that tab; anything else opens Business. Keyed, so a
-  // link to the other audience switches the tab even while the page is open.
-  const audience = (await searchParams).for === "individual" ? "individual" : "business";
+  // `?for=business` (the header's "Business plans" link) opens that tab; anything else - a plain /pricing included -
+  // opens Individual. Keyed, so a link to the other audience switches the tab even while the page is open.
+  const audience = (await searchParams).for === "business" ? "business" : "individual";
   return (
     <>
       {/* The whole price list - both audiences, both billings - as structured data (`lib/seo-graph.ts`), whichever tab is

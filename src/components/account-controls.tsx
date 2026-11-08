@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { IconFolderFilled, IconLayoutDashboardFilled } from "@tabler/icons-react";
 import { AccountMenu } from "@/components/account-menu";
+import { InvoiceNotice } from "@/components/invoice-notice";
 import { WaterButton } from "@/components/water-button";
 import { TigerCta } from "@/components/hero-tiger/tiger-cta";
 import { useLanguage } from "@/lib/i18n/language-context";
@@ -15,7 +16,8 @@ import { useAuthUser } from "@/lib/supabase/use-auth-user";
  * The English header's right end: Log in + Sign up (the orange pearl pill) for a visitor, and once signed in the
  * account icon with its menu (`account-menu.tsx`). The big YOUR PROJECTS button sits before them either way: a link to
  * /my-projects for a signed-in client, and the log-in popup for a visitor (the page needs an account). A team account
- * also gets an **Admin** button first, into the admin dashboard (`/admin`). Invisible until
+ * also gets an **Admin** button first, into the admin dashboard (`/admin`). An invoice waiting to be paid adds the bell
+ * (`invoice-notice.tsx`) before the account icon. Invisible until
  * Supabase has answered who is here, so a signed-in visitor never sees the wrong buttons flash.
  */
 export function AccountControls() {
@@ -41,6 +43,7 @@ export function AccountControls() {
             <span className="max-[1699px]:hidden">{t.account.projectsButton}</span>
             <span className="min-[1700px]:hidden">{t.account.projectsButtonShort}</span>
           </WaterButton>
+          <InvoiceNotice />
           <span className="ml-1">
             <AccountMenu user={user} />
           </span>

@@ -25,7 +25,7 @@ import { ProjectComments, type ProjectComment } from "@/components/project-comme
 import { ProjectReviewCard } from "@/components/project-review-card";
 import { FilmInTheMaking } from "@/components/film-in-the-making";
 import { FormatIcon } from "@/components/format-icon";
-import { ProjectChanges } from "@/components/project-changes";
+import { ProjectChanges, type PendingChanges } from "@/components/project-changes";
 import { canRequest, type ChangeKind } from "@/lib/project-changes";
 import { ProjectRating } from "@/components/project-rating";
 import { MAIN_WITH_FIXED_PAGE_BG_CLASS } from "@/lib/page-shell";
@@ -79,6 +79,14 @@ export function ProjectDetailView({
   const [revisionOpen, setRevisionOpen] = useState(initialAction === "revision" && initial.status === "review");
   // The change-request window open (from the cards at the foot of the page, or a fact in the drawer).
   const [changeOpen, setChangeOpen] = useState<ChangeKind | null>(null);
+  // Requests waiting for the team, per fact - an orange line under the value until the team decides.
+  const [pending, setPending] = useState<PendingChanges>({});
+  const noteOf = (kind: ChangeKind) => {
+    const req = pending[kind];
+    if (!req) return undefined;
+    if (kind === "revision" && req.paid) return p.changes.pendingRevision;
+    return req.paid ? p.changes.pendingPaid : p.changes.pendingFree;
+  };
   const editOf = (kind: ChangeKind) => (canRequest(project, kind) ? () => setChangeOpen(kind) : undefined);
   const [fileError, setFileError] = useState<string | null>(null);
   const [commentCount, setCommentCount] = useState<number | null>(null);
@@ -251,15 +259,16 @@ export function ProjectDetailView({
             </div>
 
             <div className="grid grid-cols-2 gap-2.5">
-              <Fact icon={<IconCalendarFilled className="size-6" aria-hidden />} label={p.due} value={project.dueDate ? formatDateDisplay(project.dueDate.slice(0, 10)) : p.tbd} onEdit={editOf("deadline")} editLabel={p.changes.edit} />
-              <Fact icon={<IconClockFilled className="size-6" aria-hidden />} label={p.length} value={project.durationSeconds ? formatVideoTime(project.durationSeconds) : p.tbd} onEdit={editOf("duration")} editLabel={p.changes.edit} />
-              <Fact icon={<FormatIcon format={project.format} className="size-6" />} label={p.format} value={project.format ?? p.tbd} onEdit={editOf("format")} editLabel={p.changes.edit} />
+              <Fact icon={<IconCalendarFilled className="size-6" aria-hidden />} label={p.due} value={project.dueDate ? formatDateDisplay(project.dueDate.slice(0, 10)) : p.tbd} onEdit={editOf("deadline")} editLabel={p.changes.edit} note={noteOf("deadline")} />
+              <Fact icon={<IconClockFilled className="size-6" aria-hidden />} label={p.length} value={project.durationSeconds ? formatVideoTime(project.durationSeconds) : p.tbd} onEdit={editOf("duration")} editLabel={p.changes.edit} note={noteOf("duration")} />
+              <Fact icon={<FormatIcon format={project.format} className="size-6" />} label={p.format} value={project.format ?? p.tbd} onEdit={editOf("format")} editLabel={p.changes.edit} note={noteOf("format")} />
               <Fact
                 icon={<IconCircleCheckFilled className="size-6" aria-hidden />}
                 label={p.revisionsLeft}
                 value={p.revisionsLeftValue.replace("{left}", String(left)).replace("{total}", String(project.revisionsTotal))}
                 onEdit={editOf("revision")}
                 editLabel={p.changes.edit}
+                note={noteOf("revision")}
               />
             </div>
 
@@ -467,7 +476,7 @@ export function ProjectDetailView({
               </section>
 
               {/* Change requests - deadline, length, format, revision - last. The drawer's facts open them too. */}
-              <ProjectChanges project={project} sample={sample} open={changeOpen} onOpenChange={setChangeOpen} />
+              <ProjectChanges project={project} sample={sample} open={changeOpen} onOpenChange={setChangeOpen} onPendingChange={setPending} />
             </div>
           </div>
         </div>
