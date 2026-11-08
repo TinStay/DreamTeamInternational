@@ -3,23 +3,20 @@ import { EMAIL_PRIMARY, emailHref } from "@/lib/contact-info";
 import { pricingPath, privacyPath, refundsPath } from "@/lib/routes";
 
 /**
- * The English terms. What Paddle's domain review looks for is all here, so keep it when changing them: the legal seller,
- * acceptance, Paddle as reseller and merchant of record (clause 2.1), misuse rules, generative-AI rules with a takedown
- * route (section 3), suspension, the service level, IP and a contact. Nothing here may read "no refunds": refunds live in
- * the Refund Policy (`refunds-english-content.tsx`), which only points at Paddle's own. The site sells to the US first, so
- * the terms also carry what US law and practice expect: the automatic-renewal disclosure (ROSCA, California's ARL -
- * clause 2.5), the warranty disclaimer and liability cap in capitals (section 7), the note that fully AI-generated work
- * may not be copyrightable in the US (6.1), the AI-performer disclosure and the FTC rules on testimonials (3.5),
- * a DMCA route (3.6), and the governing law (7.3).
+ * The English terms. DT A I is the seller of every order and Stripe only processes the payments. Refunds live in the Refund Policy (`refunds-english-content.tsx`). The site sells to the US
+ * first, so the terms carry what US law and practice expect: the automatic-renewal disclosure (ROSCA, California's ARL -
+ * clause 2.5), the warranty disclaimer and liability cap in capitals (section 7), the note that fully AI-generated work may
+ * not be copyrightable in the US (6.1), the AI-performer disclosure and the FTC rules on testimonials (3.6), a DMCA route
+ * (3.7) and the governing law (7.4).
  */
-const PADDLE_AUP = "https://www.paddle.com/help/start/intro-to-paddle/what-am-i-not-allowed-to-sell-on-paddle";
 
 export function TermsEnglishContent() {
   return (
     <>
       <p className="not-prose text-[0.9375rem] leading-relaxed text-muted-foreground">
-        These Terms and Conditions govern the relationship between DT A I, a company registered in Bulgaria with its office at
-        27-29 Nikolay Kopernik Street, floor 2, office 17, Sofia, and trading as &ldquo;Keplerbay&rdquo;
+        These Terms and Conditions govern the relationship between DT A I OOD, a company registered in Bulgaria (UIC 208668338,
+        VAT number BG208668338) with its office at 27-29 Nikolay Kopernik Street, floor 2, office 17, Sofia 1574, and trading as
+        &ldquo;Keplerbay&rdquo;
         (hereinafter referred to as the &ldquo;Contractor&rdquo;) and clients (hereinafter referred
         to as the &ldquo;Client&rdquo;), in connection with the provision of services for generating
         and editing video content using artificial intelligence (AI). The Client contracts with DT A I for these services. By
@@ -51,19 +48,17 @@ export function TermsEnglishContent() {
 
       <h2>2. Prices, Payment and Subscriptions</h2>
       <p>
-        <strong>2.1. Online orders:</strong>{" "}Our order process is conducted by our online reseller Paddle.com. Paddle.com is
-        the Merchant of Record for all our online orders - packs, subscriptions, paid project changes and invoices sent
-        through our website. Paddle provides all customer service inquiries and handles returns, and its{" "}
-        <a href="https://www.paddle.com/legal/checkout-buyer-terms" target="_blank" rel="noopener noreferrer">Buyer Terms</a>{" "}
-        apply to the purchase.
+        <strong>2.1. Online orders:</strong>{" "}The Contractor is the seller of every order placed through the website: packs,
+        subscriptions, paid project changes and invoices. Card payments are processed by Stripe. The Contractor does not
+        see or store full card numbers.
       </p>
       <p>
-        <strong>2.2. Prices and tax:</strong>{" "}Prices are in US dollars and are shown before tax. Paddle adds any sales tax or
-        VAT due at checkout.
+        <strong>2.2. Prices and tax:</strong>{" "}Prices are in US dollars and are shown before tax. Any sales tax or VAT due is
+        added at checkout.
       </p>
       <p>
-        <strong>2.3. Payment:</strong>{" "}Online orders are paid at checkout. A custom quote is billed through a Paddle invoice,
-        payable by the date shown on it.
+        <strong>2.3. Payment:</strong>{" "}Online orders are paid at checkout. A custom quote is billed by invoice, payable by the
+        date shown on it.
       </p>
       <p>
         <strong>2.4. Video time:</strong>{" "}Seconds of video are added to the Client&apos;s account once the payment is
@@ -74,11 +69,11 @@ export function TermsEnglishContent() {
         <strong>2.5. Subscriptions and automatic renewal:</strong>{" "}A subscription is billed monthly or annually, as
         chosen at checkout. It renews automatically at the end of each billing period, and the payment method on file is
         charged the price shown at checkout for the next period, until the Client cancels. The price, the billing period and
-        the renewal are shown before the Client confirms the purchase, and Paddle&apos;s receipt confirms them by email. The
+        the renewal are shown before the Client confirms the purchase, and a receipt confirms them by email. The
         Client can cancel at any time online, from their account, or by writing to{" "}
         <a href={emailHref("Cancel my subscription")}>{EMAIL_PRIMARY.label}</a>; cancelling takes effect at the end of the
-        paid period, the plan and its video time stay available until then, and no further payment is taken. Paddle sends
-        renewal reminders where the law requires them. Price changes are announced by email at least 30 days before they
+        paid period, the plan and its video time stay available until then, and no further payment is taken. A reminder is
+        emailed before an annual plan renews. Price changes are announced by email at least 30 days before they
         apply to a renewal.
       </p>
       <p>
@@ -101,10 +96,6 @@ export function TermsEnglishContent() {
         <li>deepfakes, face swaps or voice impersonation;</li>
         <li>content using a real person&apos;s face, voice or likeness without that person&apos;s explicit consent;</li>
         <li>illegal, hateful, sexual or otherwise harmful content;</li>
-        <li>
-          content that falls outside{" "}
-          <a href={PADDLE_AUP} target="_blank" rel="noopener noreferrer">Paddle&apos;s Acceptable Use Policy</a>.
-        </li>
       </ul>
       <p>
         <strong>3.3. The Client&apos;s materials:</strong>{" "}The Client is responsible for their briefs, scripts, images, logos,
@@ -211,8 +202,7 @@ export function TermsEnglishContent() {
         <strong>7.4. Governing law and disputes:</strong>{" "}These Terms are governed by the law of Bulgaria, and disputes are
         heard by the courts of Sofia, Bulgaria. If the Client is a consumer, they keep the protection of the mandatory
         consumer law of the place where they live, and may bring a claim there. The Client and the Contractor will first try
-        to settle any dispute by writing to each other. Purchases made through Paddle are also subject to Paddle&apos;s{" "}
-        <a href="https://www.paddle.com/legal/checkout-buyer-terms" target="_blank" rel="noopener noreferrer">Buyer Terms</a>.
+        to settle any dispute by writing to each other.
       </p>
       <p>
         <strong>7.5. Age and accounts:</strong>{" "}The Client must be at least 18 years old to create an account or place an

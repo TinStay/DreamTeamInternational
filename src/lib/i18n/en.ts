@@ -953,7 +953,7 @@ export const en = {
       loading: "Loading…",
       invoices: {
         title: "Invoices",
-        hint: "Bill a custom quote. Paddle issues the invoice and emails it to the client, adds any tax from their billing address, and they pay it on Paddle's checkout.",
+        hint: "Bill a custom quote. Stripe emails the invoice to the client, adds any tax from their billing address, and they pay it on Stripe's page.",
         none: "No invoices yet.",
         newInvoice: "New invoice",
         cancel: "Cancel",
@@ -965,7 +965,7 @@ export const en = {
         dueIn: "Due in (days)",
         memo: "Note on the invoice (optional)",
         address: "Billing address",
-        addressHint: "Paddle needs one on every invoice. Leave it empty if the client already has one on file.",
+        addressHint: "Needed to work out tax. Leave it empty if the client already has one on file.",
         addressFields: { line1: "Address", line2: "Apartment, suite (optional)", city: "City", state: "State / region", postal_code: "ZIP / postal code", country: "Country code (e.g. US)" },
         subtotal: "Subtotal before tax",
         send: "Send invoice",
@@ -973,10 +973,10 @@ export const en = {
         sent: "Invoice sent to the client.",
         errors: {
           invalid: "Check the lines: each needs a description and an amount of at least $1.",
-          address_required: "Add the client's billing address - Paddle needs one on every invoice.",
+          address_required: "Add the client's billing address - Stripe needs it to work out the tax.",
           invalid_address: "The address is incomplete. A US address needs the street, city, state and ZIP.",
-          not_configured: "Paddle isn't set up on this site yet.",
-          paddle: "Paddle refused the invoice: {message}",
+          not_configured: "Stripe isn't set up on this site yet.",
+          stripe: "Stripe refused the invoice: {message}",
           generic: "We couldn't send the invoice. Please try again."
         } as Record<string, string>
       }
@@ -1039,7 +1039,7 @@ export const en = {
       decline: "Decline",
       notePlaceholder: "Note for the client (optional)",
       paid: "paid",
-      refundNote: "Paid by card - declining does not refund it automatically: refund the transaction in Paddle.",
+      refundNote: "Paid by card - declining does not refund it automatically: refund the payment in Stripe.",
       review: "Client review",
       error: "That didn't work. Please try again."
     },
@@ -1119,6 +1119,23 @@ export const en = {
   },
   // `/investors` - the investor relations page (it replaced the contact page): why Keplerbay, who we want to hear from,
   // what happens next, and the short "I'm interested" form (posted to `/api/contact` as an investor inquiry).
+  contactPage: {
+    metaTitle: "Contact Keplerbay | AI Video Production",
+    metaDescription:
+      "Questions about a video, a plan or an order? Write to the Keplerbay team at hq@keplerbay.com or send a message from this page.",
+    eyebrow: "Contact",
+    title1: "Talk to",
+    title2: "our team",
+    lead: "Questions about a video, a plan or an order you have placed? Send us a message or write to us, and a person from our team will answer.",
+    formTitle: "Send a message",
+    formSubject: "Contact page",
+    emailTitle: "Email us",
+    emailNote: "For orders, billing, refunds and anything else. Please write from the email on your account if you have one.",
+    linksTitle: "Quick answers",
+    links: { pricing: "Prices and plans", refunds: "Refund policy", terms: "Terms and conditions" },
+    companyTitle: "Company details",
+    company: { name: "Company", trading: "trading as Keplerbay", uic: "Company number (UIC)", vat: "VAT number", address: "Registered address" },
+  },
   investors: {
     metaTitle: "Investor Relations | Keplerbay",
     metaDescription:
@@ -1222,10 +1239,10 @@ export const en = {
     },
     organizationDescription:
       "Keplerbay is an AI video production company. Its team writes, directs and produces finished AI videos - social media ads, TV ads, corporate, product, explainer and UGC-style videos, brand mascots, real estate and music videos - for businesses and creators in the United States, Europe and worldwide, fully online. One video costs from $299; monthly plans start at $389 for individuals and $990 for businesses. Videos are delivered in 3-10 days and clients own the files.",
-    // The address the structured data gives (San Francisco, like the footer and the contact section); no street yet.
-    city: "San Francisco",
-    region: "CA",
-    country: "United States",
+    // The address the structured data gives: the legal seat of DT A I, as in the terms. A US office goes here once one exists.
+    city: "Sofia",
+    region: "Sofia City",
+    country: "Bulgaria",
     topics: [
       "AI video production",
       "AI-generated video advertising",
@@ -2621,8 +2638,8 @@ export const en = {
     address: "Address",
     hours: "Hours",
     hoursVal: "Mon-Fri, 9am - 6pm",
-    // The same address as the footer's (`footer.address`) - one address everywhere.
-    addressVal: "San Francisco, Silicon Valley, CA, USA",
+    // The legal seat of DT A I, as in the terms and the privacy policy.
+    addressVal: "27-29 Nikolay Kopernik Street, floor 2, office 17, Sofia 1574, Bulgaria",
     copyAddress: "Copy address",
     formTitle: "Send a Message",
     name: "Name",
@@ -2919,7 +2936,8 @@ export const en = {
     ourWork: "Our work",
     socials: "Socials",
     contact: "Contact",
-    address: "San Francisco, Silicon Valley, CA, USA",
+    // The small line beside the copyright: who the seller is. The full address is in the terms and the privacy policy.
+    legalLine: "Keplerbay is a trading name of DT A I, Sofia, Bulgaria.",
     reviews: "Reviews",
     googleReviews: "reviews on Google",
     copy: "Keplerbay. All rights reserved.",
@@ -3212,14 +3230,14 @@ export const en = {
     // A client's subscription (lib/email/subscription-emails.ts). Placeholders: {plan} {from} {date} {client}.
     subscription: {
       reason: "You're getting this email because you have a Keplerbay subscription.",
-      facts: { plan: "Plan", billing: "Billing", price: "Price", videoTime: "Video time", renews: "Renews on", endsOn: "Active until", previous: "Previous plan", client: "Client", paddle: "In Paddle" },
+      facts: { plan: "Plan", billing: "Billing", price: "Price", videoTime: "Video time", renews: "Renews on", endsOn: "Active until", previous: "Previous plan", client: "Client", stripe: "In Stripe" },
       billing: { monthly: "Monthly", annual: "Annual" } as Record<string, string>,
       perMonth: "{price} / month",
       perYear: "{price} / year",
       videoTimeMonthly: "{time} of video every month",
       videoTimeAnnual: "{time} of video a year",
       customPlan: "Custom plan",
-      buttons: { start: "Start a project", manage: "Manage your subscription", resume: "Resume your subscription", plans: "See plans", paddle: "Open in Paddle" },
+      buttons: { start: "Start a project", manage: "Manage your subscription", resume: "Resume your subscription", plans: "See plans", stripe: "Open in Stripe" },
       started: {
         subject: "Welcome to {plan} - your subscription is active",
         eyebrow: "Subscription active",

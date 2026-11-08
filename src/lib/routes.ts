@@ -5,7 +5,7 @@ export function homePath(language: Language) {
   return `/${language}`;
 }
 
-/** Localized path for the combined Process + Contact page. */
+/** Localized contact page (the form, the email and the company details). */
 export function contactProcessPath(language: Language) {
   return `/${language}/contact`;
 }

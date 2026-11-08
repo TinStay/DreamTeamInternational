@@ -220,12 +220,12 @@ export function organizationGraph(lang: Language) {
         slogan: t.hero.subtitle,
         email: EMAIL_PRIMARY.label,
         telephone,
-        // San Francisco, as the footer and the contact section show it (no street yet, so none here either).
+        // The legal seat of DT A I, as the terms give it.
         address: {
           "@type": "PostalAddress",
           addressLocality: t.seo.city,
           addressRegion: t.seo.region,
-          addressCountry: "US",
+          addressCountry: "BG",
         },
         areaServed: AREA_SERVED,
         knowsLanguage: ["en", "bg"],

@@ -15,7 +15,7 @@ export type ClientOverview = {
   openProjects: number;
   /** The live subscription's pack, if any. */
   planKey: string | null;
-  /** Paddle's status of the latest subscription (active, past_due, canceled, ...), if they ever had one. */
+  /** Stripe's status of the latest subscription (active, past_due, canceled, ...), if they ever had one. */
   subscriptionStatus: string | null;
   lastActivity: string | null;
 };
