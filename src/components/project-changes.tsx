@@ -46,7 +46,6 @@ import {
 } from "@/lib/project-changes";
 import type { ClientProject } from "@/lib/client-projects";
 import { cn } from "@/lib/utils";
-import { openPaddleCheckout } from "@/lib/paddle-client";
 
 const PEARL = "bg-[linear-gradient(115deg,#ff5e00,#ff9a3c)]";
 const EASE = [0.22, 1, 0.36, 1] as const;
@@ -68,7 +67,7 @@ const money = (cents: number) => `$${(cents / 100).toLocaleString("en-US", { min
  * and what it costs. The window can also be opened from the drawer's facts (`open` / `onOpenChange`, owned by the page).
  * The rules and the prices are `lib/project-changes.ts`; the database works the price out again and refuses anything off
  * the rules (`request_project_change()`, supabase/changes.sql). Seconds come from the video time; seconds the client
- * doesn't have are bought with the request at the one-time price; a request that costs money goes through Paddle
+ * doesn't have are bought with the request at the one-time price; a request that costs money goes through Stripe
  * (`/api/project-requests/checkout`) before the team sees it. Below the cards, the project's requests and where each stands.
  */
 export function ProjectChanges({ project, sample = false, open, onOpenChange }: { project: ClientProject; sample?: boolean; open: ChangeKind | null; onOpenChange: (kind: ChangeKind | null) => void }) {
@@ -90,7 +89,7 @@ export function ProjectChanges({ project, sample = false, open, onOpenChange }: 
   useEffect(() => {
     const id = window.setTimeout(() => {
       void load();
-      // Back from Paddle's checkout: say how the payment went, then drop the flag from the address.
+      // Back from Stripe: say how the payment went, then drop the flag from the address.
       const flag = new URLSearchParams(window.location.search).get("request");
       if (flag === "paid" || flag === "cancelled") {
         setNotice(flag === "paid" ? c.paid : c.payCancelled);
@@ -109,11 +108,10 @@ export function ProjectChanges({ project, sample = false, open, onOpenChange }: 
 
   async function pay(requestId: string): Promise<boolean> {
     const res = await fetch("/api/project-requests/checkout", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ requestId }) });
-    const data = (await res.json().catch(() => ({}))) as { transactionId?: string };
-    if (!res.ok || !data.transactionId) return false;
-    // Paid: Paddle sends the browser back here with ?request=paid; closed without paying: the cancelled notice.
-    const back = `${window.location.origin}${window.location.pathname}`;
-    return openPaddleCheckout(data.transactionId, { successUrl: `${back}?request=paid`, onClosed: () => setNotice(c.payCancelled) });
+    const data = (await res.json().catch(() => ({}))) as { url?: string };
+    if (!res.ok || !data.url) return false;
+    window.location.assign(data.url);
+    return true;
   }
 
   /** Sends a request; returns an error message, or null when it went through. */

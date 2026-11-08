@@ -12,7 +12,7 @@ import { PageBreadcrumbs } from "@/components/page-breadcrumbs";
 
 /**
  * The legal text's look. Tailwind's typography plugin is not installed here, so `prose` classes do nothing: the headings,
- * spacing, bullets and links are set directly, and Paddle's reviewer has to be able to find each section at a glance.
+ * spacing, bullets and links are set directly, so a reader can find each section at a glance.
  */
 const LEGAL_BODY_CLASS = cn(
   "max-w-none text-[0.9375rem] leading-relaxed text-muted-foreground",

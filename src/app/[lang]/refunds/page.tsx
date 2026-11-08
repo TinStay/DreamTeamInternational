@@ -16,7 +16,7 @@ const LAST_UPDATED = "06-11-2026";
 const META: Record<Language, { title: string; description: string }> = {
   en: {
     title: "Refund Policy | Keplerbay",
-    description: "How refunds work for Keplerbay orders and subscriptions, handled by Paddle, our Merchant of Record.",
+    description: "How refunds work for Keplerbay video orders and subscriptions: 14 days on unused video time, free fixes, and your legal rights.",
   },
 };
 

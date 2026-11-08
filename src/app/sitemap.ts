@@ -27,6 +27,7 @@ const PATHS: readonly string[] = [
   "/about",
   "/careers",
   "/investors",
+  "/contact",
   "/privacy",
   "/terms",
   "/refunds",

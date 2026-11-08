@@ -2,17 +2,17 @@
 
 import Link from "next/link";
 import { Sphere } from "./iridescent-shapes";
-import { IconMapPin, IconPhone } from "@tabler/icons-react";
+import { IconMail } from "@tabler/icons-react";
 import { openConsentSettings } from "@/lib/consent";
-import { PHONE_US } from "@/lib/contact-info";
+import { EMAIL_PRIMARY } from "@/lib/contact-info";
 import { useLanguage } from "@/lib/i18n/language-context";
 import { BrandWordmark } from "@/components/ui/brand-wordmark";
-import { aboutPath, careersPath, homePath, investorsPath, portfolioPath, pricingPath, privacyPath, projectsPath, refundsPath, termsPath } from "@/lib/routes";
+import { aboutPath, careersPath, contactProcessPath, homePath, investorsPath, portfolioPath, pricingPath, privacyPath, projectsPath, refundsPath, termsPath } from "@/lib/routes";
 import { SOCIAL_LINKS } from "@/lib/social-links";
 import { cn } from "@/lib/utils";
 
 /*
- * The site footer: the brand (logo, line, the San Francisco phone and address) and five link columns -
+ * The site footer: the brand (logo, line, the contact email) and five link columns -
  * Order a video (with every style of video), Pricing (with the packs), Company (About us, Policies, Cookies, Terms),
  * Resources (Customers, Our work) and Socials (text links, no icon buttons; dropped while `SOCIAL_LINKS` is empty) -
  * with the copyright along the bottom.
@@ -57,14 +57,10 @@ export function Footer() {
             </Link>
             <p className="max-w-xs text-sm text-muted-foreground">{f.desc}</p>
             <div className="flex flex-col items-center gap-2.5 text-sm sm:items-start">
-              <a href={PHONE_US.href} className={cn(linkClass, "group inline-flex items-center gap-2")}>
-                <IconPhone className="size-4 shrink-0 text-primary" aria-hidden />
-                <span>{PHONE_US.label}</span>
+              <a href={EMAIL_PRIMARY.href} className={cn(linkClass, "group inline-flex items-center gap-2")}>
+                <IconMail className="size-4 shrink-0 text-primary" aria-hidden />
+                <span>{EMAIL_PRIMARY.label}</span>
               </a>
-              <p className="inline-flex max-w-xs items-start gap-2 text-left text-muted-foreground">
-                <IconMapPin className="mt-0.5 size-4 shrink-0 text-primary" aria-hidden />
-                <span>{f.address}</span>
-              </p>
             </div>
           </div>
 
@@ -100,6 +96,9 @@ export function Footer() {
             </Link>
             <Link href={careersPath(language)} className={linkClass}>
               {f.careers}
+            </Link>
+            <Link href={contactProcessPath(language)} className={linkClass}>
+              {t.header.contact}
             </Link>
             <Link href={investorsPath(language)} className={linkClass}>
               {t.header.investors}
@@ -147,6 +146,7 @@ export function Footer() {
           <p>
             © {new Date().getFullYear()} {f.copy}
           </p>
+          <p>{f.legalLine}</p>
         </div>
       </div>
 

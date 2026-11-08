@@ -9,6 +9,7 @@ import {
   aboutPath,
   homePath,
   investorsPath,
+  contactProcessPath,
   portfolioPath,
   pricingPath,
   projectPath,
@@ -65,7 +66,7 @@ const PRICE_WORDS: Record<
 > = {
   en: {
     intro: (url) =>
-      `All prices are in US dollars and listed on ${url}. Checkout runs through Paddle, the merchant of record, which adds sales tax or VAT where it applies and issues the invoice.`,
+      `All prices are in US dollars and listed on ${url}. Checkout runs through Stripe, and any sales tax or VAT is added on top where it applies.`,
     audience: (label) => `${label} plans`,
     oneTime: (plan) => `${formatPrice(plan.price!)} one-time, no subscription`,
     subscription: (plan) =>
@@ -87,8 +88,7 @@ const FACT_WORDS: Record<Language, Record<string, string>> = {
     rights:
       "Rights: Business plans include full commercial use; Individual plans are for personal and creator use (advertising a business requires a Business plan).",
     formats: "Kinds of video we make",
-    legal: `Company: Keplerbay is the brand of ${LEGAL_ENTITY}. Online orders are sold through Paddle.com, the merchant of record.`,
-    office: "Office",
+    legal: `Company: Keplerbay is the brand of ${LEGAL_ENTITY}. ${LEGAL_ENTITY} is the seller of every order, and payments are processed by Stripe.`,
     profiles: "Profiles",
   },
 };
@@ -188,7 +188,6 @@ function section(lang: Language, full: boolean) {
   lines.push(`## ${h.contact}`, "");
   lines.push(`- ${t.contact.email}: ${EMAIL_PRIMARY.label}`);
   lines.push(`- ${t.contact.phone}: ${PHONE_PRIMARY.label}, ${PHONE_SECONDARY.label}`);
-  lines.push(`- ${f.office}: ${t.contact.addressVal}`);
   // None while the profiles are parked (`SOCIAL_LINKS` empty).
   if (SOCIAL_LINKS.length) lines.push(`- ${f.profiles}: ${SOCIAL_LINKS.map((social) => social.href).join(", ")}`);
   lines.push("");
@@ -200,6 +199,7 @@ function section(lang: Language, full: boolean) {
   lines.push(`- ${t.header.projects}: ${absoluteUrl(projectsPath(lang))}`);
   lines.push(`- ${t.header.portfolio}: ${absoluteUrl(portfolioPath(lang))}`);
   lines.push(`- ${t.header.about}: ${absoluteUrl(aboutPath(lang))}`);
+  lines.push(`- ${t.header.contact}: ${absoluteUrl(contactProcessPath(lang))}`);
   lines.push(`- ${t.header.investors}: ${absoluteUrl(investorsPath(lang))}`);
   lines.push("");
 

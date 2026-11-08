@@ -8,10 +8,10 @@ export function emailFrom(): string {
 }
 
 /**
- * TEST ENVIRONMENT: every admin email - the contact and quote forms, project and subscription alerts - goes to the
- * DreamTeam inbox for now. Switch this to `EMAIL_PRIMARY.label` (info@keplerbay.com) when Keplerbay goes live.
+ * Every admin email - the contact and quote forms, project and subscription alerts - goes to the public inbox,
+ * hq@keplerbay.com (until 08-11-2026 the DreamTeam test inbox, info@dreamteamvideo.com).
  */
-export const ADMIN_INBOX = "info@dreamteamvideo.com";
+export const ADMIN_INBOX = "hq@keplerbay.com";
 
 /** Where admin emails go: `TEAM_NOTIFY_EMAIL` when set, else `ADMIN_INBOX`. */
 export function teamInbox(): string {

@@ -205,7 +205,7 @@ export function PricingCard({
         </button>
       )}
       {/* The automatic-renewal disclosure US law asks for before a subscription is bought (ROSCA, California's ARL):
-          the period, that it renews until cancelled, and that cancelling is online. Paddle's checkout repeats it. */}
+          the period, that it renews until cancelled, and that cancelling is online. Stripe's checkout repeats it. */}
       {subscription && pricing ? (
         <p className="mt-2.5 text-center text-[12px] leading-snug text-[#9a9ba3]">
           {fill(p.renewal, { total: formatPrice(annual ? pricing.annualTotal : plan.price ?? 0) })}{" "}
