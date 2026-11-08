@@ -1,5 +1,6 @@
 import type Stripe from "stripe";
 import { INVOICE_FOOTER, lineTax, taxEnabled } from "@/lib/stripe-tax";
+import { applyInvoiceProfile } from "@/lib/invoice-profiles";
 
 /** One invoice, as the client's account page and the team's client window show it. */
 export type InvoiceSummary = {
@@ -88,6 +89,8 @@ export function parseAddress(raw: unknown): BillingAddress | null {
  */
 export async function sendCustomInvoice(stripe: Stripe, customerId: string, userId: string, draft: InvoiceDraft, teamUserId: string): Promise<Stripe.Invoice> {
   const tax = lineTax();
+  // The client's invoice texts (Bulgarian / international) from their address; the plain footer while it is unknown.
+  const profiled = (await applyInvoiceProfile(stripe, customerId)) !== null;
   const invoice = await stripe.invoices.create({
     customer: customerId,
     currency: "usd",
@@ -95,7 +98,7 @@ export async function sendCustomInvoice(stripe: Stripe, customerId: string, user
     days_until_due: draft.daysUntilDue,
     automatic_tax: { enabled: taxEnabled() },
     pending_invoice_items_behavior: "exclude",
-    footer: INVOICE_FOOTER,
+    ...(profiled ? {} : { footer: INVOICE_FOOTER }),
     ...(draft.memo ? { description: draft.memo } : {}),
     metadata: { user_id: userId, purchase_type: "custom_invoice", created_by: teamUserId },
   });
