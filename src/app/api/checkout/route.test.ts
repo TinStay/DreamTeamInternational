@@ -5,7 +5,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
  * `/api/checkout` - the start of every purchase. The price must come from the server, a one-time video's length must be
  * validated, a live subscriber must never be sold a second plan, and every checkout must carry its order.
  */
-const stripe = { checkout: { sessions: { create: vi.fn() } }, customers: { update: vi.fn(async () => ({})) } };
+const stripe = { checkout: { sessions: { create: vi.fn() } } };
 const state = { stripe: stripe as unknown, user: { id: "u1", email: "client@example.com" } as { id: string; email: string } | null, subscribed: false };
 
 vi.mock("@/lib/stripe", () => ({ getStripe: () => state.stripe }));
@@ -14,7 +14,7 @@ vi.mock("@/lib/subscriptions", () => ({ hasLiveSubscription: vi.fn(async () => s
 const orders = vi.hoisted(() => ({ createPendingOrder: vi.fn(async () => "order-1"), updateOrder: vi.fn(async () => {}) }));
 vi.mock("@/lib/orders", () => orders);
 const { clearTaxIds } = vi.hoisted(() => ({ clearTaxIds: vi.fn(async () => undefined) }));
-vi.mock("@/lib/stripe-customers", () => ({ customerFor: vi.fn(async () => "cus_test_1"), clearTaxIdsForCheckout: clearTaxIds }));
+vi.mock("@/lib/stripe-customers", () => ({ customerFor: vi.fn(async () => "cus_test_1"), clearTaxIdsForCheckout: clearTaxIds, hasBillingSubscription: vi.fn(async () => state.subscribed) }));
 
 const { POST } = await import("./route");
 
@@ -131,19 +131,6 @@ describe("/api/checkout", () => {
     state.subscribed = true;
     await post({ plan: "personal" });
     expect(clearTaxIds).not.toHaveBeenCalled();
-  });
-
-  it("marks a company outside Bulgaria for no VAT and asks it for its name; a person pays VAT", async () => {
-    stripe.customers.update.mockClear();
-    state.user = { id: "u-payer", email: "payer@example.com" }; // its own rate-limit bucket
-    await post({ plan: "personal", payer: "company_abroad" });
-    expect(stripe.customers.update).toHaveBeenCalledWith("cus_test_1", { tax_exempt: "reverse", metadata: { payer_type: "company_abroad" } });
-    expect(created().name_collection).toEqual({ business: { enabled: true, optional: false } });
-    stripe.customers.update.mockClear();
-    stripe.checkout.sessions.create.mockClear();
-    await post({ plan: "personal", payer: "nonsense" });
-    expect(stripe.customers.update).toHaveBeenCalledWith("cus_test_1", { tax_exempt: "none", metadata: { payer_type: "person" } });
-    expect(created().name_collection).toEqual({ business: { enabled: true, optional: true } });
   });
 
   it("refuses a checkout started from another site (CSRF)", async () => {

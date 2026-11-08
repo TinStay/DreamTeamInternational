@@ -6,11 +6,12 @@ import { LEGAL_NAME_FULL, LEGAL_UIC, LEGAL_VAT } from "@/lib/brand";
  * **the accountant still has to confirm the wording and the rules**):
  *
  * - `bg` - a client in Bulgaria: in Bulgarian, 20% VAT, the company named in Cyrillic.
- * - `intl_zero` - a company outside Bulgaria (it said so on the pricing page - `lib/payer.ts` - or gave an EU VAT
- *   number): 0% VAT under чл. 21, ал. 2 ЗДДС (Fiverr / Israel, MindGuard / Switzerland), plus the reverse-charge line for
- *   an EU business.
- * - `intl_vat` - a person outside Bulgaria: Bulgarian VAT, no exemption line. Video production is a general service
- *   (the owner, 08-11-2026), so a person is taxed where DT A I is, inside the EU and outside it (чл. 21, ал. 1).
+ * - `intl_zero` - a company outside Bulgaria that gave its tax ID at checkout: 0% VAT under чл. 21, ал. 2 ЗДДС
+ *   (Fiverr / Israel, MindGuard / Switzerland), plus the reverse-charge line for an EU business.
+ * - `intl_vat` - a person outside Bulgaria: Bulgarian VAT, no exemption line.
+ *
+ * Video production is a general service (the owner, 08-11-2026; tax code `txcd_20030000`): a person pays 20% wherever
+ * they are (чл. 21, ал. 1), a company that gives its tax ID pays none - Stripe Tax charges the same.
  *
  * Stripe's invoice templates can only be made in the Dashboard, so the same texts are written onto the **Stripe customer**
  * (`invoice_settings.footer` / `custom_fields`, `preferred_locales`) once their country is known. Every invoice for that
@@ -88,7 +89,8 @@ export async function applyInvoiceProfile(stripe: Stripe, customerId: string): P
     const customer = found as Stripe.Customer;
     const country = customer.address?.country ?? null;
     const hasTaxId = (customer.tax_ids?.data.length ?? 0) > 0;
-    const companyAbroad = customer.tax_exempt === "reverse" || customer.metadata?.payer_type === "company_abroad";
+    // A customer the team marked reverse-charge in Stripe counts as a company abroad too.
+    const companyAbroad = customer.tax_exempt === "reverse";
     const key = invoiceProfileFor(country, hasTaxId, companyAbroad);
     if (!key) return null;
     const settings = invoiceSettingsFor(key, country, bankDetails());

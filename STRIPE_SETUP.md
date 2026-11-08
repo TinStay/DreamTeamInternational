@@ -101,11 +101,12 @@ Stripe only shows "I'm purchasing as a business" to a customer with no saved tax
 the saved ones first - except while the client has a live subscription, whose renewals are taxed on that tax ID. The bank line needs `INVOICE_BANK_IBAN` (and optionally
 `INVOICE_BANK_NAME`, `INVOICE_BANK_BIC`) in `.env.local` and Vercel - typed by the owner, never in the code.
 
-### Tax code - Advertising Services (owner's decision, 08-11-2026, accountant to confirm)
-Tax → Settings → default tax code `txcd_20060002` (Advertising Services), tax-exclusive prices, a Bulgarian registration
-(standard, `small_seller`). Stripe then charges 20% in Bulgaria and to EU persons, reverses it for an EU business with a
-VAT number, and charges nothing to anyone outside the EU - business or person (чл. 21, ал. 5 ЗДДС / Art. 59 of the VAT
-Directive). Set in the sandbox; the live account needs the same three settings.
+### Tax code - General services (video production; owner's decision 08-11-2026, accountant to confirm)
+Tax → Settings → default tax code `txcd_20030000` (General - Services), tax-exclusive prices, a Bulgarian registration
+(standard, `small_seller`). Stripe then charges 20% to every person (Bulgaria, the EU and outside it) and to Bulgarian
+companies, and nothing to a company abroad that gives its tax ID (EU reverse charge, or outside the EU). A company in a
+country with no tax ID field at checkout (the US) is taxed as a person. Set in the sandbox; the live account needs the
+same three settings.
 
 ### Not in Stripe's invoices (the program has them)
 - `Словом` (the total in words) - Stripe has no such field; the site could fill a custom field, but only four exist.

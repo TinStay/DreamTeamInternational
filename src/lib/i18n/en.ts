@@ -117,18 +117,6 @@ export const en = {
     renewalMonthly: "every month until you cancel. Cancel anytime from your account.",
     renewalAnnual: "every year until you cancel. Cancel anytime from your account.",
     notIncluded: "Not included:",
-    // Asked before Stripe's checkout opens (payer-dialog.tsx) - it decides the VAT.
-    payer: {
-      title: "Who is paying?",
-      text: "This sets the VAT on your invoice. You choose again on every order.",
-      options: {
-        person: { label: "Me, personally", note: "Bulgarian VAT (20%) is added" },
-        company_bg: { label: "A company in Bulgaria", note: "20% VAT; add your VAT number on the next page" },
-        company_abroad: { label: "A company outside Bulgaria", note: "No VAT; enter the company name on the next page" },
-      },
-      continue: "Continue to payment",
-      opening: "Opening the payment page…",
-    },
     buy: {
       notConfigured: "Payments aren't switched on yet - please contact us and we'll set your pack up by hand.",
       error: "We couldn't start the checkout. Please try again.",

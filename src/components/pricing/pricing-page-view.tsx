@@ -15,8 +15,6 @@ import { ANNUAL_PERCENT, AUDIENCES, PLANS, type Audience, type Billing, type Pla
 import { openSignup } from "@/lib/signup-dialog";
 import { useAuthUser } from "@/lib/supabase/use-auth-user";
 import { emailHref } from "@/lib/contact-info";
-import { PayerDialog } from "@/components/pricing/payer-dialog";
-import type { PayerType } from "@/lib/payer";
 
 const BILLINGS: Billing[] = ["monthly", "annual"];
 
@@ -46,24 +44,18 @@ export function PricingPageView({ initialAudience = "individual" }: { initialAud
   const user = useAuthUser();
   const [buying, setBuying] = useState<string | null>(null);
   const [buyError, setBuyError] = useState<string | null>(null);
-  // The pack waiting for the "Who is paying?" answer (`PayerDialog`) before Stripe opens.
-  const [pending, setPending] = useState<{ plan: Plan; seconds?: number } | null>(null);
 
   // Buying a pack: a signed-out visitor is asked to sign up first; then Stripe's checkout opens, and once it confirms the
   // payment the seconds appear in the account (see /api/stripe/webhook).
-  function buy(plan: Plan, seconds?: number) {
+  async function buy(plan: Plan, seconds?: number) {
     setBuyError(null);
     if (!user) {
       openSignup();
       return;
     }
-    setPending({ plan, seconds });
-  }
-
-  async function checkout(plan: Plan, seconds: number | undefined, payer: PayerType) {
     setBuying(plan.key);
     try {
-      const res = await fetch("/api/checkout", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ plan: plan.key, billing, payer, ...(seconds ? { seconds } : {}) }) });
+      const res = await fetch("/api/checkout", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ plan: plan.key, billing, ...(seconds ? { seconds } : {}) }) });
       const json = (await res.json().catch(() => ({}))) as { url?: string; error?: string };
       if (res.ok && json.url) {
         window.location.assign(json.url);
@@ -74,7 +66,6 @@ export function PricingPageView({ initialAudience = "individual" }: { initialAud
       setBuyError(p.buy.error);
     }
     setBuying(null);
-    setPending(null);
   }
 
   return (
@@ -86,14 +77,6 @@ export function PricingPageView({ initialAudience = "individual" }: { initialAud
       </div>
 
       <SiteHeader />
-      <PayerDialog
-        open={pending !== null}
-        onOpenChange={(open) => {
-          if (!open && !buying) setPending(null);
-        }}
-        busy={buying !== null}
-        onChoose={(payer) => pending && void checkout(pending.plan, pending.seconds, payer)}
-      />
 
       <div className="relative z-10 flex w-full flex-1 flex-col pb-8 pt-24 text-[#f4f4f5] lg:pt-32">
         <div className="mx-auto w-full max-w-[1120px] px-5">
@@ -149,7 +132,7 @@ export function PricingPageView({ initialAudience = "individual" }: { initialAud
 
           <div className="grid grid-cols-1 items-stretch gap-4 md:grid-cols-3">
             {PLANS[audience].map((plan) => (
-              <PricingCard key={plan.key} plan={plan} billing={billing} href={contactHref} onBuy={(x, secs) => buy(x, secs)} busy={buying === plan.key} />
+              <PricingCard key={plan.key} plan={plan} billing={billing} href={contactHref} onBuy={(x, secs) => void buy(x, secs)} busy={buying === plan.key} />
             ))}
           </div>
           {buyError ? (
