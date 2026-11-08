@@ -260,6 +260,11 @@ export const en = {
       scriptTerm: "Scriptwriting add-on",
       scriptText: "= $100 per 30 seconds of video (included in Brand). Without it, you provide the script or voiceover text."
     },
+    // Under the Business plans: a company is saved on its account before it orders (business-details-card.tsx).
+    companyFirst: {
+      text: "Buying for a company? Add your company details first - a company outside Bulgaria pays no VAT.",
+      link: "Add company details",
+    },
     note: {
       individual:
         "Prices in USD, before tax - any sales tax or VAT is added at checkout. Individual plans are for personal and creator use - advertising a business requires a Business plan.",
@@ -457,14 +462,36 @@ export const en = {
     },
     // The business name and tax ID saved from the last checkout, and whether to keep them (business-details-card.tsx).
     businessDetails: {
-      title: "Business details at checkout",
-      hint: "When you pay as a business, Stripe saves your business name and VAT number. Choose whether to use them next time, or to be asked every time whether you are paying as a business or as a person.",
-      taxIdLabel: "VAT / tax ID: {id}",
-      keep: "Use these details next time",
-      keepOn: "Your next checkout uses these business details. To pay as a person, turn this off first.",
-      keepOff: "Your next checkout asks again whether you pay as a business or as a person.",
-      none: "No business details saved. To pay as a business, tick \"I'm purchasing as a business\" on the payment page and enter your VAT number.",
-      error: "That did not save. Please try again.",
+      title: "Business details",
+      hint: "Buying for a company? Add it here before you order. A company outside Bulgaria then pays no VAT; a company in Bulgaria pays 20%. Without a company saved, you pay as a person (20% VAT).",
+      none: "No company saved. You pay as a person.",
+      add: "Add a company",
+      edit: "Edit",
+      remove: "Remove",
+      companyName: "Company name",
+      country: "Country",
+      chooseCountry: "Choose a country",
+      vatNumber: "VAT number",
+      companyNumber: "Company number (e.g. EIN)",
+      optional: "optional",
+      vatBg: "A company in Bulgaria pays 20% VAT. Your VAT number goes on the invoice.",
+      vatEu: "With a valid EU VAT number, no VAT is charged (reverse charge).",
+      vatAbroad: "A company outside the EU pays no VAT. Your company number goes on the invoice.",
+      savedBg: "Your orders are invoiced to this company, with 20% VAT.",
+      savedEu: "Your orders are invoiced to this company, with no VAT (reverse charge).",
+      savedAbroad: "Your orders are invoiced to this company, with no VAT.",
+      futureOnly: "Changes apply to your next invoices. For an invoice already issued, contact us.",
+      save: "Save company",
+      saving: "Saving…",
+      cancel: "Cancel",
+      errors: {
+        invalid_name: "Enter the company's name.",
+        invalid_country: "Choose the company's country.",
+        invalid_number: "Enter the company number.",
+        vat_required: "A company in the EU needs its VAT number to pay no VAT.",
+        invalid_vat: "That VAT number does not look right. Check it and try again.",
+        failed: "That did not save. Please try again.",
+      },
     },
     invoices: {
       title: "Invoices & receipts",

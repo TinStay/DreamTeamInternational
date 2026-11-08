@@ -28,36 +28,7 @@ export async function customerFor(stripe: Stripe, userId: string, fallback: { em
   return customer.id;
 }
 
-/**
- * The customer metadata key for the client's choice to keep their saved tax ID between checkouts (`/account`).
- */
+/** Customer metadata: a company saved on the account page (`lib/company-details.ts`) - kept for every checkout. */
 export const KEEP_TAX_ID = "keep_tax_id";
 
-/**
- * Lets the client choose again, on every checkout, whether they pay as a business or as a person: Stripe's checkout only
- * offers "I'm purchasing as a business" to a customer with no tax ID saved, so the saved ones are removed first. Skipped
- * while the client has a live subscription - its renewals are taxed on the tax ID it was bought with. The checkout saves
- * whatever the client enters this time, and the webhook writes the matching invoice texts. Never throws.
- */
-export async function clearTaxIdsForCheckout(stripe: Stripe, customerId: string): Promise<void> {
-  try {
-    // The client chose, on their account page, to keep their business details for next time.
-    const customer = await stripe.customers.retrieve(customerId);
-    if (!("deleted" in customer && customer.deleted) && (customer as Stripe.Customer).metadata?.[KEEP_TAX_ID] === "true") return;
-    const ids = await stripe.customers.listTaxIds(customerId, { limit: 20 });
-    for (const id of ids.data) await stripe.customers.deleteTaxId(customerId, id.id);
-  } catch {
-    /* the checkout then simply uses the saved tax ID */
-  }
-}
 
-/** Whether this Stripe customer has a subscription Stripe will bill again - its renewals are taxed on the customer's
- * current tax settings, so a one-time checkout must not change them. (A team-made `sub_mock_` row is not one.) */
-export async function hasBillingSubscription(stripe: Stripe, customerId: string): Promise<boolean> {
-  try {
-    const subs = await stripe.subscriptions.list({ customer: customerId, status: "all", limit: 20 });
-    return subs.data.some((s) => ["active", "trialing", "past_due", "unpaid", "incomplete"].includes(s.status));
-  } catch {
-    return false;
-  }
-}

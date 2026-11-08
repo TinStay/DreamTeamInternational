@@ -6,7 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 import { hasLiveSubscription } from "@/lib/subscriptions";
 import { createPendingOrder, updateOrder } from "@/lib/orders";
 import { createRateLimiter, isCrossSite } from "@/lib/server/form-guards";
-import { clearTaxIdsForCheckout, customerFor, hasBillingSubscription } from "@/lib/stripe-customers";
+import { customerFor } from "@/lib/stripe-customers";
 import { applyInvoiceProfile } from "@/lib/invoice-profiles";
 import { checkoutConsent, checkoutStudioParams, checkoutTaxAndInvoice, lineTax } from "@/lib/stripe-tax";
 
@@ -44,8 +44,6 @@ export async function POST(request: Request) {
   // The client's one Stripe customer: their invoices, billing address and tax ID stay together across purchases.
   const customer = await customerFor(stripe, auth.user.id, { email: auth.user.email });
   if (!customer) return NextResponse.json({ error: "not_configured" }, { status: 503 });
-  // Business or person is the client's choice on every checkout - unless a live plan is taxed on what it was bought with.
-  if (spec.oneTime ? !(await hasBillingSubscription(stripe, customer)) : true) await clearTaxIdsForCheckout(stripe, customer);
   // A returning client's invoice texts (Bulgarian / international, with or without VAT), from the address Stripe holds.
   const profiled = (await applyInvoiceProfile(stripe, customer)) !== null;
   const orderId = await createPendingOrder(spec, auth.user.id, billing);

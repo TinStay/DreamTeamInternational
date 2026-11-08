@@ -13,8 +13,7 @@ vi.mock("@/lib/supabase/server", () => ({ createClient: async () => ({ auth: { g
 vi.mock("@/lib/subscriptions", () => ({ hasLiveSubscription: vi.fn(async () => state.subscribed) }));
 const orders = vi.hoisted(() => ({ createPendingOrder: vi.fn(async () => "order-1"), updateOrder: vi.fn(async () => {}) }));
 vi.mock("@/lib/orders", () => orders);
-const { clearTaxIds } = vi.hoisted(() => ({ clearTaxIds: vi.fn(async () => undefined) }));
-vi.mock("@/lib/stripe-customers", () => ({ customerFor: vi.fn(async () => "cus_test_1"), clearTaxIdsForCheckout: clearTaxIds, hasBillingSubscription: vi.fn(async () => state.subscribed) }));
+vi.mock("@/lib/stripe-customers", () => ({ customerFor: vi.fn(async () => "cus_test_1") }));
 
 const { POST } = await import("./route");
 
@@ -28,7 +27,6 @@ beforeEach(() => {
   stripe.checkout.sessions.create.mockReset().mockResolvedValue({ id: "cs_test_1", url: "https://checkout.stripe.com/c/cs_test_1" });
   orders.createPendingOrder.mockClear();
   orders.updateOrder.mockClear();
-  clearTaxIds.mockClear();
 });
 
 describe("/api/checkout", () => {
@@ -99,9 +97,10 @@ describe("/api/checkout", () => {
     expect(params.customer).toBe("cus_test_1");
     expect(params.customer_email).toBeUndefined();
     expect(params.billing_address_collection).toBe("required");
-    expect(params.customer_update).toEqual({ address: "auto", name: "auto" });
-    expect(params.tax_id_collection).toEqual({ enabled: true, required: "never" });
-    expect(params.name_collection).toEqual({ business: { enabled: true, optional: true } });
+    // No business fields at checkout - a company is known from its account page.
+    expect(params.customer_update).toEqual({ address: "auto" });
+    expect(params.tax_id_collection).toBeUndefined();
+    expect(params.name_collection).toBeUndefined();
     expect(params.automatic_tax).toEqual({ enabled: false }); // off until STRIPE_TAX_ENABLED=true
     expect(params.line_items[0].price_data.tax_behavior).toBe("exclusive");
     expect(params.invoice_creation.enabled).toBe(true);
@@ -122,15 +121,6 @@ describe("/api/checkout", () => {
     expect(created().payment_method_collection).toBe("always");
     expect(created().submit_type).toBeUndefined();
     vi.unstubAllEnvs();
-  });
-
-  it("lets the client choose business or person again each time, unless a live plan depends on the saved tax ID", async () => {
-    await post({ plan: "personal" });
-    expect(clearTaxIds).toHaveBeenCalledWith(expect.anything(), "cus_test_1");
-    clearTaxIds.mockClear();
-    state.subscribed = true;
-    await post({ plan: "personal" });
-    expect(clearTaxIds).not.toHaveBeenCalled();
   });
 
   it("refuses a checkout started from another site (CSRF)", async () => {
