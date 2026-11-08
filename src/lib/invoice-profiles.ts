@@ -52,7 +52,7 @@ const BG_ADDRESS = "ул. „Николай Коперник“ № 27-29, ет.
 const EN_ADDRESS = "27-29 Nikolay Kopernik St, floor 2, office 17, 1574 Sofia, Bulgaria";
 
 /** The footer, the header fields (at most four - Stripe's limit) and the language for one kind of invoice. */
-export function invoiceSettingsFor(key: InvoiceProfileKey, country: string | null | undefined, bank: BankDetails | null): InvoiceSettings {
+export function invoiceSettingsFor(key: InvoiceProfileKey, country: string | null | undefined, bank: BankDetails | null, companyNumber = ""): InvoiceSettings {
   if (key === "bg") {
     const bankLine = bank ? ` · Банка: ${bank.name} · IBAN: ${bank.iban} · BIC: ${bank.bic}` : "";
     return {
@@ -71,6 +71,9 @@ export function invoiceSettingsFor(key: InvoiceProfileKey, country: string | nul
     customFields.push({ name: "VAT / ДДС", value: "0% - чл. 21, ал. 2 от ЗДДС" });
     if (EU_COUNTRIES.has((country ?? "").toUpperCase())) {
       customFields.push({ name: "Reverse charge", value: "Art. 196 Directive 2006/112/EC" });
+    } else if (companyNumber) {
+      // Outside the EU Stripe shows no tax ID, so the client's own company number goes in the header.
+      customFields.push({ name: "Client company no.", value: companyNumber.slice(0, 140) });
     }
   }
   customFields.push({ name: "Payment terms", value: "14 days from the invoice date" });
@@ -87,13 +90,14 @@ export async function applyInvoiceProfile(stripe: Stripe, customerId: string): P
     const found = await stripe.customers.retrieve(customerId, { expand: ["tax_ids"] });
     if ("deleted" in found && found.deleted) return null;
     const customer = found as Stripe.Customer;
-    const country = customer.address?.country ?? null;
+    // A company saved on the account page invoices from its own country, whatever address the card was paid from.
+    const country = customer.metadata?.company_country || customer.address?.country || null;
     const hasTaxId = (customer.tax_ids?.data.length ?? 0) > 0;
     // A customer the team marked reverse-charge in Stripe counts as a company abroad too.
     const companyAbroad = customer.tax_exempt === "reverse";
     const key = invoiceProfileFor(country, hasTaxId, companyAbroad);
     if (!key) return null;
-    const settings = invoiceSettingsFor(key, country, bankDetails());
+    const settings = invoiceSettingsFor(key, country, bankDetails(), customer.metadata?.company_number ?? "");
     const current = customer.invoice_settings;
     const same =
       customer.metadata?.invoice_profile === key &&

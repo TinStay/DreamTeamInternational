@@ -75,8 +75,8 @@ export function checkoutConsent(
 
 /**
  * What a Checkout session needs for tax and a proper invoice, for an existing Stripe customer: the billing address is
- * always collected (a US address must be complete to be taxed, and it goes on the invoice) and saved back to the customer,
- * and a business can enter its tax ID - without one Stripe treats a cross-border sale as B2C. In payment mode the session
+ * always collected (a US address must be complete to be taxed, and it goes on the invoice) and saved back to the customer.
+ * A company is known from its account page, not from the checkout. In payment mode the session
  * also issues an **invoice** (subscriptions get one each period anyway), carrying the same metadata as the payment.
  * `profiled`: the customer already carries their invoice texts (`lib/invoice-profiles.ts`), so the invoice takes them
  * from the customer; otherwise it gets the plain footer.
@@ -86,15 +86,14 @@ export function checkoutTaxAndInvoice(
   metadata: Stripe.MetadataParam,
   description?: string,
   profiled = false,
-): Pick<Stripe.Checkout.SessionCreateParams, "automatic_tax" | "billing_address_collection" | "customer_update" | "tax_id_collection" | "invoice_creation" | "name_collection"> {
+): Pick<Stripe.Checkout.SessionCreateParams, "automatic_tax" | "billing_address_collection" | "customer_update" | "invoice_creation"> {
   return {
     automatic_tax: { enabled: taxEnabled() },
     billing_address_collection: "required",
-    customer_update: { address: "auto", name: "auto" },
-    // The tax ID is never required: Stripe only offers it where it has a VAT-style number to collect (the EU, the UK,
-    // Switzerland…), and a business anywhere - a US company without one, say - can still give its name for the invoice.
-    tax_id_collection: { enabled: true, required: "never" },
-    name_collection: { business: { enabled: true, optional: true } },
+    // The address only: the customer's name stays the one on the account - a company saved there keeps its name.
+    customer_update: { address: "auto" },
+    // No business fields here: everyone pays at checkout as a person, and a company adds itself on its account page
+    // first (`lib/company-details.ts`), which tells Stripe before the checkout opens.
     ...(mode === "payment" ? { invoice_creation: { enabled: true, invoice_data: { metadata, ...(profiled ? {} : { footer: INVOICE_FOOTER }), ...(description ? { description } : {}) } } } : {}),
   };
 }

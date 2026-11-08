@@ -2,7 +2,9 @@ import { NextResponse } from "next/server";
 import { getStripe } from "@/lib/stripe";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { KEEP_TAX_ID } from "@/lib/stripe-customers";
+import { KEEP_TAX_ID, customerFor } from "@/lib/stripe-customers";
+import { COMPANY_COUNTRY_KEY, COMPANY_NUMBER_KEY, parseCompany, removeCompany, saveCompany } from "@/lib/company-details";
+import { applyInvoiceProfile } from "@/lib/invoice-profiles";
 import { createRateLimiter, isCrossSite } from "@/lib/server/form-guards";
 
 export const runtime = "nodejs";
@@ -22,27 +24,29 @@ async function clientCustomer(): Promise<{ userId: string; customer: string | nu
 }
 
 /**
- * `GET` - the business details saved from the client's last checkout (the business name and tax ID) and whether they
- * chose to keep them for the next one. `POST { keep: boolean }` - that choice (`keep_tax_id` on the Stripe customer).
- * Without a choice the checkout asks "business or person" afresh every time (`clearTaxIdsForCheckout`).
+ * The client's business details (`business-details-card.tsx`):
+ * - `GET` - the company saved on their Stripe customer (name, country, company / VAT number) and whether the next
+ *   checkout keeps them.
+ * - `POST { company: { name, country, number } }` - saves a company (`lib/company-details.ts`): a company outside
+ *   Bulgaria is then charged no VAT. `POST { keep }` - keep the details for the next checkout, or be asked every time.
+ * - `DELETE` - removes the company; the client is taxed as a person again.
  */
 export async function GET() {
   const stripe = getStripe();
-  if (!stripe) return NextResponse.json({ taxId: null, keep: false });
+  if (!stripe) return NextResponse.json({ company: null, keep: false });
   const me = await clientCustomer();
   if (me instanceof NextResponse) return me;
-  if (!me.customer) return NextResponse.json({ taxId: null, keep: false });
+  if (!me.customer) return NextResponse.json({ company: null, keep: false });
   try {
     const customer = await stripe.customers.retrieve(me.customer, { expand: ["tax_ids"] });
-    if ("deleted" in customer && customer.deleted) return NextResponse.json({ taxId: null, keep: false });
-    const first = customer.tax_ids?.data[0];
-    return NextResponse.json({
-      taxId: first ? { type: first.type, value: first.value, country: first.country ?? null } : null,
-      business: customer.name ?? null,
-      keep: customer.metadata?.[KEEP_TAX_ID] === "true",
-    });
+    if ("deleted" in customer && customer.deleted) return NextResponse.json({ company: null, keep: false });
+    const vat = customer.tax_ids?.data[0];
+    const number = customer.metadata?.[COMPANY_NUMBER_KEY] || vat?.value || "";
+    const country = customer.metadata?.[COMPANY_COUNTRY_KEY] || vat?.country || customer.address?.country || "";
+    const company = number ? { name: customer.name ?? "", country, number } : null;
+    return NextResponse.json({ company, keep: customer.metadata?.[KEEP_TAX_ID] === "true" });
   } catch {
-    return NextResponse.json({ taxId: null, keep: false });
+    return NextResponse.json({ company: null, keep: false });
   }
 }
 
@@ -52,12 +56,48 @@ export async function POST(request: Request) {
   if (!stripe) return NextResponse.json({ error: "not_configured" }, { status: 503 });
   const me = await clientCustomer();
   if (me instanceof NextResponse) return me;
-  if (!me.customer) return NextResponse.json({ error: "no_customer" }, { status: 404 });
-  const body = (await request.json().catch(() => ({}))) as { keep?: unknown };
+  // A client who has never paid has no Stripe customer yet: their company details create it.
+  const customer = me.customer ?? (await customerFor(stripe, me.userId));
+  if (!customer) return NextResponse.json({ error: "not_configured" }, { status: 503 });
+  const body = (await request.json().catch(() => ({}))) as { keep?: unknown; company?: unknown };
+
+  if (body.company !== undefined) {
+    const company = parseCompany(body.company);
+    if (typeof company === "string") return NextResponse.json({ error: company }, { status: 400 });
+    try {
+      await saveCompany(stripe, customer, company);
+    } catch (err) {
+      if (err instanceof Error && err.message === "invalid_vat") return NextResponse.json({ error: "invalid_vat" }, { status: 400 });
+      return NextResponse.json({ error: "failed" }, { status: 502 });
+    }
+    await applyInvoiceProfile(stripe, customer);
+    return NextResponse.json({ company, keep: true });
+  }
+
   if (typeof body.keep !== "boolean") return NextResponse.json({ error: "invalid" }, { status: 400 });
   try {
-    await stripe.customers.update(me.customer, { metadata: { [KEEP_TAX_ID]: body.keep ? "true" : "" } });
+    await stripe.customers.update(customer, {
+      metadata: { [KEEP_TAX_ID]: body.keep ? "true" : "" },
+      // Not kept: the next checkout asks again, and the client is taxed as a person until they say otherwise.
+      ...(body.keep ? {} : { tax_exempt: "none" as const }),
+    });
     return NextResponse.json({ keep: body.keep });
+  } catch {
+    return NextResponse.json({ error: "failed" }, { status: 502 });
+  }
+}
+
+export async function DELETE(request: Request) {
+  if (isCrossSite(request)) return NextResponse.json({ error: "forbidden" }, { status: 403 });
+  const stripe = getStripe();
+  if (!stripe) return NextResponse.json({ error: "not_configured" }, { status: 503 });
+  const me = await clientCustomer();
+  if (me instanceof NextResponse) return me;
+  if (!me.customer) return NextResponse.json({ company: null, keep: false });
+  try {
+    await removeCompany(stripe, me.customer);
+    await applyInvoiceProfile(stripe, me.customer);
+    return NextResponse.json({ company: null, keep: false });
   } catch {
     return NextResponse.json({ error: "failed" }, { status: 502 });
   }
