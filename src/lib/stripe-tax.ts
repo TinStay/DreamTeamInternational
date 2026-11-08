@@ -78,18 +78,21 @@ export function checkoutConsent(
  * always collected (a US address must be complete to be taxed, and it goes on the invoice) and saved back to the customer,
  * and a business can enter its tax ID - without one Stripe treats a cross-border sale as B2C. In payment mode the session
  * also issues an **invoice** (subscriptions get one each period anyway), carrying the same metadata as the payment.
+ * `profiled`: the customer already carries their invoice texts (`lib/invoice-profiles.ts`), so the invoice takes them
+ * from the customer; otherwise it gets the plain footer.
  */
 export function checkoutTaxAndInvoice(
   mode: "payment" | "subscription",
   metadata: Stripe.MetadataParam,
   description?: string,
+  profiled = false,
 ): Pick<Stripe.Checkout.SessionCreateParams, "automatic_tax" | "billing_address_collection" | "customer_update" | "tax_id_collection" | "invoice_creation"> {
   return {
     automatic_tax: { enabled: taxEnabled() },
     billing_address_collection: "required",
     customer_update: { address: "auto", name: "auto" },
     tax_id_collection: { enabled: true },
-    ...(mode === "payment" ? { invoice_creation: { enabled: true, invoice_data: { metadata, footer: INVOICE_FOOTER, ...(description ? { description } : {}) } } } : {}),
+    ...(mode === "payment" ? { invoice_creation: { enabled: true, invoice_data: { metadata, ...(profiled ? {} : { footer: INVOICE_FOOTER }), ...(description ? { description } : {}) } } } : {}),
   };
 }
 

@@ -7,6 +7,7 @@ import { hasLiveSubscription } from "@/lib/subscriptions";
 import { createPendingOrder, updateOrder } from "@/lib/orders";
 import { createRateLimiter, isCrossSite } from "@/lib/server/form-guards";
 import { customerFor } from "@/lib/stripe-customers";
+import { applyInvoiceProfile } from "@/lib/invoice-profiles";
 import { checkoutConsent, checkoutStudioParams, checkoutTaxAndInvoice, lineTax } from "@/lib/stripe-tax";
 
 // Every checkout writes an order and opens a Stripe session - a handful a minute per client is plenty.
@@ -43,6 +44,8 @@ export async function POST(request: Request) {
   // The client's one Stripe customer: their invoices, billing address and tax ID stay together across purchases.
   const customer = await customerFor(stripe, auth.user.id, { email: auth.user.email });
   if (!customer) return NextResponse.json({ error: "not_configured" }, { status: 503 });
+  // A returning client's invoice texts (Bulgarian / international, with or without VAT), from the address Stripe holds.
+  const profiled = (await applyInvoiceProfile(stripe, customer)) !== null;
   const orderId = await createPendingOrder(spec, auth.user.id, billing);
   const metadata = { user_id: auth.user.id, plan_key: spec.planKey, seconds: String(spec.seconds), purchase_type: spec.oneTime ? "one_time" : "subscription", ...(spec.oneTime ? {} : { billing }), ...(orderId ? { order_id: orderId } : {}) };
 
@@ -58,7 +61,7 @@ export async function POST(request: Request) {
     ...checkoutStudioParams(mode),
     ...checkoutConsent(mode, origin),
     // Stripe Tax on the billing address, the client's tax ID, and an invoice for a one-time payment (lib/stripe-tax.ts).
-    ...checkoutTaxAndInvoice(mode, metadata, productName),
+    ...checkoutTaxAndInvoice(mode, metadata, productName, profiled),
     line_items: [
       {
         quantity: 1,

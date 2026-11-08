@@ -7,6 +7,7 @@ import { saveSubscription } from "@/lib/subscriptions";
 import { updateOrder } from "@/lib/orders";
 import { notifyProjectEvent } from "@/lib/email/project-notifications";
 import { notifySubscriptionEvent } from "@/lib/email/subscription-notifications";
+import { applyInvoiceProfile } from "@/lib/invoice-profiles";
 
 export const runtime = "nodejs";
 
@@ -100,6 +101,14 @@ export async function POST(request: Request) {
     // Bought, cancelled, upgraded / downgraded or ended: the client's email and the admin copy (once each; never throws).
     await notifySubscriptionEvent(stripe, event, new URL(request.url).origin);
     return NextResponse.json({ received: true });
+  }
+
+  // A finished checkout has saved the client's billing address and any tax ID: write their invoice texts onto the
+  // customer, so every later invoice (renewals, the team's, hand-made ones) is the right kind. Never fails the webhook.
+  if (event.type === "checkout.session.completed") {
+    const customer = (event.data.object as Stripe.Checkout.Session).customer;
+    const customerId = typeof customer === "string" ? customer : customer?.id;
+    if (customerId) await applyInvoiceProfile(stripe, customerId);
   }
 
   await settleOrder(event);
