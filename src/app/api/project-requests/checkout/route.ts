@@ -3,8 +3,7 @@ import { getStripe } from "@/lib/stripe";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createRateLimiter, isCrossSite } from "@/lib/server/form-guards";
-import { clearTaxIdsForCheckout, customerFor } from "@/lib/stripe-customers";
-import { hasLiveSubscription } from "@/lib/subscriptions";
+import { clearTaxIdsForCheckout, customerFor, hasBillingSubscription } from "@/lib/stripe-customers";
 import { applyInvoiceProfile } from "@/lib/invoice-profiles";
 import { checkoutConsent, checkoutStudioParams, checkoutTaxAndInvoice, lineTax } from "@/lib/stripe-tax";
 
@@ -50,7 +49,7 @@ export async function POST(request: Request) {
 
   const customer = await customerFor(stripe, auth.user.id, { email: auth.user.email });
   if (!customer) return NextResponse.json({ error: "not_configured" }, { status: 503 });
-  if (!(await hasLiveSubscription(stripe, auth.user.id))) await clearTaxIdsForCheckout(stripe, customer);
+  if (!(await hasBillingSubscription(stripe, customer))) await clearTaxIdsForCheckout(stripe, customer);
   const profiled = (await applyInvoiceProfile(stripe, customer)) !== null;
   const productName = `Keplerbay - ${LINE[String(row.kind)] ?? "Project change"}`;
   const tax = lineTax();

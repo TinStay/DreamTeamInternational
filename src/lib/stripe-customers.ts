@@ -50,3 +50,14 @@ export async function clearTaxIdsForCheckout(stripe: Stripe, customerId: string)
     /* the checkout then simply uses the saved tax ID */
   }
 }
+
+/** Whether this Stripe customer has a subscription Stripe will bill again - its renewals are taxed on the customer's
+ * current tax settings, so a one-time checkout must not change them. (A team-made `sub_mock_` row is not one.) */
+export async function hasBillingSubscription(stripe: Stripe, customerId: string): Promise<boolean> {
+  try {
+    const subs = await stripe.subscriptions.list({ customer: customerId, status: "all", limit: 20 });
+    return subs.data.some((s) => ["active", "trialing", "past_due", "unpaid", "incomplete"].includes(s.status));
+  } catch {
+    return false;
+  }
+}

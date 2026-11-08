@@ -16,7 +16,7 @@ describe("invoiceProfileFor", () => {
     expect(invoiceProfileFor("FR", false)).toBe("intl_vat");
     expect(invoiceProfileFor("US", false)).toBe("intl_vat");
   });
-  it("gives a company abroad that said so the 0% invoice, with or without a tax ID", () => {
+  it("gives a customer marked reverse-charge the 0% invoice, with or without a tax ID", () => {
     expect(invoiceProfileFor("US", false, true)).toBe("intl_zero");
     expect(invoiceProfileFor("DE", false, true)).toBe("intl_zero");
     expect(invoiceProfileFor("BG", false, true)).toBe("bg");
