@@ -12,9 +12,14 @@ describe("invoiceProfileFor", () => {
     expect(invoiceProfileFor("DE", true)).toBe("intl_zero");
     expect(invoiceProfileFor("IL", true)).toBe("intl_zero");
   });
-  it("gives a client abroad without a tax ID the invoice with VAT", () => {
-    expect(invoiceProfileFor("US", false)).toBe("intl_vat");
+  it("gives a person abroad the invoice with VAT, inside the EU and outside it", () => {
     expect(invoiceProfileFor("FR", false)).toBe("intl_vat");
+    expect(invoiceProfileFor("US", false)).toBe("intl_vat");
+  });
+  it("gives a company abroad that said so the 0% invoice, with or without a tax ID", () => {
+    expect(invoiceProfileFor("US", false, true)).toBe("intl_zero");
+    expect(invoiceProfileFor("DE", false, true)).toBe("intl_zero");
+    expect(invoiceProfileFor("BG", false, true)).toBe("bg");
   });
   it("waits while the country is unknown", () => {
     expect(invoiceProfileFor(null, true)).toBeNull();
@@ -45,12 +50,12 @@ describe("invoiceSettingsFor", () => {
     expect(german.customFields.some((f) => f.name === "Reverse charge")).toBe(true);
   });
   it("keeps every kind within Stripe's four header fields", () => {
-    for (const [key, country] of [["bg", "BG"], ["intl_zero", "DE"], ["intl_zero", "CH"], ["intl_vat", "US"]] as const) {
+    for (const [key, country] of [["bg", "BG"], ["intl_zero", "DE"], ["intl_zero", "CH"], ["intl_vat", "FR"]] as const) {
       expect(invoiceSettingsFor(key, country, bank).customFields.length).toBeLessThanOrEqual(4);
     }
   });
   it("gives the invoice with VAT no exemption line", () => {
-    expect(invoiceSettingsFor("intl_vat", "US", null).customFields.some((f) => f.name === "VAT / ДДС")).toBe(false);
+    expect(invoiceSettingsFor("intl_vat", "FR", null).customFields.some((f) => f.name === "VAT / ДДС")).toBe(false);
   });
 });
 
