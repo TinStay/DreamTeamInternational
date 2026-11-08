@@ -35,7 +35,7 @@ function segButton(active: boolean) {
  * `?for=` (the header's Pricing links, read by the route). A pack's button opens Stripe's checkout (`/api/checkout` - a
  * client with a live subscription is not sold a second one), the Enterprise one the contact page.
  */
-export function PricingPageView({ initialAudience = "business" }: { initialAudience?: Audience }) {
+export function PricingPageView({ initialAudience = "individual" }: { initialAudience?: Audience }) {
   const { t } = useLanguage();
   const p = t.plans;
   const contactHref = emailHref();

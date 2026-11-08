@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { IconFolder, IconFolderFilled, IconLayoutDashboard, IconLogout, IconUser } from "@tabler/icons-react";
 import { AccountMenu } from "@/components/account-menu";
+import { InvoiceNotice } from "@/components/invoice-notice";
 import { useLanguage } from "@/lib/i18n/language-context";
 import { accountPath, homePath, myProjectsPath, teamPath } from "@/lib/routes";
 import { openLogin, openSignup } from "@/lib/signup-dialog";
@@ -31,6 +32,7 @@ export function MobileTopControls() {
           >
             <IconFolderFilled className="size-5" aria-hidden />
           </Link>
+          <InvoiceNotice />
           <AccountMenu user={user} />
         </>
       ) : (

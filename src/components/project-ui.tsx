@@ -30,13 +30,15 @@ export function SectionHead({ id, title, count, icon }: { id: string; title: str
 }
 
 /** One key fact as a tile; with `onEdit` it is a button (the client's change requests). */
-export function Fact({ icon, label, value, onEdit, editLabel }: { icon: ReactNode; label: string; value: string; onEdit?: () => void; editLabel?: string }) {
+/** `note` - a short orange line under the value (a change request for this fact waiting for the team). */
+export function Fact({ icon, label, value, onEdit, editLabel, note }: { icon: ReactNode; label: string; value: string; onEdit?: () => void; editLabel?: string; note?: string }) {
   const body = (
     <>
       <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-[#ff7a1a]/12 text-[#ff8a1f] transition-transform duration-200 ease-out group-hover:scale-105">{icon}</span>
       <span className="min-w-0 flex-1">
         <span className="block text-sm text-white/50">{label}</span>
         <span className="block text-base font-semibold break-words">{value}</span>
+        {note ? <span className="mt-0.5 block text-xs font-semibold text-[#ff8a1f]">{note}</span> : null}
       </span>
     </>
   );
@@ -46,7 +48,7 @@ export function Fact({ icon, label, value, onEdit, editLabel }: { icon: ReactNod
     <button
       type="button"
       onClick={onEdit}
-      aria-label={`${editLabel ?? ""}: ${label} - ${value}`}
+      aria-label={`${editLabel ?? ""}: ${label} - ${value}${note ? ` (${note})` : ""}`}
       className={cn(box, "group cursor-pointer transition-[transform,border-color,background-color] duration-200 ease-out hover:-translate-y-0.5 hover:border-[#ff7a1a]/45 hover:bg-white/[0.06]")}
     >
       {body}

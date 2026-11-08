@@ -14,7 +14,7 @@ export function TermsEnglishContent() {
   return (
     <>
       <p className="not-prose text-[0.9375rem] leading-relaxed text-muted-foreground">
-        These Terms and Conditions govern the relationship between DT A I OOD, a company registered in Bulgaria (UIC 208668338,
+        These Terms and Conditions govern the relationship between DT A I Ltd., a company registered in Bulgaria (UIC 208668338,
         VAT number BG208668338) with its office at 27-29 Nikolay Kopernik Street, floor 2, office 17, Sofia 1574, and trading as
         &ldquo;Keplerbay&rdquo;
         (hereinafter referred to as the &ldquo;Contractor&rdquo;) and clients (hereinafter referred

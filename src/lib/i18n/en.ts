@@ -356,6 +356,15 @@ export const en = {
   },
   // The signed-in header menu and the account pages (/account, /profile, /my-projects).
   account: {
+    // The header's bell for invoices waiting to be paid (invoice-notice.tsx).
+    invoiceNotice: {
+      label: "Invoices to pay: {count}",
+      title: "Invoices to pay",
+      newTitle: "New invoice",
+      due: "Due {date}",
+      pay: "Pay now",
+      close: "Close",
+    },
     menu: "Account menu",
     logout: "Sign out",
     metaTitle: "Account & subscription | Keplerbay",
@@ -575,6 +584,10 @@ export const en = {
         costSeconds: "{n} from your video time",
         costMixed: "{n} from your video time + {amount}",
         edit: "Change",
+        // Under a drawer fact while a request for it waits for the team (paid, or free and sent).
+        pendingRevision: "+1 paid - waiting for us",
+        pendingPaid: "Change paid - waiting for us",
+        pendingFree: "Change requested - waiting for us",
         costMoney: "{amount}",
         free: "Free",
         balanceAfter: "Video time after: {balance}",

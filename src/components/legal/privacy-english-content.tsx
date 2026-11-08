@@ -31,7 +31,7 @@ export function PrivacyEnglishContent() {
       <h2>1. Who we are</h2>
       <ul>
         <li>
-          <strong>Company:</strong>{" "}DT A I OOD, trading as Keplerbay - an AI video production company registered in Sofia, Bulgaria
+          <strong>Company:</strong>{" "}DT A I Ltd., trading as Keplerbay - an AI video production company registered in Sofia, Bulgaria
         </li>
         <li>
           <strong>Company number (UIC):</strong>{" "}208668338; <strong>VAT number:</strong>{" "}BG208668338
