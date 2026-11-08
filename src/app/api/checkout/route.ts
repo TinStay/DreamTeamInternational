@@ -6,8 +6,9 @@ import { createClient } from "@/lib/supabase/server";
 import { hasLiveSubscription } from "@/lib/subscriptions";
 import { createPendingOrder, updateOrder } from "@/lib/orders";
 import { createRateLimiter, isCrossSite } from "@/lib/server/form-guards";
-import { customerFor } from "@/lib/stripe-customers";
+import { clearTaxIdsForCheckout, customerFor } from "@/lib/stripe-customers";
 import { applyInvoiceProfile } from "@/lib/invoice-profiles";
+import { isPayerType, payerCustomerSettings, type PayerType } from "@/lib/payer";
 import { checkoutConsent, checkoutStudioParams, checkoutTaxAndInvoice, lineTax } from "@/lib/stripe-tax";
 
 // Every checkout writes an order and opens a Stripe session - a handful a minute per client is plenty.
@@ -30,7 +31,9 @@ export async function POST(request: Request) {
   if (!auth.user) return NextResponse.json({ error: "not_signed_in" }, { status: 401 });
   if (isRateLimited(auth.user.id, Date.now())) return NextResponse.json({ error: "rate_limited" }, { status: 429 });
 
-  const body = (await request.json().catch(() => ({}))) as { plan?: unknown; billing?: unknown; seconds?: unknown };
+  const body = (await request.json().catch(() => ({}))) as { plan?: unknown; billing?: unknown; seconds?: unknown; payer?: unknown };
+  // Who pays - a person, a company in Bulgaria or one abroad (the pricing page asks); it decides the VAT.
+  const payer: PayerType = isPayerType(body.payer) ? body.payer : "person";
   const billing = isBilling(body.billing) ? body.billing : "monthly";
   const spec = checkoutFor(String(body.plan ?? ""), billing, body.seconds);
   if (!spec) return NextResponse.json({ error: "invalid_plan" }, { status: 400 });
@@ -44,6 +47,14 @@ export async function POST(request: Request) {
   // The client's one Stripe customer: their invoices, billing address and tax ID stay together across purchases.
   const customer = await customerFor(stripe, auth.user.id, { email: auth.user.email });
   if (!customer) return NextResponse.json({ error: "not_configured" }, { status: 503 });
+  // Business or person is the client's choice on every checkout - unless a live plan is taxed on what it was bought with.
+  if (spec.oneTime ? !(await hasLiveSubscription(stripe, auth.user.id)) : true) {
+    await clearTaxIdsForCheckout(stripe, customer);
+    // If this fails the client is simply taxed as before - never less than they owe.
+    await Promise.resolve()
+      .then(() => stripe.customers.update(customer, payerCustomerSettings(payer)))
+      .catch(() => null);
+  }
   // A returning client's invoice texts (Bulgarian / international, with or without VAT), from the address Stripe holds.
   const profiled = (await applyInvoiceProfile(stripe, customer)) !== null;
   const orderId = await createPendingOrder(spec, auth.user.id, billing);
@@ -61,7 +72,7 @@ export async function POST(request: Request) {
     ...checkoutStudioParams(mode),
     ...checkoutConsent(mode, origin),
     // Stripe Tax on the billing address, the client's tax ID, and an invoice for a one-time payment (lib/stripe-tax.ts).
-    ...checkoutTaxAndInvoice(mode, metadata, productName, profiled),
+    ...checkoutTaxAndInvoice(mode, metadata, productName, profiled, payer !== "person"),
     line_items: [
       {
         quantity: 1,

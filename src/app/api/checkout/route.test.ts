@@ -5,7 +5,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
  * `/api/checkout` - the start of every purchase. The price must come from the server, a one-time video's length must be
  * validated, a live subscriber must never be sold a second plan, and every checkout must carry its order.
  */
-const stripe = { checkout: { sessions: { create: vi.fn() } } };
+const stripe = { checkout: { sessions: { create: vi.fn() } }, customers: { update: vi.fn(async () => ({})) } };
 const state = { stripe: stripe as unknown, user: { id: "u1", email: "client@example.com" } as { id: string; email: string } | null, subscribed: false };
 
 vi.mock("@/lib/stripe", () => ({ getStripe: () => state.stripe }));
@@ -13,7 +13,8 @@ vi.mock("@/lib/supabase/server", () => ({ createClient: async () => ({ auth: { g
 vi.mock("@/lib/subscriptions", () => ({ hasLiveSubscription: vi.fn(async () => state.subscribed) }));
 const orders = vi.hoisted(() => ({ createPendingOrder: vi.fn(async () => "order-1"), updateOrder: vi.fn(async () => {}) }));
 vi.mock("@/lib/orders", () => orders);
-vi.mock("@/lib/stripe-customers", () => ({ customerFor: vi.fn(async () => "cus_test_1") }));
+const { clearTaxIds } = vi.hoisted(() => ({ clearTaxIds: vi.fn(async () => undefined) }));
+vi.mock("@/lib/stripe-customers", () => ({ customerFor: vi.fn(async () => "cus_test_1"), clearTaxIdsForCheckout: clearTaxIds }));
 
 const { POST } = await import("./route");
 
@@ -27,6 +28,7 @@ beforeEach(() => {
   stripe.checkout.sessions.create.mockReset().mockResolvedValue({ id: "cs_test_1", url: "https://checkout.stripe.com/c/cs_test_1" });
   orders.createPendingOrder.mockClear();
   orders.updateOrder.mockClear();
+  clearTaxIds.mockClear();
 });
 
 describe("/api/checkout", () => {
@@ -98,7 +100,8 @@ describe("/api/checkout", () => {
     expect(params.customer_email).toBeUndefined();
     expect(params.billing_address_collection).toBe("required");
     expect(params.customer_update).toEqual({ address: "auto", name: "auto" });
-    expect(params.tax_id_collection).toEqual({ enabled: true });
+    expect(params.tax_id_collection).toEqual({ enabled: true, required: "never" });
+    expect(params.name_collection).toEqual({ business: { enabled: true, optional: true } });
     expect(params.automatic_tax).toEqual({ enabled: false }); // off until STRIPE_TAX_ENABLED=true
     expect(params.line_items[0].price_data.tax_behavior).toBe("exclusive");
     expect(params.invoice_creation.enabled).toBe(true);
@@ -119,6 +122,28 @@ describe("/api/checkout", () => {
     expect(created().payment_method_collection).toBe("always");
     expect(created().submit_type).toBeUndefined();
     vi.unstubAllEnvs();
+  });
+
+  it("lets the client choose business or person again each time, unless a live plan depends on the saved tax ID", async () => {
+    await post({ plan: "personal" });
+    expect(clearTaxIds).toHaveBeenCalledWith(expect.anything(), "cus_test_1");
+    clearTaxIds.mockClear();
+    state.subscribed = true;
+    await post({ plan: "personal" });
+    expect(clearTaxIds).not.toHaveBeenCalled();
+  });
+
+  it("marks a company outside Bulgaria for no VAT and asks it for its name; a person pays VAT", async () => {
+    stripe.customers.update.mockClear();
+    state.user = { id: "u-payer", email: "payer@example.com" }; // its own rate-limit bucket
+    await post({ plan: "personal", payer: "company_abroad" });
+    expect(stripe.customers.update).toHaveBeenCalledWith("cus_test_1", { tax_exempt: "reverse", metadata: { payer_type: "company_abroad" } });
+    expect(created().name_collection).toEqual({ business: { enabled: true, optional: false } });
+    stripe.customers.update.mockClear();
+    stripe.checkout.sessions.create.mockClear();
+    await post({ plan: "personal", payer: "nonsense" });
+    expect(stripe.customers.update).toHaveBeenCalledWith("cus_test_1", { tax_exempt: "none", metadata: { payer_type: "person" } });
+    expect(created().name_collection).toEqual({ business: { enabled: true, optional: true } });
   });
 
   it("refuses a checkout started from another site (CSRF)", async () => {

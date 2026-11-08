@@ -79,19 +79,24 @@ export function checkoutConsent(
  * and a business can enter its tax ID - without one Stripe treats a cross-border sale as B2C. In payment mode the session
  * also issues an **invoice** (subscriptions get one each period anyway), carrying the same metadata as the payment.
  * `profiled`: the customer already carries their invoice texts (`lib/invoice-profiles.ts`), so the invoice takes them
- * from the customer; otherwise it gets the plain footer.
+ * from the customer; otherwise it gets the plain footer. `businessRequired`: the client said a company pays (`lib/payer.ts`),
+ * so its name is required.
  */
 export function checkoutTaxAndInvoice(
   mode: "payment" | "subscription",
   metadata: Stripe.MetadataParam,
   description?: string,
   profiled = false,
-): Pick<Stripe.Checkout.SessionCreateParams, "automatic_tax" | "billing_address_collection" | "customer_update" | "tax_id_collection" | "invoice_creation"> {
+  businessRequired = false,
+): Pick<Stripe.Checkout.SessionCreateParams, "automatic_tax" | "billing_address_collection" | "customer_update" | "tax_id_collection" | "invoice_creation" | "name_collection"> {
   return {
     automatic_tax: { enabled: taxEnabled() },
     billing_address_collection: "required",
     customer_update: { address: "auto", name: "auto" },
-    tax_id_collection: { enabled: true },
+    // The tax ID is never required: Stripe only offers it where it has a VAT-style number to collect (the EU, the UK,
+    // Switzerland…), and a business anywhere - a US company without one, say - can still give its name for the invoice.
+    tax_id_collection: { enabled: true, required: "never" },
+    name_collection: { business: { enabled: true, optional: !businessRequired } },
     ...(mode === "payment" ? { invoice_creation: { enabled: true, invoice_data: { metadata, ...(profiled ? {} : { footer: INVOICE_FOOTER }), ...(description ? { description } : {}) } } } : {}),
   };
 }

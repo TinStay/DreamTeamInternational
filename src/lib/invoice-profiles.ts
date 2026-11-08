@@ -6,11 +6,11 @@ import { LEGAL_NAME_FULL, LEGAL_UIC, LEGAL_VAT } from "@/lib/brand";
  * **the accountant still has to confirm the wording and the rules**):
  *
  * - `bg` - a client in Bulgaria: in Bulgarian, 20% VAT, the company named in Cyrillic.
- * - `intl_zero` - a business outside Bulgaria with a tax ID (an EU business with a VAT number, or a company outside the
- *   EU, e.g. Fiverr / Israel, MindGuard / Switzerland): 0% VAT under чл. 21, ал. 2 ЗДДС, plus the reverse-charge line for
+ * - `intl_zero` - a company outside Bulgaria (it said so on the pricing page - `lib/payer.ts` - or gave an EU VAT
+ *   number): 0% VAT under чл. 21, ал. 2 ЗДДС (Fiverr / Israel, MindGuard / Switzerland), plus the reverse-charge line for
  *   an EU business.
- * - `intl_vat` - a client outside Bulgaria with no tax ID (a private person): Bulgarian VAT, no exemption line. Which of
- *   these may go without VAT is the accountant's call; until then they are invoiced with VAT.
+ * - `intl_vat` - a person outside Bulgaria: Bulgarian VAT, no exemption line. Video production is a general service
+ *   (the owner, 08-11-2026), so a person is taxed where DT A I is, inside the EU and outside it (чл. 21, ал. 1).
  *
  * Stripe's invoice templates can only be made in the Dashboard, so the same texts are written onto the **Stripe customer**
  * (`invoice_settings.footer` / `custom_fields`, `preferred_locales`) once their country is known. Every invoice for that
@@ -25,11 +25,11 @@ export const EU_COUNTRIES = new Set([
 ]);
 
 /** Which invoice a client gets, from their billing country and whether they gave a tax ID; `null` while the country is unknown. */
-export function invoiceProfileFor(country: string | null | undefined, hasTaxId: boolean): InvoiceProfileKey | null {
+export function invoiceProfileFor(country: string | null | undefined, hasTaxId: boolean, companyAbroad = false): InvoiceProfileKey | null {
   const code = (country ?? "").trim().toUpperCase();
   if (!/^[A-Z]{2}$/.test(code)) return null;
   if (code === "BG") return "bg";
-  return hasTaxId ? "intl_zero" : "intl_vat";
+  return companyAbroad || hasTaxId ? "intl_zero" : "intl_vat";
 }
 
 /** The bank line under every invoice. The IBAN is read from the environment only - it is never written in the code. */
@@ -87,7 +87,9 @@ export async function applyInvoiceProfile(stripe: Stripe, customerId: string): P
     if ("deleted" in found && found.deleted) return null;
     const customer = found as Stripe.Customer;
     const country = customer.address?.country ?? null;
-    const key = invoiceProfileFor(country, (customer.tax_ids?.data.length ?? 0) > 0);
+    const hasTaxId = (customer.tax_ids?.data.length ?? 0) > 0;
+    const companyAbroad = customer.tax_exempt === "reverse" || customer.metadata?.payer_type === "company_abroad";
+    const key = invoiceProfileFor(country, hasTaxId, companyAbroad);
     if (!key) return null;
     const settings = invoiceSettingsFor(key, country, bankDetails());
     const current = customer.invoice_settings;

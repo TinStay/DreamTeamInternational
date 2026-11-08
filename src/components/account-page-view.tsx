@@ -6,6 +6,7 @@ import { IconArrowUpRight } from "@tabler/icons-react";
 import { AccountAvatar } from "@/components/account-avatar";
 import { ACCOUNT_CARD, AccountRow, AccountShell } from "@/components/account-shell";
 import { AccountPlanCard } from "@/components/account-plan-card";
+import { BusinessDetailsCard } from "@/components/business-details-card";
 import { ProfileForm } from "@/components/profile-form";
 import { PlanDetailsDialog } from "@/components/plan-details-dialog";
 import { useMyPlan } from "@/lib/supabase/use-my-plan";
@@ -172,6 +173,11 @@ export function AccountPageView({
             </table>
           </div>
         )}
+      </section>
+
+      {/* The business name and tax ID from the last checkout, and whether the next checkout keeps them. */}
+      <section className={`${ACCOUNT_CARD} mt-6 p-6`}>
+        <BusinessDetailsCard titleClassName={SECTION_TITLE} />
       </section>
 
       {/* Every Stripe invoice - one per payment and any the team sent - with its tax, the hosted page and the PDF. */}

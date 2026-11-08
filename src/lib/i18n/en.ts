@@ -117,6 +117,18 @@ export const en = {
     renewalMonthly: "every month until you cancel. Cancel anytime from your account.",
     renewalAnnual: "every year until you cancel. Cancel anytime from your account.",
     notIncluded: "Not included:",
+    // Asked before Stripe's checkout opens (payer-dialog.tsx) - it decides the VAT.
+    payer: {
+      title: "Who is paying?",
+      text: "This sets the VAT on your invoice. You choose again on every order.",
+      options: {
+        person: { label: "Me, personally", note: "Bulgarian VAT (20%) is added" },
+        company_bg: { label: "A company in Bulgaria", note: "20% VAT; add your VAT number on the next page" },
+        company_abroad: { label: "A company outside Bulgaria", note: "No VAT; enter the company name on the next page" },
+      },
+      continue: "Continue to payment",
+      opening: "Opening the payment page…",
+    },
     buy: {
       notConfigured: "Payments aren't switched on yet - please contact us and we'll set your pack up by hand.",
       error: "We couldn't start the checkout. Please try again.",
@@ -454,6 +466,17 @@ export const en = {
       billing: { monthly: "monthly", annual: "annual" } as Record<string, string>,
       cols: { date: "Date", order: "Order", length: "Video time", amount: "Amount", status: "Status" },
       status: { pending: "Pending", paid: "Paid", failed: "Failed", expired: "Not completed" } as Record<string, string>
+    },
+    // The business name and tax ID saved from the last checkout, and whether to keep them (business-details-card.tsx).
+    businessDetails: {
+      title: "Business details at checkout",
+      hint: "When you pay as a business, Stripe saves your business name and VAT number. Choose whether to use them next time, or to be asked every time whether you are paying as a business or as a person.",
+      taxIdLabel: "VAT / tax ID: {id}",
+      keep: "Use these details next time",
+      keepOn: "Your next checkout uses these business details. To pay as a person, turn this off first.",
+      keepOff: "Your next checkout asks again whether you pay as a business or as a person.",
+      none: "No business details saved. To pay as a business, tick \"I'm purchasing as a business\" on the payment page and enter your VAT number.",
+      error: "That did not save. Please try again.",
     },
     invoices: {
       title: "Invoices & receipts",
