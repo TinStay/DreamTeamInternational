@@ -1,5 +1,20 @@
 import type { Metadata } from "next";
-import { Archivo, DM_Sans, Exo_2, Inter, Manrope, Montserrat, Playfair_Display, Space_Grotesk } from "next/font/google";
+// The faces are self-hosted from the @fontsource packages (their CSS carries the unicode-range subsets, Cyrillic
+// included), never fetched from Google at build time: next/font/google broke the Vercel build once Google began
+// answering with `/l/font?kit=…&skey=…` URLs, whose query it cannot parse. The `--font-*` names are set in globals.css.
+import "@fontsource-variable/exo-2/wght.css";
+import "@fontsource-variable/exo-2/wght-italic.css";
+import "@fontsource/montserrat/700.css";
+import "@fontsource/montserrat/800.css";
+import "@fontsource/playfair-display/500.css";
+import "@fontsource/playfair-display/600.css";
+import "@fontsource/playfair-display/500-italic.css";
+import "@fontsource/playfair-display/600-italic.css";
+import "@fontsource-variable/manrope/wght.css";
+import "@fontsource-variable/space-grotesk/wght.css";
+import "@fontsource-variable/dm-sans/wght.css";
+import "@fontsource-variable/archivo/wdth.css";
+import "@fontsource-variable/inter/wght.css";
 import "../globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { SmoothScroll } from "@/components/smooth-scroll";
@@ -27,7 +42,7 @@ import { Suspense } from "react";
  */
 
 /**
- * Fonts are self-hosted by `next/font` (no runtime request to Google), so they
+ * Fonts are self-hosted from @fontsource (no request to Google at build or run time), so they
  * can't fail to load behind a CSS `@import`. Cyrillic subsets are required —
  * the site is Bulgarian-first. Exo 2 (headings and body alike) is variable
  * (100–900), so no `weight`; the display faces that ship static files list
@@ -43,62 +58,6 @@ import { Suspense } from "react";
  * too), DM Sans for the body; neither has Cyrillic, so Manrope follows them in the stack and stands in for the
  * Bulgarian glyphs.
  */
-const montserrat = Montserrat({
-  subsets: ["latin", "cyrillic"],
-  weight: ["700", "800"],
-  variable: "--font-montserrat",
-  display: "swap",
-});
-const playfair = Playfair_Display({
-  subsets: ["latin", "cyrillic"],
-  weight: ["500", "600"],
-  style: ["normal", "italic"],
-  variable: "--font-playfair",
-  display: "swap",
-});
-/**
- * Exo 2 - the site's one face: headings (`font-heading`) and body / UI (`font-sans`) alike, and Plasico's showcase
- * headline. A variable font (100–900 + italic), so no weight list; `globals.css` maps both tokens to it.
- */
-const exo = Exo_2({
-  subsets: ["latin", "latin-ext", "cyrillic"],
-  style: ["normal", "italic"],
-  variable: "--font-exo",
-  display: "swap",
-});
-// A variable font (200–800), so no weight list: OSMO's page runs its body at 400 and its titles at 600.
-const manrope = Manrope({
-  subsets: ["latin", "cyrillic"],
-  variable: "--font-manrope",
-  display: "swap",
-});
-// The platform's faces (mymindguard.ai), Latin only - variable fonts, no weight list.
-const spaceGrotesk = Space_Grotesk({
-  subsets: ["latin"],
-  variable: "--font-space-grotesk",
-  display: "swap",
-});
-const dmSans = DM_Sans({
-  subsets: ["latin"],
-  variable: "--font-dm-sans",
-  display: "swap",
-});
-
-// The English site's faces (the client's pricing file): Archivo, expanded (the `wdth` axis - set at 112%), black, for
-// the headings, and Inter for everything else. Latin only - the Bulgarian site keeps Exo 2. `html.site-deep` in
-// globals.css switches them on.
-const archivo = Archivo({
-  subsets: ["latin", "latin-ext"],
-  axes: ["wdth"],
-  variable: "--font-archivo",
-  display: "swap",
-});
-const inter = Inter({
-  subsets: ["latin", "latin-ext"],
-  variable: "--font-inter",
-  display: "swap",
-});
-
 // Unknown locales 404 here, before any page.
 export const dynamicParams = false;
 
@@ -157,11 +116,10 @@ export default async function RootLayout({
     // without it the light `:root` palette flashes until next-themes' script runs.
     // next-themes reconciles this client-side if the visitor picked light
     // (suppressHydrationWarning covers that swap).
-    // Font variables live on <html>: `--font-sans` / `--font-heading` are
-    // resolved on `:root`, so the families must be defined there too.
+    // The font variables are defined on `:root` in globals.css.
     <html
       lang={locale}
-      className={`dark${deep ? " site-deep" : ""} ${exo.variable} ${montserrat.variable} ${playfair.variable} ${manrope.variable} ${spaceGrotesk.variable} ${dmSans.variable}${deep ? ` ${archivo.variable} ${inter.variable}` : ""}`}
+      className={`dark${deep ? " site-deep" : ""}`}
       style={{ colorScheme: "dark" }}
       suppressHydrationWarning
     >
