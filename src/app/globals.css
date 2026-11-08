@@ -1,10 +1,21 @@
-/* Exo 2 - headings and body / UI alike - is self-hosted via `next/font` in
-   `layout.tsx`, which sets --font-exo. */
+/* Exo 2 - headings and body / UI alike - and the display faces are self-hosted from the @fontsource packages
+   imported in `layout.tsx`; the `--font-*` names below point at their families. */
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
 @plugin "tailwindcss-animate";
+
+:root {
+  --font-exo: "Exo 2 Variable";
+  --font-montserrat: "Montserrat";
+  --font-playfair: "Playfair Display";
+  --font-manrope: "Manrope Variable";
+  --font-space-grotesk: "Space Grotesk Variable";
+  --font-dm-sans: "DM Sans Variable";
+  --font-archivo: "Archivo Variable";
+  --font-inter: "Inter Variable";
+}
 
 /*
  * The dark variant, with a theme lock: a block carrying `theme-light` / `theme-dark` is fixed to that theme
