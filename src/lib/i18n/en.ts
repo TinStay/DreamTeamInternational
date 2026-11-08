@@ -260,6 +260,11 @@ export const en = {
       scriptTerm: "Scriptwriting add-on",
       scriptText: "= $100 per 30 seconds of video (included in Brand). Without it, you provide the script or voiceover text."
     },
+    // Under the Business plans: a company is saved on its account before it orders (business-details-card.tsx).
+    companyFirst: {
+      text: "Buying for a company? Add your company details first - a company outside Bulgaria pays no VAT.",
+      link: "Add company details",
+    },
     note: {
       individual:
         "Prices in USD, before tax - any sales tax or VAT is added at checkout. Individual plans are for personal and creator use - advertising a business requires a Business plan.",
@@ -475,6 +480,7 @@ export const en = {
       savedBg: "Your orders are invoiced to this company, with 20% VAT.",
       savedEu: "Your orders are invoiced to this company, with no VAT (reverse charge).",
       savedAbroad: "Your orders are invoiced to this company, with no VAT.",
+      futureOnly: "Changes apply to your next invoices. For an invoice already issued, contact us.",
       save: "Save company",
       saving: "Saving…",
       cancel: "Cancel",

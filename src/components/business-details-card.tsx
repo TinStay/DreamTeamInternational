@@ -162,6 +162,7 @@ export function BusinessDetailsCard({ titleClassName }: { titleClassName: string
         </div>
       )}
       {company && !editing ? <p className="mt-3 text-xs text-white/45">{company.country === "BG" ? c.savedBg : EU_COUNTRIES.has(company.country) ? c.savedEu : c.savedAbroad}</p> : null}
+      {details !== null ? <p className="mt-2 text-xs text-white/40">{c.futureOnly}</p> : null}
       {error ? <p className="mt-3 text-sm text-red-300">{error}</p> : null}
     </div>
   );

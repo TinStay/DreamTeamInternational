@@ -15,6 +15,8 @@ import { ANNUAL_PERCENT, AUDIENCES, PLANS, type Audience, type Billing, type Pla
 import { openSignup } from "@/lib/signup-dialog";
 import { useAuthUser } from "@/lib/supabase/use-auth-user";
 import { emailHref } from "@/lib/contact-info";
+import Link from "next/link";
+import { accountPath } from "@/lib/routes";
 
 const BILLINGS: Billing[] = ["monthly", "annual"];
 
@@ -36,7 +38,7 @@ function segButton(active: boolean) {
  * client with a live subscription is not sold a second one), the Enterprise one the contact page.
  */
 export function PricingPageView({ initialAudience = "individual" }: { initialAudience?: Audience }) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const p = t.plans;
   const contactHref = emailHref();
   const [audience, setAudience] = useState<Audience>(initialAudience);
@@ -158,6 +160,15 @@ export function PricingPageView({ initialAudience = "individual" }: { initialAud
             </p>
           </section>
           <p className="mt-[18px] text-center text-[13px] text-[#62636b]">{p.note[audience]}</p>
+          {/* A company has to be saved on its account before it orders - that is how Stripe knows it is one. */}
+          {audience === "business" ? (
+            <p className="mt-2 text-center text-[13px] text-[#9a9ba3]">
+              {p.companyFirst.text}{" "}
+              <Link href={accountPath(language)} className="font-semibold text-primary underline decoration-primary/40 underline-offset-4 transition-colors duration-200 hover:text-white">
+                {p.companyFirst.link}
+              </Link>
+            </p>
+          ) : null}
 
           <PricingFaq className="mt-14" />
         </div>
