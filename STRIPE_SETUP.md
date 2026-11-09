@@ -41,6 +41,7 @@ STRIPE_WEBHOOK_SECRET=whsec_...
 STRIPE_TAX_ENABLED=                # true once step 7 is done
 STRIPE_TAX_CODE=                   # optional: the txcd_ code the accountant confirms
 STRIPE_TOS_CONSENT=                # true for a required tick box at checkout (needs the Terms link from step 2)
+PAYMENTS_PAUSED=                   # true stops new checkouts (pricing page says payments are off); the rest keeps working
 ```
 
 Remove the `PADDLE_*` variables. Redeploy after changing them.

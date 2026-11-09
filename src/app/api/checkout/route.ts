@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { checkoutFor, isBilling } from "@/lib/checkout";
 import { getDictionary } from "@/lib/i18n/config";
-import { getStripe } from "@/lib/stripe";
+import { getStripe, paymentsPaused } from "@/lib/stripe";
 import { createClient } from "@/lib/supabase/server";
 import { hasLiveSubscription } from "@/lib/subscriptions";
 import { createPendingOrder, updateOrder } from "@/lib/orders";
@@ -23,7 +23,7 @@ const isRateLimited = createRateLimiter(60_000, 10);
 export async function POST(request: Request) {
   if (isCrossSite(request)) return NextResponse.json({ error: "forbidden" }, { status: 403 });
   const stripe = getStripe();
-  if (!stripe) return NextResponse.json({ error: "not_configured" }, { status: 503 });
+  if (!stripe || paymentsPaused()) return NextResponse.json({ error: "not_configured" }, { status: 503 });
 
   const supabase = await createClient();
   const { data: auth } = await supabase.auth.getUser();

@@ -9,3 +9,12 @@ export function getStripe(): Stripe | null {
   client ??= new Stripe(key);
   return client;
 }
+
+/**
+ * `PAYMENTS_PAUSED=true` (Vercel) stops new self-service checkouts - the pricing page then says payments are not
+ * switched on yet - while everything else keeps working: the webhook, subscriptions already running, cancel / resume,
+ * and the invoices the team sends.
+ */
+export function paymentsPaused(): boolean {
+  return process.env.PAYMENTS_PAUSED === "true";
+}
