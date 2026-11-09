@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getStripe } from "@/lib/stripe";
+import { getStripe, paymentsPaused } from "@/lib/stripe";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createRateLimiter, isCrossSite } from "@/lib/server/form-guards";
@@ -22,7 +22,7 @@ export async function POST(request: Request) {
   if (isCrossSite(request)) return NextResponse.json({ error: "forbidden" }, { status: 403 });
   const stripe = getStripe();
   const admin = createAdminClient();
-  if (!stripe || !admin) return NextResponse.json({ error: "not_configured" }, { status: 503 });
+  if (!stripe || !admin || paymentsPaused()) return NextResponse.json({ error: "not_configured" }, { status: 503 });
 
   const supabase = await createClient();
   const { data: auth } = await supabase.auth.getUser();

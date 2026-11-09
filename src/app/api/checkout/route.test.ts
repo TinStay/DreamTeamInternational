@@ -8,7 +8,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 const stripe = { checkout: { sessions: { create: vi.fn() } } };
 const state = { stripe: stripe as unknown, user: { id: "u1", email: "client@example.com" } as { id: string; email: string } | null, subscribed: false };
 
-vi.mock("@/lib/stripe", () => ({ getStripe: () => state.stripe }));
+vi.mock("@/lib/stripe", () => ({ getStripe: () => state.stripe, paymentsPaused: () => process.env.PAYMENTS_PAUSED === "true" }));
 vi.mock("@/lib/supabase/server", () => ({ createClient: async () => ({ auth: { getUser: async () => ({ data: { user: state.user } }) } }) }));
 vi.mock("@/lib/subscriptions", () => ({ hasLiveSubscription: vi.fn(async () => state.subscribed) }));
 const orders = vi.hoisted(() => ({ createPendingOrder: vi.fn(async () => "order-1"), updateOrder: vi.fn(async () => {}) }));
@@ -121,6 +121,16 @@ describe("/api/checkout", () => {
     expect(created().payment_method_collection).toBe("always");
     expect(created().submit_type).toBeUndefined();
     vi.unstubAllEnvs();
+  });
+
+  it("is off while payments are paused (PAYMENTS_PAUSED=true)", async () => {
+    process.env.PAYMENTS_PAUSED = "true";
+    try {
+      expect((await post({ plan: "personal" })).status).toBe(503);
+      expect(stripe.checkout.sessions.create).not.toHaveBeenCalled();
+    } finally {
+      delete process.env.PAYMENTS_PAUSED;
+    }
   });
 
   it("refuses a checkout started from another site (CSRF)", async () => {
