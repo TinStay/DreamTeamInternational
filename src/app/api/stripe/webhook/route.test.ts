@@ -41,6 +41,8 @@ const notifications = vi.hoisted(() => ({ notifyProjectEvent: vi.fn(async () => 
 vi.mock("@/lib/email/project-notifications", () => notifications);
 const subNotify = vi.hoisted(() => ({ notifySubscriptionEvent: vi.fn(async () => {}) }));
 vi.mock("@/lib/email/subscription-notifications", () => subNotify);
+const invoicing = vi.hoisted(() => ({ startInvoicedSubscription: vi.fn(async (...args: unknown[]): Promise<string | null> => (void args, "sub_new")) }));
+vi.mock("@/lib/invoice-orders", async (original) => ({ ...(await original<typeof import("@/lib/invoice-orders")>()), ...invoicing }));
 
 process.env.STRIPE_WEBHOOK_SECRET = "whsec_test";
 const { POST } = await import("./route");
@@ -57,6 +59,7 @@ beforeEach(() => {
   db.insertError = null;
   orders.updateOrder.mockClear();
   subs.saveSubscription.mockClear().mockResolvedValue(true);
+  invoicing.startInvoicedSubscription.mockClear().mockResolvedValue("sub_new");
 });
 
 describe("/api/stripe/webhook", () => {
@@ -142,5 +145,49 @@ describe("/api/stripe/webhook", () => {
     await send("checkout.session.completed", session({ id: "cs_req", payment_status: "unpaid", metadata: meta }));
     expect(updates).toHaveLength(0);
     expect(notifications.notifyProjectEvent).not.toHaveBeenCalled();
+  });
+
+  describe("orders paid by invoice", () => {
+    const PACK = { ...META, flow: "invoice", purchase_type: "one_time", amount_cents: "53700" };
+    const PLAN = { user_id: "u1", plan_key: "creator", seconds: "40", order_id: "order-plan", flow: "invoice", purchase_type: "subscription", billing: "monthly", amount_cents: "38900" };
+
+    it("credits a pack once its invoice is paid, settles its order, and starts no subscription", async () => {
+      expect((await send("invoice.paid", { id: "in_pack", status: "paid", customer: "cus_1", metadata: PACK })).status).toBe(200);
+      expect(inserts).toEqual([expect.objectContaining({ user_id: "u1", seconds: 40, plan_key: "personal", external_ref: "in_pack", order_id: "order-1" })]);
+      expect(orders.updateOrder).toHaveBeenCalledWith("order-1", expect.objectContaining({ status: "paid" }));
+      expect(invoicing.startInvoicedSubscription).not.toHaveBeenCalled();
+    });
+
+    it("credits a plan's first period and then starts its subscription, noted on the order", async () => {
+      expect((await send("invoice.paid", { id: "in_plan", status: "paid", customer: "cus_1", metadata: PLAN })).status).toBe(200);
+      expect(inserts).toEqual([expect.objectContaining({ seconds: 40, plan_key: "creator", external_ref: "in_plan", note: "Subscription payment" })]);
+      expect(invoicing.startInvoicedSubscription).toHaveBeenCalledWith(stripe, expect.objectContaining({ id: "in_plan", customer: "cus_1", paid: true }), "Creator");
+      expect(orders.updateOrder).toHaveBeenCalledWith("order-plan", { stripe_subscription_id: "sub_new" });
+    });
+
+    it("lets Stripe retry when the subscription cannot be started", async () => {
+      invoicing.startInvoicedSubscription.mockRejectedValueOnce(new Error("stripe down"));
+      expect((await send("invoice.paid", { id: "in_plan", status: "paid", customer: "cus_1", metadata: PLAN })).status).toBe(500);
+    });
+
+    it("closes the order of a voided invoice, crediting nothing", async () => {
+      await send("invoice.voided", { id: "in_pack", status: "void", customer: "cus_1", metadata: PACK });
+      expect(inserts).toHaveLength(0);
+      expect(orders.updateOrder).toHaveBeenCalledWith("order-1", { status: "expired" });
+    });
+
+    it("settles a change request paid on its invoice, with no seconds", async () => {
+      const meta = { user_id: "u1", request_id: "req-9", project_id: "p1", purchase_type: "project_request", kind: "revision", flow: "invoice" };
+      expect((await send("invoice.paid", { id: "in_req", status: "paid", customer: "cus_1", metadata: meta })).status).toBe(200);
+      expect(inserts).toHaveLength(0);
+      expect(updates).toContainEqual({ table: "project_requests", patch: expect.objectContaining({ status: "requested", stripe_session_id: "in_req" }), filters: [["id", "req-9"], ["user_id", "u1"], ["status", "awaiting_payment"]] });
+    });
+
+    it("leaves the team's own invoices and Checkout's invoices alone", async () => {
+      await send("invoice.paid", { id: "in_custom", status: "paid", customer: "cus_1", metadata: { user_id: "u1", purchase_type: "custom_invoice" } });
+      await send("invoice.paid", { id: "in_checkout", status: "paid", customer: "cus_1", metadata: { ...META, purchase_type: "one_time" } });
+      expect(inserts).toHaveLength(0);
+      expect(orders.updateOrder).not.toHaveBeenCalled();
+    });
   });
 });

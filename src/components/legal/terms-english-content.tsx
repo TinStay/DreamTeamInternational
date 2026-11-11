@@ -54,11 +54,11 @@ export function TermsEnglishContent() {
       </p>
       <p>
         <strong>2.2. Prices and tax:</strong>{" "}Prices are in US dollars and are shown before tax. Any sales tax or VAT due is
-        added at checkout.
+        added at checkout or on the invoice.
       </p>
       <p>
-        <strong>2.3. Payment:</strong>{" "}Online orders are paid at checkout. A custom quote is billed by invoice, payable by the
-        date shown on it.
+        <strong>2.3. Payment:</strong>{" "}Online orders are paid at checkout or by an invoice emailed to the Client. A custom quote is
+        billed by invoice. An invoice is payable by the date shown on it.
       </p>
       <p>
         <strong>2.4. Video time:</strong>{" "}Seconds of video are added to the Client&apos;s account once the payment is
@@ -67,8 +67,9 @@ export function TermsEnglishContent() {
       </p>
       <p>
         <strong>2.5. Subscriptions and automatic renewal:</strong>{" "}A subscription is billed monthly or annually, as
-        chosen at checkout. It renews automatically at the end of each billing period, and the payment method on file is
-        charged the price shown at checkout for the next period, until the Client cancels. The price, the billing period and
+        chosen at checkout. It renews automatically at the end of each billing period, until the Client cancels: the payment
+        method on file is charged the price shown at checkout for the next period or, where the plan is paid by invoice, an
+        invoice for the next period at that price is emailed to the Client. The price, the billing period and
         the renewal are shown before the Client confirms the purchase, and a receipt confirms them by email. The
         Client can cancel at any time online, from their account, or by writing to{" "}
         <a href={emailHref("Cancel my subscription")}>{EMAIL_PRIMARY.label}</a>; cancelling takes effect at the end of the

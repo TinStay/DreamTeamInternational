@@ -14,7 +14,8 @@ export type Purchase = { userId: string; seconds: number; planKey: string; ref: 
  * The rule: **seconds are only ever added for money that has been collected.** A card that is declined never completes
  * a checkout; a bank debit (ACH / SEPA) completes it as `unpaid` and only counts once Stripe sends
  * `checkout.session.async_payment_succeeded`; a subscription's first or renewal payment that fails sends
- * `invoice.payment_failed`, never `invoice.paid`.
+ * `invoice.payment_failed`, never `invoice.paid`. An order paid **by invoice** (`flow: invoice`) is credited from its
+ * own `invoice.paid` - an invoice still open, void or uncollectible adds nothing.
  */
 export type CreditDecision =
   | { kind: "credit"; purchase: Purchase }
@@ -61,7 +62,11 @@ export function creditDecision(event: Stripe.Event): CreditDecision {
       if (invoice.status && invoice.status !== "paid") return { kind: "none", reason: "not_paid" };
       const sub = invoice.parent?.subscription_details?.subscription ?? invoice.subscription;
       const subscriptionId = typeof sub === "string" ? sub : sub?.id;
-      return subscriptionId ? { kind: "subscription", subscriptionId, ref: invoice.id } : { kind: "none", reason: "not_a_pack" };
+      if (subscriptionId) return { kind: "subscription", subscriptionId, ref: invoice.id };
+      // An order paid by invoice (`lib/invoice-orders.ts`): a pack, or a plan's first period. Only an invoice marked
+      // `flow: invoice` - the invoice a Checkout payment issues carries the same metadata and is credited from its session.
+      if (meta?.flow !== "invoice") return { kind: "none", reason: "not_a_pack" };
+      return packOrNone(purchaseFromMetadata(meta, invoice.id, meta.purchase_type === "subscription" ? "Subscription payment" : "Pack purchase"));
     }
     case "checkout.session.async_payment_failed":
     case "invoice.payment_failed":

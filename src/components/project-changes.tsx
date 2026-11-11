@@ -46,6 +46,8 @@ import {
 } from "@/lib/project-changes";
 import type { ClientProject } from "@/lib/client-projects";
 import { cn } from "@/lib/utils";
+import { InvoiceOrderDialog, type OrderDetails, type OrderResult, type SentInvoice } from "@/components/invoice-order-dialog";
+import { formatMoney } from "@/components/invoice-list";
 
 const PEARL = "bg-[linear-gradient(115deg,#ff5e00,#ff9a3c)]";
 const EASE = [0.22, 1, 0.36, 1] as const;
@@ -129,12 +131,43 @@ export function ProjectChanges({
   const closed = Boolean(project.approvedAt) || project.status === "delivered";
   const openOf = (kind: ChangeKind) => requests.find((r) => r.kind === kind && isOpen(r));
 
-  async function pay(requestId: string): Promise<boolean> {
-    const res = await fetch("/api/project-requests/checkout", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ requestId }) });
-    const data = (await res.json().catch(() => ({}))) as { url?: string };
-    if (!res.ok || !data.url) return false;
-    window.location.assign(data.url);
-    return true;
+  // A paid request whose invoice needs the client's billing details first (the invoice flow, a client Stripe has no
+  // address for): the order window asks for them.
+  const [billingFor, setBillingFor] = useState<ProjectRequest | null>(null);
+
+  async function postPay(requestId: string, details?: OrderDetails) {
+    const res = await fetch("/api/project-requests/checkout", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ requestId, ...(details ? { details } : {}) }) });
+    const data = (await res.json().catch(() => ({}))) as { url?: string; invoice?: SentInvoice; error?: string };
+    return { ok: res.ok, ...data };
+  }
+
+  /**
+   * Pays for a request: Stripe's checkout opens, or - the invoice flow - its invoice goes to the client's email (a client
+   * without a billing address is asked for it in the order window first).
+   */
+  async function pay(request: ProjectRequest): Promise<boolean> {
+    const data = await postPay(request.id);
+    if (data.ok && data.url) {
+      window.location.assign(data.url);
+      return true;
+    }
+    if (data.ok && data.invoice) {
+      setNotice(c.invoiceSent.replace("{email}", data.invoice.email));
+      setRowBusy(null);
+      return true;
+    }
+    if (data.error === "billing_required") {
+      setBillingFor(request);
+      setRowBusy(null);
+      return true;
+    }
+    return false;
+  }
+
+  async function payWithDetails(details: OrderDetails): Promise<OrderResult> {
+    if (!billingFor) return { error: "failed" };
+    const data = await postPay(billingFor.id, details);
+    return data.ok && data.invoice ? { invoice: data.invoice } : { error: data.error ?? "failed" };
   }
 
   /** Sends a request; returns an error message, or null when it went through. */
@@ -149,7 +182,7 @@ export function ProjectChanges({
     const req = requestFromRow(data as Record<string, unknown>);
     setRequests((prev) => [req, ...prev.filter((r) => !(r.kind === kind && r.status === "awaiting_payment"))]);
     if (req.costSeconds > 0) notifyCreditsChanged();
-    if (req.status === "awaiting_payment") return (await pay(req.id)) ? null : c.errors.generic;
+    if (req.status === "awaiting_payment") return (await pay(req)) ? null : c.errors.generic;
     notifyProject(project.id, "change_request", { requestId: req.id });
     setNotice(c.sent);
     return null;
@@ -172,7 +205,7 @@ export function ProjectChanges({
   async function payNow(r: ProjectRequest) {
     if (sample) return;
     setRowBusy(r.id);
-    if (!(await pay(r.id))) {
+    if (!(await pay(r))) {
       setNotice(c.errors.generic);
       setRowBusy(null);
     }
@@ -287,6 +320,18 @@ export function ProjectChanges({
       ) : null}
 
       <ChangeDialog kind={open && canRequest(project, open) && !openOf(open) ? open : null} project={project} balance={balance} onClose={() => onOpenChange(null)} onSend={send} />
+      {billingFor ? (
+        <InvoiceOrderDialog
+          open
+          onOpenChange={(next) => {
+            if (!next) setBillingFor(null);
+          }}
+          title={c.invoiceTitle.replace("{kind}", summary(billingFor))}
+          price={formatMoney(billingFor.costCents)}
+          afterPaid={t.plans.invoiceOrder.afterPaid.request}
+          submit={payWithDetails}
+        />
+      ) : null}
     </section>
   );
 }

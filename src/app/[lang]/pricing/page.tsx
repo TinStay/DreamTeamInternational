@@ -5,6 +5,7 @@ import { localeAlternates } from "@/lib/routes";
 import { LOCALES, isLocale, getDictionary } from "@/lib/i18n/config";
 import { jsonLd, openGraphFor } from "@/lib/seo";
 import { pricingGraph } from "@/lib/seo-graph";
+import { purchaseFlow } from "@/lib/stripe";
 
 export const dynamicParams = false;
 
@@ -49,7 +50,7 @@ export default async function LocalePricingPage({
       {/* The whole price list - both audiences, both billings - as structured data (`lib/seo-graph.ts`), whichever tab is
           open. */}
       <script type="application/ld+json" dangerouslySetInnerHTML={jsonLd(pricingGraph(lang))} />
-      <PricingPageView key={audience} initialAudience={audience} />
+      <PricingPageView key={audience} initialAudience={audience} purchaseFlow={purchaseFlow()} />
     </>
   );
 }

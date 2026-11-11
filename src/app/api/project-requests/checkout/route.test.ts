@@ -13,7 +13,15 @@ const state = vi.hoisted(() => ({
 }));
 const create = vi.hoisted(() => vi.fn(async (...args: [Record<string, unknown>]) => (void args, { id: "cs_req", url: "https://checkout.stripe.com/c/cs_req" })));
 
-vi.mock("@/lib/stripe", () => ({ getStripe: () => ({ checkout: { sessions: { create } } }), paymentsPaused: () => false }));
+const flow = vi.hoisted(() => ({ value: "checkout" as "checkout" | "invoice" }));
+vi.mock("@/lib/stripe", () => ({ getStripe: () => ({ checkout: { sessions: { create } } }), paymentsPaused: () => false, purchaseFlow: () => flow.value }));
+const invoicing = vi.hoisted(() => ({
+  sendOrderInvoice: vi.fn(async (...args: [unknown, Record<string, unknown>]) => (void args, { id: "in_req_1", number: "000000-0091", customer_email: "client@example.com", total: 15000, total_excluding_tax: 15000, currency: "usd", created: 1794000000, due_date: 1794604800, status: "open" })),
+  voidOpenOrderInvoices: vi.fn(async (...args: [unknown, string, (m: Record<string, string>) => boolean]) => (void args, [] as string[])),
+}));
+vi.mock("@/lib/invoice-orders", () => invoicing);
+const billing = vi.hoisted(() => ({ saveBillingDetails: vi.fn(async () => true), billingDetailsOf: vi.fn(async (): Promise<{ name: string; address: unknown; company: boolean } | null> => null) }));
+vi.mock("@/lib/billing-details", async (original) => ({ ...(await original<typeof import("@/lib/billing-details")>()), ...billing }));
 vi.mock("@/lib/stripe-customers", () => ({ customerFor: vi.fn(async () => "cus_test_1") }));
 vi.mock("@/lib/subscriptions", () => ({ hasLiveSubscription: vi.fn(async () => false) }));
 vi.mock("@/lib/supabase/server", () => ({ createClient: async () => ({ auth: { getUser: async () => ({ data: { user: state.user } }) } }) }));
@@ -40,6 +48,11 @@ const post = (body: unknown, origin = "http://localhost:3000") =>
 
 let n = 0;
 beforeEach(() => {
+  flow.value = "checkout";
+  invoicing.sendOrderInvoice.mockClear();
+  invoicing.voidOpenOrderInvoices.mockClear();
+  billing.billingDetailsOf.mockReset().mockResolvedValue(null);
+  billing.saveBillingDetails.mockClear().mockResolvedValue(true);
   state.user = { id: `u${++n}`, email: "client@example.com" };
   state.row = { id: ID, project_id: "p1", user_id: state.user.id, kind: "deadline", cost_cents: 15000, status: "awaiting_payment", projects: { title: "Holiday Spot" } };
   state.filters.length = 0;
@@ -73,5 +86,37 @@ describe("/api/project-requests/checkout", () => {
     state.user = null;
     expect((await post({ requestId: ID })).status).toBe(401);
     expect(create).not.toHaveBeenCalled();
+  });
+});
+
+describe("/api/project-requests/checkout - paid by invoice", () => {
+  const DETAILS = { name: "Ada Client", address: { line1: "1 Main St", city: "Austin", state: "TX", postal_code: "78701", country: "US" } };
+
+  it("asks for the billing details first when Stripe holds no address for the client", async () => {
+    flow.value = "invoice";
+    const res = await post({ requestId: ID });
+    expect(res.status).toBe(409);
+    expect(await res.json()).toEqual({ error: "billing_required" });
+    expect(invoicing.sendOrderInvoice).not.toHaveBeenCalled();
+  });
+
+  it("emails the request's invoice for the database's amount, replacing its earlier one", async () => {
+    flow.value = "invoice";
+    const res = await post({ requestId: ID, details: DETAILS });
+    expect(res.status).toBe(200);
+    expect((await res.json()).invoice).toMatchObject({ number: "000000-0091", email: "client@example.com", totalCents: 15000 });
+    expect(create).not.toHaveBeenCalled();
+    const order = invoicing.sendOrderInvoice.mock.calls[0][1] as { amountCents: number; metadata: Record<string, string> };
+    expect(order.amountCents).toBe(15000);
+    expect(order.metadata).toMatchObject({ purchase_type: "project_request", request_id: ID, project_id: "p1" });
+    expect(invoicing.voidOpenOrderInvoices.mock.calls[0][2]({ request_id: ID })).toBe(true);
+    expect(state.updates).toContainEqual({ stripe_session_id: "in_req_1" });
+  });
+
+  it("uses the address Stripe already holds, without asking again", async () => {
+    flow.value = "invoice";
+    billing.billingDetailsOf.mockResolvedValue({ name: "Ada", address: DETAILS.address, company: false });
+    expect((await post({ requestId: ID })).status).toBe(200);
+    expect(billing.saveBillingDetails).not.toHaveBeenCalled();
   });
 });

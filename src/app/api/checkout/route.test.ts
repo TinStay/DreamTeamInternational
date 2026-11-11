@@ -8,7 +8,19 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 const stripe = { checkout: { sessions: { create: vi.fn() } } };
 const state = { stripe: stripe as unknown, user: { id: "u1", email: "client@example.com" } as { id: string; email: string } | null, subscribed: false };
 
-vi.mock("@/lib/stripe", () => ({ getStripe: () => state.stripe, paymentsPaused: () => process.env.PAYMENTS_PAUSED === "true" }));
+vi.mock("@/lib/stripe", () => ({
+  getStripe: () => state.stripe,
+  paymentsPaused: () => process.env.PAYMENTS_PAUSED === "true",
+  purchaseFlow: () => (process.env.PURCHASE_FLOW === "checkout" ? "checkout" : "invoice"),
+}));
+vi.mock("@/lib/supabase/admin", () => ({ createAdminClient: () => null }));
+const invoicing = vi.hoisted(() => ({
+  sendOrderInvoice: vi.fn(async (...args: [unknown, Record<string, unknown>]) => (void args, { id: "in_order_1", number: "000000-0090", customer_email: "client@example.com", total: 35880, total_excluding_tax: 29900, currency: "usd", created: 1794000000, due_date: 1794604800, status: "open" })),
+  voidOpenOrderInvoices: vi.fn(async (...args: [unknown, string, (m: Record<string, string>) => boolean]) => (void args, [] as string[])),
+}));
+vi.mock("@/lib/invoice-orders", () => invoicing);
+const billing = vi.hoisted(() => ({ saveBillingDetails: vi.fn(async () => true), billingDetailsOf: vi.fn(async () => null) }));
+vi.mock("@/lib/billing-details", async (original) => ({ ...(await original<typeof import("@/lib/billing-details")>()), ...billing }));
 vi.mock("@/lib/supabase/server", () => ({ createClient: async () => ({ auth: { getUser: async () => ({ data: { user: state.user } }) } }) }));
 vi.mock("@/lib/subscriptions", () => ({ hasLiveSubscription: vi.fn(async () => state.subscribed) }));
 const orders = vi.hoisted(() => ({ createPendingOrder: vi.fn(async () => "order-1"), updateOrder: vi.fn(async () => {}) }));
@@ -20,7 +32,14 @@ const { POST } = await import("./route");
 const post = (body: unknown) => POST(new Request("http://localhost:3000/api/checkout", { method: "POST", body: JSON.stringify(body), headers: { "Content-Type": "application/json" } }));
 const created = () => stripe.checkout.sessions.create.mock.calls[0][0];
 
+const DETAILS = { name: "Ada Client", address: { line1: "1 Main St", city: "Austin", state: "TX", postal_code: "78701", country: "US" } };
+
 beforeEach(() => {
+  // The Checkout tests below run the `checkout` flow; the invoice flow (the default) has its own block.
+  process.env.PURCHASE_FLOW = "checkout";
+  invoicing.sendOrderInvoice.mockClear();
+  invoicing.voidOpenOrderInvoices.mockClear().mockResolvedValue([]);
+  billing.saveBillingDetails.mockClear().mockResolvedValue(true);
   state.stripe = stripe;
   state.user = { id: "u1", email: "client@example.com" };
   state.subscribed = false;
@@ -144,5 +163,62 @@ describe("/api/checkout", () => {
     const statuses: number[] = [];
     for (let i = 0; i < 11; i++) statuses.push((await post({ plan: "personal" })).status);
     expect(statuses.at(-1)).toBe(429);
+  });
+});
+
+describe("/api/checkout - paid by invoice (the default flow)", () => {
+  beforeEach(() => {
+    delete process.env.PURCHASE_FLOW;
+    state.user = { id: `u-inv-${Math.random()}`, email: "client@example.com" };
+  });
+
+  it("emails an invoice instead of opening a checkout: the server's price, the order, the flow's metadata", async () => {
+    const res = await post({ plan: "personal", seconds: 40, details: DETAILS, amount: 1 });
+    expect(res.status).toBe(200);
+    expect(await res.json()).toEqual({ invoice: { number: "000000-0090", email: "client@example.com", totalCents: 35880, currency: "usd", dueAt: new Date(1794604800 * 1000).toISOString() } });
+    expect(stripe.checkout.sessions.create).not.toHaveBeenCalled();
+
+    const order = invoicing.sendOrderInvoice.mock.calls[0][1];
+    expect(order).toMatchObject({ customer: "cus_test_1", amountCents: (299 + 2 * 119) * 100 });
+    expect(order.metadata).toMatchObject({ user_id: state.user?.id, plan_key: "personal", seconds: "40", purchase_type: "one_time", order_id: "order-1", amount_cents: String((299 + 2 * 119) * 100) });
+    expect(billing.saveBillingDetails).toHaveBeenCalledWith(stripe, "cus_test_1", DETAILS);
+    expect(orders.updateOrder).toHaveBeenCalledWith("order-1", { stripe_session_id: "in_order_1" });
+    // A one-time video never replaces another invoice.
+    expect(invoicing.voidOpenOrderInvoices).not.toHaveBeenCalled();
+  });
+
+  it("needs the billing details before anything is made", async () => {
+    for (const details of [undefined, { name: "Ada", address: { country: "US" } }, { name: "Ada", address: { ...DETAILS.address, state: "" } }]) {
+      const res = await post({ plan: "personal", details });
+      expect(res.status).toBe(400);
+      expect(await res.json()).toEqual({ error: "invalid_details" });
+    }
+    expect(orders.createPendingOrder).not.toHaveBeenCalled();
+    expect(invoicing.sendOrderInvoice).not.toHaveBeenCalled();
+  });
+
+  it("invoices a plan's first period, states the renewal, and replaces a plan invoice still unpaid", async () => {
+    invoicing.voidOpenOrderInvoices.mockResolvedValueOnce(["order-old"]);
+    await post({ plan: "creator", billing: "annual", details: DETAILS });
+    const order = invoicing.sendOrderInvoice.mock.calls[0][1] as { amountCents: number; line: string; memo: string; metadata: Record<string, string> };
+    expect(order.amountCents).toBe(389 * 10 * 100);
+    expect(order.line).toContain("first year");
+    expect(order.memo).toContain("renews every year by invoice");
+    expect(order.metadata).toMatchObject({ purchase_type: "subscription", billing: "annual", seconds: String(40 * 12), amount_cents: String(389 * 10 * 100) });
+    // Only plan invoices are replaced, and their orders are closed.
+    const match = invoicing.voidOpenOrderInvoices.mock.calls[0][2];
+    expect(match({ purchase_type: "subscription" })).toBe(true);
+    expect(match({ purchase_type: "one_time" })).toBe(false);
+    expect(orders.updateOrder).toHaveBeenCalledWith("order-old", { status: "expired" });
+  });
+
+  it("still never sells a second plan to a live subscriber, and marks the order failed when Stripe refuses the invoice", async () => {
+    state.subscribed = true;
+    expect((await post({ plan: "pro", details: DETAILS })).status).toBe(409);
+    state.subscribed = false;
+    invoicing.sendOrderInvoice.mockRejectedValueOnce(new Error("stripe down"));
+    const res = await post({ plan: "personal", details: DETAILS });
+    expect(res.status).toBe(502);
+    expect(orders.updateOrder).toHaveBeenCalledWith("order-1", { status: "failed" });
   });
 });
