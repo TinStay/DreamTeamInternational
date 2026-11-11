@@ -9,7 +9,7 @@ import type Stripe from "stripe";
 const live = vi.hoisted(() => ({ value: false }));
 vi.mock("@/lib/subscriptions", () => ({ hasLiveSubscription: vi.fn(async () => live.value) }));
 
-const { INVOICE_DUE_DAYS, nextPeriodAnchor, sendOrderInvoice, startInvoicedSubscription, voidOpenOrderInvoices } = await import("@/lib/invoice-orders");
+const { INVOICE_DUE_DAYS, INVOICE_GRACE_DAYS, nextPeriodAnchor, sendOrderInvoice, startInvoicedSubscription, voidOpenOrderInvoices, voidOverdueOrderInvoices } = await import("@/lib/invoice-orders");
 
 const stripe = {
   invoices: {
@@ -103,5 +103,41 @@ describe("nextPeriodAnchor", () => {
     const from = new Date("2026-11-11T12:00:00Z");
     expect(nextPeriodAnchor("month", from)).toBe(Date.parse("2026-12-11T11:00:00Z") / 1000);
     expect(nextPeriodAnchor("year", from)).toBe(Date.parse("2027-11-11T11:00:00Z") / 1000);
+  });
+});
+
+describe("voidOverdueOrderInvoices", () => {
+  const NOW = new Date("2026-11-20T06:00:00Z");
+  const day = 86_400;
+  const t = Math.floor(NOW.getTime() / 1000);
+  // An async-iterable list, as stripe-node's auto-paging list is.
+  const listOf = (rows: Record<string, unknown>[]) => ({ async *[Symbol.asyncIterator]() { yield* rows; } });
+
+  it("voids only the site's order invoices unpaid three days past their due date, and expires their orders", async () => {
+    stripe.invoices.list.mockReturnValue(listOf([
+      { id: "in_old", due_date: t - (INVOICE_GRACE_DAYS + 1) * day, amount_paid: 0, metadata: { flow: "invoice", order_id: "o1" } },
+      { id: "in_recent", due_date: t - 1 * day, amount_paid: 0, metadata: { flow: "invoice", order_id: "o2" } },
+      { id: "in_team", due_date: t - 10 * day, amount_paid: 0, metadata: { purchase_type: "custom_invoice" } },
+      { id: "in_renewal", due_date: t - 10 * day, amount_paid: 0, metadata: { flow: "invoice" }, parent: { type: "subscription_details" } },
+      { id: "in_partly", due_date: t - 10 * day, amount_paid: 5000, metadata: { flow: "invoice", order_id: "o3" } },
+      { id: "in_request", due_date: t - 5 * day, amount_paid: 0, metadata: { flow: "invoice", purchase_type: "project_request" } },
+    ]));
+    const expired: (string | null)[] = [];
+    const voided = await voidOverdueOrderInvoices(s, NOW, async ({ orderId }) => void expired.push(orderId));
+
+    expect(voided).toEqual(["in_old", "in_request"]);
+    expect(stripe.invoices.voidInvoice.mock.calls.map((c) => (c as unknown[])[0])).toEqual(["in_old", "in_request"]);
+    expect(expired).toEqual(["o1", null]);
+    // Stripe is asked only for open, emailed invoices due before the cut-off.
+    expect(stripe.invoices.list.mock.calls[0][0]).toMatchObject({ status: "open", collection_method: "send_invoice", due_date: { lt: t - INVOICE_GRACE_DAYS * day } });
+  });
+
+  it("goes on past an invoice Stripe refuses to void", async () => {
+    stripe.invoices.list.mockReturnValue(listOf([
+      { id: "in_a", due_date: t - 9 * day, metadata: { flow: "invoice" } },
+      { id: "in_b", due_date: t - 9 * day, metadata: { flow: "invoice" } },
+    ]));
+    stripe.invoices.voidInvoice.mockRejectedValueOnce(new Error("already paid"));
+    expect(await voidOverdueOrderInvoices(s, NOW)).toEqual(["in_b"]);
   });
 });

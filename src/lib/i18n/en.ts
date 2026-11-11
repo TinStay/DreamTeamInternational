@@ -150,7 +150,7 @@ export const en = {
       sentText: "Invoice {number} for {total} was sent to {email}.",
       step1: "Open the email from Keplerbay with your invoice.",
       step2: "Pay it from the link in the email.",
-      due: "Please pay by {date}.",
+      due: "Please pay by {date}. An invoice still unpaid three days after that is cancelled - you can simply order again.",
       oneTime: "one-time",
       perMonth: "/ month",
       perYear: "/ year",

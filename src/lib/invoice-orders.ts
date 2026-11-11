@@ -78,6 +78,40 @@ export async function voidOpenOrderInvoices(stripe: Stripe, customer: string, ma
   return orders;
 }
 
+/** Days past an order invoice's due date before the daily job voids it (`voidOverdueOrderInvoices`). */
+export const INVOICE_GRACE_DAYS = 3;
+
+/**
+ * The daily clean-up (`/api/cron/void-overdue-invoices`): voids every order invoice the site sent (`flow: "invoice"`)
+ * that is still unpaid `INVOICE_GRACE_DAYS` after its due date, so a forgotten order does not stay payable for good -
+ * the client simply orders again. Its order turns `expired` (the webhook's `invoice.voided` does the same). Never
+ * touches an invoice the team sent by hand, a subscription renewal (Stripe's own past-due settings handle those) or one
+ * that is partly paid. Returns the invoices voided; one that fails is skipped, the rest still go.
+ */
+export async function voidOverdueOrderInvoices(
+  stripe: Stripe,
+  now = new Date(),
+  onVoided?: (invoice: { id: string; orderId: string | null }) => Promise<void>,
+): Promise<string[]> {
+  const cutoff = Math.floor(now.getTime() / 1000) - INVOICE_GRACE_DAYS * 86_400;
+  const voided: string[] = [];
+  let seen = 0;
+  for await (const inv of stripe.invoices.list({ status: "open", collection_method: "send_invoice", due_date: { lt: cutoff }, limit: 100 })) {
+    if (++seen > 1000) break;
+    const m = inv.metadata ?? {};
+    if (!inv.id || !isInvoiceOrder(m) || inv.parent?.type === "subscription_details" || (inv.amount_paid ?? 0) > 0) continue;
+    if (!inv.due_date || inv.due_date >= cutoff) continue;
+    try {
+      await stripe.invoices.voidInvoice(inv.id);
+    } catch {
+      continue;
+    }
+    voided.push(inv.id);
+    await onVoided?.({ id: inv.id, orderId: m.order_id || null }).catch(() => undefined);
+  }
+  return voided;
+}
+
 /** The Stripe product a plan's subscription is priced on (`kb_plan_<key>`), created on first use. */
 export async function planProduct(stripe: Stripe, planKey: string, name: string): Promise<string> {
   const id = `kb_plan_${planKey}`;

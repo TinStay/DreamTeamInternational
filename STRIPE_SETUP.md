@@ -54,6 +54,7 @@ STRIPE_TAX_CODE=                   # optional: the txcd_ code the accountant con
 STRIPE_TOS_CONSENT=                # true for a required tick box at checkout (needs the Terms link from step 2)
 PAYMENTS_PAUSED=                   # true stops new checkouts (pricing page says payments are off); the rest keeps working
 PURCHASE_FLOW=                     # empty = orders are invoices emailed to the client (6a); checkout = Stripe's Checkout page
+CRON_SECRET=                       # any random string of 16+ characters - lets Vercel's daily job void overdue invoices (6a)
 ```
 
 Remove the `PADDLE_*` variables. Redeploy after changing them.
@@ -78,6 +79,12 @@ What to set in the Dashboard for it:
 - **Settings → Billing → Subscriptions and emails → Manage invoices sent to customers**: what happens to a subscription
   whose invoice stays unpaid (cancel it after a number of days - otherwise it keeps sending invoices).
 - **Settings → Customer emails**: your own sending domain, so the invoice emails come from `…@keplerbay.com` (section 5).
+
+**Unpaid invoices lapse by themselves.** Once a day (06:00 UTC, `vercel.json` → `crons`) the site voids every order
+invoice it sent that is still unpaid **3 days after its due date** (10 days after the order) and marks the order "not
+completed"; the client simply orders again. It never touches an invoice the team sent by hand, a subscription renewal or
+a partly paid invoice. It needs `CRON_SECRET` in Vercel (Production) - without it the job refuses to run. Stripe has no
+such setting for one-off invoices (only "mark uncollectible after 30 / 60 / 90 days").
 
 `PURCHASE_FLOW=checkout` brings Stripe's Checkout page back (the card is then charged on the spot and saved for renewals).
 
