@@ -8,6 +8,8 @@ import { updateOrder } from "@/lib/orders";
 import { notifyProjectEvent } from "@/lib/email/project-notifications";
 import { notifySubscriptionEvent } from "@/lib/email/subscription-notifications";
 import { applyInvoiceProfile } from "@/lib/invoice-profiles";
+import { isInvoiceOrder, startInvoicedSubscription } from "@/lib/invoice-orders";
+import { getDictionary } from "@/lib/i18n/config";
 
 export const runtime = "nodejs";
 
@@ -29,8 +31,24 @@ async function credit(p: Purchase): Promise<boolean> {
   return !error || error.code === "23505";
 }
 
-/** Settles the checkout's order from its checkout events (best effort - the credits never wait on it). */
+/** A paid (or voided) invoice of an order paid by invoice, or `null` for any other event. */
+function orderInvoice(event: Stripe.Event): { id: string; customer: string; metadata: Stripe.Metadata; paid: boolean; paidAt: number } | null {
+  if (event.type !== "invoice.paid" && event.type !== "invoice.voided") return null;
+  const invoice = event.data.object as Stripe.Invoice;
+  if (!invoice.id || !isInvoiceOrder(invoice.metadata)) return null;
+  const customer = typeof invoice.customer === "string" ? invoice.customer : (invoice.customer?.id ?? "");
+  // When it was paid - the same on every delivery of the event, so what is made from it is the same too.
+  const paidAt = invoice.status_transitions?.paid_at ?? event.created;
+  return { id: invoice.id, customer, metadata: invoice.metadata ?? {}, paid: event.type === "invoice.paid" && invoice.status === "paid", paidAt };
+}
+
+/** Settles the order from its checkout events, or from its invoice (best effort - the credits never wait on it). */
 async function settleOrder(event: Stripe.Event) {
+  const invoice = orderInvoice(event);
+  if (invoice?.metadata.order_id) {
+    await updateOrder(invoice.metadata.order_id, invoice.paid ? { status: "paid", paid_at: new Date().toISOString() } : { status: "expired" });
+    return;
+  }
   if (!event.type.startsWith("checkout.session.")) return;
   const session = event.data.object as Stripe.Checkout.Session;
   const orderId = session.metadata?.order_id;
@@ -50,22 +68,29 @@ async function settleOrder(event: Stripe.Event) {
  * `awaiting_payment` to `requested`, and the team sees it. Returns false on a real failure (Stripe retries).
  */
 async function settleProjectRequest(event: Stripe.Event, origin: string): Promise<boolean> {
-  if (event.type !== "checkout.session.completed" && event.type !== "checkout.session.async_payment_succeeded") return true;
-  const session = event.data.object as Stripe.Checkout.Session;
-  const requestId = session.metadata?.request_id;
-  if (session.metadata?.purchase_type !== "project_request" || !requestId || session.payment_status !== "paid") return true;
+  // Paid on Stripe's Checkout, or - an order paid by invoice - on its invoice.
+  let paid: { ref: string; metadata: Stripe.Metadata } | null = null;
+  const invoice = orderInvoice(event);
+  if (invoice) {
+    if (invoice.paid) paid = { ref: invoice.id, metadata: invoice.metadata };
+  } else if (event.type === "checkout.session.completed" || event.type === "checkout.session.async_payment_succeeded") {
+    const session = event.data.object as Stripe.Checkout.Session;
+    if (session.payment_status === "paid") paid = { ref: session.id, metadata: session.metadata ?? {} };
+  }
+  const requestId = paid?.metadata.request_id;
+  if (!paid || paid.metadata.purchase_type !== "project_request" || !requestId) return true;
   const admin = createAdminClient();
   if (!admin) return false;
   const { error } = await admin
     .from("project_requests")
-    .update({ status: "requested", paid_at: new Date().toISOString(), stripe_session_id: session.id })
+    .update({ status: "requested", paid_at: new Date().toISOString(), stripe_session_id: paid.ref })
     .eq("id", requestId)
-    .eq("user_id", session.metadata?.user_id ?? "")
+    .eq("user_id", paid.metadata.user_id ?? "")
     .eq("status", "awaiting_payment");
   if (error) return false;
   // Paid: the team hears about the request now (a free one was announced when the client sent it). Once only - the
   // email's idempotency key is the request's id, so Stripe's retries send nothing new.
-  const projectId = session.metadata?.project_id;
+  const projectId = paid.metadata.project_id;
   if (projectId) await notifyProjectEvent({ id: "stripe-webhook", isTeam: false, system: true }, { projectId, event: "change_request", requestId }, origin);
   return true;
 }
@@ -77,8 +102,10 @@ async function settleProjectRequest(event: Stripe.Event, origin: string): Promis
  * is paid (the first month too, and every renewal). Declined cards, failed bank debits and failed renewals add nothing.
  * The checkout's **order** (`lib/orders.ts`, its id in the metadata) is settled from the checkout events - paid, failed
  * (a delayed bank payment that did not go through) or expired (the checkout was abandoned) - and every credit points at
- * it. Subscription created / updated / deleted events are mirrored into `subscriptions` (one live plan per client). The
- * signature is verified with `STRIPE_WEBHOOK_SECRET`, so only Stripe can call this.
+ * it. Subscription created / updated / deleted events are mirrored into `subscriptions` (one live plan per client). An
+ * order paid **by invoice** (`lib/invoice-orders.ts`) is settled from its `invoice.paid`: the seconds, the order, a paid
+ * change request, and for a plan the subscription itself. The signature is verified with `STRIPE_WEBHOOK_SECRET`, so
+ * only Stripe can call this.
  */
 export async function POST(request: Request) {
   const stripe = getStripe();
@@ -127,6 +154,21 @@ export async function POST(request: Request) {
   if (purchase && !(await credit(purchase))) {
     // Let Stripe retry: better a late credit than a paid client with no seconds.
     return NextResponse.json({ error: "credit_failed" }, { status: 500 });
+  }
+
+  // A plan ordered by invoice: its first period is paid (and credited above) - now the subscription itself starts, and
+  // sends an invoice every period from the next one on. A failure lets Stripe retry (the credit and the subscription
+  // are each made once).
+  const paidInvoice = orderInvoice(event);
+  if (paidInvoice?.paid && paidInvoice.metadata.purchase_type === "subscription") {
+    try {
+      const planKey = paidInvoice.metadata.plan_key ?? "";
+      const name = (getDictionary("en").plans.tiers as Record<string, { name: string }>)[planKey]?.name ?? planKey;
+      const subscriptionId = await startInvoicedSubscription(stripe, paidInvoice, name);
+      if (subscriptionId) await updateOrder(paidInvoice.metadata.order_id, { stripe_subscription_id: subscriptionId });
+    } catch {
+      return NextResponse.json({ error: "subscription_failed" }, { status: 500 });
+    }
   }
   return NextResponse.json({ received: true });
 }

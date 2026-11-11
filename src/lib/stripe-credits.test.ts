@@ -46,6 +46,24 @@ describe("creditDecision - seconds only for collected money", () => {
     ).toEqual({ kind: "subscription", subscriptionId: "sub_2", ref: "in_2" });
   });
 
+  it("credits an order paid by invoice - a pack, or a plan's first period - from its own invoice", () => {
+    const meta = { ...META, flow: "invoice", purchase_type: "one_time", order_id: "o1" };
+    expect(creditDecision(event("invoice.paid", { id: "in_10", status: "paid", metadata: meta }))).toEqual({
+      kind: "credit",
+      purchase: { userId: "u1", seconds: 20, planKey: "personal", ref: "in_10", note: "Pack purchase", orderId: "o1" },
+    });
+    const plan = { user_id: "u1", plan_key: "creator", seconds: "40", flow: "invoice", purchase_type: "subscription" };
+    expect(creditDecision(event("invoice.paid", { id: "in_11", status: "paid", metadata: plan }))).toMatchObject({ kind: "credit", purchase: { seconds: 40, ref: "in_11", note: "Subscription payment" } });
+  });
+
+  it("never credits the invoice a Checkout payment issues, a team invoice or a paid change request", () => {
+    // Same pack metadata, but no `flow: invoice`: that one is credited from its checkout session.
+    expect(creditDecision(event("invoice.paid", { id: "in_12", status: "paid", metadata: { ...META, purchase_type: "one_time" } }))).toEqual({ kind: "none", reason: "not_a_pack" });
+    expect(creditDecision(event("invoice.paid", { id: "in_13", status: "paid", metadata: { user_id: "u1", purchase_type: "custom_invoice" } }))).toEqual({ kind: "none", reason: "not_a_pack" });
+    expect(creditDecision(event("invoice.paid", { id: "in_14", status: "paid", metadata: { ...META, flow: "invoice", purchase_type: "project_request" } }))).toEqual({ kind: "none", reason: "not_a_pack" });
+    expect(creditDecision(event("invoice.paid", { id: "in_15", status: "open", metadata: { ...META, flow: "invoice", purchase_type: "one_time" } }))).toEqual({ kind: "none", reason: "not_paid" });
+  });
+
   it("does not credit an invoice that is not actually paid", () => {
     expect(creditDecision(event("invoice.paid", { id: "in_3", status: "open", subscription: "sub_1" }))).toEqual({ kind: "none", reason: "not_paid" });
   });

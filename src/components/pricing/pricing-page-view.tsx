@@ -17,6 +17,9 @@ import { useAuthUser } from "@/lib/supabase/use-auth-user";
 import { emailHref } from "@/lib/contact-info";
 import Link from "next/link";
 import { accountPath } from "@/lib/routes";
+import { InvoiceOrderDialog, type OrderDetails, type OrderResult } from "@/components/invoice-order-dialog";
+import { formatMoney } from "@/components/invoice-list";
+import { checkoutFor } from "@/lib/checkout";
 
 const BILLINGS: Billing[] = ["monthly", "annual"];
 
@@ -34,10 +37,11 @@ function segButton(active: boolean) {
  * annual discount's tag), that audience's three cards, the "every plan includes" box with the revision and scriptwriting
  * definitions, the audience's note, and the pricing questions (`PricingFaq` - every plan's price in the page's HTML,
  * whichever audience is on screen, for search engines and AI assistants). Dark whatever the theme - the file's palette. `initialAudience` comes from
- * `?for=` (the header's Pricing links, read by the route). A pack's button opens Stripe's checkout (`/api/checkout` - a
- * client with a live subscription is not sold a second one), the Enterprise one the contact page.
+ * `?for=` (the header's Pricing links, read by the route). A pack's button starts the order (`/api/checkout` - a client
+ * with a live subscription is not sold a second one): by `purchaseFlow`, the order window (`InvoiceOrderDialog` - the
+ * invoice is emailed and paid from the email) or Stripe's checkout; the Enterprise one opens the contact page.
  */
-export function PricingPageView({ initialAudience = "individual" }: { initialAudience?: Audience }) {
+export function PricingPageView({ initialAudience = "individual", purchaseFlow = "invoice" }: { initialAudience?: Audience; purchaseFlow?: "invoice" | "checkout" }) {
   const { t, language } = useLanguage();
   const p = t.plans;
   const contactHref = emailHref();
@@ -47,12 +51,22 @@ export function PricingPageView({ initialAudience = "individual" }: { initialAud
   const [buying, setBuying] = useState<string | null>(null);
   const [buyError, setBuyError] = useState<string | null>(null);
 
-  // Buying a pack: a signed-out visitor is asked to sign up first; then Stripe's checkout opens, and once it confirms the
-  // payment the seconds appear in the account (see /api/stripe/webhook).
+  // The order window's subject (the invoice flow): the plan and, for a one-time video, its length.
+  const [order, setOrder] = useState<{ plan: Plan; seconds?: number; billing: Billing } | null>(null);
+  const [orderOpen, setOrderOpen] = useState(false);
+
+  // Buying a pack: a signed-out visitor is asked to sign up first. Then, by the purchase flow, the order window opens (the
+  // invoice goes to their email) or Stripe's checkout does; once the payment is confirmed the seconds appear in the
+  // account (see /api/stripe/webhook).
   async function buy(plan: Plan, seconds?: number) {
     setBuyError(null);
     if (!user) {
       openSignup();
+      return;
+    }
+    if (purchaseFlow === "invoice") {
+      setOrder({ plan, seconds, billing });
+      setOrderOpen(true);
       return;
     }
     setBuying(plan.key);
@@ -69,6 +83,23 @@ export function PricingPageView({ initialAudience = "individual" }: { initialAud
     }
     setBuying(null);
   }
+
+  async function sendOrder(details: OrderDetails): Promise<OrderResult> {
+    if (!order) return { error: "failed" };
+    const res = await fetch("/api/checkout", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ plan: order.plan.key, billing: order.billing, ...(order.seconds ? { seconds: order.seconds } : {}), details }),
+    });
+    const json = (await res.json().catch(() => ({}))) as OrderResult;
+    return res.ok && json.invoice ? { invoice: json.invoice } : { error: json.error ?? "failed" };
+  }
+
+  // What the order window shows: the plan's name, and its price before tax as the server will invoice it.
+  const o = p.invoiceOrder;
+  const spec = order ? checkoutFor(order.plan.key, order.billing, order.seconds) : null;
+  const orderName = order ? ((p.tiers as Record<string, { name: string }>)[order.plan.key]?.name ?? order.plan.key) : "";
+  const period = order?.billing === "annual" ? "year" : "month";
 
   return (
     // `theme-dark`: the page (its page background, header and footer too) is dark on the Bulgarian site's light theme
@@ -173,6 +204,18 @@ export function PricingPageView({ initialAudience = "individual" }: { initialAud
           <PricingFaq className="mt-14" />
         </div>
       </div>
+
+      {order && spec ? (
+        <InvoiceOrderDialog
+          open={orderOpen}
+          onOpenChange={setOrderOpen}
+          title={spec.oneTime ? o.packTitle.replace("{name}", orderName).replace("{seconds}", String(spec.seconds)) : o.planTitle.replace("{name}", orderName).replace("{billing}", p.billing[order.billing].toLowerCase())}
+          price={`${formatMoney(spec.amountCents)} ${spec.oneTime ? o.oneTime : spec.interval === "year" ? o.perYear : o.perMonth}`}
+          renewal={spec.oneTime ? null : o.renewal.replace("{period}", period)}
+          afterPaid={spec.oneTime ? o.afterPaid.pack : o.afterPaid.plan}
+          submit={sendOrder}
+        />
+      ) : null}
 
       <Footer />
       <MobileNav />

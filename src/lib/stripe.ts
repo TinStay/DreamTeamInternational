@@ -18,3 +18,12 @@ export function getStripe(): Stripe | null {
 export function paymentsPaused(): boolean {
   return process.env.PAYMENTS_PAUSED === "true";
 }
+
+/**
+ * How a client pays. `invoice` (the default): the order becomes a Stripe **invoice sent to their email**, paid from the
+ * link in it - nothing is paid on the site itself. `checkout`: Stripe's hosted Checkout page opens straight from the
+ * site (set `PURCHASE_FLOW=checkout`).
+ */
+export function purchaseFlow(): "invoice" | "checkout" {
+  return process.env.PURCHASE_FLOW === "checkout" ? "checkout" : "invoice";
+}
